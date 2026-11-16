@@ -1,0 +1,99 @@
+/* =========================================================================
+   Brix · Direction artistique « Aube »
+   Page blanche et aérée, éclairée par un dégradé vivant violet → magenta → pêche.
+   Titres Bricolage Grotesque, texte Inter, chiffres du métier en JetBrains Mono.
+   ========================================================================= */
+:root {
+  --paper: #ffffff; --paper-2: #f7f5fc; --paper-3: #efebf9;
+  --ink: #130f26; --ink-2: #2a2450; --mute: #5f5a7a; --faint: #8a85a3; --line: #e9e5f4;
+  --brand: #1f389d;
+  --v: #6d28d9; --v2: #8b5cf6; --v3: #c4b5fd; --mag: #d946ef; --peach: #fb923c; --sky: #818cf8;
+  --ok: #15803d; --ok-bg: #dcfce7; --warn: #b45309; --warn-bg: #fef3c7; --bad: #dc2626;
+  --dawn: linear-gradient(92deg, var(--v) 0%, var(--mag) 55%, var(--peach) 100%);
+  --display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --nav-h: 74px;
+  --r-lg: 28px; --r-xl: 40px;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--nav-h) + 20px) }
+html.lenis, html.lenis body { height: auto }
+.lenis.lenis-smooth { scroll-behavior: auto !important }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: clip; text-rendering: optimizeLegibility }
+img, svg, video, canvas { display: block; max-width: 100% }
+a { color: inherit; text-decoration: none }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0 }
+h1, h2, h3, h4, h5, p, ul, figure { margin: 0 }
+ul { padding: 0; list-style: none }
+:focus-visible { outline: 2px solid var(--v2); outline-offset: 3px; border-radius: 8px }
+::selection { background: #e9d5ff; color: var(--ink) }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+.skip { position: fixed; left: 16px; top: -60px; z-index: 100; background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; transition: top .2s }
+.skip:focus { top: 12px }
+
+svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; flex: none }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)) }
+.mono { font-family: var(--mono) }
+.num { font-variant-numeric: tabular-nums }
+.grad { background: var(--dawn); -webkit-background-clip: text; background-clip: text; color: transparent }
+
+/* ---------- Typo commune ---------- */
+.sec { padding-block: clamp(88px, 11vw, 150px) }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--v) }
+.eyebrow .i { width: 16px; height: 16px }
+.h2 { font-family: var(--display); font-weight: 700; font-size: clamp(38px, 5.4vw, 76px); line-height: .98; letter-spacing: -.048em; margin-top: 16px; max-width: 17ch; text-wrap: balance }
+.h3 { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 2.6vw, 36px); line-height: 1.05; letter-spacing: -.035em; text-wrap: balance }
+.sub { font-size: clamp(17px, 1.45vw, 19px); line-height: 1.6; color: var(--mute); max-width: 54ch; margin-top: 22px; text-wrap: pretty }
+.head { display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; align-items: end }
+.center { text-align: center; margin-inline: auto }
+.center .h2, .center .sub { margin-inline: auto }
+
+/* ---------- Boutons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; height: 50px; padding: 0 24px; border-radius: 999px; font-weight: 600; font-size: 15px; white-space: nowrap; transition: background .25s, box-shadow .25s, color .25s; will-change: transform; position: relative }
+.btn .i { width: 18px; height: 18px; transition: transform .3s var(--ease) }
+.btn:hover .i.go { transform: translateX(3px) }
+.btn.dark { background: var(--ink); color: #fff }
+.btn.dark:hover { background: var(--ink-2); box-shadow: 0 14px 34px -14px rgba(19, 15, 38, .7) }
+.btn.white { background: #fff; color: var(--ink) }
+.btn.white:hover { box-shadow: 0 14px 34px -12px rgba(19, 15, 38, .45) }
+.btn.glass { color: #fff; background: rgba(255, 255, 255, .14); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .5); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px) }
+.btn.glass:hover { background: rgba(255, 255, 255, .24) }
+.btn.line { box-shadow: inset 0 0 0 1.5px var(--line); background: #fff }
+.btn.line:hover { box-shadow: inset 0 0 0 1.5px var(--v3) }
+.btn.dawn { color: #fff; background: linear-gradient(100deg, var(--v), var(--mag) 60%, var(--peach)); background-size: 160% 100%; transition: background-position .6s var(--ease), box-shadow .3s }
+.btn.dawn:hover { background-position: 100% 0; box-shadow: 0 16px 40px -16px rgba(217, 70, 239, .8) }
+.btn.sm { height: 42px; padding: 0 18px; font-size: 14px }
+.btn.lg { height: 58px; padding: 0 30px; font-size: 16px }
+.link { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--v) }
+.link .i { width: 16px; height: 16px; transition: transform .3s var(--ease) }
+.link:hover .i { transform: translateX(3px) }
+
+/* ---------- Badges ---------- */
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; line-height: 1.4 }
+.badge .i { width: 13px; height: 13px; stroke-width: 2.4 }
+.badge.ok { background: var(--ok-bg); color: var(--ok) }
+.badge.v { background: var(--paper-3); color: var(--v) }
+.badge.new { background: #fae8ff; color: #a21caf }
+.badge.only { background: linear-gradient(90deg, #ede9fe, #fce7f3, #ffedd5); color: #7e22ce }
+.badge.soon { background: #f1f5f9; color: #475569 }
+.badge.warn { background: var(--warn-bg); color: var(--warn) }
+
+/* ---------- Grain + mesh ---------- */
+.grain { position: absolute; inset: -50%; z-index: -1; opacity: .14; mix-blend-mode: overlay; pointer-events: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); animation: grain 1.2s steps(6) infinite }
+@keyframes grain { 0% { transform: translate(0, 0) } 20% { transform: translate(-3%, 2%) } 40% { transform: translate(2%, -3%) } 60% { transform: translate(-2%, -1%) } 80% { transform: translate(3%, 3%) } 100% { transform: translate(0, 0) } }
+canvas.mesh { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2 }
+
+/* ---------- Carte de base ---------- */
+.card { background: #fff; border-radius: 22px; box-shadow: 0 30px 70px -34px rgba(40, 10, 90, .35), 0 0 0 1px var(--line) }
+
+@media (max-width: 1060px) { .head { grid-template-columns: 1fr; gap: 18px } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important }
+}
+
+/* mots découpés pour les titres animés */
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em }
+.w > span { display: inline-block }
