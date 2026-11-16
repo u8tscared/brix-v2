@@ -37,9 +37,9 @@ describe('parcours demande de prix → commande → livraison', () => {
     await env.DB.prepare(`INSERT INTO chantiers (id, organization_id, name, address) VALUES ('ch1','org_a','SDB Martin','12 rue Paul Bert, Lyon')`).run();
     await env.DB.prepare(`INSERT INTO devis (id, organization_id, chantier_id, number, status, title) VALUES ('dv1','org_a','ch1','D-2026-042','signe','Salle de bains')`).run();
     const lignes = [
-      ['l1', 1, 'section', 'Plomberie', 0, null, null, null],
+      ['l1', 1, 'section', 'Plomberie', 0, null, 0, null],
       ['l2', 2, 'fourniture', 'Tube multicouche Ø16 barre 4 m', 10, 'u', 7.5, null],
-      ['l3', 3, 'main_oeuvre', 'Pose', 8, 'h', null, null],
+      ['l3', 3, 'main_oeuvre', 'Pose', 8, 'h', 0, null],
       ['l4', 4, 'fourniture', 'Tube multicouche Ø16 barre 4 m', 5, 'u', 7.5, null],
       ['l5', 5, 'ouvrage', 'Ballon 200 L posé', 1, 'u', 400, 'BALLON-200'],
     ];

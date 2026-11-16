@@ -68,6 +68,7 @@ export async function handleFournisseursRoutes(request: Request, env: Env, pathn
       route('PATCH', '/api/fournisseurs/annuaire/:id', (p, b) => s.modifierFournisseur(p.id, b)),
       route('DELETE', '/api/fournisseurs/annuaire/:id', async (p) => (await s.archiverFournisseur(p.id), { ok: true })),
       route('POST', '/api/fournisseurs/annuaire/:id/tarif', (p, b) => s.importerTarif(p.id, b)),
+      route('POST', '/api/fournisseurs/annuaire/:id/relier', (p, b) => s.relierPartenaire(p.id, String(b?.code ?? ''))),
 
       route('GET', '/api/fournisseurs/demandes', (_p, _b, u) => s.listerDemandes({ statut: q(u, 'statut'), chantier_id: q(u, 'chantier_id'), devis_id: q(u, 'devis_id') })),
       route('POST', '/api/fournisseurs/demandes', async (_p, b) => {

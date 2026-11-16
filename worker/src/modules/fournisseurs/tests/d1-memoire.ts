@@ -1,7 +1,7 @@
 /// <reference types="node" />
 /**
  * Fausse base D1 en mémoire (node:sqlite, Node ≥ 22) pour les tests d'intégration.
- * Charge les schema.sql des modules fournisseurs, api-publique et mcp + des tables cœur minimales.
+ * Charge les schema.sql du cœur et des modules fournisseurs, api-publique et mcp.
  */
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -13,14 +13,6 @@ const here = dirname(fileURLToPath(import.meta.url));
 const { DatabaseSync } = createRequire(import.meta.url)('node:sqlite') as typeof import('node:sqlite');
 type DatabaseSync = InstanceType<typeof DatabaseSync>;
 
-const COEUR = `
-CREATE TABLE IF NOT EXISTS organizations (id TEXT PRIMARY KEY, name TEXT, email TEXT, phone TEXT, address TEXT, siret TEXT);
-CREATE TABLE IF NOT EXISTS clients (id TEXT PRIMARY KEY, organization_id TEXT, kind TEXT, name TEXT, email TEXT, phone TEXT, address TEXT, city TEXT, siret TEXT);
-CREATE TABLE IF NOT EXISTS chantiers (id TEXT PRIMARY KEY, organization_id TEXT, client_id TEXT, name TEXT, address TEXT, status TEXT, start_date TEXT, end_date TEXT, budget_ht REAL);
-CREATE TABLE IF NOT EXISTS devis (id TEXT PRIMARY KEY, organization_id TEXT, client_id TEXT, chantier_id TEXT, number TEXT, status TEXT, title TEXT, total_ht REAL, total_tva REAL, total_ttc REAL, created_at INTEGER, sent_at INTEGER, signed_at INTEGER);
-CREATE TABLE IF NOT EXISTS devis_lignes (id TEXT PRIMARY KEY, devis_id TEXT, position INTEGER, kind TEXT, designation TEXT, quantity REAL, unit TEXT, unit_price_ht REAL, unit_cost_ht REAL, vat_rate REAL, supplier_ref TEXT);
-CREATE TABLE IF NOT EXISTS factures (id TEXT PRIMARY KEY, organization_id TEXT, client_id TEXT, chantier_id TEXT, number TEXT, status TEXT, total_ht REAL, total_ttc REAL, issued_at INTEGER, due_at INTEGER, paid_at INTEGER);
-`;
 
 class Stmt {
   constructor(private db: DatabaseSync, public sql: string, public params: unknown[] = []) {}
@@ -44,8 +36,7 @@ class Stmt {
 
 export function creerD1(): D1Database {
   const db = new DatabaseSync(':memory:');
-  db.exec(COEUR);
-  for (const f of ['../schema.sql', '../../api-publique/schema.sql', '../../mcp/schema.sql']) {
+  for (const f of ['../../core/schema.sql', '../schema.sql', '../../api-publique/schema.sql', '../../mcp/schema.sql']) {
     try {
       db.exec(readFileSync(join(here, f), 'utf8'));
     } catch (e) {

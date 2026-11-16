@@ -11,6 +11,7 @@ import { CONNECTEURS } from './connecteurs/registre';
 import * as demandes from './demandes';
 import type { Ctx } from './demandes';
 import { demoActive, chargerDemo } from './demo';
+import { relierPartenaire } from '../api-publique/handlers';
 
 export class FournisseursService {
   constructor(
@@ -35,6 +36,10 @@ export class FournisseursService {
   }
   archiverFournisseur(id: string) {
     return annuaire.archiverFournisseur(this.env, this.ctx, id);
+  }
+  /** Relie la fiche à un fournisseur connecté par API (code partenaire donné par le fournisseur). */
+  relierPartenaire(id: string, code: string) {
+    return relierPartenaire(this.env, this.ctx.organizationId, id, code);
   }
   connecteurs() {
     return CONNECTEURS;

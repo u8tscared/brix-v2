@@ -19,9 +19,9 @@ export interface Besoin {
   prix_cible_cents: number | null;
 }
 
-/** Les montants du module devis sont en euros HT (REAL). Point unique de conversion. */
+/** Les montants du module devis sont en euros HT (REAL). Point unique de conversion. 0 = coût non renseigné. */
 export function devisAmountToCents(value: number | null | undefined): number | null {
-  if (value == null || !Number.isFinite(value)) return null;
+  if (value == null || !Number.isFinite(value) || value <= 0) return null;
   return Math.round(value * 100);
 }
 
