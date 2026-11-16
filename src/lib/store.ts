@@ -86,7 +86,7 @@ const demoState = () => ({
   isDemo: true,
   plan: 'equipe' as Plan,
   priorities: ['devis_rapides', 'argent', 'organisation'] as PriorityKey[],
-  enabled: recommendModules('electricien', 'petite', ['devis_rapides', 'argent', 'organisation', 'achats', 'equipe']).concat(['fournisseurs', 'agent_nuit', 'mcp', 'secretaire', 'portail', 'avis', 'rdv', 'leads', 'cotes', 'pv', 'sav', 'frais', 'site', 'reseaux', 'compta', 'paie', 'conges', 'habilitations', 'documents', 'stocks', 'vehicules', 'soustraitants', 'pointage', 'equipe'] as ModuleKey[]),
+  enabled: [...new Set(recommendModules('electricien', 'petite', ['devis_rapides', 'argent', 'organisation', 'achats', 'equipe']).concat(['fournisseurs', 'agent_nuit', 'mcp', 'secretaire', 'portail', 'avis', 'rdv', 'leads', 'cotes', 'pv', 'sav', 'frais', 'site', 'reseaux', 'compta', 'paie', 'conges', 'habilitations', 'documents', 'stocks', 'vehicules', 'soustraitants', 'pointage', 'equipe'] as ModuleKey[]))],
   company: demo.demoCompany,
   user: demo.demoUser,
   clients: demo.demoClients,
