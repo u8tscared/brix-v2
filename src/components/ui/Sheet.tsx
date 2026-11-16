@@ -31,7 +31,7 @@ export function Sheet({ open, onClose, title, subtitle, children, footer, side =
           'absolute flex flex-col bg-white shadow-pop',
           'inset-x-0 bottom-0 max-h-[92dvh] rounded-t-[22px] animate-[fade-up_.28s_cubic-bezier(.2,.8,.2,1)_both]',
           side === 'right' && 'md:inset-y-2 md:left-auto md:right-2 md:max-h-none md:w-[var(--w)] md:rounded-[18px]',
-          side === 'center' && 'md:inset-auto md:left-1/2 md:top-1/2 md:max-h-[86dvh] md:w-[var(--w)] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[18px]',
+          side === 'center' && 'md:inset-0 md:m-auto md:h-fit md:max-h-[86dvh] md:w-[var(--w)] md:rounded-[18px]',
         )}
       >
         <div className="mx-auto mt-2 h-1 w-10 rounded-full bg-line2 md:hidden" />
