@@ -10,6 +10,9 @@ const Onboarding = lazy(() => import('@/pages/onboarding/Onboarding'));
 const Welcome = lazy(() => import('@/pages/Welcome'));
 const Demo = lazy(() => import('@/pages/Demo'));
 const ClientPortal = lazy(() => import('@/pages/public/ClientPortal'));
+// Portail fournisseur (espace fournisseurs, autre chantier) : chargé s'il est présent.
+const portailFournisseur = import.meta.glob<{ default: React.ComponentType }>('./modules/fournisseurs/PortailFournisseurPage.tsx');
+const PortailFournisseur = lazy(portailFournisseur['./modules/fournisseurs/PortailFournisseurPage.tsx'] ?? (() => import('@/components/layout/Placeholder')));
 
 function Home() {
   const onboarded = useBrix((s) => s.onboarded);
@@ -26,6 +29,7 @@ export default function App() {
           <Route path="/inscription" element={<Onboarding />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/p/:token" element={<ClientPortal />} />
+          <Route path="/portail-fournisseur/:token" element={<PortailFournisseur />} />
           <Route path="/app" element={<AppShell />}>
             <Route index element={<Cockpit />} />
             {MODULE_ROUTES.map(({ module, path, Component }) => (
