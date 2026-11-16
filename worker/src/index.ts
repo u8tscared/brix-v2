@@ -29,7 +29,9 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const h = cors(request.headers.get('origin'), env);
-    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: h });
+    // L'API publique et le MCP répondent eux-mêmes à OPTIONS (CORS ouvert, accès par clé).
+    const selfCors = url.pathname.startsWith('/api/public/') || url.pathname.startsWith('/api/mcp');
+    if (request.method === 'OPTIONS' && !selfCors) return new Response(null, { status: 204, headers: h });
     try {
       if (url.pathname.startsWith('/api/')) {
         const handlers = [handleCoreRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes];
@@ -43,7 +45,8 @@ export default {
       return new Response('Brix V2 API', { status: 200 });
     } catch (e) {
       const status = e instanceof HttpError ? e.status : 500;
-      const message = e instanceof Error ? e.message : 'Erreur';
+      // Jamais de détail interne dans une erreur 500.
+      const message = status === 500 ? 'Erreur interne' : e instanceof Error ? e.message : 'Erreur';
       if (status === 500) console.error(e);
       return withHeaders(json({ error: message }, status), h);
     }

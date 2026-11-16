@@ -1,5 +1,5 @@
 import type { Env } from '../../env';
-import { requireAuth, signJwt } from '../../lib/auth';
+import { requireAuth, signJwt, timingSafeEqual } from '../../lib/auth';
 import { HttpError, json, readJson, uid } from '../../lib/http';
 
 async function hashPassword(password: string, salt = crypto.randomUUID()) {
@@ -30,7 +30,7 @@ export async function handleCoreRoutes(request: Request, env: Env, pathname: str
     const user = await env.DB.prepare('SELECT id, organization_id, password_hash, role FROM users WHERE email = ?').bind(String(email).toLowerCase()).first<{ id: string; organization_id: string; password_hash: string; role: string }>();
     if (!user) throw new HttpError(401, 'Identifiants incorrects');
     const [salt] = user.password_hash.split(':');
-    if ((await hashPassword(password, salt)) !== user.password_hash) throw new HttpError(401, 'Identifiants incorrects');
+    if (!timingSafeEqual(await hashPassword(password, salt), user.password_hash)) throw new HttpError(401, 'Identifiants incorrects');
     return json({ token: await signJwt({ sub: user.id, org: user.organization_id, role: user.role }, env.JWT_SECRET) });
   }
 
