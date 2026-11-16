@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AudioLines, FileText, LayoutGrid, Search, Sparkles } from 'lucide-react';
+import { AudioLines, FileText, Hand, LayoutGrid, Search } from 'lucide-react';
 import { Button, cn } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 
 const STEPS = [
-  { icon: Sparkles, title: 'Bienvenue dans votre Brix', text: "Tout ce que vous avez choisi est prêt. Cette visite dure 30 secondes, et vous pouvez la relancer à tout moment dans Réglages." },
+  { icon: Hand, title: 'Bienvenue dans votre Brix', text: "Tout ce que vous avez choisi est prêt. Cette visite dure 30 secondes, et vous pouvez la relancer à tout moment dans Réglages." },
   { icon: AudioLines, title: 'Parlez à Bob', text: "Le gros bouton micro, c'est Bob. Dites « fais un devis pour Mme Martin, 3 prises et un radiateur » : il le prépare, vous validez." },
   { icon: FileText, title: 'Un devis en 2 minutes', text: 'Chaque devis se remplit à la voix, depuis la bibliothèque de prix, ou depuis la prise de cotes. Bob vérifie les oublis et la marge avant l\'envoi.' },
   { icon: LayoutGrid, title: 'Vos outils, rangés par département', text: 'Vendre, Facturer, Chantiers, Équipe, Achats… Vous ne voyez que ce que vous utilisez. Ajoutez un outil quand vous en avez besoin.' },
