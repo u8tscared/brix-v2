@@ -35,9 +35,8 @@
 .tf-t tbody tr:not(.tf-g):hover > td.hi { background: linear-gradient(90deg, rgba(139, 92, 246, .08), rgba(217, 70, 239, .08)) }
 
 /* ligne de département */
-.tf-g th { text-align: left; background: var(--paper-2); padding-block: 22px 14px; font-family: var(--display); font-size: 20px; font-weight: 700; letter-spacing: -.025em }
-.tf-g th { display: table-cell }
-.tf-gi { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: #fff; vertical-align: -9px; margin-right: 12px }
+.tf-t .tf-g th { text-align: left; background: var(--paper-2); padding-block: 22px 14px; font-family: var(--display); font-size: 20px; font-weight: 700; letter-spacing: -.025em }
+.tf-t th > .tf-gi { display: inline-grid; max-width: none; margin-top: 0; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: #fff; vertical-align: -9px; margin-right: 12px }
 .tf-gi .i { width: 17px; height: 17px }
 .tf-g small { font-family: var(--body); font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--faint); margin-left: 12px }
 
@@ -81,9 +80,9 @@
   .tf-y, .tf-s { width: 24px; height: 24px }
   .tf-y .i, .tf-s .i { width: 13px; height: 13px }
   .tf-o { font-size: 11px; padding: 0 6px; height: 22px }
-  .tf-txt { font-size: 12.5px }
+  .tf-txt { font-size: 11.5px; letter-spacing: -.01em }
   .tf-t td small { font-size: 10.5px }
-  .tf-g th { font-size: 17px; padding: 18px 14px 12px }
+  .tf-t .tf-g th { font-size: 17px; padding: 18px 14px 12px }
   .tf-g small { display: block; margin: 4px 0 0 44px }
-  .tf-gi { width: 30px; height: 30px; margin-right: 10px }
+  .tf-t th > .tf-gi { display: inline-grid; width: 30px; height: 30px; margin-right: 10px }
 }

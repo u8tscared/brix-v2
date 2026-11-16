@@ -26,7 +26,7 @@
 .ready .c .i { width: 16px; height: 16px; stroke-width: 2.6; color: #fff }
 
 /* ---------- COMPARATIF ---------- */
-.cmp-wrap { margin-top: 56px; overflow-x: auto; border-radius: var(--r-lg); box-shadow: 0 0 0 1px var(--line); background: #fff; -webkit-overflow-scrolling: touch }
+.cmp-wrap { position: relative; margin-top: 56px; overflow-x: auto; border-radius: var(--r-lg); box-shadow: 0 0 0 1px var(--line); background: #fff; -webkit-overflow-scrolling: touch }
 .cmp-t { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 760px; font-size: 15px }
 .cmp-t th, .cmp-t td { padding: 15px 16px; text-align: center; border-bottom: 1px solid var(--line) }
 .cmp-t tr:last-child td, .cmp-t tr:last-child th { border-bottom: 0 }
