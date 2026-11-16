@@ -1,0 +1,164 @@
+// « Connexions » : la vitrine honnête des extensions fournisseurs. Ce qui marche, ce qui dépend des enseignes.
+import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Check, Code2, FileSpreadsheet, FileText, Mail, MousePointerClick, Receipt, Reply, Send, Webhook } from 'lucide-react';
+import { Badge, Button, Card, PageHeader } from '@/components/ui';
+import { CONNECTEURS, type ConnecteurDef } from '../../../../worker/src/modules/fournisseurs/connecteurs/registre';
+import { useAchats } from '../data/store';
+import { FournisseurPastille } from '../components/ui';
+import { CAPACITES } from '../components/achats/commun';
+
+const ICONES: Record<string, ReactNode> = { email: <Mail />, api_brix: <Webhook />, fichier_tarif: <FileSpreadsheet />, edi: <FileText />, factures_pdp: <Receipt /> };
+const ACTIONS: Record<string, { label: string; to: string }> = {
+  email: { label: 'Voir mes fournisseurs', to: '../annuaire' },
+  fichier_tarif: { label: 'Importer un tarif', to: '../catalogue' },
+};
+
+const Puces = ({ c }: { c: ConnecteurDef }) => (
+  <div className="flex flex-wrap gap-1">
+    {c.capacites.map((k) => <span key={k} className="rounded-full bg-sub px-2 py-0.5 text-[11px] font-medium text-ink-2">{CAPACITES[k]}</span>)}
+  </div>
+);
+
+const Titre = ({ titre, texte }: { titre: string; texte: string }) => (
+  <div className="mb-3">
+    <h2 className="text-[16px] font-semibold">{titre}</h2>
+    <p className="mt-0.5 text-[13px] text-ink-2">{texte}</p>
+  </div>
+);
+
+export default function Connecteurs() {
+  const nav = useNavigate();
+  const fournisseurs = useAchats((s) => s.fournisseurs);
+  const utilisees = new Set(fournisseurs.map((f) => f.enseigne).filter(Boolean));
+  const dispo = CONNECTEURS.filter((c) => c.etat === 'disponible');
+  const formats = CONNECTEURS.filter((c) => c.etat === 'sur_accord' && !c.champs.some((ch) => ch.cle === 'numero_compte_client'));
+  const enseignes = CONNECTEURS.filter((c) => c.etat === 'sur_accord' && c.champs.some((ch) => ch.cle === 'numero_compte_client'))
+    .sort((a, b) => Number(utilisees.has(b.cle)) - Number(utilisees.has(a.cle)));
+  const bientot = CONNECTEURS.filter((c) => c.etat === 'bientot');
+
+  return (
+    <div className="space-y-8">
+      <PageHeader title="Connexions" subtitle="Brix marche dès aujourd’hui avec tous vos fournisseurs, par e-mail et lien sécurisé. Les connexions directes arrivent enseigne par enseigne." />
+
+      <Card className="p-5 md:p-6">
+        <div className="text-[13px] font-medium text-ink-2">Comment ça marche, aujourd’hui, avec n’importe quel fournisseur</div>
+        <ol className="mt-4 grid gap-4 md:grid-cols-3 md:gap-6">
+          {[
+            { icon: <Send />, t: 'Brix envoie un e-mail', d: 'Votre demande de prix ou votre commande part au comptoir, avec un lien personnel et sécurisé.' },
+            { icon: <MousePointerClick />, t: 'Le fournisseur répond en ligne', d: 'Depuis son téléphone ou son ordinateur, sans compte ni installation : prix, confirmation, expédition.' },
+            { icon: <Reply />, t: 'Tout revient dans Brix', d: 'Comparatif des prix, suivi de livraison et historique se mettent à jour tout seuls.' },
+          ].map((e, i) => (
+            <li key={i} className="flex gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-vi-50 text-vi-700 [&_svg]:h-[18px] [&_svg]:w-[18px]">{e.icon}</span>
+              <div>
+                <div className="text-[14px] font-semibold"><span className="num mr-1 text-ink-3">{i + 1}.</span>{e.t}</div>
+                <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-2">{e.d}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </Card>
+
+      <section>
+        <Titre titre="Disponible maintenant" texte="Rien à demander à personne : c’est déjà actif sur votre compte." />
+        <div className="grid gap-3 lg:grid-cols-3">
+          {dispo.map((c) => (
+            <Card key={c.cle} className="flex min-w-0 flex-col p-4">
+              <div className="flex items-start justify-between gap-2">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-sub text-ink-2 [&_svg]:h-[18px] [&_svg]:w-[18px]">{ICONES[c.cle] ?? <Code2 />}</span>
+                <Badge tone="ok" dot>Disponible</Badge>
+              </div>
+              <div className="mt-3 text-[14.5px] font-semibold">{c.nom}</div>
+              <p className="mt-1 flex-1 text-[12.5px] leading-relaxed text-ink-2">{c.description}</p>
+              <div className="mt-3"><Puces c={c} /></div>
+              {ACTIONS[c.cle] && (
+                <Button size="sm" variant="secondary" className="mt-4 self-start" onClick={() => nav(ACTIONS[c.cle].to)}>{ACTIONS[c.cle].label}</Button>
+              )}
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <Titre titre="Connexions directes aux enseignes" texte="Prix nets en temps réel, commande en un clic, suivi automatique. Elles s’ouvrent quand chaque enseigne donne son accord ; en attendant, tout fonctionne par e-mail." />
+        <div className="mb-3 grid gap-3 md:grid-cols-2">
+          {formats.map((c) => (
+            <Card key={c.cle} className="flex min-w-0 gap-3 p-4">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sub text-ink-2 [&_svg]:h-[18px] [&_svg]:w-[18px]">{ICONES[c.cle] ?? <Code2 />}</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[14px] font-semibold">{c.nom}</span>
+                  <Badge>Sur accord</Badge>
+                </div>
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-2">{c.description}</p>
+                {c.condition_reelle && <p className="mt-1.5 text-[11.5px] text-ink-3">Il faut : {c.condition_reelle}</p>}
+              </div>
+            </Card>
+          ))}
+        </div>
+        <div className="mb-3 flex items-start gap-2.5 rounded-[12px] border border-[#c9f0d6] bg-ok-bg px-3.5 py-3 text-[13px] text-[#166534]">
+          <Check className="mt-0.5 h-4 w-4 shrink-0" />
+          <span><span className="font-medium">Déjà possible avec toutes ces enseignes :</span> demandes de prix et commandes par e-mail au comptoir de votre agence, import de vos prix nets.</span>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {enseignes.map((c) => {
+            const court = c.description.split(' Dès aujourd')[0];
+            return (
+              <Card key={c.cle} className="flex min-w-0 flex-col p-4">
+                <div className="flex items-center gap-3">
+                  <FournisseurPastille f={{ nom: c.nom, enseigne: c.cle }} size={40} />
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14px] font-semibold">{c.nom}</div>
+                    <div className="truncate text-[12px] text-ink-3">{court}</div>
+                  </div>
+                  {utilisees.has(c.cle) && <Badge tone="violet" className="shrink-0">Le vôtre</Badge>}
+                </div>
+                <div className="mt-3 flex-1"><Puces c={c} /></div>
+                <p className="mt-3 border-t border-line pt-2.5 text-[11.5px] leading-snug text-ink-3">
+                  <span className="font-medium text-ink-2">Sur accord de l’enseigne.</span> {c.condition_reelle?.split('. En attendant')[0]}.
+                </p>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {bientot.length > 0 && (
+        <section>
+          <Titre titre="Bientôt" texte="Prévu, pas encore construit." />
+          <div className="grid gap-3 md:grid-cols-2">
+            {bientot.map((c) => <Card key={c.cle} className="p-4"><div className="text-[14px] font-semibold">{c.nom}</div><p className="mt-1 text-[12.5px] text-ink-2">{c.description}</p></Card>)}
+          </div>
+        </section>
+      )}
+
+      <div className="overflow-hidden rounded-[14px] bg-ink text-white">
+        <div className="grid gap-6 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:p-7">
+          <div>
+            <div className="text-[12px] font-medium text-white/60">Vous êtes fournisseur ?</div>
+            <h2 className="mt-1 font-display text-[22px] font-semibold leading-tight tracking-[-0.02em]">Recevez les demandes des artisans directement dans votre logiciel</h2>
+            <p className="mt-2 text-[13px] leading-relaxed text-white/70">
+              L’API Brix Fournisseurs vous envoie demandes de prix et commandes en temps réel. Vous répondez par API : prix, confirmation, expédition, tarifs et factures.
+            </p>
+            <a href="/api/public/v1/openapi.json" target="_blank" rel="noreferrer" className="mt-4 inline-flex h-10 items-center gap-2 rounded-[10px] bg-white px-4 text-[13.5px] font-medium text-ink transition hover:bg-white/90">
+              Lire la documentation <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+          <ul className="space-y-3 text-[13px]">
+            {[
+              { t: 'API REST documentée', d: 'Description OpenAPI publique, testable en quelques minutes.' },
+              { t: 'Webhooks signés', d: 'Chaque envoi est signé : vous vérifiez qu’il vient bien de Brix.' },
+              { t: 'Code partenaire', d: 'Vous donnez un code BRX-XXXX-XXXX à vos clients artisans : leurs demandes arrivent chez vous, sans ressaisie.' },
+            ].map((x) => (
+              <li key={x.t} className="flex gap-3 rounded-[12px] border border-white/10 bg-white/[.04] p-3">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-white/60" />
+                <div><div className="font-medium">{x.t}</div><div className="mt-0.5 text-[12.5px] text-white/60">{x.d}</div></div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}

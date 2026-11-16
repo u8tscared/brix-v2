@@ -51,9 +51,9 @@ const GENERIQUES: ConnecteurDef[] = [
   },
   {
     cle: 'fichier_tarif',
-    nom: 'Import de tarifs (CSV, Excel, FAB-DIS)',
+    nom: 'Import de tarifs (CSV, FAB-DIS)',
     description:
-      'Importez le fichier de prix nets envoyé par votre commercial. Brix reconnaît les colonnes tout seul, garde l\'historique et vous alerte quand un prix augmente.',
+      'Importez le fichier de prix nets envoyé par votre commercial (Excel enregistré en CSV). Brix reconnaît les colonnes tout seul, garde l\'historique et vous alerte quand un prix augmente.',
     mode: 'fichier',
     etat: 'disponible',
     capacites: ['catalogue', 'prix_nets'],
