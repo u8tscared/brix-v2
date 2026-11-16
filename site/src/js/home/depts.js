@@ -48,6 +48,15 @@ export function initDepts() {
     tabs.scrollTo({ left: b.offsetLeft - tabs.clientWidth / 2 + b.offsetWidth / 2, behavior: reduce ? 'auto' : 'smooth' });
     const draw = () => {
       panel.innerHTML = panelHTML(d);
+      panel.classList.remove('all');
+      if (d.features.length > 4) {
+        const more = document.createElement('button');
+        more.type = 'button';
+        more.className = 'btn line more-ft';
+        more.innerHTML = `Voir les ${d.features.length - 4} autres fonctions ${ic('chevron-down')}`;
+        more.addEventListener('click', () => { panel.classList.add('all'); more.remove(); });
+        $('.fgrid2', panel).after(more);
+      }
       if (reduce) return;
       gsap.from($('.dp-head', panel).children, { y: 24, opacity: 0, duration: 0.8, stagger: 0.06, ease: 'expo.out' });
       gsap.from($$('.ft', panel), { y: 30, opacity: 0, scale: 0.97, duration: 0.8, stagger: 0.045, ease: 'expo.out', delay: 0.05 });

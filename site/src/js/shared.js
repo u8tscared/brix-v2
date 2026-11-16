@@ -69,8 +69,8 @@ export function renderCompare(table, { cols = COMPETITORS.map((_, i) => i), keyO
   const rows = MATRIX.filter((r) => !keyOnly || r.key);
   table.innerHTML = `
     <caption class="sr">Comparatif des fonctions de Brix et des principaux logiciels pour artisans</caption>
-    <thead><tr><th scope="col"><span class="sr">Fonction</span></th>${cols.map((c) => `<th scope="col">${esc(COMPETITORS[c])}</th>`).join('')}<th scope="col" class="brix"><span class="sr">Brix</span>${wordmark}</th></tr></thead>
-    <tbody>${rows.map((r) => `<tr><th scope="row">${r.f}</th>${cols.map((c) => `<td>${cell(r.v[c])}</td>`).join('')}<td class="brix">${cell(r.brix)}${r.note ? `<small>${r.note}</small>` : ''}</td></tr>`).join('')}</tbody>`;
+    <thead><tr><th scope="col"><span class="sr">Fonction</span></th><th scope="col" class="brix"><span class="sr">Brix</span>${wordmark}</th>${cols.map((c) => `<th scope="col">${esc(COMPETITORS[c])}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map((r) => `<tr><th scope="row">${r.f}</th><td class="brix">${cell(r.brix)}${r.note ? `<small>${r.note}</small>` : ''}</td>${cols.map((c) => `<td>${cell(r.v[c])}</td>`).join('')}</tr>`).join('')}</tbody>`;
   // la colonne Brix s'allume ligne après ligne
   if (!reduce) gsap.from($$('td.brix > span', table), { scale: 0, duration: 0.5, ease: 'back.out(2.4)', stagger: 0.05, scrollTrigger: { trigger: table, start: 'top 75%', once: true } });
 }

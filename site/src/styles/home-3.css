@@ -166,6 +166,9 @@
   .sim-o > div:last-child { grid-column: 1 / -1 }
 }
 @media (max-width: 560px) {
+  .cmp-t { min-width: 600px; font-size: 13.5px }
+  .cmp-t th, .cmp-t td { padding: 12px 10px }
+  .cmp-t tbody th { min-width: 150px; max-width: 150px; box-shadow: 1px 0 0 var(--line) }
   .plans { grid-template-columns: 1fr }
   .stats { grid-template-columns: 1fr }
   .wk-h, .wk-r, .wk-t { grid-template-columns: 1fr 74px 74px; gap: 8px; font-size: 14px }

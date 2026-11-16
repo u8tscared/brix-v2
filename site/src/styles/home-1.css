@@ -227,9 +227,13 @@ legend .mono { font-size: 12px; color: var(--v); background: var(--paper-3); pad
   .win-side li.off { display: none }
 }
 @media (max-width: 560px) {
-  .stack { height: 300px }
-  .fc-quote { left: 0; width: 88% }
-  .fc-bob { width: 230px; top: 170px }
+  .hgrid { padding-bottom: 110px; gap: 28px }
+  .stack { height: 400px }
+  .fc-quote { left: 0; width: 92%; padding: 18px }
+  .fq-l { font-size: 13px }
+  .fq-t b { font-size: 26px }
+  .fc-bob { width: 236px; left: auto; right: 0; top: 236px }
+  .scene .big { font-size: 46px }
   .seg { grid-template-columns: 1fr 1fr }
   .cfg-out { flex-direction: column; align-items: stretch }
   .cfg-out .btn { width: 100% }

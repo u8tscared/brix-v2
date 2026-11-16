@@ -32,7 +32,7 @@
 /* ---------- NUIT → AUBE ---------- */
 .night { position: relative; color: #fff; background: #0b0820; overflow: clip; isolation: isolate }
 .sky { position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, #0b0820 0%, #160f3a 55%, #2a1458 100%) }
-.sky::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #4c1d95 0%, #c026d3 48%, #fb923c 88%, #fde68a 100%); opacity: var(--dawn, 0); transition: opacity .2s linear }
+.sky::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, #3b0f7a 0%, #6d28d9 30%, #b42bc9 58%, #f0723c 86%, #fcd68a 100%); opacity: var(--dawn, 0); transition: opacity .2s linear }
 .stars { position: absolute; inset: 0; opacity: calc(1 - var(--dawn, 0)); background-image: radial-gradient(1.4px 1.4px at 12% 18%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 28% 62%, #fff 50%, transparent 51%), radial-gradient(1.2px 1.2px at 44% 30%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 63% 14%, #fff 50%, transparent 51%), radial-gradient(1.6px 1.6px at 78% 44%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 88% 76%, #fff 50%, transparent 51%), radial-gradient(1.2px 1.2px at 8% 84%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 54% 88%, #fff 50%, transparent 51%), radial-gradient(1.3px 1.3px at 36% 8%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 94% 22%, #fff 50%, transparent 51%); background-size: 420px 380px; animation: twinkle 4s ease-in-out infinite alternate; z-index: 1 }
 @keyframes twinkle { to { filter: brightness(.6) } }
 .sun { position: absolute; left: 50%; bottom: -46vh; width: 90vh; height: 90vh; margin-left: -45vh; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 237, 180, .95), rgba(251, 146, 60, .55) 45%, transparent 72%); transform: translateY(calc((1 - var(--dawn, 0)) * 40vh)); opacity: var(--dawn, 0); z-index: 1 }
@@ -40,7 +40,7 @@
 .night-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; width: 100% }
 .night .eyebrow { color: var(--v3) }
 .night .sub { color: rgba(255, 255, 255, .78) }
-.dawn-t { background: linear-gradient(92deg, #c4b5fd, #f0abfc 50%, #fdba74); -webkit-background-clip: text; background-clip: text; color: transparent }
+.dawn-t { background: linear-gradient(92deg, #ddd6fe, #fbcfe8 50%, #fed7aa); -webkit-background-clip: text; background-clip: text; color: transparent }
 .clock { margin-top: 44px; display: flex; align-items: baseline; gap: 16px }
 .clock .mono { font-size: clamp(56px, 7vw, 96px); font-weight: 500; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums }
 .clock small { font-size: 15px; color: rgba(255, 255, 255, .66) }
@@ -126,6 +126,8 @@
 }
 @media (max-width: 560px) {
   .fgrid2 { grid-template-columns: 1fr }
+  .depts .dpanel:not(.all) .ft:nth-child(n+5) { display: none }
+  .more-ft { display: flex !important }
   .dtabs-wrap { margin-inline: -20px; top: calc(var(--nav-h) + 4px) }
   .dtabs { border-radius: 0; padding-inline: 14px; box-shadow: 0 1px 0 var(--line) }
   .dtab-pill { display: none }
@@ -135,3 +137,5 @@
   .sup-card { padding: 24px }
   .chat { min-height: 430px }
 }
+
+.more-ft { display: none; width: 100%; margin-top: 12px }
