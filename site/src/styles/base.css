@@ -97,3 +97,4 @@ canvas.mesh { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 
 /* mots découpés pour les titres animés */
 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; margin-bottom: -.1em }
 .w > span { display: inline-block }
+[hidden] { display: none !important }

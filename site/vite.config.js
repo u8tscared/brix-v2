@@ -3,7 +3,8 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 
 const root = __dirname;
-const PAGES = ['index', 'fonctionnalites', 'tarifs', 'ia', 'fournisseurs', 'comparatif', 'demarrer'];
+const ALL_PAGES = ['index', 'fonctionnalites', 'tarifs', 'ia', 'fournisseurs', 'comparatif', 'demarrer'];
+const PAGES = process.env.PAGES ? process.env.PAGES.split(',') : ALL_PAGES;
 
 /* ---------- Partials : <!--@include nom--> ---------- */
 function includePartials(html, depth = 0) {
