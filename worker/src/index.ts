@@ -1,10 +1,13 @@
 import type { Env } from './env';
 import { HttpError, json } from './lib/http';
 import { handleCoreRoutes } from './modules/core/routes';
+import { handleFournisseursRoutes } from './modules/fournisseurs/routes';
+import { handleApiPubliqueRoutes } from './modules/api-publique/routes';
+import { handleMcpRoutes } from './modules/mcp/routes';
+import { relancerWebhooks } from './modules/api-publique/webhooks';
 
 // Point d'entrée du worker Brix V2. Chaque module expose handleXRoutes(request, env, pathname)
 // qui renvoie null si la route ne le concerne pas (convention du CLAUDE.md).
-// Modules à brancher quand ils arrivent : fournisseurs, api-publique, mcp.
 
 const cors = (origin: string | null, env: Env) => ({
   'access-control-allow-origin': origin && (origin === env.APP_ORIGIN || origin.startsWith('http://localhost')) ? origin : env.APP_ORIGIN,
@@ -15,7 +18,9 @@ const cors = (origin: string | null, env: Env) => ({
 
 const withHeaders = (res: Response, headers: Record<string, string>) => {
   const r = new Response(res.body, res);
-  for (const [k, v] of Object.entries(headers)) r.headers.set(k, v);
+  // L'API publique et le MCP gèrent leur propre CORS (accès par clé) : on ne l'écrase pas.
+  const ownCors = r.headers.has('access-control-allow-origin');
+  for (const [k, v] of Object.entries(headers)) if (!(ownCors && k.startsWith('access-control'))) r.headers.set(k, v);
   r.headers.set('x-content-type-options', 'nosniff');
   return r;
 };
@@ -27,7 +32,7 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: h });
     try {
       if (url.pathname.startsWith('/api/')) {
-        const handlers = [handleCoreRoutes];
+        const handlers = [handleCoreRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes];
         for (const handle of handlers) {
           const res = await handle(request, env, url.pathname);
           if (res) return withHeaders(res, h);
@@ -42,5 +47,10 @@ export default {
       if (status === 500) console.error(e);
       return withHeaders(json({ error: message }, status), h);
     }
+  },
+
+  // Cron (toutes les minutes, voir wrangler.toml) : renvoi des webhooks partenaires en échec.
+  async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+    ctx.waitUntil(relancerWebhooks(env));
   },
 };

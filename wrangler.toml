@@ -20,3 +20,6 @@ database_id = "A_REMPLIR_APRES_wrangler_d1_create"
 [[r2_buckets]]
 binding = "FILES"
 bucket_name = "brix-v2-files"
+
+[triggers]
+crons = ["* * * * *"]
