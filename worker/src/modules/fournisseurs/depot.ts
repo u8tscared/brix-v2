@@ -47,13 +47,13 @@ export async function prochainNumero(env: Env, orgId: string, type: 'DP' | 'BC')
   const annee = new Date().getUTCFullYear();
   const prefix = `${type}-${annee}-`;
   const table = type === 'DP' ? 'fournisseurs_demandes' : 'fournisseurs_commandes';
-  const row = await first<{ n: string | null }>(
+  const row = await first<{ n: number | null }>(
     env,
-    `SELECT MAX(numero) AS n FROM ${table} WHERE organization_id = ? AND numero LIKE ?`,
+    `SELECT MAX(CAST(substr(numero, ${prefix.length + 1}) AS INTEGER)) AS n FROM ${table} WHERE organization_id = ? AND numero LIKE ?`,
     orgId,
     `${prefix}%`,
   );
-  const last = row?.n ? Number(row.n.slice(prefix.length)) : 0;
+  const last = row?.n ? Number(row.n) : 0;
   return `${prefix}${String((Number.isFinite(last) ? last : 0) + 1).padStart(4, '0')}`;
 }
 

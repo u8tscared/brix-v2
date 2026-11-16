@@ -171,8 +171,13 @@ export async function envoyerDemande(env: Env, ctx: Ctx, demandeId: string, rela
   const out: ResultatEnvoiDemande = { envoyes: 0, simules: [], erreurs: [] };
 
   for (const dest of dests) {
+    // Le serveur ne garde que le hash : un nouveau lien est créé à chaque e-mail, mais l'ancien reste valable
+    // (table des jetons secondaires) pour qu'un fournisseur qui clique sur le premier e-mail ne tombe pas sur une erreur.
     const { token, hash } = await jeton();
     const lien = urlPortail(env, token);
+    if (dest.token_hash && dest.statut !== 'a_envoyer') {
+      await run(env, `INSERT OR IGNORE INTO fournisseurs_jetons_anciens (token_hash, destinataire_id, created_at) VALUES (?,?,?)`, dest.token_hash, dest.id, Date.now());
+    }
     await run(env, `UPDATE fournisseurs_demandes_destinataires SET token_hash = ?, expire_le = ? WHERE id = ?`, hash, Date.now() + 30 * DAY_MS, dest.id);
 
     const partenaire = await partenaireDuFournisseur(env, ctx.organizationId, dest.fournisseur_id);
@@ -257,26 +262,33 @@ export interface ReponseInput {
 }
 
 /** Enregistre la réponse d'un fournisseur (portail ou API). Remplace une réponse précédente. */
-export async function enregistrerReponse(env: Env, destinataireId: string, input: ReponseInput, acteur: Acteur): Promise<void> {
+export async function enregistrerReponse(env: Env, orgId: string, destinataireId: string, input: ReponseInput, acteur: Acteur): Promise<void> {
   const dest = await first<Destinataire & { organization_id: string; demande_statut: string; fournisseur_nom: string }>(
     env,
     `SELECT dd.*, d.organization_id, d.statut AS demande_statut, f.nom AS fournisseur_nom
      FROM fournisseurs_demandes_destinataires dd
      JOIN fournisseurs_demandes d ON d.id = dd.demande_id
-     JOIN fournisseurs_annuaire f ON f.id = dd.fournisseur_id WHERE dd.id = ?`,
+     JOIN fournisseurs_annuaire f ON f.id = dd.fournisseur_id WHERE dd.id = ? AND d.organization_id = ?`,
     destinataireId,
+    orgId,
   );
   if (!dest) throw new HttpError(404, 'destinataire_introuvable', 'Demande introuvable');
   if (['annulee', 'commandee'].includes(dest.demande_statut)) throw new HttpError(409, 'demande_close', 'Cette demande est close, merci.');
+  if (dest.statut === 'a_envoyer') throw new HttpError(409, 'pas_encore_envoyee', "Cette demande n'a pas encore été envoyée à ce fournisseur");
   const lignes = await lignesDemande(env, dest.demande_id);
   const valides = new Map(lignes.map((l) => [l.id, l]));
-  const saisies = (input.lignes ?? []).filter((l) => valides.has(l.ligne_id));
+  const vus = new Set<string>();
+  const saisies = (Array.isArray(input.lignes) ? input.lignes : []).filter((l) => l && valides.has(l.ligne_id) && !vus.has(l.ligne_id) && vus.add(l.ligne_id));
   if (saisies.length === 0) throw new HttpError(400, 'reponse_vide', 'Indiquez au moins un prix');
   for (const s of saisies) {
     if (s.prix_unitaire_cents != null && (!Number.isInteger(s.prix_unitaire_cents) || s.prix_unitaire_cents < 0 || s.prix_unitaire_cents > 100_000_000)) {
       throw new HttpError(400, 'prix_invalide', 'Un prix est invalide');
     }
   }
+
+  const port = entierOuNull(input.frais_port_cents, 0, 10_000_000, 'frais_port_cents');
+  const delai = entierOuNull(input.delai_livraison_jours, 0, 365, 'delai_livraison_jours');
+  const validite = entierOuNull(input.validite_jours, 1, 365, 'validite_jours') ?? 30;
 
   const stmts = [env.DB.prepare(`DELETE FROM fournisseurs_reponses_lignes WHERE destinataire_id = ?`).bind(destinataireId)];
   for (const s of saisies) {
@@ -293,7 +305,7 @@ export async function enregistrerReponse(env: Env, destinataireId: string, input
   stmts.push(
     env.DB.prepare(
       `UPDATE fournisseurs_demandes_destinataires SET statut = 'repondue', repondu_le = ?, delai_livraison_jours = ?, frais_port_cents = ?, validite_jours = ?, commentaire = ? WHERE id = ?`,
-    ).bind(Date.now(), input.delai_livraison_jours ?? null, input.frais_port_cents ?? null, input.validite_jours ?? 30, input.commentaire?.slice(0, 1000) ?? null, destinataireId),
+    ).bind(Date.now(), delai, port, validite, typeof input.commentaire === 'string' ? input.commentaire.slice(0, 1000) : null, destinataireId),
   );
   await env.DB.batch(stmts);
 
@@ -313,14 +325,17 @@ export async function enregistrerReponse(env: Env, destinataireId: string, input
   await recalculerStatut(env, dest.demande_id);
 }
 
-export async function declinerDemande(env: Env, destinataireId: string, motif: string | null, acteur: Acteur): Promise<void> {
-  const dest = await first<{ demande_id: string; organization_id: string; fournisseur_nom: string }>(
+export async function declinerDemande(env: Env, orgId: string, destinataireId: string, motif: string | null, acteur: Acteur): Promise<void> {
+  const dest = await first<{ demande_id: string; organization_id: string; fournisseur_nom: string; demande_statut: string }>(
     env,
-    `SELECT dd.demande_id, d.organization_id, f.nom AS fournisseur_nom FROM fournisseurs_demandes_destinataires dd
-     JOIN fournisseurs_demandes d ON d.id = dd.demande_id JOIN fournisseurs_annuaire f ON f.id = dd.fournisseur_id WHERE dd.id = ?`,
+    `SELECT dd.demande_id, d.organization_id, d.statut AS demande_statut, f.nom AS fournisseur_nom FROM fournisseurs_demandes_destinataires dd
+     JOIN fournisseurs_demandes d ON d.id = dd.demande_id JOIN fournisseurs_annuaire f ON f.id = dd.fournisseur_id WHERE dd.id = ? AND d.organization_id = ?`,
     destinataireId,
+    orgId,
   );
   if (!dest) throw new HttpError(404, 'destinataire_introuvable', 'Demande introuvable');
+  if (['annulee', 'commandee'].includes(dest.demande_statut)) throw new HttpError(409, 'demande_close', 'Cette demande est close, merci.');
+  motif = typeof motif === 'string' ? motif : null;
   await run(env, `UPDATE fournisseurs_demandes_destinataires SET statut = 'declinee', repondu_le = ?, commentaire = ? WHERE id = ?`, Date.now(), motif?.slice(0, 500) ?? null, destinataireId);
   await journal(env, dest.organization_id, 'demande', dest.demande_id, 'declinee', acteur, { fournisseur: dest.fournisseur_nom, motif });
   await recalculerStatut(env, dest.demande_id);
@@ -385,7 +400,7 @@ export async function annulerDemande(env: Env, ctx: Ctx, id: string): Promise<vo
   if (d.statut === 'commandee') throw new HttpError(409, 'deja_commandee', 'Déjà passée en commande');
   await majStatutDemande(env, id, 'annulee');
   await journal(env, ctx.organizationId, 'demande', id, 'annulee', 'artisan');
-  const dests = await all<{ fournisseur_id: string }>(env, `SELECT fournisseur_id FROM fournisseurs_demandes_destinataires WHERE demande_id = ?`, id);
+  const dests = await all<{ fournisseur_id: string }>(env, `SELECT fournisseur_id FROM fournisseurs_demandes_destinataires WHERE demande_id = ? AND statut != 'a_envoyer'`, id);
   for (const x of dests) {
     const p = await partenaireDuFournisseur(env, ctx.organizationId, x.fournisseur_id);
     if (p) await emettre(env, p, 'demande.annulee', { demande_id: id, numero: d.numero });
@@ -393,3 +408,10 @@ export async function annulerDemande(env: Env, ctx: Ctx, id: string): Promise<vo
 }
 
 export { majStatutDemande };
+
+/** Entier borné ou null ; lève 400 si la valeur est présente mais invalide. */
+export function entierOuNull(v: unknown, min: number, max: number, champ: string): number | null {
+  if (v === undefined || v === null || v === '') return null;
+  if (typeof v !== 'number' || !Number.isInteger(v) || v < min || v > max) throw new HttpError(400, 'valeur_invalide', `Valeur invalide pour ${champ}`);
+  return v;
+}

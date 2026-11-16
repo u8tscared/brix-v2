@@ -116,6 +116,13 @@ CREATE TABLE IF NOT EXISTS fournisseurs_demandes_destinataires (
 );
 CREATE INDEX IF NOT EXISTS idx_fournisseurs_dd_demande ON fournisseurs_demandes_destinataires(demande_id);
 
+-- Liens envoyés lors des e-mails précédents (relances) : restent valables jusqu'à l'expiration du destinataire
+CREATE TABLE IF NOT EXISTS fournisseurs_jetons_anciens (
+  token_hash TEXT PRIMARY KEY NOT NULL,
+  destinataire_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS fournisseurs_reponses_lignes (
   id TEXT PRIMARY KEY NOT NULL,
   destinataire_id TEXT NOT NULL,

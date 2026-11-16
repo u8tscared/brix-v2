@@ -40,7 +40,9 @@ function reponse(body: unknown, status = 200, extra: Record<string, string> = {}
 
 export async function traiterRpc(env: Env, ctx: McpCtx, msg: RpcReq): Promise<unknown | null> {
   if (!msg || msg.jsonrpc !== '2.0' || typeof msg.method !== 'string') return rpcErr(null, -32600, 'Requête JSON-RPC invalide');
-  const notification = msg.id === undefined;
+  const notification = msg.id === undefined || msg.id === null;
+  // JSON-RPC : on ne répond jamais à une notification (pas d'id).
+  if (notification) return null;
   switch (msg.method) {
     case 'initialize': {
       const demandee = msg.params?.protocolVersion;
@@ -123,6 +125,7 @@ export async function handleMcpRoutes(request: Request, env: Env, pathname: stri
     return reponse(rpcErr(null, -32700, 'JSON invalide'), 400);
   }
   if (Array.isArray(payload)) {
+    if (payload.length === 0) return reponse(rpcErr(null, -32600, 'Lot vide'), 400);
     const out = (await Promise.all(payload.slice(0, 20).map((p) => traiterRpc(env, ctx, p)))).filter((x) => x !== null);
     return out.length ? reponse(out) : reponse(null, 202);
   }

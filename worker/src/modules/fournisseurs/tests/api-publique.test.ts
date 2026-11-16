@@ -115,7 +115,25 @@ describe('API Brix Fournisseurs', () => {
     // Révocation
     const k2 = (await api('POST', '/cles', cle, { nom: 'ERP', scopes: ['demandes:read'] })).data;
     expect((await api('GET', '/commandes', k2.cle)).status).toBe(403);
+    // Une clé limitée ne peut pas créer une clé plus puissante
+    const k3 = (await api('POST', '/cles', cle, { nom: 'Hook', scopes: ['webhooks:write'] })).data;
+    expect((await api('POST', '/cles', k3.cle, { nom: 'Pirate', scopes: ['commandes:write'] })).status).toBe(403);
     await api('DELETE', `/cles/${k2.id}`, cle);
     expect((await api('GET', '/demandes', k2.cle)).status).toBe(401);
+  });
+});
+
+describe('garde-fous', () => {
+  it('refuse les URL de webhook internes', async () => {
+    const { urlWebhookAutorisee } = await import('../../api-publique/webhooks');
+    for (const u of ['http://erp.exemple.fr/h', 'https://127.0.0.1/h', 'https://[::1]/h', 'https://localhost/h', 'https://0x7f000001/h', 'https://erp.exemple.fr:22/h', 'https://intranet/h'])
+      expect(urlWebhookAutorisee(new URL(u))).toBe(false);
+    expect(urlWebhookAutorisee(new URL('https://erp.exemple.fr/hooks/brix'))).toBe(true);
+  });
+  it('lit les montants à la française', async () => {
+    const { parseEurosToCents } = await import('../util');
+    expect(parseEurosToCents('1.250')).toBe(125_000);
+    expect(parseEurosToCents('1 250,50 €')).toBe(125_050);
+    expect(parseEurosToCents('12.5')).toBe(1_250);
   });
 });
