@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { CheckCircle2, ChevronRight, ClipboardCheck, Eye, Printer, Send, ShieldCheck } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, EmptyState, Field, Input, PageHeader, Segmented, Select, Sheet, cn, toast } from '@/components/ui';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ChevronLeft, ClipboardCheck, Eye, Printer, Send, ShieldCheck } from 'lucide-react';
+import { PvChooser, PvSteps, PvSuccess } from './components/pv/PvParts';
+import { Button, Card, CardHeader, EmptyState, Field, IconTile, Input, PageHeader, Segmented, Select, Sheet, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
-import { dateFull, dateShort, todayISO, uid } from '@/lib/format';
+import { dateFull, todayISO, uid } from '@/lib/format';
 import { useChantiersLocal, useChantiersSeed, type Pv } from './store';
 import { sendPv } from './service';
 import { ReservesEditor } from './components/pv/ReservesEditor';
@@ -13,6 +14,7 @@ import { SignaturePad } from './components/common/SignaturePad';
 export default function PvReception() {
   useChantiersSeed();
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const { chantiers, clients, company, user, upsertChantier } = useBrix();
   const { pvs, upsertPv, addJournal } = useChantiersLocal();
   const chantierId = params.get('chantier') ?? '';
@@ -51,26 +53,14 @@ export default function PvReception() {
   if (!ch || !pv) {
     return (
       <div className="space-y-5">
-        <PageHeader title="PV de réception" subtitle="Signé sur place, sur le téléphone. Les garanties démarrent le jour même." />
+        <PageHeader icon={<IconTile name="ClipboardCheck" dept="chantiers" size="lg" />} title="PV de réception" subtitle="Signé sur place, sur le téléphone. Les garanties démarrent le jour même." />
         {ready.length === 0 ? (
           <EmptyState icon={<ClipboardCheck />} title="Aucun chantier à réceptionner" text="Le PV se prépare à la fin d’un chantier en cours." />
         ) : (
-          <Card>
-            <CardHeader title="Choisissez le chantier" />
-            {ready.map((c) => {
-              const p = pvs.find((x) => x.chantierId === c.id);
-              return (
-                <button key={c.id} onClick={() => setParams({ chantier: c.id })} className="flex min-h-[60px] w-full items-center gap-3 border-b border-line px-4 py-2 text-left last:border-b-0 hover:bg-[#fafafc]">
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px] font-medium">{c.name}</span>
-                    <span className="block text-xs text-ink-3">{c.progress} % · fin prévue {dateShort(c.endDate)}</span>
-                  </span>
-                  {p?.signedAt ? <Badge tone="ok">PV signé</Badge> : c.progress >= 80 ? <Badge tone="violet">Prêt</Badge> : null}
-                  <ChevronRight className="h-4 w-4 text-ink-3" />
-                </button>
-              );
-            })}
-          </Card>
+          <section className="space-y-3">
+            <h2 className="eyebrow">Quel chantier réceptionnez-vous ?</h2>
+            <PvChooser chantiers={ready} pvs={pvs} onPick={(id) => setParams({ chantier: id })} />
+          </section>
         )}
       </div>
     );
@@ -79,7 +69,8 @@ export default function PvReception() {
   return (
     <div className="space-y-5">
       <PageHeader
-        kicker={<Link to={`/app/chantiers/${ch.id}`} className="hover:text-ink">← {ch.name}</Link>}
+        icon={<IconTile name="ClipboardCheck" dept="chantiers" size="lg" />}
+        kicker={<Link to={`/app/chantiers/${ch.id}`} className="flex items-center gap-1 hover:text-ink"><ChevronLeft className="h-3.5 w-3.5" />{ch.name}</Link>}
         title="PV de réception"
         subtitle={signed ? `Signé le ${dateFull(pv.signedAt!)} et envoyé à ${client?.name ?? 'votre client'}.` : 'Faites le tour du chantier avec votre client, puis signez tous les deux.'}
         actions={
@@ -92,19 +83,15 @@ export default function PvReception() {
         }
       />
 
-      {signed && (
-        <Card className="flex flex-col gap-3 border-[#c9f0d6] bg-ok-bg p-4 sm:flex-row sm:items-center">
-          <CheckCircle2 className="h-6 w-6 shrink-0 text-ok" />
-          <div className="flex-1 text-[13.5px]">
-            <b className="font-semibold">Réception prononcée {pv.reserves.length ? `avec ${pv.reserves.length} réserve${pv.reserves.length > 1 ? 's' : ''}` : 'sans réserve'}.</b> Le PV est archivé dans les documents du chantier.
-          </div>
-          <Button icon={<Printer className="h-4 w-4" />} onClick={() => window.print()}>Imprimer ou PDF</Button>
-        </Card>
+      {signed ? (
+        <PvSuccess pv={pv} clientName={client?.name ?? 'votre client'} onPrint={() => window.print()} onBack={() => navigate(`/app/chantiers/${ch.id}`)} />
+      ) : (
+        <PvSteps step={!pv.signatures.client && !pv.signatures.artisan ? 0 : canSign ? 2 : 1} />
       )}
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <div className="space-y-4">
-          <Card className="p-4">
+          <Card className="p-4 md:p-5">
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Date de réception">
                 <Input type="date" value={pv.date} disabled={signed} onChange={(e) => set({ date: e.target.value })} />
@@ -149,7 +136,7 @@ export default function PvReception() {
           </div>
 
           {!signed && (
-            <Button variant="primary" size="lg" className="w-full justify-center" disabled={!canSign} loading={sending} icon={<Send className="h-4 w-4" />} onClick={sign}>
+            <Button variant={canSign ? 'dawn' : 'primary'} size="lg" className="sticky bottom-[calc(96px+var(--safe-b))] z-10 w-full justify-center md:static" disabled={!canSign} loading={sending} icon={<Send className="h-4 w-4" />} onClick={sign}>
               {canSign ? 'Valider la réception et envoyer le PV' : 'Les deux signatures sont nécessaires'}
             </Button>
           )}
