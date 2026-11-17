@@ -156,7 +156,7 @@ export function Gauge({ label, value, max, limit, format = (v) => num(v, 1), uni
       </div>
       <div className="relative h-2 rounded-full bg-[#eeecf4]">
         <div className={cn('absolute inset-y-0 left-0 rounded-full transition-[width,background-color] duration-700 ease-out-quint', color)} style={{ width: `${pctV}%` }} />
-        {limit !== undefined && <span aria-hidden className="absolute -top-1 h-4 w-[2px] rounded-full bg-ink/70" style={{ left: `calc(${Math.min(100, (limit / max) * 100)}% - 1px)` }} />}
+        {limit !== undefined && <span aria-hidden className="absolute -top-1 h-4 w-[2px] rounded-full bg-[#15122a]/70" style={{ left: `calc(${Math.min(100, (limit / max) * 100)}% - 1px)` }} />}
       </div>
     </div>
   );

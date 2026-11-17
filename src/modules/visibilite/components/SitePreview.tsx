@@ -8,9 +8,9 @@ import { DEFAULT_SERVICES, SERVICES } from '../service';
 import { useVisi, type SiteTheme } from '../store';
 
 export const THEMES: Record<SiteTheme, { label: string; bg: string; surface: string; ink: string; sub: string; accent: string; accentInk: string; hero: string; font: string }> = {
-  clair: { label: 'Clair', bg: '#ffffff', surface: '#f5f6fa', ink: '#14162b', sub: '#5b5e73', accent: '#1F389D', accentInk: '#ffffff', hero: 'linear-gradient(180deg,#eef1fb,#ffffff)', font: 'Poppins' },
-  atelier: { label: 'Atelier', bg: '#121214', surface: '#1d1d21', ink: '#f4f4f5', sub: '#a1a1aa', accent: '#fb923c', accentInk: '#121214', hero: 'linear-gradient(180deg,#1d1d21,#121214)', font: 'Poppins' },
-  nature: { label: 'Nature', bg: '#fbf8f2', surface: '#f1ece1', ink: '#23261f', sub: '#64675b', accent: '#3f6b4a', accentInk: '#ffffff', hero: 'linear-gradient(180deg,#efe9dc,#fbf8f2)', font: 'Georgia' },
+  clair: { label: 'Clair', bg: '#ffffff', surface: '#f5f6fa', ink: '#14162b', sub: '#5b5e73', accent: '#1F389D', accentInk: '#ffffff', hero: 'linear-gradient(180deg,#eef1fb,#ffffff)', font: 'Geist, system-ui, sans-serif' },
+  atelier: { label: 'Atelier', bg: '#121214', surface: '#1d1d21', ink: '#f4f4f5', sub: '#a1a1aa', accent: '#fb923c', accentInk: '#121214', hero: 'linear-gradient(180deg,#1d1d21,#121214)', font: 'Geist, system-ui, sans-serif' },
+  nature: { label: 'Nature', bg: '#fbf8f2', surface: '#f1ece1', ink: '#23261f', sub: '#64675b', accent: '#3f6b4a', accentInk: '#ffffff', hero: 'linear-gradient(180deg,#efe9dc,#fbf8f2)', font: 'Georgia, serif' },
 };
 
 /** Le site vitrine de l'artisan, construit à partir de ses données Brix. `mobile` force la mise en page téléphone. */

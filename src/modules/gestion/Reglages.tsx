@@ -87,7 +87,7 @@ export default function Reglages() {
               >
                 <t.icon className={cn('h-4 w-4 transition-colors', on ? 'text-[#4f46e5]' : 'text-ink-3 group-hover:text-ink-2')} strokeWidth={1.75} />
                 {t.label}
-                {meta[k] && <span className={cn('num ml-auto hidden text-[11.5px] lg:inline', on ? 'text-ink-3' : 'text-ink-3/80')}>{meta[k]}</span>}
+                {meta[k] && <span className={cn('num ml-auto hidden text-[11.5px] lg:inline', 'text-ink-3')}>{meta[k]}</span>}
               </Link>
             );
           })}

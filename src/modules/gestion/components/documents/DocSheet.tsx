@@ -33,7 +33,7 @@ export function DocSheet({ doc, onClose, onReplace, onFetch, onShare, fetching }
         <div className="space-y-5 pt-3">
           <div className="relative mx-auto aspect-[1/1.3] w-full max-w-[300px] overflow-hidden rounded-[10px] bg-white p-6 shadow-[0_0_0_1px_var(--line),0_24px_40px_-24px_rgba(19,15,38,.35)]">
             <div className="flex items-start justify-between">
-              <div className="h-2 w-20 rounded-full bg-ink/80" />
+              <div className="h-2 w-20 rounded-full bg-[#15122a]/80" />
               <div className="h-6 w-6 rounded-full border-2 border-[#4f46e5]/40" />
             </div>
             <div className="mt-2 h-1.5 w-28 rounded-full bg-line2" />

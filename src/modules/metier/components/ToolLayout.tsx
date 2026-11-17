@@ -124,7 +124,7 @@ export function ToolLayout({ tool, inputs, hero, visual, children, formulas, ref
       </div>
 
       {lines && (
-        <div className="sticky bottom-[calc(76px+var(--safe-b))] z-20 -mx-1 flex items-center gap-3 rounded-[16px] bg-white/95 p-2 pl-4 shadow-pop backdrop-blur lg:hidden">
+        <div className="sticky bottom-[calc(90px+var(--safe-b))] z-20 -mx-1 flex items-center gap-3 rounded-[16px] bg-white/95 p-2 pl-4 shadow-pop backdrop-blur lg:hidden">
           <div className="min-w-0 flex-1">
             <div className="truncate text-[11px] font-medium text-ink-3">{hero.label}</div>
             {heroNode('num block truncate text-[19px] font-semibold leading-tight tracking-[-0.03em]')}
