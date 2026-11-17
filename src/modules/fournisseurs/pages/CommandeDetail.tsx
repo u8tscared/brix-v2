@@ -58,7 +58,7 @@ export default function CommandeDetail() {
   return (
     <div className="space-y-5">
       <div className="space-y-3">
-        <Link to="/app/fournisseurs/commandes" className="inline-flex h-9 items-center gap-1.5 text-[13px] font-medium text-ink-2 hover:text-ink">
+        <Link to="/app/fournisseurs/commandes" className="inline-flex h-10 items-center md:h-9 gap-1.5 text-[13px] font-medium text-ink-2 hover:text-ink">
           <ArrowLeft className="h-4 w-4" /> Commandes
         </Link>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
@@ -153,8 +153,8 @@ export default function CommandeDetail() {
         <div className="space-y-4">
           <CommandeInfos c={c} f={f} chantier={chantier} />
           <Card className="p-2">
-            <Button variant="ghost" className="w-full justify-start" icon={<FileDown className="h-4 w-4" />} onClick={() => { telechargerEdi(c, f, company, chantier); toast('Bon de commande EDI téléchargé', 'info'); }}>
-              Télécharger le bon (format EDI)
+            <Button variant="ghost" className="w-full justify-start" icon={<FileDown className="h-4 w-4" />} onClick={() => { telechargerEdi(c, f, company, chantier); toast('Bon de commande téléchargé, au format lu par les logiciels des négoces', 'info'); }}>
+              Télécharger le bon de commande
             </Button>
             {isDemo && c.token && (
               <Button variant="ghost" className="w-full justify-start" icon={<ExternalLink className="h-4 w-4" />} onClick={() => window.open(lienPortail(c.token!), '_blank')}>

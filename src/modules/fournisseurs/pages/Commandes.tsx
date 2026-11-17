@@ -48,6 +48,7 @@ export default function Commandes() {
 
       {commandes.length > 0 && (
         <Segmented
+          className="[&>button]:h-10 md:[&>button]:h-8"
           value={filtre}
           onChange={setFiltre}
           options={[

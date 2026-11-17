@@ -47,8 +47,8 @@ function Tableau(p: Props) {
       <table className="w-full min-w-[640px] border-collapse text-[13px]">
         <thead>
           <tr className="border-b border-line text-[12px] text-ink-2">
-            <th className="sticky left-0 bg-white px-4 py-2.5 text-left font-medium">Article</th>
-            {avecCible && <th className={cn(th, 'text-ink-3')}>Prévu au devis</th>}
+            <th className="sticky left-0 min-w-[210px] bg-white px-4 py-2.5 text-left font-medium">Article</th>
+            {avecCible && <th className={cn(th, 'whitespace-nowrap text-ink-3')}>Prévu au devis</th>}
             {comp.totaux.map((t) => (
               <th key={t.destinataire_id} className={cn(th, 'min-w-[132px] align-bottom', conseilles.has(t.destinataire_id) && 'bg-vi-50/40')}>
                 <div className="flex flex-col items-end gap-1">

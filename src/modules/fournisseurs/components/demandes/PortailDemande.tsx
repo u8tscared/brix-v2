@@ -44,6 +44,7 @@ export default function PortailDemande({ d, dest, entreprise }: { d: Demande; de
     );
     setPort(dest.port ? ecrirePrix(dest.port) : '');
     setDelai(dest.delaiJours != null ? String(dest.delaiJours) : '');
+    setCommentaire(dest.commentaire ?? '');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dest.id]);
 
@@ -52,7 +53,13 @@ export default function PortailDemande({ d, dest, entreprise }: { d: Demande; de
   const avecPrix = d.lignes.filter((l) => !lignes[l.id]?.indispo && lirePrix(lignes[l.id]?.prix ?? '') != null).length;
   const sansRien = d.lignes.filter((l) => !lignes[l.id]?.indispo && lirePrix(lignes[l.id]?.prix ?? '') == null).length;
 
-  if (fini === 'prix') return <Merci titre="Merci, vos prix sont envoyés" texte={`${entreprise} les reçoit tout de suite. Si votre offre est retenue, le bon de commande arrivera par e-mail avec un lien comme celui-ci.`} />;
+  if (fini === 'prix')
+    return (
+      <div className="space-y-3">
+        <Merci titre="Merci, vos prix sont envoyés" texte={`${entreprise} les reçoit tout de suite. Si votre offre est retenue, le bon de commande arrivera par e-mail avec un lien comme celui-ci.`} />
+        <Button variant="secondary" className="h-12 w-full justify-center" onClick={() => { setFini(null); setModifier(true); }}>Corriger mes prix</Button>
+      </div>
+    );
   if (fini === 'decline' || dest.statut === 'declinee') return <Merci titre="C’est noté" texte={`${entreprise} sait que vous ne pouvez pas répondre à cette demande. Merci de l’avoir signalé.`} />;
   if (d.statut === 'annulee' || d.statut === 'commandee')
     return <Merci titre="Cette demande est close" texte={d.statut === 'commandee' ? `${entreprise} a déjà passé commande pour cette liste. Merci pour votre réponse.` : `${entreprise} a annulé cette demande. Vous n’avez rien à faire.`} />;

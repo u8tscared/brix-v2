@@ -14,6 +14,33 @@ const ACTIONS: Record<string, { label: string; to: string }> = {
   fichier_tarif: { label: 'Importer un tarif', to: '../catalogue' },
 };
 
+// Textes affichés à l'artisan : le registre du serveur parle aux développeurs (EDI, GLN, webhook…), ici on parle simple.
+const TEXTES: Record<string, { nom: string; description: string; condition?: string }> = {
+  email: {
+    nom: 'E-mail et lien de réponse',
+    description: 'Marche avec tous les fournisseurs, dès aujourd’hui. Brix envoie la demande ou la commande par e-mail avec un lien personnel : le fournisseur répond, confirme ou indique l’expédition depuis son téléphone, sans compte ni installation.',
+  },
+  api_brix: {
+    nom: 'Logiciel du fournisseur relié',
+    description: 'Si votre fournisseur a un logiciel relié à Brix, vos demandes et commandes arrivent directement chez lui, et ses prix, confirmations, livraisons et factures reviennent tout seuls. Il vous suffit du code partenaire qu’il vous donne.',
+  },
+  fichier_tarif: {
+    nom: 'Import de vos prix nets',
+    description: 'Le fichier de prix envoyé par votre commercial (Excel ou CSV) : Brix reconnaît les colonnes tout seul, garde l’historique et vous prévient quand un prix augmente.',
+  },
+  edi: {
+    nom: 'Commande automatique (EDI)',
+    description: 'Le format d’échange des grands négoces. Brix le joint déjà à vos bons de commande ; l’envoi direct, sans e-mail, s’active quand le fournisseur ouvre son canal pour vous.',
+    condition: 'un accord avec le service informatique du fournisseur, qui s’occupe des réglages.',
+  },
+  factures_pdp: {
+    nom: 'Factures fournisseurs automatiques',
+    description: 'Les factures de vos fournisseurs arrivent dans Brix par la facture électronique et sont comparées toutes seules à la commande et à la livraison.',
+    condition: 'le branchement à la plateforme de facture électronique, déjà utilisée par Brix pour vos propres factures.',
+  },
+};
+const texte = (c: ConnecteurDef) => ({ nom: TEXTES[c.cle]?.nom ?? c.nom, description: TEXTES[c.cle]?.description ?? c.description, condition: TEXTES[c.cle]?.condition ?? c.condition_reelle });
+
 const Puces = ({ c }: { c: ConnecteurDef }) => (
   <div className="flex flex-wrap gap-1">
     {c.capacites.map((k) => <span key={k} className="rounded-full bg-sub px-2 py-0.5 text-[11px] font-medium text-ink-2">{CAPACITES[k]}</span>)}
@@ -69,11 +96,11 @@ export default function Connecteurs() {
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-sub text-ink-2 [&_svg]:h-[18px] [&_svg]:w-[18px]">{ICONES[c.cle] ?? <Code2 />}</span>
                 <Badge tone="ok" dot>Disponible</Badge>
               </div>
-              <div className="mt-3 text-[14.5px] font-semibold">{c.nom}</div>
-              <p className="mt-1 flex-1 text-[12.5px] leading-relaxed text-ink-2">{c.description}</p>
+              <div className="mt-3 text-[14.5px] font-semibold">{texte(c).nom}</div>
+              <p className="mt-1 flex-1 text-[12.5px] leading-relaxed text-ink-2">{texte(c).description}</p>
               <div className="mt-3"><Puces c={c} /></div>
               {ACTIONS[c.cle] && (
-                <Button size="sm" variant="secondary" className="mt-4 self-start" onClick={() => nav(ACTIONS[c.cle].to)}>{ACTIONS[c.cle].label}</Button>
+                <Button size="sm" variant="secondary" className="mt-4 self-start max-md:h-10" onClick={() => nav(ACTIONS[c.cle].to)}>{ACTIONS[c.cle].label}</Button>
               )}
             </Card>
           ))}
@@ -88,11 +115,11 @@ export default function Connecteurs() {
               <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sub text-ink-2 [&_svg]:h-[18px] [&_svg]:w-[18px]">{ICONES[c.cle] ?? <Code2 />}</span>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[14px] font-semibold">{c.nom}</span>
+                  <span className="text-[14px] font-semibold">{texte(c).nom}</span>
                   <Badge>Sur accord</Badge>
                 </div>
-                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-2">{c.description}</p>
-                {c.condition_reelle && <p className="mt-1.5 text-[11.5px] text-ink-3">Il faut : {c.condition_reelle}</p>}
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-2">{texte(c).description}</p>
+                {texte(c).condition && <p className="mt-1.5 text-[11.5px] text-ink-3">Il faut {texte(c).condition}</p>}
               </div>
             </Card>
           ))}
@@ -116,7 +143,7 @@ export default function Connecteurs() {
                 </div>
                 <div className="mt-3 flex-1"><Puces c={c} /></div>
                 <p className="mt-3 border-t border-line pt-2.5 text-[11.5px] leading-snug text-ink-3">
-                  <span className="font-medium text-ink-2">Sur accord de l’enseigne.</span> {c.condition_reelle?.split('. En attendant')[0]}.
+                  <span className="font-medium text-ink-2">Sur accord de l’enseigne.</span> Une convention reste à signer avec {c.nom} ; en attendant, tout passe par e-mail.
                 </p>
               </Card>
             );
@@ -139,7 +166,7 @@ export default function Connecteurs() {
             <div className="text-[12px] font-medium text-white/60">Vous êtes fournisseur ?</div>
             <h2 className="mt-1 font-display text-[22px] font-semibold leading-tight tracking-[-0.02em]">Recevez les demandes des artisans directement dans votre logiciel</h2>
             <p className="mt-2 text-[13px] leading-relaxed text-white/70">
-              L’API Brix Fournisseurs vous envoie demandes de prix et commandes en temps réel. Vous répondez par API : prix, confirmation, expédition, tarifs et factures.
+              Brix envoie demandes de prix et commandes à votre logiciel, en temps réel. Il répond tout seul : prix, confirmation, expédition, tarifs et factures. Transmettez cette page à votre service informatique.
             </p>
             <a href="/api/public/v1/openapi.json" target="_blank" rel="noreferrer" className="mt-4 inline-flex h-10 items-center gap-2 rounded-[10px] bg-white px-4 text-[13.5px] font-medium text-ink transition hover:bg-white/90">
               Lire la documentation <ArrowRight className="h-4 w-4" />
@@ -147,8 +174,8 @@ export default function Connecteurs() {
           </div>
           <ul className="space-y-3 text-[13px]">
             {[
-              { t: 'API REST documentée', d: 'Description OpenAPI publique, testable en quelques minutes.' },
-              { t: 'Webhooks signés', d: 'Chaque envoi est signé : vous vérifiez qu’il vient bien de Brix.' },
+              { t: 'Documentation publique', d: 'Votre service informatique la lit et fait un essai en quelques minutes (API REST, description OpenAPI).' },
+              { t: 'Envois sécurisés', d: 'Chaque envoi est signé : vous vérifiez qu’il vient bien de Brix.' },
               { t: 'Code partenaire', d: 'Vous donnez un code BRX-XXXX-XXXX à vos clients artisans : leurs demandes arrivent chez vous, sans ressaisie.' },
             ].map((x) => (
               <li key={x.t} className="flex gap-3 rounded-[12px] border border-white/10 bg-white/[.04] p-3">

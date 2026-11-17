@@ -63,6 +63,7 @@ export default function Demandes() {
 
       {lignes.length > 0 && (
         <Segmented<Filtre>
+          className="[&>button]:h-10 md:[&>button]:h-8"
           value={filtre}
           onChange={setFiltre}
           options={[

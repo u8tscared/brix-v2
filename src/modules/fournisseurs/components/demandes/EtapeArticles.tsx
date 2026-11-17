@@ -37,7 +37,7 @@ export default function EtapeArticles({ lignes, onChange }: { lignes: LigneBroui
           {lignes.some((l) => !l.libre) ? 'Décochez ce que vous avez déjà en stock.' : 'Ajoutez les articles à chiffrer.'}
         </p>
         {lignes.length > 1 && (
-          <button type="button" className="h-9 shrink-0 text-[13px] font-medium text-ink-2 hover:text-ink" onClick={() => onChange(lignes.map((l) => ({ ...l, actif: !tous })))}>
+          <button type="button" className="h-10 shrink-0 text-[13px] md:h-9 font-medium text-ink-2 hover:text-ink" onClick={() => onChange(lignes.map((l) => ({ ...l, actif: !tous })))}>
             {tous ? 'Tout décocher' : 'Tout cocher'}
           </button>
         )}

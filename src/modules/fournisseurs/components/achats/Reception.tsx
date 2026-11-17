@@ -43,8 +43,8 @@ export default function Reception({ commande, open, onClose }: { commande: Comma
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[12.5px] font-medium text-ink-2">{commande.lignes.length} article{commande.lignes.length > 1 ? 's' : ''}</span>
         <div className="flex gap-1">
-          <Button size="sm" variant="ghost" onClick={() => setRecu(Object.fromEntries(commande.lignes.map((l) => [l.id, l.quantite])))}>Tout cocher</Button>
-          <Button size="sm" variant="ghost" onClick={() => setRecu(Object.fromEntries(commande.lignes.map((l) => [l.id, 0])))}>Tout décocher</Button>
+          <Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => setRecu(Object.fromEntries(commande.lignes.map((l) => [l.id, l.quantite])))}>Tout cocher</Button>
+          <Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => setRecu(Object.fromEntries(commande.lignes.map((l) => [l.id, 0])))}>Tout décocher</Button>
         </div>
       </div>
 

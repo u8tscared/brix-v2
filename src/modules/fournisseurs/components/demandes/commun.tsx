@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/components/ui';
-import { dateShort, todayISO } from '@/lib/format';
+import { dateShort } from '@/lib/format';
 
 /** Case à cocher visuelle (la cible tactile est la ligne qui la contient). */
 export function Coche({ on, className }: { on: boolean; className?: string }) {
@@ -42,11 +42,13 @@ export function saisieDecimale(s: string): string {
 export function quand(at: string): string {
   const d = new Date(at);
   const h = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-  const jour = at.slice(0, 10);
-  if (jour === todayISO()) return `aujourd’hui à ${h}`;
-  const hier = new Date();
+  // Jours comparés en heure locale (une date ISO est en UTC : autour de minuit, slice(0, 10) se trompe de jour).
+  const cle = (x: Date) => `${x.getFullYear()}-${x.getMonth()}-${x.getDate()}`;
+  const auj = new Date();
+  if (cle(d) === cle(auj)) return `aujourd’hui à ${h}`;
+  const hier = new Date(auj);
   hier.setDate(hier.getDate() - 1);
-  if (jour === hier.toISOString().slice(0, 10)) return `hier à ${h}`;
+  if (cle(d) === cle(hier)) return `hier à ${h}`;
   return `le ${dateShort(at)} à ${h}`;
 }
 

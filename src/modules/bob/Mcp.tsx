@@ -1,5 +1,1 @@
-import Placeholder from '@/components/layout/Placeholder';
-
-export default function Page() {
-  return <Placeholder />;
-}
+export { default } from '@/modules/fournisseurs/mcp/ConnecterIA';

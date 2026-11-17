@@ -68,12 +68,12 @@ export default function Consultes({ d, fournisseurs }: { d: Demande; fournisseur
           </Button>
           {isDemo && attente.length > 0 && (
             <BandeauDemo>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <span className="flex-1">Démo : rien ne part chez un vrai fournisseur. Ouvrez son lien pour répondre à sa place, ou faites répondre tout le monde.</span>
+              <div className="flex flex-col gap-2">
+                <span>Démo : rien ne part chez un vrai fournisseur. Ouvrez son lien pour répondre à sa place, ou faites répondre tout le monde.</span>
                 <Button
                   size="sm"
                   variant="soft"
-                  className="h-10 justify-center sm:h-8"
+                  className="w-full justify-center max-md:h-10"
                   icon={<Play className="h-3.5 w-3.5" />}
                   onClick={() => {
                     const n = simuler(d.id);

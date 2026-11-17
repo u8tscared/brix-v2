@@ -34,7 +34,7 @@ export default function FournisseursPage() {
               key={o.to}
               to={o.to}
               end={o.end}
-              className={({ isActive }) => cn('flex h-9 items-center whitespace-nowrap rounded-[9px] px-3 text-[13px] font-medium transition', isActive ? 'bg-ink text-white' : 'text-ink-2 hover:bg-sub hover:text-ink')}
+              className={({ isActive }) => cn('flex h-10 items-center whitespace-nowrap md:h-9 rounded-[9px] px-3 text-[13px] font-medium transition', isActive ? 'bg-ink text-white' : 'text-ink-2 hover:bg-sub hover:text-ink')}
             >
               {o.label}
             </NavLink>
