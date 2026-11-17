@@ -61,8 +61,8 @@ export function lignes(ls: Ligne[], opts: { haut?: boolean } = {}): string {
       const poids = l.fort ? 'font-weight:600;' : '';
       const couleur = l.fort ? C.ink : C.ink2;
       return `<tr>
-<td class="bx-filet ${l.fort ? 'bx-ink' : 'bx-ink2'}" style="${bord}padding:11px 12px 11px 0;font-size:14px;line-height:20px;color:${couleur};${poids}">${esc(l.libelle)}${l.detail ? `<div class="bx-ink3" style="font-size:12px;line-height:17px;color:${C.ink3};font-weight:400">${esc(l.detail)}</div>` : ''}</td>
-<td class="bx-filet bx-ink bx-num" align="right" valign="top" style="${bord}padding:11px 0;font-size:14px;line-height:20px;color:${C.ink};white-space:nowrap;${poids}${l.mono ? `font-family:${MONO};font-size:13px;` : ''}">${esc(l.valeur)}</td>
+<td class="bx-filet ${l.fort ? 'bx-ink' : 'bx-ink2'}" valign="top" style="${bord}padding:11px 12px 11px 0;font-size:14px;line-height:20px;color:${couleur};${poids}">${esc(l.libelle)}${l.detail ? `<div class="bx-ink3" style="font-size:12px;line-height:17px;color:${C.ink3};font-weight:400">${esc(l.detail)}</div>` : ''}</td>
+<td class="bx-filet bx-ink bx-num" align="right" valign="top" style="${bord}padding:11px 0;font-size:14px;line-height:20px;color:${C.ink};${l.valeur.length <= 16 ? 'white-space:nowrap;' : 'max-width:60%;'}${poids}${l.mono ? `font-family:${MONO};font-size:13px;` : ''}">${esc(l.valeur)}</td>
 </tr>`;
     })
     .join('');

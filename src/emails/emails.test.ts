@@ -110,6 +110,13 @@ describe('modèles', () => {
     expect(rendreEmail('facture_envoyee', { ...base, type: 'solde' }).sujet).toMatch(/^Facture de solde/);
   });
 
+  it('exemples cohérents (totaux = somme des lignes)', () => {
+    const c = EX.commande_fournisseur.donnees;
+    expect(c.articles.reduce((s, a) => s + a.quantite * a.prixHt, 0)).toBeCloseTo(c.montantHt, 2);
+    const d = EX.devis_envoye.donnees;
+    expect((d.lignes ?? []).reduce((s, l) => s + l.montant, 0)).toBeCloseTo(d.montantTtc, 2);
+  });
+
   it('modèle inconnu : erreur claire', () => {
     expect(() => rendreEmail('inconnu' as ModeleEmail, {} as never)).toThrow(/inconnu/);
   });

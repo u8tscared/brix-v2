@@ -106,7 +106,7 @@ export function devisSigneClient(d: DonneesEmail['devis_signe_client']): RenduEm
     { libelle: 'Signé le', valeur: dateHeure(d.signeLe) },
     { libelle: 'Par', valeur: d.signataire },
     ...(d.formule ? [{ libelle: 'Formule retenue', valeur: d.formule }] : []),
-    { libelle: 'Empreinte du document', valeur: String(d.empreinte).slice(0, 16), mono: true, detail: 'Permet de vérifier que le devis n\'a pas été modifié' },
+    { libelle: 'Empreinte', valeur: String(d.empreinte).slice(0, 12), mono: true, detail: 'Prouve que le devis n\'a pas changé' },
   ];
   const acompte = d.acompteMontant && d.acompteMontant > 0;
   const suite = acompte
