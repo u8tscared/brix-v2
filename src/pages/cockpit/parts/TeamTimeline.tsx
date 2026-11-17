@@ -54,7 +54,7 @@ export function TeamTimeline({ data, className }: { data: CockpitData; className
         <button onClick={() => navigate('/app/planning')} className="flex items-center gap-1 text-[12.5px] text-ink-2 transition hover:text-ink">Planning <ArrowUpRight className="h-3.5 w-3.5" /></button>
       </header>
 
-      <div className="mt-3 grid grid-cols-[112px_1fr] pr-5">
+      <div className="mt-3 grid grid-cols-[132px_1fr] pr-5">
         <div />
         <div className="relative h-6 text-[11px] text-ink-3">
           {HOURS.map((h) => <span key={h} className="num absolute top-1 -translate-x-1/2" style={{ left: `${pct(h * 60)}%` }}>{h} h</span>)}
@@ -69,12 +69,12 @@ export function TeamTimeline({ data, className }: { data: CockpitData; className
           const evs = data.todayEvents.filter((x) => x.employeeId === e.id).sort((a, b) => a.start.localeCompare(b.start));
           const current = evs.find((x) => toMin(x.start) <= now && toMin(x.end) > now);
           return (
-            <div key={e.id} className="grid h-[54px] grid-cols-[112px_1fr] items-center border-t border-line pr-5">
+            <div key={e.id} className="grid h-[54px] grid-cols-[132px_1fr] items-center border-t border-line pr-5">
               <div className="flex min-w-0 items-center gap-2 pl-5">
                 <Avatar initials={e.initials} color={e.color} size={26} />
                 <span className="min-w-0">
                   <b className="block truncate text-[12.5px] font-semibold">{e.firstName}</b>
-                  <span className={cn('block truncate text-[11px]', e.clockedInAt ? 'text-ok' : 'text-ink-3')}>{e.clockedInAt ? `pointé ${e.clockedInAt.replace(':', ' h ')}` : 'pas pointé'}</span>
+                  <span className={cn('block truncate text-[11px]', e.clockedInAt ? 'text-ok' : 'text-ink-3')}>{e.clockedInAt ? `pointé à ${e.clockedInAt.replace(':', ' h ')}` : 'pas pointé'}</span>
                 </span>
               </div>
               <div className="relative h-full">
@@ -87,7 +87,7 @@ export function TeamTimeline({ data, className }: { data: CockpitData; className
                       key={ev.id}
                       onClick={() => navigate(ev.chantierId ? `/app/chantiers/${ev.chantierId}` : '/app/planning')}
                       title={`${ev.start} à ${ev.end} · ${ev.title}`}
-                      className={cn('absolute top-[11px] flex h-8 origin-left animate-grow items-center overflow-hidden rounded-[8px] px-2 text-left text-[11.5px] font-medium transition-[filter] hover:brightness-95', KIND[ev.kind], current?.id === ev.id && 'ring-1 ring-current/30')}
+                      className={cn('absolute top-[11px] flex h-8 origin-left animate-grow items-center overflow-hidden rounded-[8px] px-2 text-left text-[11.5px] font-medium transition-[filter] hover:brightness-95', KIND[ev.kind], current?.id === ev.id && 'font-semibold')}
                       style={{ left: `calc(${l}% + 2px)`, width: `calc(${w}% - 4px)`, animationDelay: `${row * 70 + i * 50}ms` }}
                     >
                       <span className="truncate">{ev.title}</span>
@@ -100,7 +100,7 @@ export function TeamTimeline({ data, className }: { data: CockpitData; className
           );
         })}
         {inDay && (
-          <div className="pointer-events-none absolute inset-y-0 left-[112px] right-5" aria-hidden>
+          <div className="pointer-events-none absolute inset-y-0 left-[132px] right-5" aria-hidden>
             <i className="absolute inset-y-0 w-px bg-mag-600/70 transition-[left] duration-1000 ease-out-quint" style={{ left: `${pct(now)}%` }} />
           </div>
         )}
