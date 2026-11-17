@@ -15,10 +15,14 @@ const SAMPLES: Omit<Expense, 'id' | 'status' | 'date'>[] = [
   { supplier: 'APRR Péage Villefranche', category: 'Péage', amountTtc: 7.4, vat: 1.23 },
 ];
 
+export type ReceiptSample = (typeof SAMPLES)[number];
+/** Ticket d'exemple (démo sur ordinateur, sans appareil photo). */
+export const sampleReceipt = (): ReceiptSample => SAMPLES[Math.floor(Math.random() * SAMPLES.length)];
+
 /** Lit un ticket photographié et renvoie fournisseur, montant, TVA et catégorie. */
-export async function readReceipt(_file: File): Promise<Omit<Expense, 'id' | 'status'> & { confidence: number }> {
-  await wait(1700);
-  const s = SAMPLES[Math.floor(Math.random() * SAMPLES.length)];
+export async function readReceipt(_file: File | null, known?: ReceiptSample): Promise<Omit<Expense, 'id' | 'status'> & { confidence: number }> {
+  await wait(2200);
+  const s = known ?? sampleReceipt();
   return { ...s, date: todayISO(), confidence: 0.94 };
 }
 

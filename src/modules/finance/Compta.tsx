@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { Check, FileArchive, FileSpreadsheet, FileText, Mail, Trash2, UserPlus } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, cn, Input, PageHeader, Segmented, toast } from '@/components/ui';
-import { capitalize, money, monthName } from '@/lib/format';
+import { ArrowRight, Check, Download, FileArchive, FileSpreadsheet, FileText, Lock, Mail, RefreshCw, Trash2, UserPlus } from 'lucide-react';
+import { Badge, Button, Card, CardHeader, cn, IconTile, Input, PageHeader, Segmented, Sheet, toast } from '@/components/ui';
+import { LiveDot, SuccessDot } from '@/components/motion';
+import { capitalize, money, monthName, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
+import { BigMoney, Label, SectionHead } from './components/kit';
 import { CONNECTORS, connectSoftware, exportFec, exportPdfZip, exportSalesCsv, useCompta, vatOfMonth, type Period } from './components/comptaService';
 
 type PKey = 'mois' | 'precedent' | 'trimestre' | 'annee';
@@ -20,23 +22,36 @@ function period(k: PKey): Period {
   }
   return { from: `${y}-01-01`, to: `${y}-12-31`, label: `année ${y}` };
 }
+const hm = (isoTs: string) => new Date(isoTs).toTimeString().slice(0, 5).replace(':', ' h ');
 
 export default function Compta() {
   const s = useBrix();
   const c = useCompta();
   const [pk, setPk] = useState<PKey>('precedent');
   const [busy, setBusy] = useState<string | null>(null);
+  const [done, setDone] = useState<Record<string, boolean>>({});
   const [email, setEmail] = useState('');
+  const [pickSoft, setPickSoft] = useState(false);
   const p = period(pk);
   const now = new Date();
   const month = iso(now).slice(0, 7);
   const vat = vatOfMonth(s, month);
   const dueDay = 24;
+  const soft = CONNECTORS.find((x) => x.key === c.connected);
+
+  const sent = s.factures.filter((f) => f.status !== 'brouillon');
+  const counts = [
+    { label: 'Factures et avoirs', n: sent.length, sub: money(sent.reduce((t, f) => t + totals(f.lines).ttc, 0), true) },
+    { label: 'Tickets et achats', n: s.expenses.length + s.bank.filter((t) => t.amount < 0).length, sub: 'avec leur justificatif' },
+    { label: 'Paiements reçus', n: s.bank.filter((t) => t.amount > 0).length, sub: 'rapprochés aux factures' },
+  ];
 
   const run = async (k: string, fn: () => number | Promise<unknown>, msg: (n: number) => string) => {
     setBusy(k);
     const r = await fn();
     setBusy(null);
+    setDone((d) => ({ ...d, [k]: true }));
+    setTimeout(() => setDone((d) => ({ ...d, [k]: false })), 2600);
     toast(msg(typeof r === 'number' ? r : 0));
   };
   const connect = async (k: string, name: string) => {
@@ -48,100 +63,162 @@ export default function Compta() {
     await connectSoftware(k);
     c.setConnected(k);
     setBusy(null);
-    toast(`${name} relié : factures, achats et paiements partent tout seuls (démo)`);
+    setPickSoft(false);
+    toast(`${name} relié : tout part maintenant tout seul`);
+  };
+  const syncNow = async () => {
+    if (!c.connected) return setPickSoft(true);
+    setBusy('sync');
+    await connectSoftware(c.connected);
+    c.setConnected(c.connected);
+    setBusy(null);
+    toast(`Envoyé à ${soft?.name} : tout est à jour`);
   };
   const invite = () => {
     if (!/^\S+@\S+\.\S+$/.test(email)) return toast('Adresse e-mail incomplète', 'warn');
     c.addGuest({ email, name: email.split('@')[1].split('.')[0].replace(/-/g, ' '), since: iso(now), access: 'lecture' });
     setEmail('');
-    toast('Invitation envoyée à votre expert-comptable (démo)');
+    toast('Invitation envoyée à votre expert-comptable');
   };
 
-  return (
-    <div className="space-y-5">
-      <PageHeader title="Comptabilité" subtitle="Votre comptable reçoit tout, sans que vous ayez rien à envoyer." />
+  const exports = [
+    { k: 'fec', icon: FileText, t: 'Fichier pour les impôts', tag: 'FEC', d: 'Le format officiel, ouvert par tous les logiciels comptables', go: () => run('fec', () => exportFec(s, p), (n) => `Fichier téléchargé · ${n} lignes`) },
+    { k: 'csv', icon: FileSpreadsheet, t: 'Tableau des ventes', tag: 'Excel', d: 'Factures et avoirs, une ligne par facture', go: () => run('csv', () => exportSalesCsv(s, p), (n) => `${n} factures exportées`) },
+    { k: 'zip', icon: FileArchive, t: 'Toutes les pièces', tag: 'PDF', d: 'Factures, avoirs et tickets dans un seul dossier', go: () => run('zip', () => exportPdfZip(p), () => 'Dossier prêt, le lien part par e-mail') },
+  ];
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <Card className="p-5">
-          <div className="text-[12.5px] font-medium text-ink-2">TVA de {monthName(now)}, à déclarer avant le {dueDay}</div>
-          <div className="num mt-1.5 font-display text-[34px] font-semibold leading-tight tracking-[-0.02em] dawn-text">{money(Math.max(0, vat.due))}</div>
-          <div className="mt-4 space-y-2 text-[13px]">
-            <div className="flex justify-between"><span className="text-ink-2">TVA encaissée sur vos factures</span><span className="num font-medium">{money(vat.collected)}</span></div>
-            <div className="flex justify-between"><span className="text-ink-2">TVA récupérable (achats, frais)</span><span className="num font-medium">− {money(vat.deductible)}</span></div>
-            <div className="flex justify-between border-t border-line pt-2"><span className="font-medium">À payer</span><span className="num font-semibold">{money(Math.max(0, vat.due))}</span></div>
+  return (
+    <div className="space-y-6">
+      <PageHeader icon={<IconTile name="Calculator" dept="gestion" size="lg" />} title="Comptabilité" subtitle="Votre comptable reçoit tout, sans que vous ayez rien à envoyer." />
+
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-5 p-5 md:flex-row md:items-center md:p-6">
+          <div className="flex min-w-0 flex-1 items-start gap-4">
+            <span className={cn('relative grid h-12 w-12 shrink-0 place-items-center rounded-[14px]', soft ? 'bg-ok-bg text-ok' : 'bg-sub text-ink-3')}>
+              {soft ? <SuccessDot size={26} /> : <RefreshCw className="h-5 w-5" />}
+            </span>
+            <div className="min-w-0">
+              <div className="text-[18px] font-semibold leading-tight tracking-[-0.025em]">{soft ? `Votre comptable est à jour` : 'Reliez votre logiciel, et c’est fini'}</div>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 text-[13px] text-ink-2">
+                {soft ? (
+                  <>
+                    <LiveDot />
+                    <span>{soft.name} reçoit tout en direct{c.lastSync ? `, dernier envoi à ${hm(c.lastSync)}` : ''}</span>
+                  </>
+                ) : (
+                  <span>Une seule fois. Ensuite factures, tickets et paiements partent tout seuls, chaque nuit.</span>
+                )}
+              </div>
+            </div>
           </div>
-          <p className="mt-4 rounded-xl bg-sub p-3 text-[12.5px] leading-relaxed text-ink-2">
-            En bâtiment, la TVA se paie quand le client vous règle, pas quand vous facturez. Bob a déjà tout calculé ligne par ligne, taux de 5,5 %, 10 % et 20 % compris.
-          </p>
-          <Button className="mt-4 w-full justify-center" variant="primary" onClick={() => toast('Déclaration CA3 pré-remplie et envoyée à votre comptable (démo)')}>Préparer la déclaration</Button>
+          <Button variant={soft ? 'secondary' : 'primary'} loading={busy === 'sync'} icon={soft ? <RefreshCw /> : undefined} iconRight={soft ? undefined : <ArrowRight />} onClick={syncNow} className="max-md:w-full">
+            {soft ? 'Envoyer maintenant' : 'Relier mon logiciel'}
+          </Button>
+        </div>
+        <div className="stagger-fast grid grid-cols-1 border-t border-line sm:grid-cols-3">
+          {counts.map((x, i) => (
+            <div key={x.label} className={cn('flex items-center gap-3 px-5 py-4 md:px-6', i > 0 && 'border-line max-sm:border-t sm:border-l')}>
+              <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-full', soft ? 'bg-ok text-white' : 'bg-sub text-ink-3')}><Check className="h-3.5 w-3.5" strokeWidth={2.6} /></span>
+              <div className="min-w-0">
+                <div className="text-[13.5px] font-medium"><span className="num">{x.n}</span> {x.label.toLowerCase()}</div>
+                <div className="truncate text-[12px] text-ink-3">{soft ? 'transmis' : 'prêts'} · {x.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+        <Card className="p-5 md:p-6">
+          <Label>TVA de {monthName(now)}</Label>
+          <BigMoney value={Math.max(0, vat.due)} cents dawn className="mt-3 block text-[40px]" />
+          <div className="mt-2 text-[12.5px] text-ink-2">à déclarer avant le {dueDay} · Bob a tout calculé</div>
+          <div className="mt-5 space-y-2.5 text-[13px]">
+            <div className="flex justify-between gap-3"><span className="text-ink-2">Encaissée sur vos factures</span><span className="num font-medium">{money(vat.collected)}</span></div>
+            <div className="flex justify-between gap-3"><span className="text-ink-2">Récupérable sur vos achats et frais</span><span className="num font-medium text-ok">− {money(vat.deductible)}</span></div>
+            <div className="flex justify-between gap-3 border-t border-line pt-2.5"><span className="font-medium">À payer</span><span className="num font-semibold">{money(Math.max(0, vat.due))}</span></div>
+          </div>
+          <p className="mt-4 text-[12.5px] leading-relaxed text-ink-3">Dans le bâtiment, la TVA se paie quand le client vous règle, pas quand vous facturez. Les taux 5,5 %, 10 % et 20 % sont comptés ligne par ligne.</p>
+          <Button className="mt-5 w-full" variant="secondary" onClick={() => toast('Déclaration pré-remplie, envoyée à votre comptable pour validation')}>Préparer la déclaration</Button>
         </Card>
 
-        <Card>
-          <CardHeader title="Exporter pour le comptable" />
-          <div className="space-y-3 p-4">
+        <Card className="min-w-0">
+          <CardHeader title="Télécharger pour le comptable" />
+          <div className="space-y-3 p-4 md:p-5">
             <Segmented value={pk} onChange={setPk} className="w-full" options={[{ value: 'mois', label: 'Ce mois' }, { value: 'precedent', label: 'Mois dernier' }, { value: 'trimestre', label: 'Trimestre' }, { value: 'annee', label: 'Année' }]} />
             <div className="text-[12.5px] text-ink-3">Période : {p.label}</div>
-            {[
-              { k: 'fec', icon: FileText, t: 'Fichier FEC', d: 'Le format officiel des impôts, lu par tous les logiciels comptables', go: () => run('fec', () => exportFec(s, p), (n) => `FEC téléchargé · ${n} lignes d'écritures`) },
-              { k: 'csv', icon: FileSpreadsheet, t: 'Tableau des ventes (CSV)', d: 'Factures et avoirs, à ouvrir dans Excel', go: () => run('csv', () => exportSalesCsv(s, p), (n) => `${n} factures exportées`) },
-              { k: 'zip', icon: FileArchive, t: 'Toutes les pièces en PDF', d: 'Factures, avoirs, tickets, dans un seul dossier compressé', go: () => run('zip', () => exportPdfZip(p), () => 'Dossier PDF prêt, lien envoyé par e-mail (démo)') },
-            ].map((x) => (
-              <button key={x.k} onClick={x.go} disabled={!!busy} className="flex min-h-[60px] w-full items-center gap-3 rounded-xl border border-line px-3.5 text-left transition hover:border-line2 hover:bg-sub disabled:opacity-60">
-                <x.icon className="h-5 w-5 shrink-0 text-ink-2" strokeWidth={1.75} />
-                <span className="min-w-0 flex-1"><span className="block text-[13.5px] font-medium">{x.t}</span><span className="block text-[12px] text-ink-3">{x.d}</span></span>
-                <span className="text-[12.5px] font-medium text-vi-700">{busy === x.k ? 'Préparation…' : 'Télécharger'}</span>
-              </button>
-            ))}
+            <div className="stagger-fast space-y-2">
+              {exports.map((x) => (
+                <button key={x.k} onClick={x.go} disabled={!!busy} className="lift group flex min-h-[64px] w-full items-center gap-3 rounded-[13px] bg-white px-3.5 text-left shadow-[0_0_0_1px_var(--line)] disabled:opacity-60">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] bg-[#eef0fd] text-[#3730a3]"><x.icon className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2 text-[13.5px] font-medium">{x.t}<Badge>{x.tag}</Badge></span>
+                    <span className="block truncate text-[12px] text-ink-3">{x.d}</span>
+                  </span>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-3 transition group-hover:bg-sub group-hover:text-ink">
+                    {busy === x.k ? <RefreshCw className="h-4 w-4 animate-spin" /> : done[x.k] ? <SuccessDot size={20} /> : <Download className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader title="Relier votre logiciel comptable" meta={c.connected ? `synchronisé ${c.lastSync ? 'à ' + new Date(c.lastSync).toTimeString().slice(0, 5).replace(':', ' h ') : ''}` : 'une seule fois, ensuite tout part tout seul'} />
-        <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3">
-          {CONNECTORS.map((x) => {
-            const on = c.connected === x.key;
-            return (
-              <div key={x.key} className={cn('flex items-center gap-3 rounded-xl border p-3.5 transition', on ? 'border-[#c9f0d6] bg-ok-bg/50' : 'border-line')}>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl font-display text-[15px] font-semibold text-white" style={{ background: x.color }}>{x.name[0]}</span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[13.5px] font-semibold">{x.name}</div>
-                  <div className="truncate text-[12px] text-ink-3">{on ? 'Relié' : x.sub}</div>
-                </div>
-                {on ? (
-                  <button onClick={() => connect(x.key, x.name)} className="flex h-9 items-center gap-1 rounded-lg px-2 text-[12.5px] font-medium text-ok hover:bg-white"><Check className="h-4 w-4" />Relié</button>
-                ) : (
-                  <Button size="sm" loading={busy === x.key} disabled={!!c.connected || (!!busy && busy !== x.key)} onClick={() => connect(x.key, x.name)}>Connecter</Button>
-                )}
-              </div>
-            );
-          })}
+      <section className="space-y-3">
+        <SectionHead title="Votre logiciel comptable" meta={soft ? `${soft.name} relié` : 'à relier une seule fois'} />
+        <div className="stagger-fast grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {CONNECTORS.map((x) => (
+            <SoftTile key={x.key} x={x} on={c.connected === x.key} busy={busy === x.key} disabled={(!!c.connected && c.connected !== x.key) || (!!busy && busy !== x.key)} onClick={() => connect(x.key, x.name)} />
+          ))}
         </div>
-      </Card>
+      </section>
 
       <Card>
         <CardHeader title="Accès de votre expert-comptable" meta="il consulte tout, sans vous déranger" />
-        <div className="p-4">
+        <div className="p-4 md:p-5">
           <div className="flex flex-col gap-2 sm:flex-row">
             <Input className="sm:flex-1" icon={<Mail />} type="email" value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && invite()} placeholder="adresse@cabinet-comptable.fr" />
-            <Button variant="primary" className="h-11 justify-center" icon={<UserPlus className="h-4 w-4" />} onClick={invite}>Inviter</Button>
+            <Button variant="secondary" className="h-11" icon={<UserPlus />} onClick={invite}>Inviter</Button>
           </div>
-          <div className="mt-3 overflow-hidden rounded-xl border border-line">
+          <div className="mt-3 space-y-2">
             {c.guests.map((g) => (
-              <div key={g.email} className="flex min-h-[56px] items-center gap-3 border-b border-line px-3.5 py-2 last:border-b-0">
+              <div key={g.email} className="flex min-h-[60px] animate-[fade-up_.4s_var(--ease)_both] items-center gap-3 rounded-[13px] bg-sub/60 px-3.5 py-2">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-[12px] font-semibold text-[#3730a3] shadow-card">{g.name.slice(0, 1).toUpperCase()}</span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13.5px] font-medium">{capitalize(g.name)}</div>
                   <div className="truncate text-[12px] text-ink-3">{g.email}</div>
                 </div>
-                <Badge tone="info">Lecture et export</Badge>
-                <button onClick={() => { c.removeGuest(g.email); toast('Accès retiré', 'info'); }} className="grid h-10 w-10 place-items-center rounded-lg text-ink-3 hover:bg-sub hover:text-bad" aria-label="Retirer l'accès"><Trash2 className="h-4 w-4" /></button>
+                <Badge tone="info" icon={<Lock />} className="max-sm:hidden">Lecture seule</Badge>
+                <button onClick={() => { c.removeGuest(g.email); toast('Accès retiré', 'info'); }} className="grid h-10 w-10 place-items-center rounded-lg text-ink-3 transition hover:bg-white hover:text-bad" aria-label="Retirer l'accès"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
-            {!c.guests.length && <div className="px-4 py-6 text-center text-[13px] text-ink-3">Aucun accès invité.</div>}
+            {!c.guests.length && <div className="rounded-[13px] bg-sub/60 px-4 py-6 text-center text-[13px] text-ink-3">Aucun accès pour l’instant.</div>}
           </div>
-          <p className="mt-2 text-xs text-ink-3">Accès gratuit et illimité pour votre cabinet. Il ne peut ni modifier ni supprimer vos factures.</p>
+          <p className="mt-3 text-[12px] text-ink-3">Gratuit et sans limite pour votre cabinet. Il voit et télécharge, il ne peut ni modifier ni supprimer.</p>
         </div>
       </Card>
+
+      <Sheet open={pickSoft} onClose={() => setPickSoft(false)} title="Quel logiciel utilise votre comptable ?" subtitle="Demandez-lui si vous ne savez pas. Vous pourrez changer plus tard.">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {CONNECTORS.map((x) => (
+            <SoftTile key={x.key} x={x} on={c.connected === x.key} busy={busy === x.key} disabled={!!busy && busy !== x.key} onClick={() => connect(x.key, x.name)} />
+          ))}
+        </div>
+      </Sheet>
     </div>
+  );
+}
+
+function SoftTile({ x, on, busy, disabled, onClick }: { x: (typeof CONNECTORS)[number]; on: boolean; busy: boolean; disabled: boolean; onClick: () => void }) {
+  return (
+    <button onClick={onClick} disabled={disabled} className={cn('lift group flex min-h-[64px] items-center gap-3 rounded-[14px] bg-white p-3 text-left shadow-card transition disabled:pointer-events-none disabled:opacity-45', on && 'shadow-[0_0_0_1.5px_#86efac,0_1px_2px_rgba(19,15,38,.04)]')}>
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] text-[15px] font-semibold text-white" style={{ background: x.color }}>{x.name[0]}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[13.5px] font-semibold">{x.name}</span>
+        <span className="block truncate text-[12px] text-ink-3">{on ? 'Relié · touchez pour couper' : busy ? 'Connexion sécurisée…' : x.sub}</span>
+      </span>
+      {busy ? <RefreshCw className="h-4 w-4 animate-spin text-ink-3" /> : on ? <SuccessDot size={20} /> : <ArrowRight className="h-4 w-4 text-ink-3 transition group-hover:translate-x-0.5 group-hover:text-ink" />}
+    </button>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowDownLeft, ArrowUpRight, Check, Link2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge, Button, Card, CardHeader, cn, Segmented, Sheet, toast } from '@/components/ui';
+import { SuccessDot } from '@/components/motion';
 import { dateShort, money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { BankTx } from '@/lib/types';
@@ -13,6 +14,12 @@ export function TransactionsCard() {
   const s = useBrix();
   const [filter, setFilter] = useState<'toutes' | 'a_traiter'>('toutes');
   const [matching, setMatching] = useState<BankTx | null>(null);
+  const [done, setDone] = useState<string | null>(null);
+  const classify = (t: BankTx, category: string) => {
+    s.upsertBank({ ...t, category });
+    setDone(t.id);
+    setTimeout(() => setDone((d) => (d === t.id ? null : d)), 1400);
+  };
   const todo = (t: BankTx) => (t.amount > 0 ? !t.matchedFactureId : !t.category);
   const list = [...s.bank].sort((a, b) => b.date.localeCompare(a.date)).filter((t) => filter === 'toutes' || todo(t));
   const nTodo = s.bank.filter(todo).length;
@@ -30,6 +37,7 @@ export function TransactionsCard() {
   return (
     <Card className="min-w-0">
       <CardHeader title="Opérations" meta={`${s.bank.length}`} action={<Segmented size="sm" value={filter} onChange={setFilter} options={[{ value: 'toutes', label: 'Toutes' }, { value: 'a_traiter', label: 'À traiter', count: nTodo }]} />} />
+      <div key={filter} className="stagger-fast">
       {list.map((t) => {
         const f = t.matchedFactureId ? s.factures.find((x) => x.id === t.matchedFactureId) : undefined;
         const In = t.amount > 0;
@@ -47,11 +55,12 @@ export function TransactionsCard() {
                 ) : In ? (
                   <Badge tone="warn">Sans facture</Badge>
                 ) : (
-                  <select value={t.category ?? ''} onChange={(e) => s.upsertBank({ ...t, category: e.target.value })} className="h-7 rounded-md border border-line bg-white px-1.5 text-[12px] text-ink-2">
+                  <select value={t.category ?? ''} onChange={(e) => classify(t, e.target.value)} className={cn('h-7 max-w-[150px] rounded-full border-0 px-2.5 text-[12px] font-medium shadow-[inset_0_0_0_1px_var(--line2)] transition focus:outline-none focus:ring-4 focus:ring-vi-100', t.category ? 'bg-sub text-ink-2' : 'bg-warn-bg text-warn shadow-[inset_0_0_0_1px_#fde3b0]')}>
                     <option value="" disabled>Classer…</option>
                     {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                   </select>
                 )}
+                {done === t.id && <SuccessDot size={16} />}
               </div>
             </div>
             <div className={cn('num shrink-0 text-right text-[13.5px] font-semibold', In && 'text-ok')}>{In ? '+' : ''}{money(t.amount)}</div>
@@ -60,7 +69,14 @@ export function TransactionsCard() {
           </div>
         );
       })}
-      {!list.length && <div className="px-4 py-10 text-center text-[13px] text-ink-3">Tout est rapproché.</div>}
+      </div>
+      {!list.length && (
+        <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
+          <SuccessDot size={28} />
+          <div className="text-[14px] font-medium">Tout est rapproché</div>
+          <div className="text-[12.5px] text-ink-3">Chaque opération a sa facture ou sa catégorie.</div>
+        </div>
+      )}
 
       <Sheet open={!!matching} onClose={() => setMatching(null)} title="À quelle facture correspond ce paiement ?" subtitle={matching ? `${matching.label} · ${money(matching.amount)}` : ''}>
         <div className="space-y-2">
