@@ -33,11 +33,22 @@ export interface LigneDemande {
   devisLigneId?: string;
 }
 
+/** Disponibilité annoncée par le fournisseur pour une ligne. */
+export type Dispo = 'stock' | 'delai' | 'equivalent';
+
 export interface PrixReponse {
   ligneId: string;
-  prix: number | null; // null = indisponible
+  prix: number | null; // null = indisponible ; prix net, remise déduite
   referenceProposee?: string;
   designationProposee?: string;
+  dispo?: Dispo;
+  dispoJours?: number; // si dispo = 'delai'
+}
+
+/** Pièce jointe déposée par le fournisseur (en démo : nom et taille seulement). */
+export interface PieceJointe {
+  nom: string;
+  taille: number; // octets
 }
 
 export interface Destinataire {
@@ -51,6 +62,10 @@ export interface Destinataire {
   delaiJours?: number;
   port?: number;
   commentaire?: string;
+  remise?: number; // remise globale annoncée (%), déjà déduite des prix
+  conditions?: string; // conditions de paiement
+  validiteJours?: number; // validité de l'offre
+  pieceJointe?: PieceJointe;
   prix: PrixReponse[];
 }
 
@@ -105,6 +120,8 @@ export interface Commande {
   factureId?: string;
   ecartFacture?: number;
   message?: string;
+  prepareeLe?: string; // le fournisseur a indiqué que la commande est prête
+  proposition?: { texte: string; at: string; livraison?: string }; // modification proposée par le fournisseur
   createdAt: string;
   lignes: LigneCommande[];
   journal: Evenement[];

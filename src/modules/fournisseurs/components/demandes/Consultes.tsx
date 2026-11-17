@@ -1,6 +1,6 @@
 // Fournisseurs consultés : qui a ouvert, qui a répondu, et les gestes utiles (relancer, saisir, simuler).
 import { useState } from 'react';
-import { BellRing, ExternalLink, PhoneCall, Play } from 'lucide-react';
+import { BellRing, Check, ExternalLink, FileText, PhoneCall, Play } from 'lucide-react';
 import { Button, Card, CardHeader, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { lienPortail } from '../../data/helpers';
@@ -32,15 +32,20 @@ export default function Consultes({ d, fournisseurs }: { d: Demande; fournisseur
       <CardHeader title="Fournisseurs consultés" meta={`${d.destinataires.filter((x) => x.statut === 'repondue').length}/${d.destinataires.length} réponses`} />
       <ul>
         {d.destinataires.map((x) => (
-          <li key={x.id} className="flex min-h-[60px] items-center gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
-            <FournisseurPastille f={f(x.fournisseurId)} size={34} />
+          <li key={x.id} className="flex min-h-[64px] items-center gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
+            <span className="relative">
+              <FournisseurPastille f={f(x.fournisseurId)} size={36} />
+              {x.statut === 'vue' && <span className="fx-ping absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-vi-700" title="A ouvert la demande" />}
+              {x.statut === 'repondue' && <span className="bx-pop absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border-2 border-white bg-ok text-white"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>}
+            </span>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13.5px] font-medium">{f(x.fournisseurId)?.nom ?? 'Fournisseur'}</div>
               <div className="truncate text-[12px] text-ink-3">{detail(x)}</div>
+              {x.pieceJointe && <div className="mt-0.5 flex items-center gap-1 truncate text-[11.5px] text-ink-2"><FileText className="h-3 w-3 shrink-0 text-bad" strokeWidth={1.75} />{x.pieceJointe.nom}</div>}
             </div>
             <BadgeDestinataire s={x.statut} />
-            {isDemo && active && x.statut !== 'repondue' && x.statut !== 'declinee' && (
-              <Button size="icon" variant="ghost" className="h-11 w-11 sm:h-9 sm:w-9" aria-label="Ouvrir le lien du fournisseur" title="Ouvrir le lien du fournisseur (démo)" onClick={() => window.open(lienPortail(x.token), '_blank')}>
+            {isDemo && x.statut !== 'declinee' && (
+              <Button size="icon" variant="ghost" className="h-11 w-11 sm:h-9 sm:w-9" aria-label="Ouvrir le lien du fournisseur" title={x.statut === 'repondue' ? 'Voir son offre côté fournisseur (démo)' : 'Répondre à sa place (démo)'} onClick={() => window.open(lienPortail(x.token), '_blank')}>
                 <ExternalLink className="h-4 w-4" strokeWidth={1.75} />
               </Button>
             )}

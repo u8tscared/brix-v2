@@ -1,0 +1,59 @@
+/* Espace Achats et portail fournisseur : motion et petits détails propres au module.
+   Préfixe fx- (fournisseurs) pour ne rien écraser du kit ni des parcours (bx-). */
+
+/* Barre qui se remplit depuis la gauche (totaux du comparatif, progression) */
+@keyframes fx-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.fx-grow { transform-origin: left center; animation: fx-grow .9s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Pastille « meilleur prix » / « plus rapide » : apparaît avec un petit rebond, puis un anneau s'éloigne une fois */
+@keyframes fx-pop { 0% { opacity: 0; transform: scale(.6); } 60% { opacity: 1; transform: scale(1.08); } 100% { transform: none; } }
+@keyframes fx-halo { from { box-shadow: 0 0 0 0 var(--fx-halo, rgba(22,163,74,.35)); } to { box-shadow: 0 0 0 10px rgba(22,163,74,0); } }
+.fx-pop { animation: fx-pop .5s .35s cubic-bezier(.2,.8,.2,1) both; }
+.fx-halo { animation: fx-pop .5s .35s cubic-bezier(.2,.8,.2,1) both, fx-halo 1.2s .85s ease-out 2; }
+
+/* Cellule gagnante du comparatif : fond qui « s'allume » */
+@keyframes fx-lit { from { background-color: rgba(236,253,243,0); } to { background-color: #ecfdf3; } }
+.fx-lit { animation: fx-lit .6s .25s ease both; }
+
+/* Ligne qui vient d'être remplie dans le portail */
+@keyframes fx-flash { 0% { background-color: #f5f0ff; } 100% { background-color: transparent; } }
+.fx-flash { animation: fx-flash 1.1s ease both; }
+
+/* Point d'activité (fournisseur en train de regarder) */
+@keyframes fx-ping { 0% { box-shadow: 0 0 0 0 rgba(109,40,217,.35); } 100% { box-shadow: 0 0 0 7px rgba(109,40,217,0); } }
+.fx-ping { animation: fx-ping 1.6s ease-out infinite; }
+
+/* Camion qui avance sur la frise de suivi */
+@keyframes fx-roule { 0%, 100% { transform: translateX(-2px); } 50% { transform: translateX(2px); } }
+.fx-roule { animation: fx-roule 1.4s ease-in-out infinite; }
+
+/* Trait de frise qui se trace */
+@keyframes fx-trace { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.fx-trace { transform-origin: left center; animation: fx-trace .7s cubic-bezier(.65,0,.35,1) both; }
+@keyframes fx-trace-v { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.fx-trace-v { transform-origin: top center; animation: fx-trace-v .6s cubic-bezier(.65,0,.35,1) both; }
+
+/* Bon de commande : papier avec bord dentelé en bas */
+.fx-ticket { position: relative; background: #fff; }
+.fx-ticket::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -7px; height: 8px;
+  background: radial-gradient(circle at 6px 100%, transparent 4.5px, #fff 5px) repeat-x;
+  background-size: 12px 8px;
+  filter: drop-shadow(0 1px 0 #ececf1);
+}
+
+/* Champ de prix du portail : gros chiffres, focus net */
+.fx-prix input { font-feature-settings: 'tnum' 1; font-variant-numeric: tabular-nums; }
+.fx-prix:focus-within { box-shadow: 0 0 0 4px #ebe2fe; border-color: #b9a2f5; }
+
+/* Grain très léger sur l'en-tête du portail */
+.fx-grain { background-image: radial-gradient(rgba(19,15,38,.035) 1px, transparent 1px); background-size: 3px 3px; }
+
+/* Défilement horizontal sans barre (onglets) */
+.fx-nobar { scrollbar-width: none; }
+.fx-nobar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-grow, .fx-pop, .fx-halo, .fx-lit, .fx-flash, .fx-trace, .fx-trace-v { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+  .fx-ping, .fx-roule { animation: none !important; }
+}
