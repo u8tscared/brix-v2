@@ -55,7 +55,11 @@ export interface DonneesEmail {
   devis_signe_client: DonneesDocument & { signeLe: string; signataire: string; formule?: string; empreinte: string };
   devis_signe_artisan: DonneesDocument & { signeLe: string; signataire: string; formule?: string; lienApp: string };
   facture_envoyee: DonneesDocument & { type: 'facture' | 'acompte' | 'situation' | 'solde' };
-  facture_relance: DonneesDocument & { rang: 1 | 2 | 3; joursRetard: number };
+  facture_relance: DonneesDocument & {
+    rang: 1 | 2 | 3;
+    joursRetard: number;
+    clientPro?: boolean; // client professionnel : pénalités L441-10 et indemnité de 40 € mentionnées au rang 3
+  };
   paiement_recu_client: DonneesDocument & { payeLe: string; moyen: string; reste: number };
   paiement_recu_artisan: DonneesDocument & { payeLe: string; moyen: string; client: string; lienApp: string };
   demande_prix: {
