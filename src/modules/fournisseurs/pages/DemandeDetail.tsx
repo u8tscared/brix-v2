@@ -63,17 +63,17 @@ export default function DemandeDetail() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="bx-stagger space-y-5">
       <Link to="/app/fournisseurs/demandes" className="-ml-1 inline-flex h-10 items-center gap-1.5 rounded-lg px-1 md:h-9 text-[13px] font-medium text-ink-2 hover:text-ink">
         <ArrowLeft className="h-4 w-4" /> Demandes de prix
       </Link>
 
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">
-          <span className="num font-medium">{d.numero}</span>
+          <span className="bx-mono">{d.numero}</span>
           <BadgeDemande s={d.statut} />
         </div>
-        <h1 className="font-display text-[22px] font-semibold leading-tight tracking-[-0.025em] md:text-[26px]">{d.titre}</h1>
+        <h1 className="text-[24px] font-semibold leading-[1.15] tracking-[-0.03em] md:text-[30px]">{d.titre}</h1>
         <div className="grid grid-cols-1 gap-3 rounded-[14px] border border-line bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
           <Info icon={<FileText />} label="Devis">
             {lie ? (
@@ -98,27 +98,31 @@ export default function DemandeDetail() {
         </Card>
       )}
 
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px] xl:items-start [&>*]:min-w-0">
         <div className="min-w-0 space-y-5">
           {bons.length > 0 && <BonsCrees commandes={bons} fournisseurs={fournisseurs} />}
           {active && (comp.recommandation ? <CarteConseil comp={comp} d={d} fournisseurs={fournisseurs} onCommander={setAConfirmer} /> : <CarteAttente d={d} comp={comp} />)}
-          {comp.reponses > 0 && <Comparatif d={d} comp={comp} fournisseurs={fournisseurs} />}
         </div>
-        <aside className="min-w-0 space-y-5">
-          <Consultes d={d} fournisseurs={fournisseurs} />
+        <Consultes d={d} fournisseurs={fournisseurs} />
+      </div>
+
+      {comp.reponses > 0 && <Comparatif d={d} comp={comp} fournisseurs={fournisseurs} />}
+
+      <div className="grid gap-5 lg:grid-cols-2 lg:items-start [&>*]:min-w-0">
+        <Journal evenements={d.journal} />
+        <div className="space-y-3">
           {d.message && (
             <Card className="p-4">
-              <div className="text-[11.5px] font-medium uppercase tracking-[0.04em] text-ink-3">Votre message</div>
-              <p className="mt-1 text-[13.5px] text-ink-2">{d.message}</p>
+              <div className="text-[12px] font-medium text-ink-3">Votre mot aux fournisseurs</div>
+              <p className="mt-1 text-[13.5px] text-ink-2">« {d.message} »</p>
             </Card>
           )}
-          <Journal evenements={d.journal} />
           {active && (
-            <button type="button" onClick={() => setAnnuler(true)} className="flex h-11 w-full items-center justify-center text-[13px] font-medium text-ink-3 hover:text-bad">
+            <button type="button" onClick={() => setAnnuler(true)} className="flex h-11 w-full items-center justify-center rounded-[12px] text-[13px] font-medium text-ink-3 transition hover:bg-bad-bg hover:text-bad">
               Annuler la demande
             </button>
           )}
-        </aside>
+        </div>
       </div>
 
       <ConfirmerCommande r={aConfirmer} d={d} fournisseurs={fournisseurs} onClose={() => setAConfirmer(null)} onConfirmer={commander} />

@@ -72,6 +72,7 @@ function CarteProduit({ p, frn }: { p: Produit; frn: (id: string) => Fournisseur
             </div>
             <div className="shrink-0 text-right">
               <div className={cn('num text-[14px]', best ? 'font-semibold text-ok' : 'font-medium')}>{money(a.prixNet)}</div>
+              <div className="ml-auto mt-1 h-1 w-16 overflow-hidden rounded-full bg-line"><div className={cn('fx-grow h-full rounded-full', best ? 'bg-ok' : 'bg-ink-3/50')} style={{ width: `${Math.min(100, (meilleur / a.prixNet) * 100)}%` }} /></div>
               {best ? <span className="text-[11px] font-medium text-ok">Le moins cher</span> : i > 0 && <span className="num text-[11px] text-ink-3">{pourcent(ecart)}</span>}
             </div>
           </div>
@@ -111,7 +112,7 @@ export default function Catalogue() {
   const derniere = catalogue.reduce((d, a) => (a.majLe > d ? a.majLe : d), '');
 
   return (
-    <div className="space-y-5">
+    <div className="bx-stagger space-y-5">
       <PageHeader
         title="Prix"
         subtitle="Les prix nets de tous vos fournisseurs au même endroit. Le moins cher saute aux yeux."
@@ -157,7 +158,7 @@ export default function Catalogue() {
               <EmptyState icon={<SearchX />} title={`Rien pour « ${q} »`} text="Essayez un mot plus court, une référence ou les chiffres du code-barres. Vous pouvez aussi demander un prix à vos fournisseurs." />
             ) : (
               <>
-                <div className="grid gap-3 lg:grid-cols-2">
+                <div className="bx-stagger grid gap-3 lg:grid-cols-2">
                   {resultats.slice(0, MAX).map((p) => <CarteProduit key={p.cle} p={p} frn={frn} />)}
                 </div>
                 {resultats.length > MAX && <p className="text-center text-[12.5px] text-ink-3">{resultats.length - MAX} autres produits : précisez votre recherche.</p>}

@@ -1,7 +1,7 @@
 // Détail d'une commande, suivi façon colis : où en est-elle, que dois-je faire maintenant.
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Ban, ExternalLink, FileDown, PackageCheck, PackageSearch, Receipt, Send } from 'lucide-react';
+import { ArrowLeft, Ban, ExternalLink, FileDown, MessageSquareDiff, PackageCheck, PackageSearch, Phone, Receipt, Send } from 'lucide-react';
 import { Badge, Button, Card, CardHeader, EmptyState, Progress, Sheet, cn, toast } from '@/components/ui';
 import { dateShort, money, num, relative, todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
@@ -56,7 +56,7 @@ export default function CommandeDetail() {
   })();
 
   return (
-    <div className="space-y-5">
+    <div className="bx-stagger space-y-5">
       <div className="space-y-3">
         <Link to="/app/fournisseurs/commandes" className="inline-flex h-10 items-center md:h-9 gap-1.5 text-[13px] font-medium text-ink-2 hover:text-ink">
           <ArrowLeft className="h-4 w-4" /> Commandes
@@ -64,9 +64,9 @@ export default function CommandeDetail() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
             <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-ink-3">
-              <span className="num">{c.numero}</span>·<span>créée le {dateShort(c.createdAt)}</span>
+              <span className="bx-mono">{c.numero}</span>·<span>créée le {dateShort(c.createdAt)}</span>
             </div>
-            <h1 className="text-[24px] font-semibold leading-tight tracking-[-0.025em] md:text-[26px]">{f?.nom ?? 'Commande'}</h1>
+            <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.03em] md:text-[30px]">{f?.nom ?? 'Commande'}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <BadgeCommande s={c.statut} />
               {retard && <Badge tone="bad">Livraison en retard</Badge>}
@@ -79,13 +79,24 @@ export default function CommandeDetail() {
 
       {c.statut !== 'annulee' && (
         <Card className="px-3 py-5 md:px-6">
-          <Frise statut={c.statut} />
+          <Frise statut={c.statut} sousTitres={{ 1: c.prepareeLe ? 'Préparée' : c.referenceFournisseur ? `réf. ${c.referenceFournisseur}` : undefined, 2: c.suivi }} />
           <p className={cn('mx-auto mt-5 max-w-xl text-center text-[13.5px]', retard ? 'text-bad' : 'text-ink-2')}>
             {retard ? `La livraison était prévue ${relative(c.livraisonPrevue!)}. Appelez ${f?.nom ?? 'le fournisseur'} pour savoir où elle en est.` : message(c, f?.nom ?? 'Le fournisseur')}
           </p>
         </Card>
       )}
       {c.statut === 'annulee' && <Card className="p-4 text-[13.5px] text-ink-2">{message(c, '')}</Card>}
+
+      {c.proposition && c.statut === 'envoyee' && (
+        <Card className="bx-pop flex flex-col gap-3 border-[#fde3b5] bg-warn-bg/60 p-4 sm:flex-row sm:items-center">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-white text-warn"><MessageSquareDiff className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
+          <div className="min-w-0 flex-1">
+            <div className="text-[14px] font-semibold">{f?.nom ?? 'Le fournisseur'} propose une modification</div>
+            <div className="text-[13px] text-ink-2">« {c.proposition.texte} »{c.proposition.livraison ? ` · livraison possible le ${dateShort(c.proposition.livraison)}` : ''}</div>
+          </div>
+          {f?.telephone && <a href={`tel:${f.telephone.replace(/\s/g, '')}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-[10px] border border-line2 bg-white px-4 text-[13.5px] font-medium hover:bg-sub"><Phone className="h-4 w-4" strokeWidth={1.75} />Appeler {f.contact?.split(' ')[0] ?? ''}</a>}
+        </Card>
+      )}
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-5">
@@ -136,7 +147,7 @@ export default function CommandeDetail() {
               {c.journal.map((e, i) => (
                 <li key={i} className="relative flex gap-3 pb-3.5 last:pb-0">
                   {i < c.journal.length - 1 && <span className="absolute left-[4px] top-3 h-full w-px bg-line2" />}
-                  <span className={cn('relative mt-1.5 h-[9px] w-[9px] shrink-0 rounded-full border-2 border-white', i === 0 ? 'bg-ink' : 'bg-line2')} />
+                  <span className={cn('relative mt-1.5 h-[9px] w-[9px] shrink-0 rounded-full border-2 border-white', i === 0 ? 'bg-ink' : e.acteur === 'fournisseur' ? 'bg-ok' : 'bg-line2', i === 0 && 'fx-ping')} />
                   <div className="min-w-0">
                     <div className="text-[13px]">{e.texte}</div>
                     <div className="text-[11.5px] text-ink-3">

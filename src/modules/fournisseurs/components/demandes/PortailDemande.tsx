@@ -1,170 +1,180 @@
-// Portail fournisseur, demande de prix : le comptoir saisit ses prix depuis le lien reçu par e-mail.
-import { useEffect, useMemo, useState } from 'react';
-import { CalendarClock, CheckCircle2, MapPin, MessageSquareText, Send, Truck } from 'lucide-react';
-import { Button, Card, cn, Field, Input, Textarea } from '@/components/ui';
-import { dateLong, money } from '@/lib/format';
-import { useAchats } from '../../data/store';
-import type { Demande, Destinataire } from '../../data/types';
-import { ecrirePrix, Info, lirePrix, pluriel, saisieDecimale } from './commun';
-import PortailLigne, { saisieVide, type SaisieLigne } from './PortailLigne';
+// Portail fournisseur, demande de prix : comprendre en 3 secondes, répondre en 3 étapes, sans compte.
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Archive, CheckCheck, Undo2 } from 'lucide-react';
+import { dateLong } from '@/lib/format';
+import { useBrix } from '@/lib/store';
+import { useAchats } from '@/modules/fournisseurs/data/store';
+import { emetteurArtisan } from '@/modules/fournisseurs/data/evenements';
+import type { Demande, Destinataire } from '@/modules/fournisseurs/data/types';
+import { pluriel } from '@/modules/fournisseurs/components/demandes/commun';
+import { Acquisition, Artisan, Bloc, FaitsDemande, Mot, Progression } from '@/modules/fournisseurs/components/portail/commun';
+import LigneSaisie from '@/modules/fournisseurs/components/portail/LigneSaisie';
+import EtapeConditions from '@/modules/fournisseurs/components/portail/EtapeConditions';
+import EtapeVerifier from '@/modules/fournisseurs/components/portail/EtapeVerifier';
+import { Decliner, Message, OffreEnvoyee } from '@/modules/fournisseurs/components/portail/Fin';
+import { ResumeBarre, ResumeColonne, type ActionResume } from '@/modules/fournisseurs/components/portail/Resume';
+import {
+  conditionsVides, depuisReponse, ecrireBrouillon, effacerBrouillon, ligneFaite, ligneVide, lireBrouillon, totaux, versReponse,
+  type Conditions, type SaisieLigne,
+} from '@/modules/fournisseurs/components/portail/saisie';
 
-const MOTIFS = ['Pas en stock', 'Hors de ma gamme', 'Délai trop court'];
+const LIBELLES = ['Vos prix', 'Conditions', 'Envoi'];
 
-export function Merci({ titre, texte }: { titre: string; texte: string }) {
-  return (
-    <Card className="animate-fade-up px-6 py-10 text-center">
-      <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-ok-bg text-ok">
-        <CheckCircle2 className="h-7 w-7" strokeWidth={1.75} />
-      </span>
-      <h2 className="mt-4 font-display text-[20px] font-semibold">{titre}</h2>
-      <p className="mx-auto mt-2 max-w-sm text-[14px] text-ink-2">{texte}</p>
-    </Card>
-  );
-}
-
-export default function PortailDemande({ d, dest, entreprise }: { d: Demande; dest: Destinataire; entreprise: string }) {
+export default function PortailDemande({ d, dest }: { d: Demande; dest: Destinataire }) {
   const { repondre, decliner, marquerVu } = useAchats();
+  const chantier = useBrix((s) => s.chantiers.find((c) => c.id === d.chantierId)?.name);
+  const e = useMemo(emetteurArtisan, []);
+  const prenom = e.prenom || e.entreprise;
+
+  const [mode, setMode] = useState<'saisie' | 'envoyee' | 'declinee'>(dest.statut === 'repondue' ? 'envoyee' : dest.statut === 'declinee' ? 'declinee' : 'saisie');
+  const [juste, setJuste] = useState(false); // vient d'envoyer (animation complète) ou revient sur une offre déjà envoyée
+  const [etape, setEtape] = useState(1);
   const [lignes, setLignes] = useState<Record<string, SaisieLigne>>({});
-  const [port, setPort] = useState('');
-  const [delai, setDelai] = useState('');
-  const [commentaire, setCommentaire] = useState('');
-  const [fini, setFini] = useState<'prix' | 'decline' | null>(null);
-  const [modifier, setModifier] = useState(false);
-  const [refus, setRefus] = useState<string | null>(null);
+  const [cond, setCond] = useState<Conditions>(conditionsVides);
+  const [enregistreA, setEnregistreA] = useState<number | null>(null);
+  const touche = useRef(false);
+  const haut = useRef<HTMLDivElement>(null);
 
   useEffect(() => marquerVu(dest.token), [dest.token, marquerVu]);
   useEffect(() => {
-    setLignes(
-      Object.fromEntries(
-        d.lignes.map((l) => {
-          const p = dest.prix.find((x) => x.ligneId === l.id);
-          return [l.id, p ? { ...saisieVide(), prix: ecrirePrix(p.prix), indispo: p.prix == null, equivalent: !!p.designationProposee, designation: p.designationProposee ?? '', reference: p.referenceProposee ?? '' } : saisieVide()];
-        }),
-      ),
-    );
-    setPort(dest.port ? ecrirePrix(dest.port) : '');
-    setDelai(dest.delaiJours != null ? String(dest.delaiJours) : '');
-    setCommentaire(dest.commentaire ?? '');
+    const b = lireBrouillon(dest.token);
+    if (b && dest.statut !== 'repondue') {
+      setLignes(b.lignes);
+      setCond(b.conditions);
+      setEtape(Math.min(3, Math.max(1, b.etape)));
+      setEnregistreA(b.at);
+    } else setLignes(Object.fromEntries(d.lignes.map((l) => [l.id, ligneVide()])));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dest.id]);
 
-  const sousTotal = useMemo(() => d.lignes.reduce((s, l) => s + (lignes[l.id]?.indispo ? 0 : (lirePrix(lignes[l.id]?.prix ?? '') ?? 0) * l.quantite), 0), [lignes, d.lignes]);
-  const total = sousTotal + (lirePrix(port) ?? 0);
-  const avecPrix = d.lignes.filter((l) => !lignes[l.id]?.indispo && lirePrix(lignes[l.id]?.prix ?? '') != null).length;
-  const sansRien = d.lignes.filter((l) => !lignes[l.id]?.indispo && lirePrix(lignes[l.id]?.prix ?? '') == null).length;
+  // Sauvegarde automatique du brouillon, 700 ms après la dernière frappe.
+  useEffect(() => {
+    if (!touche.current || mode !== 'saisie') return;
+    const t = setTimeout(() => {
+      const at = Date.now();
+      ecrireBrouillon(dest.token, { lignes, conditions: cond, etape, at });
+      setEnregistreA(at);
+    }, 700);
+    return () => clearTimeout(t);
+  }, [lignes, cond, etape, dest.token, mode]);
 
-  if (fini === 'prix')
-    return (
-      <div className="space-y-3">
-        <Merci titre="Merci, vos prix sont envoyés" texte={`${entreprise} les reçoit tout de suite. Si votre offre est retenue, le bon de commande arrivera par e-mail avec un lien comme celui-ci.`} />
-        <Button variant="secondary" className="h-12 w-full justify-center" onClick={() => { setFini(null); setModifier(true); }}>Corriger mes prix</Button>
-      </div>
-    );
-  if (fini === 'decline' || dest.statut === 'declinee') return <Merci titre="C’est noté" texte={`${entreprise} sait que vous ne pouvez pas répondre à cette demande. Merci de l’avoir signalé.`} />;
-  if (d.statut === 'annulee' || d.statut === 'commandee')
-    return <Merci titre="Cette demande est close" texte={d.statut === 'commandee' ? `${entreprise} a déjà passé commande pour cette liste. Merci pour votre réponse.` : `${entreprise} a annulé cette demande. Vous n’avez rien à faire.`} />;
-  if (dest.statut === 'repondue' && !modifier)
-    return (
-      <div className="space-y-3">
-        <Merci titre="Vous avez déjà répondu" texte={`Vos prix ont été transmis à ${entreprise}. Vous pouvez les corriger tant que la commande n’est pas passée.`} />
-        <Button variant="secondary" className="h-12 w-full justify-center" onClick={() => setModifier(true)}>Corriger mes prix</Button>
-      </div>
-    );
+  const majLigne = useCallback((id: string, p: Partial<SaisieLigne>) => {
+    touche.current = true;
+    setLignes((s) => ({ ...s, [id]: { ...(s[id] ?? ligneVide()), ...p } }));
+  }, []);
+  const majCond = (p: Partial<Conditions>) => {
+    touche.current = true;
+    setCond((c) => ({ ...c, ...p }));
+  };
+
+  const t = totaux(d, lignes, cond);
+  const nb = d.lignes.length;
+  const aller = (n: number) => {
+    touche.current = true;
+    setEtape(n);
+    requestAnimationFrame(() => haut.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  };
 
   const envoyer = () => {
-    repondre(dest.token, {
-      prix: d.lignes.map((l) => {
-        const v = lignes[l.id] ?? saisieVide();
-        const p = v.indispo ? null : lirePrix(v.prix);
-        return { ligneId: l.id, prix: p, ...(v.equivalent && v.designation.trim() && p != null ? { designationProposee: v.designation.trim(), referenceProposee: v.reference.trim() || undefined } : {}) };
-      }),
-      port: lirePrix(port) ?? 0,
-      delaiJours: delai ? Number(delai) : undefined,
-      commentaire: commentaire.trim() || undefined,
-    });
-    setFini('prix');
+    repondre(dest.token, versReponse(d, lignes, cond));
+    effacerBrouillon(dest.token);
+    touche.current = false;
+    setJuste(true);
+    setMode('envoyee');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const corriger = () => {
+    const r = depuisReponse(d, dest);
+    setLignes(r.lignes);
+    setCond(r.conditions);
+    setEtape(1);
+    setMode('saisie');
     window.scrollTo({ top: 0 });
   };
 
+  if (d.statut === 'annulee') return <Message icon={<Undo2 />} titre="Cette demande est annulée" texte={`${e.entreprise} a annulé sa demande. Vous n’avez rien à faire.`} />;
+  if (d.statut === 'commandee' && mode !== 'envoyee') return <Message icon={<Archive />} titre="Cette demande est close" texte={`${e.entreprise} a déjà passé commande pour cette liste. Merci pour votre temps.`} />;
+  if (mode === 'declinee') return <Message icon={<CheckCheck />} titre="C’est noté, merci" texte={`${e.entreprise} sait que vous ne pouvez pas répondre à cette demande. Il ne vous attendra pas.`} />;
+  if (mode === 'envoyee') {
+    const tt = juste ? t : null;
+    const chiffrees = tt ? tt.chiffrees : dest.prix.filter((p) => p.prix != null).length;
+    const total = tt ? tt.total : dest.prix.reduce((s, p) => s + (p.prix ?? 0) * (d.lignes.find((l) => l.id === p.ligneId)?.quantite ?? 0), 0) + (dest.port ?? 0);
+    return (
+      <div className="space-y-6">
+        <OffreEnvoyee artisan={e.entreprise} prenom={prenom} total={total} chiffrees={chiffrees} nb={nb} delai={juste ? (cond.delai === '' ? undefined : Number(cond.delai)) : dest.delaiJours} envoyeeLe={dest.reponduLe} deja={!juste} onCorriger={d.statut === 'commandee' ? () => undefined : corriger} />
+        <Acquisition className="mx-auto max-w-[560px]" />
+      </div>
+    );
+  }
+
+  const action: ActionResume =
+    etape === 1
+      ? { libelle: 'Continuer', envoi: false, disabled: t.chiffrees === 0, onClick: () => aller(2) }
+      : etape === 2
+        ? { libelle: 'Vérifier', envoi: false, onClick: () => aller(3) }
+        : { libelle: 'Envoyer mes prix', envoi: true, disabled: t.chiffrees === 0, onClick: envoyer };
+  const restantes = nb - d.lignes.filter((l) => ligneFaite(lignes[l.id])).length;
+
   return (
-    <div className="space-y-4">
-      <Card className="p-5">
-        <div className="text-[12.5px] text-ink-3"><span className="num font-medium">{d.numero}</span> · {pluriel(d.lignes.length, 'article')}</div>
-        <h1 className="mt-1 font-display text-[21px] font-semibold leading-tight tracking-[-0.02em]">Demande de prix de {entreprise}</h1>
-        <p className="mt-1 text-[13.5px] text-ink-2">{d.titre}</p>
-        <div className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-3">
-          <Info icon={<CalendarClock />} label="Réponse avant">{d.dateLimite ? dateLong(d.dateLimite) : 'Dès que possible'}</Info>
-          <Info icon={<Truck />} label="Livraison souhaitée">{d.livraisonSouhaitee ? dateLong(d.livraisonSouhaitee) : 'À convenir'}</Info>
-          <Info icon={<MapPin />} label="Adresse">{d.adresse ?? 'Retrait en agence'}</Info>
-        </div>
-        {d.message && (
-          <p className="mt-4 flex gap-2.5 rounded-[12px] bg-sub px-3.5 py-3 text-[13.5px] text-ink-2">
-            <MessageSquareText className="mt-0.5 h-4 w-4 shrink-0 text-ink-3" strokeWidth={1.75} />« {d.message} »
-          </p>
-        )}
-      </Card>
-
-      <Card className="overflow-hidden">
-        <div className="border-b border-line px-4 py-3">
-          <h2 className="text-[15px] font-semibold">Vos prix nets</h2>
-          <p className="text-[12.5px] text-ink-3">Prix unitaire hors taxes, remise déduite. La virgule fonctionne.</p>
-        </div>
-        <ul>
-          {d.lignes.map((l, i) => (
-            <PortailLigne key={l.id} l={l} index={i} v={lignes[l.id] ?? saisieVide()} onChange={(p) => setLignes((s) => ({ ...s, [l.id]: { ...(s[l.id] ?? saisieVide()), ...p } }))} />
-          ))}
-        </ul>
-      </Card>
-
-      <Card className="grid gap-4 p-4 sm:grid-cols-2">
-        <Field label="Frais de port HT" hint="0 si franco.">
-          <Input inputMode="decimal" value={port} onChange={(e) => setPort(saisieDecimale(e.target.value))} placeholder="0,00" suffix="€" className="[&_input]:text-[16px]" />
-        </Field>
-        <Field label="Délai de livraison">
-          <Input inputMode="numeric" value={delai} onChange={(e) => setDelai(e.target.value.replace(/\D/g, '').slice(0, 2))} placeholder="1" suffix="jours" className="[&_input]:text-[16px]" />
-        </Field>
-        <Field label="Commentaire (facultatif)" className="sm:col-span-2">
-          <Textarea value={commentaire} onChange={(e) => setCommentaire(e.target.value)} placeholder="Ex. : différentiels en stock, le reste sous 48 h." className="min-h-[80px] text-[16px] sm:text-[14px]" />
-        </Field>
-      </Card>
-
-      <div className="sticky bottom-0 z-10 -mx-4 border-t border-line bg-white/95 px-4 pb-[calc(12px+var(--safe-b))] pt-3 backdrop-blur sm:static sm:mx-0 sm:rounded-[14px] sm:border sm:p-4">
-        <div className="flex items-center gap-3">
-          <div className="min-w-0 flex-1">
-            <div className="text-[12px] text-ink-3">Total HT{lirePrix(port) ? ', port compris' : ''}</div>
-            <div className="num font-display text-[22px] font-semibold leading-tight">{money(total)}</div>
+    <div className="pb-36 lg:pb-0">
+      {/* Qui demande, quoi, pour quand */}
+      <Bloc className="bx-rise relative overflow-hidden">
+        <div className="fx-grain pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+        <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
+          <div className="min-w-0 space-y-5">
+            <div>
+              <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#9898a8]">
+                <span className="inline-flex h-6 items-center rounded-full bg-[#130f26] px-2.5 text-[11.5px] font-semibold text-white">Demande de prix</span>
+                <span className="bx-mono">{d.numero}</span>
+              </div>
+              <h1 className="mt-3 text-[26px] font-semibold leading-[1.1] tracking-[-0.035em] sm:text-[32px]">
+                {pluriel(nb, 'article')} à chiffrer
+                <span className="block text-[#9898a8]">pour {e.entreprise}</span>
+              </h1>
+              <p className="mt-2 text-[14px] text-[#5f5f70]">{d.titre}</p>
+            </div>
+            <Artisan e={e} chantier={chantier} />
+            {d.message && <Mot texte={d.message} auteur={`${prenom}, ${dateLong(d.createdAt.slice(0, 10))}`} />}
           </div>
-          <Button variant="dawn" size="lg" disabled={avecPrix === 0} icon={<Send className="h-[18px] w-[18px]" />} onClick={envoyer}>
-            Envoyer mes prix
-          </Button>
+          <FaitsDemande dateLimite={d.dateLimite} livraison={d.livraisonSouhaitee} adresse={d.adresse} className="border-t border-[#ececf1] pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1" />
         </div>
-        {sansRien > 0 && avecPrix > 0 && <p className="mt-2 text-[12px] text-ink-3">{pluriel(sansRien, 'article sans prix sera indiqué', 'articles sans prix seront indiqués')} comme non disponible{sansRien > 1 ? 's' : ''}.</p>}
+      </Bloc>
+
+      <div className="mt-5 grid gap-6 lg:mt-7 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+        <div ref={haut} className="min-w-0 scroll-mt-20 space-y-4">
+          <Progression etape={etape} libelles={LIBELLES} avancement={etape === 1 ? t.faites / Math.max(1, nb) : etape === 2 ? 0.5 : 0.9} onAller={aller} />
+
+          {etape === 1 && (
+            <>
+              <Bloc key="e1" className="bx-rise overflow-hidden">
+                <div className="flex items-end justify-between gap-3 border-b border-[#ececf1] px-4 py-4 sm:px-5">
+                  <div>
+                    <h2 className="text-[17px] font-semibold tracking-[-0.02em]">Vos prix nets</h2>
+                    <p className="mt-0.5 text-[12.5px] text-[#9898a8]">Prix unitaire HT. La virgule marche, « Entrée » passe à la ligne suivante.</p>
+                  </div>
+                </div>
+                <ul className="divide-y divide-[#ececf1]">
+                  {d.lignes.map((l, i) => <LigneSaisie key={l.id} l={l} index={i} v={lignes[l.id] ?? ligneVide()} onChange={majLigne} />)}
+                </ul>
+              </Bloc>
+              {restantes > 0 && t.chiffrees > 0 && (
+                <p className="bx-fade px-1 text-center text-[12.5px] text-[#9898a8]">{pluriel(restantes, 'article sans prix sera indiqué', 'articles sans prix seront indiqués')} « pas dispo ».</p>
+              )}
+              <Decliner prenom={prenom} onDecliner={(m) => { decliner(dest.token, m); effacerBrouillon(dest.token); setMode('declinee'); window.scrollTo({ top: 0 }); }} />
+            </>
+          )}
+          {etape === 2 && <div key="e2" className="bx-rise"><EtapeConditions c={cond} onChange={majCond} souhaitee={d.livraisonSouhaitee ? dateLong(d.livraisonSouhaitee) : undefined} /></div>}
+          {etape === 3 && <div key="e3" className="bx-rise"><EtapeVerifier d={d} lignes={lignes} c={cond} remise={t.remise} onModifier={aller} /></div>}
+        </div>
+
+        <aside className="hidden space-y-4 lg:sticky lg:top-20 lg:block">
+          <ResumeColonne t={t} nb={nb} action={action} enregistreA={enregistreA} artisan={e.entreprise} />
+          <Acquisition />
+        </aside>
       </div>
 
-      <div className="pt-2 text-center">
-        {refus === null ? (
-          <button type="button" onClick={() => setRefus('')} className="h-11 text-[13.5px] font-medium text-ink-2 underline decoration-line2 underline-offset-4 hover:text-ink">
-            Je ne peux pas répondre
-          </button>
-        ) : (
-          <Card className="space-y-3 p-4 text-left">
-            <div className="text-[14px] font-semibold">Pourquoi ? (facultatif)</div>
-            <div className="flex flex-wrap gap-2">
-              {MOTIFS.map((m) => (
-                <button key={m} type="button" onClick={() => setRefus(refus === m ? '' : m)} className={cn('h-10 rounded-full border px-3.5 text-[13px] transition', refus === m ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')}>
-                  {m}
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <Button variant="ghost" className="h-11 flex-1 justify-center" onClick={() => setRefus(null)}>Retour</Button>
-              <Button variant="primary" className="h-11 flex-1 justify-center" onClick={() => { decliner(dest.token, refus || undefined); setFini('decline'); }}>
-                Prévenir {entreprise.split(' ')[0]}
-              </Button>
-            </div>
-          </Card>
-        )}
-      </div>
+      <Acquisition className="mt-8 lg:hidden" />
+      <ResumeBarre t={t} nb={nb} action={action} enregistreA={enregistreA} />
     </div>
   );
 }
