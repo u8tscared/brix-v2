@@ -5,7 +5,7 @@ import { wait, onView, radios } from '../subpage.js';
 const LANGS = {
   pt: { code: 'PT', dir: 'ltr', name: 'portugais', text: 'Casa de banho da senhora Costa. Tirar o azulejo antigo, mais ou menos doze metros quadrados. Pôr azulejo novo sessenta por sessenta. E trocar a sanita.' },
   ar: { code: 'AR', dir: 'rtl', name: 'arabe', text: 'حمّام السيدة كوستا. إزالة البلاط القديم، حوالي اثني عشر مترًا مربعًا. تركيب بلاط جديد ستين في ستين. وتغيير المرحاض.' },
-  tr: { code: 'TR', dir: 'ltr', name: 'turc', text: "Bayan Costa'nın banyosu. Eski fayansları sökmek, yaklaşık on iki metrekare. Altmışa altmış yeni fayans döşemek. Bir de klozeti değiştirmek." },
+  tr: { code: 'TR', dir: 'ltr', name: 'turc', text: "Bayan Costa’nın banyosu. Eski fayansları sökmek, yaklaşık on iki metrekare. Altmışa altmış yeni fayans döşemek. Bir de klozeti değiştirmek." },
 };
 
 export function initDictation() {
@@ -16,13 +16,14 @@ export function initDictation() {
   wave.innerHTML = Array.from({ length: 28 }, (_, i) => `<i style="animation-delay:${(i * 0.07) % 1}s"></i>`).join('');
   let run = 0, lang = 'pt';
 
-  const describe = (l) => { sr.textContent = `Démonstration : un artisan dicte en ${l.name} « ${l.text} ». Bob produit un devis en français : dépose de l'ancienne faïence, 12 m², 216 € ; carrelage grès 60 × 60 fourni posé, 12 m², 888 € ; remplacement des WC, 420 € ; total 1 524 € HT.`; };
+  const describe = (l) => { sr.textContent = `Démonstration : un artisan dicte en ${l.name} « ${l.text} ». Bob produit un devis en français : dépose de l’ancienne faïence, 12 m², 216 € ; carrelage grès 60 × 60 fourni posé, 12 m², 888 € ; remplacement des WC, 420 € ; total 1 524 € HT.`; };
 
   async function play() {
     const id = ++run, l = LANGS[lang];
     describe(l);
     code.textContent = l.code;
     said.dir = l.dir;
+    said.lang = lang;
     if (reduce) { said.textContent = l.text; lines.forEach((x) => x.classList.add('on')); return; }
     lines.forEach((x) => x.classList.remove('on'));
     sep.classList.remove('on');
@@ -46,15 +47,17 @@ export function initDictation() {
     }
     gsap.fromTo($('.dd-tot b', box), { scale: 0.85 }, { scale: 1, duration: 0.6, ease: 'back.out(3)' });
     await wait(5200);
-    if (id === run) {
+    // les langues défilent seules tant que personne n'en a choisi une
+    if (id === run && !picked) {
       const keys = Object.keys(LANGS);
       const next = keys[(keys.indexOf(lang) + 1) % keys.length];
       const b = $(`[data-lang="${next}"]`);
-      if (b) b.click();
+      if (b) { auto = true; b.click(); auto = false; }
     }
   }
 
-  radios($('[data-langs]'), (b) => { lang = b.dataset.lang; play(); });
+  let picked = false, auto = false;
+  radios($('[data-langs]'), (b) => { lang = b.dataset.lang; if (!auto) picked = true; play(); });
   describe(LANGS.pt);
   if (reduce) play(); else onView(box, play, 0.4);
 }

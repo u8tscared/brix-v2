@@ -30,12 +30,12 @@ function group(title, icon, color, count) {
 
 function renderTable(t) {
   const head = `<thead><tr><th scope="col" class="tf-fc"><span class="sr">Fonction</span></th>${PLAN_LIST.map((p) => `
-    <th scope="col" class="${p.hi ? 'hi' : ''}"><b>${p.id === 'entreprise' ? '<span class="tf-l">Entreprise</span><span class="tf-sh" aria-hidden="true">Entr.</span>' : p.name}</b><span class="tf-pr">${p.monthly === null ? 'Sur devis' : p.monthly === 0 ? '0 €' : `${euro(p.monthly)} <small>/mois</small>`}</span></th>`).join('')}</tr></thead>`;
+    <th scope="col" class="${p.hi ? 'hi' : ''}"><b>${p.id === 'entreprise' ? '<span class="tf-l">Entreprise</span><span class="tf-sh" aria-hidden="true">Entr.</span>' : p.name}</b><span class="tf-pr">${p.monthly === null ? 'Sur devis' : p.monthly === 0 ? '0 €' : `${euro(p.monthly)} <small>/mois</small>`}</span></th>`).join('')}</tr></thead>`;
 
   // l'essentiel : repris des offres
-  const base = group("L'essentiel", 'layers', '#130f26')
+  const base = group("L’essentiel", 'layers', '#130f26')
     + `<tr><th scope="row"><b>Devis et factures</b><span>Nombre de documents par mois</span></th>${ORDER.map((id) => `<td class="${PLAN_LIST.find((p) => p.id === id).hi ? 'hi' : ''}">${txt(id === 'start' ? '5 + 5' : 'Illimités')}</td>`).join('')}</tr>`
-    + `<tr><th scope="row"><b>Utilisateurs</b><span>Personnes qui se connectent à Brix</span></th><td>${txt('1')}</td><td>${txt('1')}</td><td class="hi">${txt('5 inclus')}<small>puis 9 € par personne</small></td><td>${txt('Sur mesure')}</td></tr>`;
+    + `<tr><th scope="row"><b>Utilisateurs</b><span>Personnes qui se connectent à Brix</span></th><td>${txt('1')}</td><td>${txt('1')}</td><td class="hi">${txt('5 inclus')}<small>puis 9 € par personne</small></td><td>${txt('Sur mesure')}</td></tr>`;
 
   const depts = DEPARTMENTS.map((d) => group(d.name, d.icon, d.color, d.features.length) + d.features.map((f) => `
     <tr><th scope="row"><b>${f.name}${f.tag ? ` <span class="badge ${TAG[f.tag][0]}">${TAG[f.tag][1]}</span>` : ''}</b><span>${f.desc}</span></th>${cells(f.plan, f)}</tr>`).join('')).join('');

@@ -60,7 +60,7 @@
 .pill-d em { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--faint); font-weight: 500 }
 .compta { display: flex; align-items: center; justify-content: space-between; gap: 30px; flex-wrap: wrap; margin-top: 46px; padding-top: 26px; border-top: 1px solid var(--line) }
 .compta p { font-size: 14px; color: var(--mute); max-width: 30ch; line-height: 1.45 }
-.lrow { display: flex; align-items: center; gap: clamp(22px, 4vw, 54px); flex-wrap: wrap; color: #8f89ab }
+.lrow { display: flex; align-items: center; gap: clamp(22px, 4vw, 54px); flex-wrap: wrap; color: var(--faint) }
 .lrow .wm { font-weight: 700; font-size: 21px; letter-spacing: -.02em; transition: color .2s }
 .lrow .wm:hover { color: var(--ink) }
 .wm.penny { font-family: var(--display); font-weight: 800; letter-spacing: -.04em }
@@ -111,10 +111,10 @@ legend .mono { font-size: 12px; color: var(--v); background: var(--paper-3); pad
 .wg { border-radius: 18px; background: var(--paper-2); padding: 16px; box-shadow: inset 0 0 0 1px var(--line); min-width: 0 }
 .wg.wide { grid-column: 1 / -1 }
 .wg.ink { background: var(--ink); color: #fff; box-shadow: none }
-.wg h4 { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--mute); margin-bottom: 10px }
-.wg.ink h4 { color: rgba(255, 255, 255, .7) }
-.wg h4 .i { width: 15px; height: 15px; color: var(--v) }
-.wg.ink h4 .i { color: var(--v3) }
+.wg h3 { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--mute); margin-bottom: 10px }
+.wg.ink h3 { color: rgba(255, 255, 255, .7) }
+.wg h3 .i { width: 15px; height: 15px; color: var(--v) }
+.wg.ink h3 .i { color: var(--v3) }
 .wg .big { font-family: var(--display); font-weight: 700; font-size: 30px; letter-spacing: -.04em; line-height: 1 }
 .wg .row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums }
 .wg.ink .row { border-color: rgba(255, 255, 255, .1) }
@@ -129,7 +129,7 @@ legend .mono { font-size: 12px; color: var(--v); background: var(--paper-3); pad
 
 /* ---------- PARCOURS ---------- */
 .story { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(30px, 6vw, 90px); margin-top: 70px }
-.step { min-height: 66vh; display: flex; flex-direction: column; justify-content: center; padding-block: 30px; opacity: .26; transition: opacity .5s var(--ease) }
+.step { min-height: 66vh; display: flex; flex-direction: column; justify-content: center; padding-block: 30px; opacity: .38; transition: opacity .5s var(--ease) }
 .step.on { opacity: 1 }
 .step:first-child { min-height: 50vh; justify-content: flex-start; padding-top: 60px }
 .step:last-child { min-height: 60vh }
@@ -146,16 +146,17 @@ legend .mono { font-size: 12px; color: var(--v); background: var(--paper-3); pad
 .scene { position: absolute; inset: 0; display: grid; place-items: center; padding: 28px; opacity: 0; transform: translateY(24px) scale(.97); transition: opacity .6s var(--ease), transform .7s var(--ease); pointer-events: none }
 .scene.on { opacity: 1; transform: none }
 .panel { width: min(430px, 100%); background: #fff; border-radius: 24px; padding: 24px; box-shadow: 0 30px 70px -30px rgba(40, 10, 90, .35), 0 0 0 1px var(--line) }
-.ph { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 10px }
-.ph b { font-family: var(--display); font-size: 20px; letter-spacing: -.03em }
-.ph .mono { font-size: 12px; color: var(--faint) }
+div.ph { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 10px }
+div.ph b { font-family: var(--display); font-size: 20px; letter-spacing: -.03em }
+div.ph .mono { font-size: 12px; color: var(--faint) }
 .microw { display: flex; align-items: center; gap: 14px; background: var(--paper-2); border-radius: 18px; padding: 14px }
 .micb { width: 48px; height: 48px; border-radius: 50%; background: var(--v); color: #fff; display: grid; place-items: center; position: relative; flex: none }
 .micb::before { content: ""; position: absolute; inset: -6px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(139, 92, 246, .35); animation: ping 1.6s var(--ease) infinite }
 @keyframes ping { to { transform: scale(1.35); opacity: 0 } }
 .wave { display: flex; align-items: center; gap: 3px; height: 34px; flex: 1 }
-.wave i { display: block; width: 3px; border-radius: 3px; background: var(--v2); height: 30%; animation: wv 1s ease-in-out infinite }
-@keyframes wv { 50% { height: 100% } }
+.wave i { display: block; width: 3px; border-radius: 3px; background: var(--v2); height: 100%; transform: scaleY(.3); animation: wv 1s ease-in-out infinite }
+@keyframes wv { 50% { transform: none } }
+.scene:not(.on) .wave i, .scene:not(.on) .micb::before, .scene:not(.on) .caret { animation-play-state: paused }
 .said { font-size: 15px; line-height: 1.45; margin: 16px 2px 6px; min-height: 44px }
 .caret { display: inline-block; width: 2px; height: 17px; background: var(--v); vertical-align: -3px; animation: blink 1s steps(1) infinite }
 @keyframes blink { 50% { opacity: 0 } }
@@ -207,19 +208,33 @@ legend .mono { font-size: 12px; color: var(--v); background: var(--paper-3); pad
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1100px) {
-  .hgrid { grid-template-columns: 1fr; padding-bottom: 150px }
-  .stack { height: 330px; max-width: 520px; width: 100% }
-  .fc-quote { right: auto; left: 40px; top: 0; width: 310px }
-  .fc-bob { left: auto; right: 0; top: 150px; width: 250px }
-  .fc-cash, .fc-note { display: none }
+  .hgrid { gap: 24px }
   .cfg { grid-template-columns: 1fr }
   .cfg-ctl { position: static }
+}
+/* hero sur une colonne : en dessous de 960 px les cartes flottantes mordraient sur le texte */
+@media (max-width: 960px) {
+  .hgrid { grid-template-columns: 1fr; padding-bottom: 150px }
+  .stack { height: 330px; max-width: 560px; width: 100% }
+  .fc-quote { right: auto; left: 0; top: 0; width: 310px }
+  .fc-bob { left: auto; right: 0; top: 120px; width: 250px }
+  .fc-cash, .fc-note { display: none }
 }
 @media (max-width: 860px) {
   .story { grid-template-columns: 1fr; gap: 0 }
   .stagewrap { order: -1; top: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); height: 430px; z-index: 2; background: #fff; padding-block: 10px 16px; margin-inline: -4px }
   .step, .step:first-child, .step:last-child { min-height: 58vh; padding-top: 30px }
   .panel { padding: 18px }
+  .stagewrap::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 28px; background: linear-gradient(#fff, rgba(255, 255, 255, 0)); pointer-events: none }
+  .scene { padding: 14px }
+  div.ph { margin-bottom: 12px }
+  .doc { padding: 10px 14px } .doc .r { padding: 4px 0 }
+  .sign { height: 88px; margin-top: 10px } .sign svg { width: 200px; height: 75px }
+  .sendrow { margin-top: 10px }
+  .said { margin-top: 12px; min-height: 0 } .ql { padding: 7px 0 }
+  .rfq-l { margin-bottom: 8px } .rq { padding: 9px 12px }
+  .chk { gap: 7px; margin-top: 12px } .flip { margin-bottom: 12px }
+  .tl { margin-top: 14px } .tl > div { padding-bottom: 9px }
   .hero { clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%) }
   .win-body { grid-template-columns: 64px 1fr; min-height: 0 }
   .win-side { padding: 14px 8px } .ws-logo { display: none }

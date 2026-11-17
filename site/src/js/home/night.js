@@ -40,22 +40,22 @@ export function initNight() {
 
 const CONVO = [
   {
-    q: 'Qui ne m’a pas encore payé ce mois-ci ?',
+    q: 'Qui ne m’a pas encore payé ce mois-ci ?',
     tool: 'brix.factures_impayees',
-    a: 'Trois factures sont en attente, pour 6 820 € au total :',
-    t: [['M. Garnier · F-0312', '2 340 €'], ['Mme Lefèvre · F-0315', '3 500 €'], ['SCI Les Tilleuls · F-0309', '980 €']],
+    a: 'Trois factures sont en attente, pour 6 820 € au total :',
+    t: [['M. Garnier · F-0312', '2 340 €'], ['Mme Lefèvre · F-0315', '3 500 €'], ['SCI Les Tilleuls · F-0309', '980 €']],
     end: 'Bob a déjà programmé les relances de demain matin.',
   },
   {
-    q: 'Quel chantier m’a le moins rapporté cette année ?',
+    q: 'Quel chantier m’a le moins rapporté cette année ?',
     tool: 'brix.rentabilite_chantiers',
-    a: 'La rénovation Roux : 11 % de marge, contre 27 % en moyenne. Les achats ont dépassé le devis de 1 240 €, surtout sur le carrelage.',
+    a: 'La rénovation Roux : 11 % de marge, contre 27 % en moyenne. Les achats ont dépassé le devis de 1 240 €, surtout sur le carrelage.',
   },
   {
     q: 'Prépare-moi un point sur ma trésorerie à 90 jours.',
     tool: 'brix.tresorerie_prevision',
-    a: 'Solde prévu fin février : 31 400 €. Point bas le 12 janvier à 8 900 €, juste après l’URSSAF.',
-    t: [['Encaissements attendus', '+ 58 200 €'], ['Charges prévues', '− 41 700 €']],
+    a: 'Solde prévu fin février : 31 400 €. Point bas le 12 janvier à 8 900 €, juste après l’URSSAF.',
+    t: [['Encaissements attendus', '+ 58 200 €'], ['Charges prévues', '− 41 700 €']],
   },
 ];
 
@@ -71,7 +71,8 @@ export function initChat() {
   async function run() {
     if (running) return;
     running = true;
-    for (let k = 0; ; k = (k + 1) % CONVO.length) {
+    // chaque conversation une fois, puis la dernière reste affichée (pas d'animation sans fin)
+    for (let k = 0; k < CONVO.length; k++) {
       const c = CONVO[k];
       box.innerHTML = '';
       input.textContent = '';
@@ -85,8 +86,8 @@ export function initChat() {
       await wait(1300);
       t.innerHTML = answer(c);
       gsap.from(t, { y: 14, opacity: 0, duration: 0.6, ease: 'expo.out' });
-      gsap.from($$('tr', t), { x: -10, opacity: 0, duration: 0.4, stagger: 0.12, delay: 0.2 });
-      await wait(5200);
+      if (c.t) gsap.from($$('tr', t), { x: -10, opacity: 0, duration: 0.4, stagger: 0.12, delay: 0.2 });
+      if (k < CONVO.length - 1) await wait(5200);
     }
   }
   new IntersectionObserver((e, o) => { if (e[0].isIntersecting) { run(); o.disconnect(); } }, { threshold: 0.4 }).observe(box);

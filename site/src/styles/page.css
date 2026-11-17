@@ -4,12 +4,13 @@
 .ph::before { width: 900px; height: 900px; right: -260px; top: -520px; background: radial-gradient(circle, rgba(217, 70, 239, .16), transparent 62%) }
 .ph::after { width: 800px; height: 800px; left: -300px; top: -300px; background: radial-gradient(circle, rgba(139, 92, 246, .18), transparent 62%) }
 .ph-in { padding-block: clamp(64px, 9vw, 120px) clamp(40px, 5vw, 64px) }
-.ph-t { font-family: var(--display); font-weight: 800; font-size: clamp(46px, 7.4vw, 108px); line-height: .92; letter-spacing: -.055em; margin-top: 20px; max-width: 15ch; text-wrap: balance }
+.ph-t { font-family: var(--display); font-weight: 800; font-size: clamp(46px, 7.4vw, 108px); line-height: .92; letter-spacing: -.055em; margin-top: 20px; max-width: 9.5em; text-wrap: balance }
 .ph .sub { max-width: 58ch }
 .ph-meta { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 34px; color: var(--mute); font-size: 15px }
 .ph-meta span { display: inline-flex; align-items: center; gap: 8px }
 .ph-meta b { font-family: var(--display); font-size: 22px; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums }
 .ph-meta .i { width: 18px; height: 18px; color: var(--v) }
+.ph-meta:empty { min-height: 33px } /* rempli en JS : on réserve la place (pas de saut) */
 
 /* titres de section secondaires */
 .sec-h { display: flex; justify-content: space-between; align-items: end; gap: 24px 50px; flex-wrap: wrap }
@@ -23,4 +24,5 @@
 @media (max-width: 560px) {
   .ph-meta { gap: 10px 20px }
   .ph-meta b { font-size: 19px }
+  .ph-meta:empty { min-height: 66px }
 }

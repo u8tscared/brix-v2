@@ -26,10 +26,10 @@ export const DEPARTMENTS = [
     features: [
       { name: 'Devis dicté', icon: 'mic', plan: 'start', tag: 'new', desc: 'Décrivez les travaux à voix haute, Bob écrit les lignes avec vos prix.' },
       { name: 'Devis depuis une photo ou une vidéo', icon: 'video', plan: 'pro', tag: 'only', desc: 'Filmez la pièce 30 secondes, Bob repère les postes et propose le devis.' },
-      { name: 'Bibliothèque de 50 000 prix', icon: 'library', plan: 'start', desc: 'Des ouvrages à jour par corps de métier, que vous ajustez à vos tarifs.' },
-      { name: 'Signature électronique', icon: 'pen-line', plan: 'start', desc: 'Le client signe sur votre téléphone ou reçoit un lien par mail et SMS.' },
-      { name: 'Aides à la rénovation dans le devis', icon: 'badge-euro', plan: 'pro', tag: 'only', desc: "MaPrimeRénov' et CEE calculées : le client voit tout de suite son reste à charge." },
-      { name: 'Demandes et leads', icon: 'inbox', plan: 'start', desc: 'Formulaire du site, appels, mails et plateformes arrivent dans une seule boîte.' },
+      { name: 'Bibliothèque de 50 000 ouvrages', icon: 'library', plan: 'start', desc: 'Des prix à jour par corps de métier, que vous ajustez à vos tarifs.' },
+      { name: 'Signature électronique', icon: 'pen-line', plan: 'start', desc: 'Le client signe sur votre téléphone ou reçoit un lien par e-mail et SMS.' },
+      { name: 'Aides à la rénovation dans le devis', icon: 'badge-euro', plan: 'pro', tag: 'only', desc: "MaPrimeRénov’ et CEE calculées : le client voit tout de suite son reste à charge." },
+      { name: 'Demandes entrantes', icon: 'inbox', plan: 'start', desc: 'Formulaire du site, appels, e-mails et plateformes arrivent dans une seule boîte.' },
       { name: 'Clients et historique', icon: 'contact', plan: 'start', desc: 'Fiche client avec chantiers, devis, factures, photos et échanges.' },
       { name: 'Rendez-vous en ligne', icon: 'calendar-check', plan: 'pro', desc: 'Vos clients réservent une visite dans vos créneaux libres.' },
       { name: 'Probabilité de signature', icon: 'gauge', plan: 'pro', tag: 'new', desc: 'Chaque devis reçoit un score, Brix vous dit lesquels relancer en premier.' },
@@ -42,7 +42,7 @@ export const DEPARTMENTS = [
     icon: 'receipt-euro',
     color: '#d946ef',
     title: 'La facture part,',
-    accent: "l'argent arrive.",
+    accent: "l’argent arrive.",
     pitch: 'Acomptes, situations, factures électroniques, relances et paiements. Tout ce qui sépare un chantier fini d’un compte crédité.',
     features: [
       { name: 'Factures, acomptes et situations', icon: 'file-text', plan: 'start', desc: 'Le devis signé devient facture d’acompte, de situation ou de solde en un geste.' },
@@ -53,7 +53,7 @@ export const DEPARTMENTS = [
       { name: 'Relances et impayés', icon: 'bell-ring', plan: 'pro', desc: 'Relances polies à J+7 et J+15, puis mise en demeure prête à envoyer.' },
       { name: 'Trésorerie et banque', icon: 'landmark', plan: 'pro', desc: 'Comptes synchronisés, paiements rapprochés, trésorerie prévue à 90 jours.' },
       { name: 'Notes de frais', icon: 'receipt', plan: 'pro', desc: 'Photographiez le ticket, il est lu, classé et rattaché au bon chantier.' },
-      { name: 'Export comptable', icon: 'file-spreadsheet', plan: 'start', desc: 'Pennylane, Sage, Cegid, EBP, Quadra : votre comptable reçoit tout.' },
+      { name: 'Export comptable', icon: 'file-spreadsheet', plan: 'start', desc: 'Pennylane, Sage, Cegid, EBP, Quadra : votre comptable reçoit tout.' },
     ],
   },
   {
@@ -66,10 +66,10 @@ export const DEPARTMENTS = [
     pitch: 'Photos, cotes, planning, rapports et PV de réception. Le chantier se suit depuis le téléphone, le bureau voit tout en direct.',
     features: [
       { name: 'Suivi de chantier', icon: 'clipboard-list', plan: 'start', desc: 'Étapes, documents, notes et photos, rangés par chantier.' },
-      { name: 'Rentabilité en direct', icon: 'trending-up', plan: 'pro', desc: 'Heures, achats et sous-traitance mis à jour : la marge réelle, pas une estimation.' },
+      { name: 'Rentabilité en direct', icon: 'trending-up', plan: 'pro', desc: 'Heures, achats et sous-traitance mis à jour : la marge réelle, pas une estimation.' },
       { name: 'Prise de cotes', icon: 'ruler', plan: 'start', desc: 'Dessinez la pièce sur place, surfaces et linéaires passent dans le devis.' },
-      { name: 'Métré par scan LiDAR', icon: 'scan-line', plan: 'pro', tag: 'only', desc: "Faites le tour de la pièce avec l'iPhone, le plan coté sort tout seul." },
-      { name: 'Métré depuis un plan PDF', icon: 'map', plan: 'pro', tag: 'new', desc: "Importez le plan de l'architecte, Bob mesure surfaces et linéaires." },
+      { name: 'Métré par scan LiDAR', icon: 'scan-line', plan: 'pro', tag: 'only', desc: "Faites le tour de la pièce avec l’iPhone, le plan coté sort tout seul." },
+      { name: 'Métré depuis un plan PDF', icon: 'map', plan: 'pro', tag: 'new', desc: "Importez le plan de l’architecte, Bob mesure surfaces et linéaires." },
       { name: 'Planning des chantiers', icon: 'calendar-range', plan: 'equipe', desc: 'Glissez les chantiers sur les équipes, chacun voit sa semaine sur son téléphone.' },
       { name: 'Photos et rapports', icon: 'camera', plan: 'start', desc: 'Photos datées et géolocalisées, rapport de fin de journée envoyé au client.' },
       { name: 'PV de réception', icon: 'clipboard-check', plan: 'pro', desc: 'Réserves photographiées, signature du client, levée de réserves suivie.' },
@@ -122,8 +122,8 @@ export const DEPARTMENTS = [
     accent: 'Bob lit vos chiffres.',
     pitch: 'Bob est votre bras droit. Il écrit, relance, répond au téléphone, prépare la journée, et travaille même la nuit.',
     features: [
-      { name: 'Assistant Bob', icon: 'message-circle', plan: 'pro', desc: '« Combien me doit Mme Leroy ? » Bob répond avec vos vrais chiffres.' },
-      { name: 'Brief du matin', icon: 'sunrise', plan: 'pro', tag: 'new', desc: 'Chaque matin : chantiers du jour, devis à relancer, paiements reçus.' },
+      { name: 'Assistant Bob', icon: 'message-circle', plan: 'pro', desc: '« Combien me doit Mme Leroy ? » Bob répond avec vos vrais chiffres.' },
+      { name: 'Brief du matin', icon: 'sunrise', plan: 'pro', tag: 'new', desc: 'Chaque matin : chantiers du jour, devis à relancer, paiements reçus.' },
       { name: 'Agent de nuit', icon: 'moon-star', plan: 'equipe', tag: 'only', desc: 'Bob prépare les relances et les devis la nuit. Vous validez en un geste au réveil.' },
       { name: 'Secrétaire téléphonique', icon: 'phone-incoming', plan: 'equipe', tag: 'new', desc: "Bob répond aux appels manqués, qualifie la demande et prend rendez-vous." },
       { name: 'Dictée dans votre langue', icon: 'languages', plan: 'pro', desc: 'Dictez en portugais, en arabe ou en turc. Le devis sort en français.' },
@@ -192,7 +192,7 @@ export const SIZES = [
 ];
 
 /* URL de l'app (HashRouter). Remplacer par l'URL de prod au déploiement. */
-export const APP_URL = '/app';
+export const APP_URL = (import.meta.env && import.meta.env.VITE_APP_URL) || '/app';
 export const signupUrl = (params = {}) => {
   const q = new URLSearchParams(params).toString();
   return `${APP_URL}/#/inscription${q ? `?${q}` : ''}`;

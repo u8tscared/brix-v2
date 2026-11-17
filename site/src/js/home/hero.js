@@ -14,6 +14,8 @@ export function initHero() {
       e.stopPropagation();
       document.dispatchEvent(new CustomEvent('dept:select', { detail: a.dataset.goto }));
       scrollToEl($('#departements'));
+      const tab = $(`#tab-${a.dataset.goto}`);
+      if (tab) tab.focus({ preventScroll: true });
     });
   }
   const cnt = $('.idx-h [data-count]');

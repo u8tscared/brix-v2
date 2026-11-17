@@ -1,5 +1,5 @@
 /* Petits blocs communs aux pages secondaires : entrée du hero, FAQ, attente. */
-import { gsap, reduce, $$ } from './core.js';
+import { gsap, reduce, $, $$ } from './core.js';
 
 export const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -21,10 +21,14 @@ export function heroIn() {
 
 /* FAQ accessible : un bouton par question, aria-expanded tenu à jour. */
 export function faq(root) {
+  // réponse fermée : retirée du parcours clavier et des lecteurs d'écran (inert)
+  $$('.qa', root).forEach((qa) => { const a = $('.ans', qa); if (a) a.inert = !qa.classList.contains('open'); });
   $$('.qa button', root).forEach((b) => b.addEventListener('click', () => {
     const qa = b.closest('.qa'), open = !qa.classList.contains('open');
     qa.classList.toggle('open', open);
     b.setAttribute('aria-expanded', open);
+    const a = $('.ans', qa);
+    if (a) a.inert = !open;
   }));
 }
 

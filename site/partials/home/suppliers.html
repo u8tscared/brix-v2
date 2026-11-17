@@ -1,40 +1,40 @@
 <section class="sup" id="fournisseurs" aria-labelledby="sup-t">
   <div class="wrap sec">
     <div class="head">
-      <div><span class="eyebrow rv"><svg class="i"><use href="#i-package"/></svg>Achats et fournisseurs</span><h2 class="h2 rv" id="sup-t">Le devis signé. <span class="grad">Le matériel déjà en route.</span></h2></div>
-      <p class="sub rv">Compatible avec tous vos fournisseurs, même ceux qui n'ont jamais entendu parler de Brix. Ils reçoivent un lien, répondent en deux minutes, et vous comparez sans ressaisir une ligne.</p>
+      <div><span class="eyebrow rv"><svg class="i" aria-hidden="true"><use href="#i-package"/></svg>Achats et fournisseurs</span><h2 class="h2 rv" id="sup-t">Le devis signé. <span class="grad">Le matériel déjà en route.</span></h2></div>
+      <p class="sub rv">Compatible avec tous vos fournisseurs, même ceux qui n’ont jamais entendu parler de Brix. Ils reçoivent un lien, répondent en deux minutes, et vous comparez sans ressaisir une ligne.</p>
     </div>
     <div class="flow rv" data-flow>
       <svg class="flow-line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="M20 20 H980"/><path class="fl-p" pathLength="1000" d="M20 20 H980"/></svg>
-      <div class="fnode"><span class="fn-i"><svg class="i"><use href="#i-file-pen-line"/></svg></span><b>Devis signé</b><span>La liste de matériel est extraite du devis</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i"><use href="#i-send"/></svg></span><b>Demande de prix</b><span>Envoyée à 3 fournisseurs en un clic</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i"><use href="#i-git-compare"/></svg></span><b>Comparatif</b><span>Prix et délai, ligne par ligne</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i"><use href="#i-shopping-cart"/></svg></span><b>Commande</b><span>Bon de commande généré, au format EDI si besoin</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i"><use href="#i-truck"/></svg></span><b>Livré sur chantier</b><span>Suivi, livraisons partielles, facture rapprochée</span></div>
+      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-file-pen-line"/></svg></span><b>Devis signé</b><span>La liste de matériel est extraite du devis</span></div>
+      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg></span><b>Demande de prix</b><span>Envoyée à 3 fournisseurs en un clic</span></div>
+      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-git-compare"/></svg></span><b>Comparatif</b><span>Prix et délai, ligne par ligne</span></div>
+      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-shopping-cart"/></svg></span><b>Commande</b><span>Bon de commande généré, au format EDI si besoin</span></div>
+      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-truck"/></svg></span><b>Livré sur chantier</b><span>Suivi, livraisons partielles, facture rapprochée</span></div>
     </div>
     <div class="sup-split">
       <div class="sup-card rv">
         <span class="badge v">Pour vous, artisan</span>
         <h3 class="h3">Fini les devis matériel par téléphone.</h3>
         <ul class="ticks">
-          <li><svg class="i"><use href="#i-check"/></svg>Vos tarifs fournisseurs importés (CSV, FAB-DIS), historique des prix</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Alerte quand un prix augmente, avant d'envoyer le devis</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Facture fournisseur comparée à la commande, écarts signalés</li>
-          <li><svg class="i"><use href="#i-check"/></svg>Achats imputés au chantier : la marge réelle se met à jour</li>
+          <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Vos tarifs fournisseurs importés (CSV, FAB-DIS), historique des prix</li>
+          <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Alerte quand un prix augmente, avant d’envoyer le devis</li>
+          <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Facture fournisseur comparée à la commande, écarts signalés</li>
+          <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Achats imputés au chantier : la marge réelle se met à jour</li>
         </ul>
         <p class="fine">Connexions directes avec les grands négoces en cours.</p>
       </div>
       <div class="sup-card dark rv" id="portail">
         <span class="badge only">Pour les fournisseurs</span>
         <h3 class="h3">Recevez les demandes des artisans. Sans installer quoi que ce soit.</h3>
-        <p>Le <b>Portail fournisseur Brix</b> s'ouvre depuis un lien sécurisé reçu par e-mail. Pour aller plus loin, l'<b>API Brix Fournisseurs</b> branche votre catalogue et vos stocks.</p>
-        <pre class="code" aria-label="Exemple d'appel à l'API Brix Fournisseurs"><code><span class="c-k">POST</span> /v1/quotes/<span class="c-s">rfq_8KQ2</span>/responses
+        <p>Le <b>Portail fournisseur Brix</b> s’ouvre depuis un lien sécurisé reçu par e-mail. Pour aller plus loin, l’<b>API Brix Fournisseurs</b> branche votre catalogue et vos stocks.</p>
+        <pre class="code" tabindex="0" role="region" aria-label="Exemple d'appel à l'API Brix Fournisseurs"><code><span class="c-k">POST</span> /v1/quotes/<span class="c-s">rfq_8KQ2</span>/responses
 {
   <span class="c-s">"lines"</span>: [{ <span class="c-s">"ref"</span>: <span class="c-s">"REC-90140"</span>, <span class="c-s">"price"</span>: <span class="c-n">412.00</span> }],
   <span class="c-s">"delivery"</span>: <span class="c-s">"2026-11-19"</span>
 }
 <span class="c-c">→ 201 · webhook quote.responded signé</span></code></pre>
-        <a class="link" href="fournisseurs.html">Devenir fournisseur connecté <svg class="i"><use href="#i-arrow-right"/></svg></a>
+        <a class="link" href="fournisseurs.html">Devenir fournisseur connecté <svg class="i" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
       </div>
     </div>
   </div>

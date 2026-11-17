@@ -7,7 +7,7 @@ export const COMPETITORS = ['Obat', 'Tolteck', 'Batappli', 'EBP Bâtiment', 'Sag
 
 export const MATRIX = [
   { f: 'Devis et factures BTP', v: ['y', 'y', 'y', 'y', 'y', 'y', 'y', 'p'], brix: 'y' },
-  { f: 'Bibliothèque de prix', v: ['y', 'p', 'y', 'y', 'y', 'y', 'p', 'n'], brix: 'y', note: '50 000 ouvrages' },
+  { f: 'Bibliothèque de prix', v: ['y', 'p', 'y', 'y', 'y', 'y', 'p', 'n'], brix: 'y', note: '50 000 ouvrages' },
   { f: 'Situations, acomptes, retenue de garantie', v: ['p', 'p', 'y', 'y', 'y', 'y', 'y', 'n'], brix: 'y' },
   { f: 'Signature électronique', v: ['y', 'y', 'p', 'p', 'p', 'y', null, 'y'], brix: 'y' },
   { f: 'Paiement en ligne', v: ['y', 'p', null, 'p', 'p', null, null, 'y'], brix: 'y' },

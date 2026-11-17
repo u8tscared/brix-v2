@@ -3,7 +3,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import { DEPARTMENTS } from '../data/departments.js';
+import { DEPARTMENTS, APP_URL } from '../data/departments.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,7 +33,7 @@ function initNav() {
 
   // état plein / transparent
   const hero = $('[data-hero]');
-  const solid = () => nav.classList.toggle('solid', !hero || scrollY > hero.offsetHeight - 120);
+  const solid = () => { nav.classList.toggle('solid', !hero || scrollY > hero.offsetHeight - 120); nav.classList.toggle('over', scrollY > 24); };
   addEventListener('scroll', solid, { passive: true });
   solid();
 
@@ -48,7 +48,14 @@ function initNav() {
       dd.addEventListener('pointerleave', () => { t = setTimeout(() => set(false), 160); });
     }
     btn.addEventListener('click', () => set(!dd.classList.contains('on')));
-    addEventListener('keydown', (e) => { if (e.key === 'Escape') { set(false); } });
+    addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !dd.classList.contains('on')) return;
+      const inside = dd.contains(document.activeElement);
+      set(false);
+      if (inside) btn.focus();
+    });
+    // au clavier, le menu se referme dès que le focus en sort
+    dd.addEventListener('focusout', (e) => { if (e.relatedTarget && !dd.contains(e.relatedTarget)) set(false); });
     document.addEventListener('click', (e) => { if (!dd.contains(e.target)) set(false); });
   }
 
@@ -63,6 +70,14 @@ function initNav() {
       document.documentElement.style.overflow = on ? 'hidden' : '';
       if (on && !reduce) gsap.from($$('.drawer-in > *', drawer), { y: 18, opacity: 0, duration: .5, stagger: .05, ease: 'expo.out' });
     };
+    // focus gardé entre le bouton du menu et le tiroir tant qu'il est ouvert
+    addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || drawer.hidden) return;
+      const items = [burger, ...$$('a, button', drawer)];
+      const i = items.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (!e.shiftKey && (i === items.length - 1 || i < 0)) { e.preventDefault(); items[0].focus(); }
+    });
     burger.addEventListener('click', () => open(drawer.hidden));
     drawer.addEventListener('click', (e) => { if (e.target.closest('a')) open(false); });
     addEventListener('keydown', (e) => { if (e.key === 'Escape' && !drawer.hidden) { open(false); burger.focus(); } });
@@ -77,11 +92,16 @@ export function mesh(canvas, palette) {
   const W = 96, H = 60;
   canvas.width = W; canvas.height = H;
   const blobs = palette || [[109, 40, 217], [217, 70, 239], [251, 146, 60], [129, 140, 248], [139, 92, 246], [244, 114, 182]];
-  let visible = true, sy = 0;
-  new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(canvas);
+  // la boucle ne tourne que lorsque le canvas est à l'écran
+  let visible = false, raf = 0, sy = 0;
+  new IntersectionObserver((e) => {
+    visible = e[0].isIntersecting;
+    if (visible && !raf && !reduce) raf = requestAnimationFrame(draw);
+  }).observe(canvas);
   addEventListener('scroll', () => { sy = scrollY; }, { passive: true });
   function draw(t) {
-    if (visible) {
+    raf = 0;
+    {
       x.fillStyle = 'rgb(88,28,180)';
       x.fillRect(0, 0, W, H);
       blobs.forEach((b, i) => {
@@ -95,7 +115,7 @@ export function mesh(canvas, palette) {
         x.fillRect(0, 0, W, H);
       });
     }
-    if (!reduce) requestAnimationFrame(draw);
+    if (visible && !reduce) raf = requestAnimationFrame(draw);
   }
   draw(5200);
 }
@@ -103,7 +123,7 @@ export function mesh(canvas, palette) {
 /* ---------- Apparitions ---------- */
 function initReveals() {
   if (reduce) return;
-  gsap.set('.rv', { opacity: 0, y: 36 });
+  if ($('.rv')) gsap.set('.rv', { opacity: 0, y: 36 });
   ScrollTrigger.batch('.rv', {
     start: 'top 90%',
     once: true,
@@ -114,7 +134,7 @@ function initReveals() {
     // les mots du texte montent un par un ; un élément enfant (ex. accent en dégradé) monte d'un bloc
     const out = [];
     el.childNodes.forEach((n) => {
-      if (n.nodeType === 3) n.textContent.split(/(\s+)/).forEach((w) => out.push(w.trim() ? `<span class="w"><span>${esc(w)}</span></span>` : w));
+      if (n.nodeType === 3) n.textContent.split(/([ \t\r\n]+)/).forEach((w) => out.push(w.trim() ? `<span class="w"><span>${esc(w)}</span></span>` : w));
       else if (n.nodeName === 'BR') out.push('<br>');
       else out.push(`<span class="w"><span>${n.outerHTML}</span></span>`);
     });
@@ -138,6 +158,12 @@ function initMagnetic() {
   });
 }
 
+/* Après un lien interne (lien d'évitement, ancres), le focus clavier suit le défilement. */
+function focusTarget(t) {
+  if (!t.matches('a[href], button, input, select, textarea, [tabindex]')) t.setAttribute('tabindex', '-1');
+  t.focus({ preventScroll: true });
+}
+
 /* ---------- Défilement doux (ordinateur uniquement) ---------- */
 let lenis;
 function initLenis() {
@@ -150,12 +176,14 @@ function initLenis() {
     const a = e.target.closest('a[href^="#"]');
     if (!a || a.getAttribute('href').length < 2) return;
     const target = document.querySelector(a.getAttribute('href'));
-    if (target) { e.preventDefault(); lenis.scrollTo(target, { offset: -90 }); history.replaceState(null, '', a.getAttribute('href')); }
+    if (target) { e.preventDefault(); lenis.scrollTo(target, { offset: -90 }); history.replaceState(null, '', a.getAttribute('href')); focusTarget(target); }
   });
 }
 export const scrollToEl = (el) => (lenis ? lenis.scrollTo(el, { offset: -90 }) : el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }));
 
 export function boot(pageInit) {
+  // liens vers l'app : « /app/… » pointe vers l'URL configurée (VITE_APP_URL au build)
+  if (APP_URL !== '/app') $$('a[href^="/app/"]').forEach((a) => { a.href = APP_URL + a.getAttribute('href').slice(4); if (/^https?:/.test(APP_URL)) { a.target = '_blank'; a.rel = 'noopener'; } });
   initNav();
   $$('canvas.mesh').forEach((c) => mesh(c));
   if (pageInit) pageInit();

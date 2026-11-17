@@ -2,6 +2,8 @@
 .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 50; color: #fff; transition: background .4s var(--ease), box-shadow .4s, color .4s; padding-top: env(safe-area-inset-top, 0px) }
 .navbar { display: flex; align-items: center; justify-content: space-between; height: var(--nav-h); gap: 20px }
 .nav.solid, body[data-nav="solid"] .nav, .nav.open { background: rgba(255, 255, 255, .86); backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6); box-shadow: 0 1px 0 var(--line); color: var(--ink) }
+/* au-dessus du hero en dégradé : voile flouté dès qu'on défile, pour que le titre ne passe pas sous le logo */
+.nav.over:not(.solid):not(.open) { background: rgba(76, 29, 149, .22); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); box-shadow: 0 1px 0 rgba(255, 255, 255, .12) }
 .logo { display: flex; align-items: center; color: inherit }
 .logo .wmk { height: 26px; width: auto }
 .nav.solid .logo, body[data-nav="solid"] .nav .logo, .nav.open .logo, .foot .logo { color: var(--brand) }
@@ -39,7 +41,9 @@
 .burger span:first-child { top: 17px } .burger span:last-child { top: 25px }
 .nav.open .burger span:first-child { top: 21px; transform: rotate(45deg) }
 .nav.open .burger span:last-child { top: 21px; transform: rotate(-45deg) }
-.drawer { position: fixed; inset: calc(var(--nav-h) + env(safe-area-inset-top, 0px)) 0 0; background: #fff; color: var(--ink); overflow-y: auto; overscroll-behavior: contain }
+/* backdrop-filter crée un bloc conteneur pour les enfants fixed : on l'enlève quand le tiroir est ouvert, sinon le tiroir se retrouve écrasé dans la barre */
+.nav.open { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none }
+.drawer { position: fixed; height: calc(100dvh - var(--nav-h) - env(safe-area-inset-top, 0px)); inset: calc(var(--nav-h) + env(safe-area-inset-top, 0px)) 0 0; background: #fff; color: var(--ink); overflow-y: auto; overscroll-behavior: contain }
 .drawer-in { padding: 18px max(20px, env(safe-area-inset-left, 0px)) calc(30px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 18px; max-width: 640px; margin: 0 auto }
 .dr-t { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--faint) }
 .dr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px }

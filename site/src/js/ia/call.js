@@ -6,16 +6,16 @@ import { wait, onView } from '../subpage.js';
 const SCRIPT = [
   { s: 'missed', t: 'Appel manqué · vous êtes sur le toit', d: 1400 },
   { s: 'bob', t: 'Bob a décroché · 00:04', d: 500, step: 0 },
-  { who: 'bob', m: "Bonjour, entreprise Martin Plomberie. Je suis Bob, l'assistant de Karim. Il est sur un chantier, je peux prendre votre demande ?" },
-  { who: 'cli', m: "Oui, bonjour. J'ai une fuite sous l'évier de la cuisine, ça goutte depuis hier." },
-  { who: 'bob', m: "D'accord. L'eau coule tout le temps, ou seulement quand le robinet est ouvert ?", step: 1 },
-  { who: 'cli', m: "Seulement quand j'ouvre le robinet." },
-  { who: 'bob', m: 'Merci. Karim peut passer jeudi à 8 h 30 ou vendredi à 14 h. Qu’est-ce qui vous arrange ?', step: 2 },
-  { who: 'cli', m: 'Jeudi 8 h 30, parfait.' },
-  { who: 'bob', m: "C'est noté. Vous allez recevoir un SMS avec l'heure de passage. Bonne journée !", step: 3 },
-  { s: 'done', t: 'Appel terminé · 1 min 12', d: 600 },
-  { who: 'sms', m: '<small>SMS envoyé au client</small>Martin Plomberie : visite confirmée jeudi à 8 h 30, 14 rue des Lilas. Pour décaler, répondez à ce message.' },
-  { who: 'sum', step: 4, m: '<b>Résumé pour Karim</b><div><span>Client</span><span>Mme Dubois, nouvelle cliente</span></div><div><span>Demande</span><span>Fuite sous évier, pas urgente</span></div><div><span>Visite</span><span>Jeudi 8 h 30, dans le planning</span></div>' },
+  { who: 'bob', m: "Bonjour, entreprise Martin Plomberie. Je suis Bob, l’assistant virtuel de Karim. Il est sur un chantier, je peux prendre votre demande ?" },
+  { who: 'cli', m: "Oui, bonjour. J’ai une fuite sous l’évier de la cuisine, ça goutte depuis hier." },
+  { who: 'bob', m: "D’accord. L’eau coule tout le temps, ou seulement quand le robinet est ouvert ?", step: 1 },
+  { who: 'cli', m: "Seulement quand j’ouvre le robinet." },
+  { who: 'bob', m: 'Merci. Karim peut passer jeudi à 8 h 30 ou vendredi à 14 h. Qu’est-ce qui vous arrange ?', step: 2 },
+  { who: 'cli', m: 'Jeudi 8 h 30, parfait.' },
+  { who: 'bob', m: "C’est noté. Vous allez recevoir un SMS avec l’heure de passage. Bonne journée !", step: 3 },
+  { s: 'done', t: 'Appel terminé · 1 min 12', d: 600 },
+  { who: 'sms', m: '<small>SMS envoyé au client</small>Martin Plomberie : visite confirmée jeudi à 8 h 30, 14 rue des Lilas. Pour décaler, répondez à ce message.' },
+  { who: 'sum', step: 4, m: '<b>Résumé pour Karim</b><div><span>Client</span><span>Mme Dubois, nouvelle cliente</span></div><div><span>Demande</span><span>Fuite sous évier, pas urgente</span></div><div><span>Visite</span><span>Jeudi 8 h 30, dans le planning</span></div>' },
 ];
 
 export function initCall() {

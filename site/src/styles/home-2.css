@@ -135,7 +135,7 @@
   .feed li { grid-template-columns: 40px 1fr; padding: 12px }
   .feed em { grid-column: 1 / -1; margin-bottom: -4px }
   .sup-card { padding: 24px }
-  .chat { min-height: 430px }
+  .chat { min-height: 520px }
 }
 
 .more-ft { display: none; width: 100%; margin-top: 12px }

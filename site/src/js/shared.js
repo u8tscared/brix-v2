@@ -11,7 +11,7 @@ export function renderPlans(root) {
     <article class="plan-c rv ${p.hi ? 'hi' : ''}" data-plan="${p.id}">
       <h3>Brix ${p.name}${p.tag ? ` <span class="tag">${p.tag}</span>` : ''}</h3>
       <p class="for">${p.for}</p>
-      <div class="price">${p.monthly === null ? '<b class="txt">Sur devis</b><span>selon vos agences et effectifs</span>' : `<b data-m="${p.monthly}">${p.monthly === 0 ? '0 €' : euro(p.monthly)}</b><span data-per>${p.monthly === 0 ? 'pour toujours' : 'par mois, HT'}</span>`}</div>
+      <div class="price">${p.monthly === null ? '<b class="txt">Sur devis</b><span>selon vos agences et effectifs</span>' : `<b data-m="${p.monthly}">${p.monthly === 0 ? '0 €' : euro(p.monthly)}</b><span data-per>${p.monthly === 0 ? 'pour toujours' : 'par mois HT'}</span>`}</div>
       <ul><li class="lead">${p.lead}</li>${p.items.map((i) => `<li>${ic('check')}${i}</li>`).join('')}</ul>
       ${p.note ? `<p class="fine">${p.note}</p>` : ''}
       <a class="btn ${p.hi ? 'white' : 'dark'} mag" href="${p.ctaHref}">${p.cta} ${ic('arrow-right', 'go')}</a>
@@ -31,7 +31,7 @@ export function initBilling(toggle, plansRoot) {
       if (!m) return;
       const to = annual ? annualMonthly(m) : m;
       const per = el.parentElement.querySelector('[data-per]');
-      per.textContent = annual ? `par mois, soit ${euro(to * 12)} par an` : 'par mois, HT';
+      per.textContent = annual ? `par mois HT, soit ${euro(m * 10)} HT par an` : 'par mois HT';
       if (reduce) { el.textContent = euro(to); return; }
       const o = { v: parseFloat(el.dataset.v || m) };
       gsap.to(o, { v: to, duration: 0.6, ease: 'power3.out', onUpdate: () => { el.textContent = euro(o.v); } });
@@ -52,7 +52,7 @@ export function initSimulator(root) {
     $('[data-sim-plan]', root).textContent = r.plan;
     $('[data-sim-total]', root).textContent = r.total === null ? 'Sur devis' : euro(r.total);
     $('[data-sim-per]', root).textContent = r.total === null ? 'interlocuteur dédié' : `soit ${euro(r.total / n)} par personne`;
-    input.setAttribute('aria-valuetext', `${n} utilisateurs, offre ${r.plan}`);
+    input.setAttribute('aria-valuetext', `${n >= 60 ? '60 utilisateurs ou plus' : n > 1 ? `${n} utilisateurs` : '1 utilisateur'}, offre ${r.plan}, ${r.total === null ? 'sur devis' : `${euro(r.total)} par mois`}`);
   };
   input.addEventListener('input', () => out(+input.value));
   out(+input.value);
@@ -77,10 +77,14 @@ export function renderCompare(table, { cols = COMPETITORS.map((_, i) => i), keyO
 
 /* ---------- FAQ ---------- */
 export function initFaq(root) {
+  // réponse fermée : retirée du parcours clavier et des lecteurs d'écran (inert)
+  $$('.qa', root).forEach((qa) => { const a = $('.ans', qa); if (a) a.inert = !qa.classList.contains('open'); });
   $$('.qa button', root).forEach((b) => b.addEventListener('click', () => {
     const qa = b.closest('.qa'), open = !qa.classList.contains('open');
     qa.classList.toggle('open', open);
     b.setAttribute('aria-expanded', open);
+    const a = $('.ans', qa);
+    if (a) a.inert = !open;
   }));
 }
 

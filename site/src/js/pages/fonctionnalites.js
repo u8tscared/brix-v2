@@ -15,7 +15,7 @@ const FILTERS = [
   { id: 'equipe', label: 'Inclus dans Équipe' },
 ];
 // recherche insensible aux accents et à la casse
-const norm = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const norm = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’ʼ]/g, "'").toLowerCase();
 const plural = (n, one, many) => `${n} ${n > 1 ? many : one}`;
 
 function mark(text, q) {

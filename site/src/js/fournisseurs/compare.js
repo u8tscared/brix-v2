@@ -5,10 +5,10 @@ import { radios, onView } from '../subpage.js';
 // Exemple fictif : 5 lignes de la salle de bain Leroy, prix unitaires HT proposés par 3 fournisseurs
 const LINES = [
   { n: 'Receveur extra-plat 90×120', q: 1, u: 'u' },
-  { n: 'Paroi de douche fixe 90 cm', q: 1, u: 'u' },
+  { n: 'Paroi de douche fixe 90 cm', q: 1, u: 'u' },
   { n: 'Mitigeur thermostatique', q: 1, u: 'u' },
   { n: 'Carrelage grès 60×60', q: 14, u: 'm²' },
-  { n: 'Colle carrelage C2 25 kg', q: 6, u: 'sacs' },
+  { n: 'Colle carrelage C2 25 kg', q: 6, u: 'sacs' },
 ];
 const SUPPLIERS = [
   { id: 'd', name: 'Matériaux Durand', short: 'Durand', days: 3, p: [289, 342, 168, 34.5, 22.5] },

@@ -8,7 +8,7 @@ const TAG = { new: ['new', 'Nouveau'], only: ['only', 'Exclusif Brix'], soon: ['
 /* Hero : les trois fournisseurs passent d'« Envoyée » à « Lue » puis répondent. */
 export function heroRfq(tl) {
   const rows = $$('[data-rh]');
-  const answers = ['1 417 €', '1 524 €', '1 422,60 €'];
+  const answers = ['1 417 €', '1 524 €', '1 422,60 €'];
   const set = (li, cls, txt) => { const em = $('.st em', li); em.className = cls; em.textContent = txt; return em; };
   if (reduce) { rows.forEach((li, i) => set(li, 'ok', answers[i])); return; }
   tl.from('.rh-card', { y: 80, opacity: 0, rotate: 4, duration: 1.4 }, '-=1.1')

@@ -52,6 +52,29 @@ const site = () => ({
       return out;
     },
   },
+});
+
+/* Vite range les feuilles partagées (home-*) APRÈS celle de la page : on remet l'ordre de cascade
+   voulu (socle → accueil partagé → page commune → page) pour que les surcharges de page gagnent. */
+const CSS_RANK = (href) => (/\/core-/.test(href) ? 0 : /\/home-/.test(href) ? 1 : /\/page-/.test(href) ? 2 : 3);
+const cssOrder = () => ({
+  name: 'brix-css-order',
+  apply: 'build',
+  transformIndexHtml: {
+    order: 'post',
+    handler(html) {
+      const re = /<link rel="stylesheet"[^>]*href="([^"]+\.css)"[^>]*>\n?/g;
+      const links = [...html.matchAll(re)].filter((m) => m[1].includes('assets/'));
+      if (links.length < 2) return html;
+      const sorted = [...links].sort((a, b) => CSS_RANK(a[1]) - CSS_RANK(b[1])).map((m) => m[0]);
+      let i = 0;
+      return html.replace(re, (m, href) => (href.includes('assets/') ? sorted[i++] : m));
+    },
+  },
+});
+
+const siteHot = () => ({
+  name: 'brix-site-hot',
   handleHotUpdate({ file, server }) {
     if (file.includes('/partials/')) server.ws.send({ type: 'full-reload' });
   },
@@ -59,7 +82,7 @@ const site = () => ({
 
 export default defineConfig({
   base: './',
-  plugins: [site()],
+  plugins: [site(), siteHot(), cssOrder()],
   build: {
     outDir: 'dist',
     rollupOptions: { input: Object.fromEntries(PAGES.filter((p) => existsSync(resolve(root, `${p}.html`))).map((p) => [p, resolve(root, `${p}.html`)])) },
