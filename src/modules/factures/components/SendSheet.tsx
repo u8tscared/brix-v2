@@ -64,7 +64,7 @@ export function SendSheet({ f, open, onClose, missing, checks, onPreview }: { f:
     if (viaPa) transmit(f.id);
     setBusy(false);
     setDone({ to, draft });
-    toast(`${INVOICE_TITLE[f.kind]} envoyée à ${client?.name ?? to}`);
+    toast(`${INVOICE_TITLE[f.kind]} ${f.kind === 'avoir' ? 'envoyé' : 'envoyée'} à ${client?.name ?? to}`);
   };
 
   const footer = done ? undefined : (

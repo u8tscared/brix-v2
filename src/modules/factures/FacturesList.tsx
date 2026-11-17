@@ -1,12 +1,17 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, FilePlus2, FileSignature, Plus, ReceiptText, Search } from 'lucide-react';
-import { Button, Card, EmptyState, Input, PageHeader, Segmented, cn } from '@/components/ui';
-import { capitalize, money, monthName, todayISO } from '@/lib/format';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { FilePlus2, FileSignature, Plus, ReceiptText, Search } from 'lucide-react';
+import { Button, EmptyState, IconTile, Input, PageHeader, Segmented } from '@/components/ui';
+import { useMediaQuery } from '@/components/layout/useMediaQuery';
+import { todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
-import type { Facture } from '@/lib/types';
-import { DueText, EDot, KindBadge, StatusBadge } from './components/bits';
+import { CashHeader } from './components/list/CashHeader';
+import { FactureCard, FactureRow, ROW_GRID, type RowAction } from './components/list/FactureItem';
+import { NewFactureSheet } from './components/list/NewFactureSheet';
 import { CreateFromDevisSheet } from './components/CreateFromDevisSheet';
+import { FacturePreview } from './components/FacturePreview';
+import { RecordPaymentSheet } from './components/PaymentSheets';
+import { ReminderSheet } from './components/ReminderSheet';
 import { amounts, daysLate, dueLabel, liveStatus } from './lib/model';
 import { allPayments, useFactures } from './store';
 
@@ -14,20 +19,37 @@ type Filter = 'toutes' | 'a_encaisser' | 'en_retard' | 'payees' | 'brouillons';
 
 export default function FacturesList() {
   const navigate = useNavigate();
+  const phone = !useMediaQuery('(min-width: 768px)');
+  const desk = useMediaQuery('(min-width: 1100px)');
   const factures = useBrix((s) => s.factures);
   const clients = useBrix((s) => s.clients);
+  const signedCount = useBrix((s) => s.devis.filter((d) => d.status === 'signe').length);
   const payments = useFactures((s) => s.payments);
   const [filter, setFilter] = useState<Filter>('toutes');
   const [q, setQ] = useState('');
   const [fromDevis, setFromDevis] = useState(false);
+  const [chooser, setChooser] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [act, setAct] = useState<{ id: string; kind: 'pay' | 'remind' } | null>(null);
+  const [actOpen, setActOpen] = useState(false);
   const today = todayISO();
+
+  // Barre du haut « Créer > Facture » : /app/factures?nouvelle=1
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    if (!params.get('nouvelle')) return;
+    setChooser(true);
+    setParams({}, { replace: true });
+  }, [params, setParams]);
 
   const rows = useMemo(
     () =>
-      factures.filter((f) => f.status !== 'annulee').map((f) => {
-        const client = clients.find((c) => c.id === f.clientId);
-        return { f, client, a: amounts(f), st: liveStatus(f, today), due: dueLabel(f, today) };
-      }),
+      factures
+        .filter((f) => f.status !== 'annulee')
+        .map((f) => {
+          const client = clients.find((c) => c.id === f.clientId);
+          return { f, client, a: amounts(f), st: liveStatus(f, today), due: dueLabel(f, today) };
+        }),
     [factures, clients, today],
   );
 
@@ -58,150 +80,126 @@ export default function FacturesList() {
     .filter((r) => !needle || `${r.f.number} ${r.f.title} ${r.client?.name ?? ''}`.toLowerCase().includes(needle))
     .sort((x, y) => (filter === 'en_retard' ? daysLate(y.f) - daysLate(x.f) : y.f.issueDate.localeCompare(x.f.issueDate) || y.f.number.localeCompare(x.f.number)));
 
+  const doAction = (id: string, a: RowAction) => {
+    if (a === 'send') return navigate(`/app/factures/${id}?envoyer=1`);
+    setAct({ id, kind: a });
+    setActOpen(true);
+  };
+  const actF = factures.find((f) => f.id === act?.id);
+  const itemProps = (r: (typeof visible)[number]) => ({
+    ...r,
+    onOpen: () => navigate(`/app/factures/${r.f.id}`),
+    onPreview: () => setPreview(r.f.id),
+    onAction: (a: RowAction) => doAction(r.f.id, a),
+  });
+
+  const subtitle = late.length
+    ? `${late.length} facture${late.length > 1 ? 's' : ''} en retard. Bob relance pour vous, ou en un clic ici.`
+    : pending.length
+      ? 'Vos clients sont dans les temps. Bob relancera tout seul si une échéance passe.'
+      : 'Facturez un devis signé en deux clics, la facture électronique est incluse.';
+
   return (
     <div className="space-y-5">
       <PageHeader
+        icon={<IconTile name="Receipt" dept="facturer" size="lg" />}
         title="Factures"
-        subtitle="Facturez, faites-vous payer et restez en règle avec la facture électronique."
+        subtitle={subtitle}
         actions={
           <>
-            <Button variant="secondary" icon={<FileSignature className="h-4 w-4" />} onClick={() => setFromDevis(true)} className="flex-1 sm:flex-none">
+            <Button variant="secondary" size={phone ? 'lg' : 'md'} icon={<FileSignature className="h-4 w-4" />} onClick={() => setFromDevis(true)} className="max-sm:flex-1 max-sm:justify-center">
               Depuis un devis
             </Button>
-            <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/factures/nouvelle')} className="flex-1 sm:flex-none">
+            <Button variant="primary" size={phone ? 'lg' : 'md'} icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/factures/nouvelle')} className="max-sm:flex-1 max-sm:justify-center">
               Nouvelle facture
             </Button>
           </>
         }
       />
 
-      <Card className="grid grid-cols-2 divide-line max-md:[&>*:first-child]:col-span-2 max-md:[&>*:first-child]:border-b md:grid-cols-3 md:divide-x">
-        <div className="p-4">
-          <div className="text-xs font-medium text-ink-2">Encaissé en {monthName().split(' ')[0]}</div>
-          <div className="num mt-1.5 font-display text-[30px] font-semibold leading-[1.1] tracking-[-0.02em] dawn-text">{money(cashed, true)}</div>
-          <div className="mt-1 text-xs text-ink-2">
-            {monthPayments.length} paiement{monthPayments.length > 1 ? 's' : ''} reçu{monthPayments.length > 1 ? 's' : ''}
-          </div>
-        </div>
-        <button onClick={() => setFilter('a_encaisser')} className="min-w-0 p-4 text-left transition hover:bg-[#fafafc] max-md:border-r max-md:border-line">
-          <div className="text-xs font-medium text-ink-2">À encaisser</div>
-          <div className="num mt-1.5 text-[22px] font-semibold leading-tight tracking-[-0.02em]">{money(sum(pending), true)}</div>
-          <div className="mt-1 text-xs text-ink-2">{pending.length} facture{pending.length > 1 ? 's' : ''} dans les temps</div>
-        </button>
-        <button onClick={() => setFilter('en_retard')} className="min-w-0 p-4 text-left transition hover:bg-[#fafafc]">
-          <div className="text-xs font-medium text-ink-2">En retard</div>
-          <div className={cn('num mt-1.5 text-[22px] font-semibold leading-tight tracking-[-0.02em]', late.length && 'text-bad')}>{money(sum(late), true)}</div>
-          <div className="mt-1 flex items-center gap-1 text-xs text-ink-2">
-            {late.length ? (
-              <Link to="/app/relances" onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-1 font-medium text-vi-700 hover:underline">
-                {late.length} à relancer <ArrowRight className="h-3 w-3" />
-              </Link>
-            ) : (
-              'Aucune facture en retard'
-            )}
-          </div>
-        </button>
-      </Card>
-
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <Segmented
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: 'toutes', label: 'Toutes', count: counts.toutes },
-            { value: 'a_encaisser', label: 'À encaisser', count: counts.a_encaisser },
-            { value: 'en_retard', label: 'En retard', count: counts.en_retard },
-            { value: 'payees', label: 'Payées', count: counts.payees },
-            { value: 'brouillons', label: 'Brouillons', count: counts.brouillons },
-          ]}
+      <div className="animate-[fade-up_.5s_var(--ease)_.05s_both]">
+        <CashHeader
+          cashed={cashed}
+          cashedCount={monthPayments.length}
+          onTime={sum(pending)}
+          onTimeCount={pending.length}
+          late={sum(late)}
+          lateCount={late.length}
+          active={filter}
+          onPick={(k) => setFilter((cur) => (cur === k ? 'toutes' : k))}
         />
-        <Input icon={<Search />} placeholder="Client, numéro, chantier…" value={q} onChange={(e) => setQ(e.target.value)} className="md:w-72" />
       </div>
 
-      {visible.length === 0 ? (
-        <EmptyState
-          icon={filter === 'en_retard' ? <ReceiptText /> : <FilePlus2 />}
-          title={filter === 'en_retard' ? 'Aucune facture en retard' : needle ? 'Aucune facture trouvée' : 'Aucune facture ici'}
-          text={filter === 'en_retard' ? 'Tous vos clients sont à jour. Bob surveille les échéances pour vous.' : 'Créez une facture en partant de zéro ou depuis un devis signé, en moins d’une minute.'}
-          action={filter !== 'en_retard' && <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/factures/nouvelle')}>Nouvelle facture</Button>}
-        />
-      ) : (
-        <>
-          {/* Ordinateur : liste dense */}
-          <Card className="hidden overflow-hidden lg:block">
-            <div className="grid grid-cols-[150px_minmax(0,1fr)_150px_120px_120px_140px_28px] items-center gap-4 border-b border-line bg-sub/60 px-4 py-2 text-[11.5px] font-medium text-ink-3">
+      <div className="space-y-3">
+        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
+          <Segmented
+            value={filter}
+            onChange={setFilter}
+            className="w-full lg:w-auto"
+            options={[
+              { value: 'toutes', label: 'Toutes', count: counts.toutes },
+              { value: 'a_encaisser', label: 'À encaisser', count: counts.a_encaisser },
+              { value: 'en_retard', label: 'En retard', count: counts.en_retard },
+              { value: 'payees', label: 'Payées', count: counts.payees },
+              { value: 'brouillons', label: 'Brouillons', count: counts.brouillons },
+            ]}
+          />
+          <Input icon={<Search />} placeholder="Client, numéro, chantier…" value={q} onChange={(e) => setQ(e.target.value)} className="min-w-0 flex-1 lg:max-w-80 lg:ml-auto" aria-label="Rechercher une facture" />
+        </div>
+
+        {visible.length === 0 ? (
+          <EmptyState
+            icon={filter === 'en_retard' ? <ReceiptText /> : <FilePlus2 />}
+            title={filter === 'en_retard' ? 'Aucune facture en retard' : needle ? 'Aucune facture trouvée' : 'Aucune facture ici'}
+            text={filter === 'en_retard' ? 'Tous vos clients sont à jour. Bob surveille les échéances pour vous.' : needle ? 'Essayez un autre mot ou retirez le filtre.' : 'Créez une facture en partant de zéro ou depuis un devis signé, en moins d’une minute.'}
+            action={
+              needle || filter !== 'toutes' ? (
+                <Button onClick={() => (setQ(''), setFilter('toutes'))}>Tout afficher</Button>
+              ) : (
+                <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setChooser(true)}>
+                  Nouvelle facture
+                </Button>
+              )
+            }
+          />
+        ) : desk ? (
+          <div className="overflow-hidden rounded-[18px] bg-white shadow-card">
+            <div className={`grid gap-4 border-b border-line px-5 py-2.5 text-[11.5px] font-medium text-ink-3 ${ROW_GRID}`}>
               <span>Facture</span>
-              <span>Client</span>
+              <span>Client et chantier</span>
               <span>Échéance</span>
               <span className="text-right">Total TTC</span>
               <span className="text-right">Reste à payer</span>
               <span>Statut</span>
-              <span title="Facture électronique">E-f.</span>
+              <span />
             </div>
+            <div key={filter} className="stagger-fast">
+              {visible.map((r) => (
+                <FactureRow key={r.f.id} {...itemProps(r)} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div key={filter} className="stagger-fast grid gap-2.5 md:grid-cols-2">
             {visible.map((r) => (
-              <Link key={r.f.id} to={`/app/factures/${r.f.id}`} className="grid min-h-[60px] grid-cols-[150px_minmax(0,1fr)_150px_120px_120px_140px_28px] items-center gap-4 border-b border-line px-4 py-2 transition last:border-b-0 hover:bg-[#fafafc]">
-                <div className="min-w-0">
-                  <KindBadge kind={r.f.kind} />
-                  <div className="num mt-1 text-[12px] text-ink-3">{r.f.number}</div>
-                </div>
-                <div className="min-w-0">
-                  <div className="truncate text-[13.5px] font-medium">{r.client?.name ?? 'Client à choisir'}</div>
-                  <div className="truncate text-[12.5px] text-ink-2">{r.f.title || 'Sans titre'}</div>
-                </div>
-                <DueText {...r.due} />
-                <div className="num text-right text-[13.5px] font-medium">{money(r.a.ttc * r.a.sign)}</div>
-                <div className={cn('num text-right text-[13.5px]', r.a.remaining > 0 ? 'font-semibold' : 'text-ink-3')}>{r.a.remaining > 0 ? money(r.a.remaining) : '·'}</div>
-                <div>
-                  <StatusBadge status={r.st} />
-                </div>
-                <EDot status={r.f.einvoice.status} b2c={r.client?.kind !== 'pro'} />
-              </Link>
-            ))}
-          </Card>
-
-          {/* Téléphone et tablette : cartes */}
-          <div className="grid gap-2.5 md:grid-cols-2 lg:hidden">
-            {visible.map((r) => (
-              <FactureCard key={r.f.id} f={r.f} clientName={r.client?.name} b2c={r.client?.kind !== 'pro'} />
+              <FactureCard key={r.f.id} {...itemProps(r)} />
             ))}
           </div>
-        </>
-      )}
+        )}
+        <p className="px-1 text-[12px] leading-relaxed text-ink-3">Une facture émise ne se modifie plus : pour corriger, Brix crée un avoir. La pastille à côté du statut indique où en est la facture électronique.</p>
+      </div>
 
-      <p className="text-center text-[12px] text-ink-3">
-        {capitalize(monthName())} · les factures émises ne se modifient plus : pour corriger, Brix crée un avoir.
-      </p>
-
+      <FacturePreview id={preview} onClose={() => setPreview(null)} />
+      <NewFactureSheet
+        open={chooser}
+        onClose={() => setChooser(false)}
+        signedCount={signedCount}
+        onFromDevis={() => (setChooser(false), setFromDevis(true))}
+        onBlank={() => (setChooser(false), navigate('/app/factures/nouvelle'))}
+      />
       <CreateFromDevisSheet open={fromDevis} onClose={() => setFromDevis(false)} />
+      {actF && act?.kind === 'pay' && <RecordPaymentSheet f={actF} open={actOpen} onClose={() => setActOpen(false)} />}
+      {actF && act?.kind === 'remind' && <ReminderSheet f={actF} open={actOpen} onClose={() => setActOpen(false)} />}
     </div>
-  );
-}
-
-function FactureCard({ f, clientName, b2c }: { f: Facture; clientName?: string; b2c: boolean }) {
-  const a = amounts(f);
-  const st = liveStatus(f);
-  const due = dueLabel(f);
-  return (
-    <Link to={`/app/factures/${f.id}`} className="block rounded-[14px] border border-line bg-white p-4 transition active:scale-[.99]">
-      <div className="flex items-start gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-[15px] font-semibold">{clientName ?? 'Client à choisir'}</div>
-          <div className="mt-0.5 truncate text-[13px] text-ink-2">{f.title || 'Sans titre'}</div>
-        </div>
-        <div className="text-right">
-          <div className="num text-[16px] font-semibold">{money(a.ttc * a.sign)}</div>
-          {a.remaining > 0 && a.remaining < a.net && <div className="num text-[12px] text-ink-2">reste {money(a.remaining)}</div>}
-        </div>
-      </div>
-      <div className="mt-3 flex items-center gap-2">
-        <KindBadge kind={f.kind} />
-        <span className="num text-[12px] text-ink-3">{f.number}</span>
-        <EDot status={f.einvoice.status} b2c={b2c} className="ml-auto" />
-      </div>
-      <div className="mt-2.5 flex items-center justify-between gap-2 border-t border-line pt-2.5">
-        <DueText {...due} />
-        <StatusBadge status={st} />
-      </div>
-    </Link>
   );
 }

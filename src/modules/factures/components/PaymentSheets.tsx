@@ -9,6 +9,7 @@ import { recordPayment } from '../lib/actions';
 import { amounts, METHOD_LABEL, type PaymentMethod } from '../lib/model';
 import { createPaymentLink, feeFor, METHOD_FEES } from '../service';
 import { useFactures } from '../store';
+import { SendSuccess } from '@/modules/devis/components/send/SendParts';
 
 const QUICK: PaymentMethod[] = ['virement', 'carte', 'cheque', 'especes', 'instantane', 'prelevement'];
 
@@ -17,37 +18,61 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
   const [amount, setAmount] = useState(a.remaining);
   const [method, setMethod] = useState<PaymentMethod>('virement');
   const [date, setDate] = useState(todayISO());
+  const [done, setDone] = useState<null | { amount: number; left: number }>(null);
 
   useEffect(() => {
     if (open) {
       setAmount(a.remaining);
       setDate(todayISO());
+      setDone(null);
     }
   }, [open]);
 
   const partial = amount > 0 && amount < a.remaining - 0.009;
   const save = () => {
     if (!(amount > 0)) return toast('Indiquez un montant', 'warn');
-    recordPayment(f.id, Math.min(amount, a.remaining), method, date);
-    toast(partial ? `Paiement partiel de ${money(amount)} enregistré` : 'Facture réglée, bravo');
-    onClose();
+    const paid = Math.min(amount, a.remaining);
+    recordPayment(f.id, paid, method, date);
+    setDone({ amount: paid, left: Math.max(0, a.remaining - paid) });
+    toast(partial ? `Paiement partiel de ${money(paid)} enregistré` : `${f.number} réglée`);
   };
 
   return (
     <Sheet
       open={open}
       onClose={onClose}
-      title="Enregistrer un paiement"
-      subtitle={`${f.number} · reste ${money(a.remaining)}`}
+      title={done ? undefined : 'Enregistrer un paiement'}
+      subtitle={done ? undefined : `${f.number} · reste ${money(a.remaining)}`}
       footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>Annuler</Button>
-          <Button variant="primary" icon={<Check className="h-4 w-4" />} onClick={save}>
-            {partial ? 'Enregistrer le paiement partiel' : 'Marquer comme payée'}
-          </Button>
-        </>
+        done ? undefined : (
+          <>
+            <Button variant="ghost" onClick={onClose}>
+              Annuler
+            </Button>
+            <Button variant="primary" icon={<Check className="h-4 w-4" />} onClick={save}>
+              {partial ? 'Enregistrer le paiement partiel' : 'Marquer comme payée'}
+            </Button>
+          </>
+        )
       }
     >
+      {done ? (
+        <SendSuccess
+          title={done.left > 0 ? 'Paiement enregistré' : 'Facture réglée'}
+          text={
+            done.left > 0 ? (
+              <>
+                {money(done.amount)} reçus. Il reste <b className="font-medium text-ink">{money(done.left)}</b> à encaisser, Bob continue de suivre l’échéance.
+              </>
+            ) : (
+              <>
+                {money(done.amount)} reçus sur la {f.number}. Plus aucune relance ne partira pour cette facture.
+              </>
+            )
+          }
+          onClose={onClose}
+        />
+      ) : (
       <div className="space-y-4">
         <Field label="Montant reçu">
           <Input type="number" inputMode="decimal" step="0.01" value={amount} onChange={(e) => setAmount(Number(e.target.value))} suffix="€" className="[&_input]:num [&_input]:h-14 [&_input]:text-[22px] [&_input]:font-semibold" />
@@ -71,6 +96,7 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
         </Field>
         {partial && <p className="rounded-lg bg-sub px-3 py-2 text-[12.5px] text-ink-2">Il restera {money(a.remaining - amount)} à encaisser. Bob continuera de suivre l’échéance.</p>}
       </div>
+      )}
     </Sheet>
   );
 }

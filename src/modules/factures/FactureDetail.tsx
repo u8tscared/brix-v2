@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, BellRing, Copy, Expand, FileCode2, FileMinus2, FileSignature, Link2, Printer, Send, Trash2, Wallet } from 'lucide-react';
 import { Button, EmptyState, Segmented, UnderlineTabs, toast } from '@/components/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
@@ -15,7 +15,8 @@ import { EDot, KindBadge, StatusBadge } from './components/bits';
 import { CreateFromDevisSheet } from './components/CreateFromDevisSheet';
 import { EInvoicePanel } from './components/EInvoicePanel';
 import { DetailTotals, ScaledInvoice } from './components/DetailParts';
-import { invoiceDoc, INVOICE_TITLE } from './components/invoiceDoc';
+import { INVOICE_TITLE } from './components/invoiceDoc';
+import { useInvoiceModel } from './components/useInvoiceModel';
 import { LineEditor } from './components/LineEditor';
 import { MetaForm } from './components/MetaForm';
 import { MoreMenu } from './components/MoreMenu';
@@ -24,8 +25,6 @@ import { PaymentPanel } from './components/PaymentPanel';
 import { ReminderSheet } from './components/ReminderSheet';
 import { SendSheet } from './components/SendSheet';
 import { blankFacture, buildAvoir } from './lib/billing';
-import { checkFacture } from './lib/checks';
-import { fromFacture, validateEInvoice } from './lib/einvoice-input';
 import { buildFacturX, downloadText } from './lib/facturx';
 import { amounts, liveStatus } from './lib/model';
 import { buildUbl } from './lib/ubl';
@@ -68,15 +67,12 @@ function Detail({ f }: { f: Facture }) {
   const s = useBrix();
   const fx = useFactures();
   const wide = useMediaQuery('(min-width: 1280px)');
-  const extra = fx.extras[f.id] ?? {};
-  const client = s.clients.find((c) => c.id === f.clientId);
-  const devis = s.devis.find((d) => d.id === f.devisId);
-  const chantier = s.chantiers.find((c) => c.id === f.chantierId);
-  const original = extra.creditOf ? s.factures.find((x) => x.id === extra.creditOf) : undefined;
+  const { client, devis, original, pro, extra, input: maybeInput, missing, spec: docSpec, checks } = useInvoiceModel(f);
+  const input = maybeInput!;
+  const spec = docSpec!;
   const draft = f.status === 'brouillon';
   const st = liveStatus(f);
   const a = amounts(f);
-  const pro = client?.kind === 'pro';
 
   const [side, setSide] = useState<Side>(draft ? 'apercu' : st === 'payee' ? 'efacture' : 'paiement');
   const [tab, setTab] = useState<Tab>('facture');
@@ -84,15 +80,16 @@ function Detail({ f }: { f: Facture }) {
   const [viewer, setViewer] = useState(false);
   const close = () => setSheet(null);
 
-  const input = useMemo(() => fromFacture(f, s.company, client, extra, { devisNumber: devis?.number, original }), [f, s.company, client, extra, devis, original]);
-  const missing = useMemo(() => {
-    const m = validateEInvoice(input, { b2b: pro });
-    if (!f.clientId) m.unshift('Client');
-    return [...new Set(m)];
-  }, [input, pro, f.clientId]);
-  const paperProps = { f, company: s.company, client, extra, devis, chantier, original };
-  const spec = useMemo(() => invoiceDoc(paperProps), [f, s.company, client, extra, devis, chantier, original]);
-  const checks = useMemo(() => checkFacture(f, client, s.company, extra, missing), [f, client, s.company, extra, missing]);
+  // Arrivée depuis la liste : ?apercu=1, ?envoyer=1, ?encaisser=1, ?relancer=1
+  const [params, setParams] = useSearchParams();
+  useEffect(() => {
+    const open = params.get('apercu') ? 'viewer' : params.get('envoyer') ? 'send' : params.get('encaisser') ? 'pay' : params.get('relancer') ? 'remind' : null;
+    if (!open) return;
+    if (open === 'viewer') setViewer(true);
+    else setSheet(open);
+    setParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const update = (p: Partial<Facture>) => s.upsertFacture({ ...f, ...p });
   const download = (fmt: 'cii' | 'ubl') => {
@@ -301,8 +298,8 @@ function Detail({ f }: { f: Facture }) {
         checks={draft ? checks : undefined}
         onFix={fix}
         onEdit={draft ? () => setTab('facture') : undefined}
-        onSend={draft || f.kind === 'avoir' ? openSend : a.remaining > 0 ? () => (setViewer(false), setSheet('remind')) : undefined}
-        sendLabel={draft ? 'Émettre et envoyer' : f.kind === 'avoir' ? 'Envoyer' : 'Relancer'}
+        onSend={draft || f.kind === 'avoir' ? openSend : a.remaining > 0 ? () => (setViewer(false), setSheet(st === 'en_retard' ? 'remind' : 'pay')) : undefined}
+        sendLabel={draft ? 'Émettre et envoyer' : f.kind === 'avoir' ? 'Envoyer' : st === 'en_retard' ? 'Relancer' : 'Paiement reçu'}
       />
       <RecordPaymentSheet f={f} open={sheet === 'pay'} onClose={close} />
       <PaymentLinkSheet f={f} open={sheet === 'link'} onClose={close} clientEmail={client?.email} clientPhone={client?.phone} />

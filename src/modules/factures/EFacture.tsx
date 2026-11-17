@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Card, PageHeader, UnderlineTabs } from '@/components/ui';
+import { IconTile, PageHeader, UnderlineTabs } from '@/components/ui';
+import { AnimatedNumber } from '@/components/motion';
 import { useBrix } from '@/lib/store';
 import { Annuaire } from './components/efacture/Annuaire';
 import { Inbox } from './components/efacture/Inbox';
@@ -20,7 +21,7 @@ export default function EFacture() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Facture électronique" subtitle="La réforme 2026-2027, gérée pour vous de bout en bout." />
+      <PageHeader icon={<IconTile name="ShieldCheck" dept="facturer" size="lg" />} title="Facture électronique" subtitle="La réforme 2026-2027, gérée pour vous de bout en bout." />
       <UnderlineTabs
         value={tab}
         onChange={setTab}
@@ -61,12 +62,12 @@ export default function EFacture() {
 
 function QuickStat({ label, value, onClick }: { label: string; value: number; onClick: () => void }) {
   return (
-    <Card className="group cursor-pointer p-4 transition hover:shadow-card" onClick={onClick}>
-      <div className="num text-[24px] font-semibold tracking-[-0.02em]">{value}</div>
+    <button className="group rounded-[16px] bg-white p-4 text-left shadow-card transition duration-200 hover:-translate-y-px hover:shadow-raise" onClick={onClick}>
+      <div className="num text-[26px] font-semibold tracking-[-0.03em]"><AnimatedNumber value={value} duration={600} /></div>
       <div className="mt-1 flex items-end justify-between gap-2 text-[12.5px] leading-snug text-ink-2">
         {label}
         <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-3 transition group-hover:translate-x-0.5" />
       </div>
-    </Card>
+    </button>
   );
 }
