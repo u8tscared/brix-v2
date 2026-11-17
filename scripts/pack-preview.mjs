@@ -8,7 +8,9 @@ const keep = head
   .split('\n')
   .filter((l) => !/<meta charset|<meta name="viewport"|rel="icon"/.test(l))
   .join('\n');
-const out = `<title>Brix V2</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n${keep.replace(/<title>.*<\/title>/, '')}\n<style>html,body{background:#f4f3fa}</style>\n${body}\n`;
+const start = process.env.PREVIEW_START; // ex. /parcours : écran d'arrivée de la prévisualisation
+const boot = start ? `<script>if(!location.hash||location.hash==='#/')location.hash='#${start}'</script>\n` : '';
+const out = `${boot}<title>Brix V2</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n${keep.replace(/<title>.*<\/title>/, '')}\n<style>html,body{background:#f4f3fa}</style>\n${body}\n`;
 fs.writeFileSync('dist/preview.html', out);
 const files = fs.readdirSync('dist/assets').map((f) => `assets/${f}`);
 fs.writeFileSync('dist/preview-files.json', JSON.stringify(Object.fromEntries(files.map((f) => [f, `dist/${f}`])), null, 1));

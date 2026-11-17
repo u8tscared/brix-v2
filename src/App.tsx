@@ -4,6 +4,7 @@ import AppShell, { PageLoader } from '@/components/layout/AppShell';
 import { ModuleGate } from '@/components/layout/ModuleGate';
 import { MODULE_ROUTES } from '@/modules/registry';
 import { useBrix } from '@/lib/store';
+import { SyncParcours } from '@/parcours/SyncParcours';
 
 const Cockpit = lazy(() => import('@/pages/cockpit/Cockpit'));
 const Onboarding = lazy(() => import('@/pages/onboarding/Onboarding'));
@@ -27,6 +28,7 @@ function Home() {
 export default function App() {
   return (
     <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <SyncParcours />
       <Suspense fallback={<div className="p-8"><PageLoader /></div>}>
         <Routes>
           <Route path="/" element={<Home />} />
