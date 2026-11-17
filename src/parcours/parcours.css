@@ -1,0 +1,75 @@
+/* Parcours externes (client, fournisseur, e-mails, notifications) : typo et motion propres.
+   Préfixe bx- pour ne jamais entrer en collision avec le kit de l'app. */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+
+.bx-geist { font-family: 'Geist', 'Inter', system-ui, sans-serif; }
+.bx-mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+.bx-root { font-family: 'Geist', 'Inter', system-ui, sans-serif; color: #130f26; -webkit-font-smoothing: antialiased; }
+.bx-root h1, .bx-root h2, .bx-root h3 { font-family: 'Geist', 'Inter', system-ui, sans-serif; letter-spacing: -0.03em; }
+.bx-dawn { background: linear-gradient(120deg, #6d28d9 0%, #d946ef 58%, #fb923c 100%); }
+.bx-dawn-text { background: linear-gradient(100deg, #6d28d9 0%, #d946ef 55%, #fb923c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Ciel d'aube discret derrière les en-têtes */
+.bx-sky { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.bx-sky::before, .bx-sky::after { content: ''; position: absolute; border-radius: 9999px; filter: blur(60px); opacity: .55; }
+.bx-sky::before { width: 520px; height: 520px; left: -160px; top: -300px; background: radial-gradient(circle, #c4b5fd 0%, transparent 70%); animation: bx-drift 18s ease-in-out infinite alternate; }
+.bx-sky::after { width: 460px; height: 460px; right: -140px; top: -260px; background: radial-gradient(circle, #fbcfe8 0%, #fed7aa 40%, transparent 72%); animation: bx-drift 22s ease-in-out infinite alternate-reverse; }
+@keyframes bx-drift { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(40px,30px,0) scale(1.08); } }
+
+/* Entrées */
+@keyframes bx-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes bx-pop { 0% { opacity: 0; transform: scale(.92); } 60% { opacity: 1; transform: scale(1.02); } 100% { transform: none; } }
+@keyframes bx-fade { from { opacity: 0; } to { opacity: 1; } }
+.bx-rise { animation: bx-rise .55s cubic-bezier(.2,.8,.2,1) both; }
+.bx-pop { animation: bx-pop .45s cubic-bezier(.2,.8,.2,1) both; }
+.bx-fade { animation: bx-fade .3s ease both; }
+.bx-stagger > * { animation: bx-rise .55s cubic-bezier(.2,.8,.2,1) both; }
+.bx-stagger > *:nth-child(2) { animation-delay: .06s; }
+.bx-stagger > *:nth-child(3) { animation-delay: .12s; }
+.bx-stagger > *:nth-child(4) { animation-delay: .18s; }
+.bx-stagger > *:nth-child(5) { animation-delay: .24s; }
+.bx-stagger > *:nth-child(6) { animation-delay: .30s; }
+.bx-stagger > *:nth-child(n+7) { animation-delay: .36s; }
+
+/* Reflet qui traverse la tuile */
+@keyframes bx-sheen { 0%, 70% { transform: translateX(0) skewX(-20deg); } 100% { transform: translateX(2200px) skewX(-20deg); } }
+.bx-tile-sheen { animation: bx-sheen 5s cubic-bezier(.6,0,.2,1) infinite; }
+
+/* Coche qui se dessine */
+@keyframes bx-draw { from { stroke-dashoffset: var(--len, 60); } to { stroke-dashoffset: 0; } }
+.bx-draw { stroke-dasharray: var(--len, 60); stroke-dashoffset: var(--len, 60); animation: bx-draw .6s .15s cubic-bezier(.65,0,.35,1) forwards; }
+
+/* Anneau de succès */
+@keyframes bx-ring { from { transform: scale(.6); opacity: .7; } to { transform: scale(1.9); opacity: 0; } }
+.bx-ring { animation: bx-ring 1.4s cubic-bezier(.2,.8,.2,1) infinite; }
+
+/* Bouton principal Aube : lueur et reflet au survol */
+.bx-btn-dawn { position: relative; overflow: hidden; background: linear-gradient(110deg, #6d28d9 0%, #c026d3 55%, #f97316 100%); background-size: 160% 100%; background-position: 0% 0; transition: background-position .6s cubic-bezier(.2,.8,.2,1), transform .15s ease, box-shadow .3s ease; box-shadow: 0 10px 24px -10px rgba(192,38,211,.6), inset 0 1px 0 rgba(255,255,255,.25); }
+.bx-btn-dawn:hover { background-position: 100% 0; box-shadow: 0 14px 30px -10px rgba(192,38,211,.7), inset 0 1px 0 rgba(255,255,255,.3); }
+.bx-btn-dawn:active { transform: scale(.985); }
+.bx-btn-dawn::after { content: ''; position: absolute; top: 0; bottom: 0; width: 60px; left: -80px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transform: skewX(-20deg); }
+.bx-btn-dawn:hover::after { animation: bx-shine .9s ease; }
+@keyframes bx-shine { from { left: -80px; } to { left: 110%; } }
+
+/* Point « en direct » */
+@keyframes bx-live { 0% { box-shadow: 0 0 0 0 rgba(22,163,74,.45); } 100% { box-shadow: 0 0 0 7px rgba(22,163,74,0); } }
+.bx-live { animation: bx-live 1.6s ease-out infinite; }
+
+/* Compteur qui défile */
+.bx-tick { display: inline-block; animation: bx-rise .5s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Confettis sobres (losanges Aube) */
+@keyframes bx-fall { 0% { transform: translate3d(0,-20px,0) rotate(0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate3d(var(--dx,0), 110vh, 0) rotate(var(--rot, 540deg)); opacity: .9; } }
+.bx-confetti { position: fixed; top: 0; width: 8px; height: 12px; border-radius: 2px; pointer-events: none; z-index: 80; animation: bx-fall var(--dur, 2.6s) cubic-bezier(.2,.6,.4,1) forwards; }
+
+/* Papier A4 : ombre réaliste */
+.bx-paper { box-shadow: 0 1px 0 rgba(19,15,38,.04), 0 2px 6px -2px rgba(19,15,38,.08), 0 24px 48px -24px rgba(45,20,90,.25); }
+
+/* Squelette de chargement */
+@keyframes bx-skel { from { background-position: -200px 0; } to { background-position: calc(200px + 100%) 0; } }
+.bx-skel { background: linear-gradient(90deg, #efedf6 0, #f8f7fc 40%, #efedf6 80%) no-repeat; background-size: 200px 100%; background-color: #efedf6; animation: bx-skel 1.2s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bx-sky::before, .bx-sky::after, .bx-tile-sheen, .bx-ring, .bx-live, .bx-confetti { animation: none !important; }
+  .bx-rise, .bx-pop, .bx-stagger > *, .bx-draw, .bx-fade { animation-duration: .01ms !important; animation-delay: 0s !important; }
+}
