@@ -23,11 +23,11 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: 'h-8 px-3 text-[13px] gap-1.5 rounded-lg',
+  sm: 'h-8 max-md:h-10 px-3 text-[13px] gap-1.5 rounded-lg',
   md: 'h-10 px-4 text-sm gap-2 rounded-[10px]',
   lg: 'h-12 px-5 text-[15px] gap-2 rounded-xl',
   icon: 'h-10 w-10 rounded-[10px] justify-center',
-  'icon-sm': 'h-8 w-8 rounded-lg justify-center',
+  'icon-sm': 'h-8 w-8 max-md:h-10 max-md:w-10 rounded-lg justify-center',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(

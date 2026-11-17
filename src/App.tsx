@@ -21,7 +21,7 @@ function Home() {
 
 export default function App() {
   return (
-    <HashRouter>
+    <HashRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Suspense fallback={<div className="p-8"><PageLoader /></div>}>
         <Routes>
           <Route path="/" element={<Home />} />
