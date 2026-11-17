@@ -47,7 +47,22 @@ export const LIBRARY: LibItem[] = [
   // Second œuvre
   { keys: ['peinture', 'm2 de peinture', 'mur'], designation: 'Peinture murs 2 couches acrylique velours', unit: 'm²', price: 24, cost: 4.5, hours: 0.35 },
   { keys: ['carrelage', 'faience'], designation: 'Pose de carrelage collé (hors fourniture)', unit: 'm²', price: 45, cost: 6, hours: 0.8 },
-  { keys: ['placo', 'cloison', 'plaque de platre'], designation: 'Cloison 72/48 avec isolant', unit: 'm²', price: 52, cost: 18, hours: 0.6 },
+  { keys: ['placo', 'cloison', 'plaque de platre'], designation: 'Cloison 72/48 sur ossature métallique', unit: 'm²', price: 46, cost: 16, hours: 0.6 },
+  { keys: ['plafond'], designation: 'Peinture plafond 2 couches mat', unit: 'm²', price: 26, cost: 5, hours: 0.4 },
+  { keys: ['rafraichir', 'rafraichissement', 'remise en peinture'], designation: 'Rafraîchissement de pièce : rebouchage, peinture murs et plafond', unit: 'm²', price: 38, cost: 9, hours: 0.5 },
+  { keys: ['isolation', 'isolant', 'laine de verre'], designation: 'Isolant laine de verre 100 mm', unit: 'm²', price: 18, cost: 7, hours: 0.15 },
+  // Menuiserie, serrurerie
+  { keys: ['fenetre', 'baie vitree'], designation: 'Fenêtre PVC double vitrage 2 vantaux, dépose et pose', unit: 'u', price: 720, cost: 430, hours: 3, supplier: 'Lapeyre Pro' },
+  { keys: ['porte d\'entree', 'bloc-porte'], designation: 'Bloc-porte d’entrée isolant', unit: 'u', price: 1650, cost: 980, hours: 5 },
+  { keys: ['serrure', 'serrure 3 points', 'cylindre', 'barillet'], designation: 'Serrure 3 points A2P 1 étoile avec cylindre', unit: 'u', price: 340, cost: 190, hours: 2 },
+  // Couverture, maçonnerie, extérieur
+  { keys: ['tuile', 'couverture', 'toiture'], designation: 'Reprise de couverture en tuiles : dépose, fourniture et pose', unit: 'm²', price: 68, cost: 33, hours: 0.2 },
+  { keys: ['dalle', 'dalle beton', 'chape'], designation: 'Dalle béton armé 12 cm sur hérisson', unit: 'm²', price: 85, cost: 44, hours: 0.2, supplier: 'Point.P' },
+  { keys: ['gazon', 'pelouse', 'engazonnement'], designation: 'Engazonnement : préparation du sol et semis', unit: 'm²', price: 9, cost: 4, hours: 0.03 },
+  { keys: ['haie'], designation: 'Haie champêtre 10 m, fourniture et plantation', unit: 'u', price: 420, cost: 220, hours: 5 },
+  // Confort, cuisine et bain
+  { keys: ['clim', 'climatisation', 'split', 'pompe a chaleur'], designation: 'Climatisation réversible mono-split 3,5 kW', unit: 'u', price: 2350, cost: 1380, hours: 8 },
+  { keys: ['douche a l\'italienne', 'italienne'], designation: 'Douche à l’italienne carrelée avec paroi', unit: 'u', price: 2900, cost: 1550, hours: 16, supplier: 'Cédéo' },
 ];
 
 export function findItem(label: string): LibItem | null {
@@ -86,7 +101,7 @@ export function laborLine(hours: number, rate: number, hourlyCost: number, vat: 
   return {
     id: uid('l'),
     kind: 'main_oeuvre',
-    designation: 'Pose, raccordement et essais',
+    designation: 'Main-d’œuvre : pose et finitions',
     detail: "Main d'œuvre · ton taux horaire",
     quantity: Math.max(1, Math.round(hours * 2) / 2),
     unit: 'h',

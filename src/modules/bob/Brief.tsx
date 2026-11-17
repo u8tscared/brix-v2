@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronRight, Pause, Play, Send } from 'lucide-react';
-import { Avatar, Badge, Button, Card, CardHeader, Field, Icon, Input, PageHeader, Progress, Select, cn, toast } from '@/components/ui';
+import { ChevronRight, Pause, Play, Send } from 'lucide-react';
+import { AnimatedNumber, SuccessDot } from '@/components/motion';
+import { Avatar, Badge, Button, Card, CardHeader, Field, Icon, IconTile, Input, PageHeader, Select, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { capitalize, dateLong, money, todayISO } from '@/lib/format';
 import { buildBrief, fmtDuration } from './briefData';
@@ -54,38 +55,46 @@ export default function Brief() {
 
   return (
     <div className="space-y-6">
-      <PageHeader kicker="Bob" title="Brief du matin" subtitle="Ce qui compte aujourd’hui, en une minute. À écouter dans le camion." />
+      <PageHeader icon={<IconTile name="Sunrise" dept="bob" size="lg" solid />} kicker="Bob" title="Brief du matin" subtitle="Ce qui compte aujourd’hui, en une minute. À écouter dans le camion." />
       <BobNav />
 
-      <Card className="overflow-hidden">
-        <div className="flex flex-col gap-4 p-5 md:flex-row md:items-center">
-          <button onClick={play} aria-label={playing ? 'Arrêter la lecture' : 'Écouter le brief'} className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-dawn text-white shadow-dawn transition active:scale-95">
-            {playing ? <Pause className="h-7 w-7" /> : <Play className="ml-1 h-7 w-7" />}
+      <section className="relative overflow-hidden rounded-[20px] bg-night text-white shadow-pop">
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          <div className="absolute -left-10 -top-24 h-64 w-64 rounded-full bg-[#fb923c] opacity-25 blur-[80px]" />
+          <div className="absolute -right-16 -bottom-24 h-64 w-80 rounded-full bg-[#8b5cf6] opacity-35 blur-[90px]" />
+        </div>
+        <div className="relative flex flex-col gap-5 p-5 md:flex-row md:items-center md:p-6">
+          <button onClick={play} aria-label={playing ? 'Arrêter la lecture' : 'Écouter le brief'} className="relative grid h-[72px] w-[72px] shrink-0 place-items-center rounded-full bg-dawn-diag text-white shadow-dawn transition duration-300 ease-spring hover:scale-[1.04] active:scale-95">
+            {playing && <span className="absolute inset-0 animate-ping2 rounded-full bg-[#d946ef]" aria-hidden />}
+            <span className="absolute inset-[5px] rounded-full ring-2 ring-white/30" aria-hidden />
+            {playing ? <Pause className="relative h-7 w-7" /> : <Play className="relative ml-1 h-7 w-7 fill-current" />}
           </button>
           <div className="min-w-0 flex-1">
-            <div className="text-[12.5px] font-medium text-ink-3">{capitalize(dateLong(todayISO()))}</div>
-            <div className="font-display text-[20px] font-semibold leading-tight">Bonjour {s.user.firstName}, voici ta journée</div>
-            <div className="mt-2 flex items-center gap-3">
-              <Progress value={progress} className="flex-1" />
-              <span className="num shrink-0 text-[12.5px] text-ink-2">{fmtDuration(b.seconds)}</span>
+            <div className="text-[12.5px] font-medium text-white/55">{capitalize(dateLong(todayISO()))}</div>
+            <div className="text-[22px] font-semibold leading-tight tracking-[-0.03em]">Bonjour {s.user.firstName}, voici ta journée</div>
+            <div className="mt-3 flex items-center gap-3">
+              <Waveform progress={progress} playing={playing} />
+              <span className="num shrink-0 text-[12.5px] text-white/60">{fmtDuration(b.seconds)}</span>
             </div>
           </div>
         </div>
-        <details className="border-t border-line px-5 py-3 text-[13px] text-ink-2">
-          <summary className="cursor-pointer select-none font-medium text-ink">Lire le texte</summary>
-          <p className="mt-2 leading-relaxed">{b.script}</p>
+        <details className="group relative border-t border-white/10 px-5 py-3 text-[13px] text-white/70 md:px-6">
+          <summary className="flex min-h-[28px] cursor-pointer select-none items-center gap-1.5 font-medium text-white marker:hidden [&::-webkit-details-marker]:hidden">
+            <ChevronRight className="h-4 w-4 transition group-open:rotate-90" /> Lire le texte
+          </summary>
+          <p className="mt-2 max-w-3xl leading-relaxed">{b.script}</p>
         </details>
-      </Card>
+      </section>
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-5">
           <Card>
             <CardHeader title="Argent" icon={<Icon name="Wallet" className="h-4 w-4 text-ink-3" />} action={<Button size="sm" variant="ghost" onClick={() => navigate('/app/tresorerie')}>Trésorerie</Button>} />
             <div className="grid grid-cols-2 divide-line md:grid-cols-4 md:divide-x">
-              <Mini label="Encaissé hier" value={money(b.inYesterday, true)} />
-              <Mini label="Ce mois" value={money(b.inMonth, true)} />
-              <Mini label="À encaisser" value={money(b.toCollect, true)} />
-              <Mini label="En retard" value={money(b.lateTotal, true)} tone={b.lateTotal ? 'bad' : undefined} sub={b.late.length ? `${b.late.length} facture${b.late.length > 1 ? 's' : ''}` : 'aucune'} />
+              <Mini label="Encaissé hier" value={b.inYesterday} />
+              <Mini label="Ce mois" value={b.inMonth} />
+              <Mini label="À encaisser" value={b.toCollect} />
+              <Mini label="En retard" value={b.lateTotal} tone={b.lateTotal ? 'bad' : undefined} sub={b.late.length ? `${b.late.length} facture${b.late.length > 1 ? 's' : ''}` : 'aucune'} />
             </div>
           </Card>
 
@@ -129,18 +138,20 @@ export default function Brief() {
 
         <div className="space-y-5">
           <Card>
-            <CardHeader title="3 choses à faire" meta="choisies par Bob" />
+            <CardHeader title="3 choses à faire" meta={`${b.todos.filter((t) => done[t.id]).length} sur ${b.todos.length}`} />
+            <div className="stagger-fast">
             {b.todos.map((t, i) => (
               <div key={t.id} className="flex items-start gap-3 border-b border-line px-4 py-3 last:border-b-0">
-                <button onClick={() => setDone((d) => ({ ...d, [t.id]: !d[t.id] }))} aria-label="Fait" className={cn('mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full border-2 transition', done[t.id] ? 'border-ok bg-ok text-white' : 'border-line2 text-transparent hover:border-ink-3')}>
-                  <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                <button onClick={() => { const on = !done[t.id]; setDone((d) => ({ ...d, [t.id]: on })); if (on) toast('Une de moins.', 'ok'); }} aria-label={done[t.id] ? 'Remettre à faire' : 'Marquer comme fait'} className="-m-2 grid h-11 w-11 shrink-0 place-items-center">
+                  {done[t.id] ? <SuccessDot size={26} /> : <span className="h-[26px] w-[26px] rounded-full border-2 border-line2 transition hover:border-ink-3" />}
                 </button>
                 <button onClick={() => navigate(t.to)} className="min-w-0 flex-1 text-left">
-                  <div className={cn('text-[13.5px] font-medium', done[t.id] && 'text-ink-3 line-through')}>{i + 1}. {t.text}</div>
+                  <div className={cn('text-[13.5px] font-medium transition-colors', done[t.id] && 'text-ink-3 line-through')}>{i + 1}. {t.text}</div>
                   <div className="line-clamp-2 text-[12px] text-ink-3">{t.detail}</div>
                 </button>
               </div>
             ))}
+            </div>
           </Card>
 
           <Card>
@@ -189,12 +200,32 @@ export default function Brief() {
   );
 }
 
-function Mini({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: 'bad' }) {
+function Mini({ label, value, sub, tone }: { label: string; value: number; sub?: string; tone?: 'bad' }) {
   return (
     <div className="border-b border-line p-4 odd:border-r md:border-b-0 md:odd:border-r-0">
       <div className="text-[12px] font-medium text-ink-2">{label}</div>
-      <div className={cn('num mt-1 text-[19px] font-semibold tracking-[-0.02em]', tone === 'bad' && 'text-bad')}>{value}</div>
+      <div className={cn('num mt-1 text-[19px] font-semibold tracking-[-0.02em]', tone === 'bad' && 'text-bad')}><AnimatedNumber value={value} format={(n) => money(Math.round(n), true)} /></div>
       {sub && <div className="text-[11.5px] text-ink-3">{sub}</div>}
+    </div>
+  );
+}
+
+const BARS = Array.from({ length: 64 }, (_, i) => 0.25 + 0.75 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.37)));
+
+/** Onde du message vocal : se remplit au fil de la lecture. */
+function Waveform({ progress, playing }: { progress: number; playing: boolean }) {
+  return (
+    <div className="flex h-9 min-w-0 flex-1 items-center justify-between gap-[2px] overflow-hidden" role="progressbar" aria-valuenow={Math.round(progress)} aria-valuemin={0} aria-valuemax={100} aria-label="Avancement du brief">
+      {BARS.map((h, i) => {
+        const on = (i / BARS.length) * 100 < progress;
+        return (
+          <i
+            key={i}
+            className={cn('block min-w-[2px] max-w-[4px] flex-1 rounded-full transition-colors duration-300', on ? 'bg-white' : 'bg-white/25', playing && on && 'animate-wave')}
+            style={{ height: `${Math.round(h * 100)}%`, animationDelay: `${(i % 7) * 0.09}s` }}
+          />
+        );
+      })}
     </div>
   );
 }

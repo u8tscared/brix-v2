@@ -1,44 +1,78 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Mic, RotateCcw } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, EmptyState, Icon, PageHeader, Segmented, cn, toast } from '@/components/ui';
+import { ArrowRight, ArrowUpRight, Check, Mic, RotateCcw } from 'lucide-react';
+import { AnimatedNumber, SuccessDot } from '@/components/motion';
+import { Badge, Button, Card, CardHeader, EmptyState, Icon, IconTile, PageHeader, Segmented, cn, toast } from '@/components/ui';
+import type { DepartmentKey } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import { useUI } from '@/lib/ui';
-import { CAPABILITIES } from './engine';
+import { capabilities } from './engine';
 import { useBobLocal } from './store';
 import { BobNav } from './components/BobNav';
 import { MemoryCard } from './components/MemoryCard';
 import { BobMark } from './components/VoiceOrb';
 import { Toggle } from './components/SettingToggle';
 
+const DEPT: Record<string, DepartmentKey> = {
+  FileText: 'vendre', Contact: 'vendre', Wallet: 'facturer', BellRing: 'facturer', CalendarRange: 'equipe', Users: 'equipe',
+  HardHat: 'chantiers', Calculator: 'gestion', Landmark: 'gestion', ShieldCheck: 'metier',
+};
+
 export default function BobPage() {
   const ui = useUI();
   const navigate = useNavigate();
   const bob = useBrix((s) => s.bob);
+  const firstName = useBrix((s) => s.user.firstName);
   const updateBob = useBrix((s) => s.updateBob);
+  const decideNight = useBobLocal((s) => s.decideNight);
   const { tone, setTone } = useBobLocal();
+  const caps = capabilities();
   const todo = bob.filter((b) => !b.done).length;
+
+  const validate = (id: string) => {
+    updateBob(id, { done: true });
+    decideNight(id, 'validee');
+    toast('Validé.', 'ok', { label: 'Annuler', run: () => { updateBob(id, { done: false }); decideNight(id, null); } });
+  };
 
   return (
     <div className="space-y-6">
       <PageHeader
+        icon={<IconTile name="AudioLines" dept="bob" size="lg" solid />}
         title="Bob"
         subtitle="Ton assistant : tu parles, il fait. Devis, relances, planning, questions de métier."
-        actions={<Button variant="dawn" size="lg" icon={<Mic className="h-5 w-5" />} onClick={() => ui.askBob('', true)}>Parler à Bob</Button>}
+        actions={<Button variant="dawn" size="lg" icon={<Mic className="h-5 w-5" />} kbd="⌘J" onClick={() => ui.askBob('', true)}>Parler à Bob</Button>}
       />
       <BobNav />
+
+      {/* Barre de demande : un seul geste pour commencer. */}
+      <button
+        onClick={() => ui.askBob('')}
+        className="lift group flex w-full items-center gap-3 rounded-[18px] bg-white p-3 pr-4 text-left shadow-card"
+      >
+        <BobMark size={40} active />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[15px] font-medium text-ink">Salut {firstName || 'chef'}, je fais quoi pour toi ?</span>
+          <span className="block truncate text-[12.5px] text-ink-3">Par exemple : « {caps[0].example} »</span>
+        </span>
+        <span className="hidden items-center gap-2 text-[12.5px] text-ink-3 sm:flex">
+          <span className="num"><AnimatedNumber value={bob.length} /></span> actions cette semaine
+        </span>
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-white transition group-hover:translate-x-0.5"><ArrowRight className="h-4 w-4" /></span>
+      </button>
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.35fr_1fr]">
         <div className="space-y-5">
           <Card>
             <CardHeader title="Ce que Bob sait faire" meta="Touche un exemple pour l’essayer" />
-            <div className="grid gap-px bg-line sm:grid-cols-2">
-              {CAPABILITIES.map((c) => (
-                <button key={c.title} onClick={() => ui.askBob(c.example)} className="group flex min-h-[76px] items-start gap-3 bg-white p-4 text-left transition hover:bg-[#fbfaff]">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-sub text-ink-2 group-hover:bg-vi-50 group-hover:text-vi-700">
-                    <Icon name={c.icon} className="h-[18px] w-[18px]" />
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-[13.5px] font-semibold">{c.title}</span>
+            <div className="stagger-fast grid gap-2 p-3 sm:grid-cols-2">
+              {caps.map((c) => (
+                <button key={c.title} onClick={() => ui.askBob(c.example)} className="group flex min-h-[76px] items-start gap-3 rounded-[14px] p-3 text-left transition hover:bg-sub active:scale-[.99]">
+                  <IconTile name={c.icon} dept={DEPT[c.icon] ?? 'bob'} size="sm" />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1 text-[13.5px] font-semibold">
+                      {c.title}
+                      <ArrowUpRight className="h-3.5 w-3.5 text-ink-3 opacity-0 transition group-hover:opacity-100" />
+                    </span>
                     <span className="mt-0.5 block text-[12.5px] leading-snug text-ink-2">« {c.example} »</span>
                   </span>
                 </button>
@@ -49,27 +83,27 @@ export default function BobPage() {
           <Card>
             <CardHeader title="Ce que Bob a fait" meta={todo ? `${todo} à valider` : 'tout est validé'} />
             {bob.length === 0 ? (
-              <EmptyState className="m-4" icon={<RotateCcw />} title="Rien pour l’instant" text="Chaque action de Bob apparaîtra ici, avec un bouton pour la vérifier." />
+              <EmptyState className="m-4 shadow-none" icon={<RotateCcw />} title="Rien pour l’instant" text="Chaque action de Bob apparaîtra ici, avec un bouton pour la vérifier." />
             ) : (
-              <div>
+              <ol className="stagger-fast relative px-4 py-2">
+                <span className="absolute bottom-6 left-[33px] top-6 w-px bg-line" aria-hidden />
                 {bob.map((b) => (
-                  <div key={b.id} className="flex items-start gap-3 border-b border-line px-4 py-3 last:border-b-0">
-                    <span className={cn('relative grid h-9 w-9 shrink-0 place-items-center rounded-[10px] border border-line bg-white text-ink-2')}>
-                      <Icon name={b.icon} className="h-4 w-4" />
-                      {b.done && <span className="absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full bg-ok text-white ring-2 ring-white"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>}
+                  <li key={b.id} className="relative flex items-start gap-3 py-2.5">
+                    <span className={cn('relative z-[1] grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white shadow-[0_0_0_1px_var(--line2)] transition-colors', b.done ? 'text-ok' : 'text-ink-2')}>
+                      {b.done ? <SuccessDot size={20} /> : <Icon name={b.icon} className="h-4 w-4" />}
                     </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[13.5px] font-medium leading-snug">{b.text}</div>
+                    <div className="min-w-0 flex-1 pt-0.5">
+                      <div className={cn('text-[13.5px] font-medium leading-snug transition-colors', b.done && 'text-ink-2')}>{b.text}</div>
                       {b.detail && <div className="mt-0.5 text-[12.5px] text-ink-2">{b.detail}</div>}
-                      <div className="mt-1 text-[11.5px] text-ink-3">à {b.at.replace(':', ' h ')}{b.done ? ' · validé' : ''}</div>
+                      <div className="num mt-1 text-[11.5px] text-ink-3">à {b.at.replace(':', ' h ')}{b.done ? ' · validé' : ''}</div>
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-center">
-                      {b.to && <Button size="sm" variant="secondary" onClick={() => navigate(b.to!)}>{b.cta ?? 'Voir'}</Button>}
-                      {!b.done && <Button size="sm" variant="ghost" icon={<Check className="h-3.5 w-3.5" />} onClick={() => { updateBob(b.id, { done: true }); toast('Action validée.'); }}>Valider</Button>}
+                      {b.to && <Button size="sm" variant="ghost" iconRight={<ArrowUpRight className="h-3.5 w-3.5" />} onClick={() => navigate(b.to!)}>{b.cta ?? 'Voir'}</Button>}
+                      {!b.done && <Button size="sm" variant="primary" icon={<Check className="h-3.5 w-3.5" />} onClick={() => validate(b.id)}>Valider</Button>}
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ol>
             )}
           </Card>
         </div>
@@ -97,13 +131,13 @@ export default function BobPage() {
 
           <Card className="p-4">
             <div className="flex items-start gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-sub text-ink-2"><Icon name="ShieldCheck" className="h-[18px] w-[18px]" /></span>
+              <IconTile name="ShieldCheck" dept="bob" size="sm" />
               <div className="min-w-0 flex-1 text-[13px] text-ink-2">
                 <div className="mb-1 flex items-center gap-2 text-[14px] font-semibold text-ink">Version de démo <Badge tone="neutral">Démo</Badge></div>
-                Ici, Bob répond avec des réponses préparées et agit sur les données de démonstration. Dans la version finale, il comprend tout ce que tu lui dis. Il ne fait jamais rien d’important sans ton accord : envoyer un devis, payer, supprimer.
+                Ici, Bob répond avec des réponses préparées et agit sur les données de démonstration. Il ne fait jamais rien d’important sans ton accord : envoyer un devis, payer, supprimer.
               </div>
             </div>
-            <button onClick={() => navigate('/app/bob/nuit')} className="mt-3 flex w-full items-center justify-between rounded-[10px] bg-sub px-3 py-2.5 text-[13px] font-medium text-ink hover:bg-line">
+            <button onClick={() => navigate('/app/bob/nuit')} className="mt-3 flex min-h-[44px] w-full items-center justify-between rounded-[12px] bg-sub px-3 py-2.5 text-[13px] font-medium text-ink transition hover:bg-line">
               Régler ce que Bob fait seul <ArrowRight className="h-4 w-4" />
             </button>
           </Card>
