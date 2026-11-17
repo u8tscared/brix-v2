@@ -46,11 +46,11 @@ export type RingTone = keyof typeof RING_COLOR;
 
 /** Anneau compte à rebours (jours restants), rouge si dépassé. */
 export function DaysRing({ days, horizon = 90, size = 44, stroke = 4, className, label }: { days: number; horizon?: number; size?: number; stroke?: number; className?: string; label?: ReactNode }) {
-  const tone: RingTone = days < 0 ? 'bad' : days <= 30 ? 'warn' : 'ok';
+  const tone: RingTone = days < 0 ? 'bad' : days <= horizon ? 'warn' : 'ok';
   const value = days < 0 ? 100 : Math.max(4, Math.min(100, (days / horizon) * 100));
   return (
     <ToneRing value={value} tone={tone} size={size} stroke={stroke} className={className}>
-      <span className={cn('flex flex-col items-center leading-none', days < 0 ? 'text-bad' : days <= 30 ? 'text-warn' : 'text-ink')}>
+      <span className={cn('flex flex-col items-center leading-none', days < 0 ? 'text-bad' : days <= horizon ? 'text-warn' : 'text-ink')}>
         {label ?? (
           <>
             <span className="num text-[12px] font-semibold">{Math.abs(days) > 999 ? '999+' : Math.abs(days)}</span>

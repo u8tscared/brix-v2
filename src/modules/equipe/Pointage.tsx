@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle2, ChevronLeft, ChevronRight, Info, Undo2 } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, EmptyState, PageHeader, toast } from '@/components/ui';
+import { Badge, Button, Card, CardHeader, cn, EmptyState, IconTile, PageHeader, toast } from '@/components/ui';
+import { AnimatedNumber, GrowBar } from '@/components/motion';
+import type { ReactNode } from 'react';
 import { useBrix } from '@/lib/store';
 import { money, num, todayISO } from '@/lib/format';
 import type { Employee } from '@/lib/types';
@@ -44,7 +46,7 @@ export default function Pointage() {
   if (employees.length === 0) {
     return (
       <div className="space-y-5">
-        <PageHeader title="Pointage" />
+        <PageHeader icon={<IconTile name="Timer" dept="equipe" size="lg" />} title="Pointage" />
         <EmptyState icon={<Timer />} title="Personne à pointer pour l’instant" text="Invitez votre équipe : chacun pointe en un appui depuis son téléphone." action={<Link to="/app/equipe"><Button variant="primary">Inviter mon équipe</Button></Link>} />
       </div>
     );
@@ -52,41 +54,27 @@ export default function Pointage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Pointage" subtitle="Arrivée, départ, pauses. Les heures sup, paniers et zones se calculent tout seuls." />
+      <PageHeader icon={<IconTile name="Timer" dept="equipe" size="lg" />} title="Pointage" subtitle="Arrivée, départ, pauses. Heures sup, paniers et zones se calculent tout seuls." />
 
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-[400px_minmax(0,1fr)]">
         <ClockCard />
-        <Card>
+        <Card className="flex h-full flex-col">
           <CardHeader title={current ? 'Cette semaine, en bref' : 'La semaine en bref'} meta={`${staff.length} salariés`} />
-          <div className="grid grid-cols-2 sm:grid-cols-4">
-            <div className="border-b border-r border-line p-4 sm:border-b-0">
-              <div className="text-xs text-ink-2">Heures</div>
-              <div className="num mt-1 text-[22px] font-semibold">{num(tot.h, 0)} h</div>
-            </div>
-            <div className="border-b border-line p-4 sm:border-b-0 sm:border-r">
-              <div className="text-xs text-ink-2">Heures sup</div>
-              <div className="num mt-1 text-[22px] font-semibold">{hhmm(tot.hs)}</div>
-            </div>
-            <div className="border-r border-line p-4">
-              <div className="text-xs text-ink-2">Paniers repas</div>
-              <div className="num mt-1 text-[22px] font-semibold">{tot.paniers}</div>
-              <div className="num text-[11.5px] text-ink-3">{money(tot.paniers * C.panier)}</div>
-            </div>
-            <div className="p-4">
-              <div className="text-xs text-ink-2">Petits déplacements</div>
-              <div className="num mt-1 text-[22px] font-semibold">{money(trajet + transport, true)}</div>
-              <div className="num text-[11.5px] text-ink-3">trajet {money(trajet)} · transport {money(transport)}</div>
-            </div>
+          <div className="grid flex-1 grid-cols-2">
+            <WeekStat label="Heures travaillées" value={<AnimatedNumber value={tot.h} format={(n) => `${Math.round(n)} h`} />} sub={`sur ${staff.length * 35} h prévues`} bar={(tot.h / Math.max(1, staff.length * 35)) * 100} className="border-b border-r" />
+            <WeekStat label="Heures sup" value={hhmm(tot.hs)} sub="+25 % puis +50 %" className="border-b" />
+            <WeekStat label="Paniers repas" value={<AnimatedNumber value={tot.paniers} />} sub={money(tot.paniers * C.panier)} className="border-r" />
+            <WeekStat label="Petits déplacements" value={<AnimatedNumber value={trajet + transport} format={(n) => money(n, true)} />} sub={`trajet ${money(trajet, true)} · transport ${money(transport, true)}`} />
           </div>
-          <div className="flex items-start gap-2 border-t border-line px-4 py-3 text-[12px] text-ink-2">
-            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ink-3" />
-            <span>Heures sup au-delà de 35 h par semaine : +25 % jusqu’à 43 h, +50 % au-delà. Zone de trajet calculée depuis le dépôt jusqu’au chantier pointé.</span>
+          <div className="flex items-start gap-2 border-t border-line px-4 py-3 text-[12px] leading-relaxed text-ink-3 md:px-5">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>Heures sup au-delà de 35 h par semaine : +25 % jusqu’à 43 h, +50 % au-delà. La zone se calcule depuis le dépôt jusqu’au chantier pointé.</span>
           </div>
         </Card>
       </div>
 
       {lastPending && (
-        <button onClick={() => setMonday(lastMonday)} className="flex w-full items-center gap-3 rounded-[14px] border border-[#fde3b5] bg-warn-bg/70 px-4 py-3 text-left text-[13.5px]">
+        <button onClick={() => setMonday(lastMonday)} className="lift flex w-full items-center gap-3 rounded-[14px] bg-white px-4 py-3 text-left text-[13.5px] shadow-[0_0_0_1px_#fde3b0,0_1px_2px_rgba(19,15,38,.04)]">
           <span className="h-2 w-2 shrink-0 rounded-full bg-warn" />
           <span className="flex-1"><span className="font-semibold">La semaine {isoWeek(lastMonday)} attend votre validation.</span> <span className="text-ink-2">Elle part ensuite dans la paie.</span></span>
           <ChevronRight className="h-4 w-4 text-ink-3" />
@@ -133,6 +121,17 @@ export default function Pointage() {
       </Card>
 
       <PunchEditSheet emp={edit?.emp ?? null} date={edit?.date ?? null} punch={edit?.p ?? null} onClose={() => setEdit(null)} />
+    </div>
+  );
+}
+
+function WeekStat({ label, value, sub, bar, className }: { label: string; value: ReactNode; sub: string; bar?: number; className?: string }) {
+  return (
+    <div className={cn('flex min-w-0 flex-col justify-center border-line p-4 md:p-5', className)}>
+      <div className="text-[12.5px] font-medium text-ink-2">{label}</div>
+      <div className="num mt-2 text-[26px] font-semibold leading-none tracking-[-0.035em]">{value}</div>
+      <div className="mt-1.5 truncate text-[12px] text-ink-3">{sub}</div>
+      {bar !== undefined && <GrowBar value={bar} className="mt-3" barClassName="bg-[#0891b2]" />}
     </div>
   );
 }
