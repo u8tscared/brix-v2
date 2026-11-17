@@ -1,169 +1,185 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
-import { Wordmark } from '@/components/brand/Logo';
-import { Button, cn } from '@/components/ui';
-import { MODULES, PLAN_ORDER, TRADE_BY_KEY, recommendModules, type Plan } from '@/lib/catalog';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { TRADE_BY_KEY, recommendModules } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import type { TradeKey } from '@/lib/types';
-import { OnboardingPreview } from './OnboardingPreview';
-import { StepAccount, StepCompany, StepModules, StepPriorities, StepTrade, type Draft } from './steps';
+import { BrandLogo } from '@/parcours/marque';
+import '@/parcours/parcours.css';
+import './onboarding.css';
+import { EMPTY, PRET, STEPS, clear, firstOpen, load, missing, save, type Draft } from './draft';
+import { finishOnboarding, type ClientImporte } from './finish';
+import { Pret } from './Pret';
+import { ApercuDesktop, ApercuMobile } from './preview/Apercu';
+import { AccesStep } from './steps/AccesStep';
+import { EntrepriseStep } from './steps/EntrepriseStep';
+import { MetierStep } from './steps/MetierStep';
+import { ModulesStep } from './steps/ModulesStep';
+import { PrioritesStep } from './steps/PrioritesStep';
 
-const STEPS = ['Métier', 'Entreprise', 'Priorités', 'Outils', 'Accès'];
+const parseStep = (v: string | null) => (v === 'pret' ? PRET : v && /^\d$/.test(v) ? Math.min(PRET - 1, Math.max(0, Number(v) - 1)) : null);
 
-/** Inscription en 5 étapes : chaque réponse construit l'app de l'artisan, en direct. */
+/** Inscription /inscription : 5 étapes, l'app se construit en direct pour le métier choisi, puis « Votre Brix est prêt ». */
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
-  const complete = useBrix((s) => s.completeOnboarding);
-  const [step, setStep] = useState(0);
-  const [building, setBuilding] = useState(false);
-  const [touchedModules, setTouchedModules] = useState(false);
-  const pre = params.get('metier') as TradeKey | null;
-  const [d, setD] = useState<Draft>({
-    trade: pre && TRADE_BY_KEY[pre] ? pre : undefined,
-    secondary: [],
-    companyName: '',
-    siret: '',
-    address: '',
-    city: '',
-    priorities: [],
-    enabled: [],
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    withDemo: true,
+  const [params, setParams] = useSearchParams();
+  const storeUser = useBrix((s) => s.user);
+  const [saved] = useState(load);
+  const metierParam = params.get('metier') as TradeKey | null;
+  const fromSite = !!metierParam && !!TRADE_BY_KEY[metierParam];
+
+  const [d, setD] = useState<Draft>(() => {
+    const base = saved?.d ?? { ...EMPTY, firstName: storeUser.firstName, lastName: storeUser.lastName, email: storeUser.email };
+    if (fromSite && !base.trade) return { ...base, trade: metierParam!, secondary: base.secondary.filter((x) => x !== metierParam) };
+    return base;
   });
-  const set = (p: Partial<Draft>) => {
-    if (p.enabled) setTouchedModules(true);
+  const [touched, setTouched] = useState(saved?.touched ?? false);
+  const [imported, setImported] = useState<ClientImporte[]>([]);
+  const set = useCallback((p: Partial<Draft>) => {
+    if (p.enabled) setTouched(true);
     setD((x) => ({ ...x, ...p }));
-  };
+  }, []);
+
+  // Étape lue dans l'adresse (?etape=2) : le bouton retour du téléphone et du navigateur fonctionne.
+  const raw = parseStep(params.get('etape')) ?? saved?.step ?? 0;
+  const step = firstOpen(d, raw);
+  const [initialPret] = useState(step === PRET);
+  const goTo = useCallback(
+    (n: number, replace = false) => {
+      const next: Record<string, string> = { etape: n === PRET ? 'pret' : String(n + 1) };
+      if (metierParam) next.metier = metierParam;
+      setParams(next, { replace });
+    },
+    [metierParam, setParams],
+  );
+  useEffect(() => {
+    if (parseStep(params.get('etape')) !== step) goTo(step, true);
+  }, [step]);
+
+  // Sens de la transition (glissé vers la gauche en avançant, vers la droite en revenant).
+  const prev = useRef(step);
+  const dir = step >= prev.current ? 'fwd' : 'back';
+  useEffect(() => {
+    prev.current = step;
+    window.scrollTo({ top: 0 });
+    if (step < PRET) document.querySelector<HTMLElement>('#ob-main h1')?.focus({ preventScroll: true });
+  }, [step]);
 
   // Le pack de départ suit les réponses tant que l'artisan n'a pas retouché la liste.
   useEffect(() => {
-    if (touchedModules) return;
+    if (touched) return;
     setD((x) => ({ ...x, enabled: recommendModules(x.trade ?? 'autre', x.size ?? 'solo', x.priorities) }));
-  }, [d.trade, d.size, d.priorities, touchedModules]);
+  }, [d.trade, d.size, d.priorities, touched]);
 
-  const plan: Plan = useMemo(() => {
-    const need = d.enabled.map((k) => MODULES.find((m) => m.key === k)!.plan);
-    let p = need.reduce<Plan>((acc, x) => (PLAN_ORDER.indexOf(x) > PLAN_ORDER.indexOf(acc) ? x : acc), 'start');
-    if (d.size === 'grande') p = 'entreprise';
-    return p;
-  }, [d.enabled, d.size]);
+  useEffect(() => save({ d, step, touched }), [d, step, touched]);
 
-  const canNext = [!!d.trade, !!d.size && d.companyName.trim().length > 1, d.priorities.length > 0, d.enabled.length > 0, !!d.firstName.trim() && /.+@.+\..+/.test(d.email) && d.password.length >= 8][step];
-  const hint = ['Choisissez votre métier', 'Indiquez le nom et la taille', 'Choisissez au moins une priorité', '', 'Prénom, e-mail et mot de passe'][step];
-
-  const finish = () => {
-    setBuilding(true);
-    setTimeout(() => {
-      const initials = d.companyName.split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
-      complete({
-        company: { name: d.companyName, legalName: d.companyName.toUpperCase(), siret: d.siret, address: d.address, city: d.city, trade: d.trade!, secondaryTrades: d.secondary, size: d.size!, employees: { solo: 1, petite: 4, pme: 20, grande: 80 }[d.size!], email: d.email, logoInitials: initials || 'B' },
-        user: { firstName: d.firstName.trim(), lastName: d.lastName.trim(), email: d.email, role: 'patron' },
-        priorities: d.priorities,
-        enabled: d.enabled,
-        plan,
-        withDemoData: d.withDemo,
-      });
-      navigate('/app', { replace: true });
-    }, 3200);
+  const block = missing(step, d);
+  const next = () => {
+    if (block) return;
+    if (step === PRET - 1) setD((x) => ({ ...x, accessOk: true }));
+    goTo(step + 1);
+  };
+  const back = () => (step === 0 ? navigate('/bienvenue') : goTo(step - 1));
+  const open = () => {
+    finishOnboarding(d, imported);
+    clear();
+    navigate('/app', { replace: true });
   };
 
-  if (building) return <Building d={d} />;
+  // Entrée pour continuer (sauf sur un bouton, un lien ou un champ qui gère sa propre touche Entrée).
+  const keyRef = useRef({ next, open, step, back });
+  keyRef.current = { next, open, step, back };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement;
+      if (e.altKey && e.key === 'ArrowLeft') return keyRef.current.back();
+      if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+      // Sur une carte de choix, Entrée valide l'étape (Espace coche ou décoche).
+      if (!t.closest('.ob-card') && t.closest('button, a, textarea, select, [data-enter="ignore"]')) return;
+      e.preventDefault();
+      keyRef.current.step === PRET ? keyRef.current.open() : keyRef.current.next();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  if (step === PRET) {
+    return (
+      <div className="bx-root ob relative min-h-dvh overflow-x-hidden">
+        <div className="bx-sky" aria-hidden />
+        <header className="relative z-10 mx-auto flex h-16 max-w-[1040px] items-center px-4 pt-[env(safe-area-inset-top)] md:px-8">
+          <BrandLogo size={24} />
+        </header>
+        <div className="relative z-10">
+          <Pret d={d} set={set} imported={imported} setImported={setImported} onBack={() => goTo(PRET - 1)} onOpen={open} instant={initialPret} />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-dvh bg-[#fbfaff]">
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-line/60 bg-[#fbfaff]/90 pt-safe backdrop-blur-xl">
-          <div className="mx-auto flex h-14 max-w-[720px] items-center gap-4 px-5">
-            <button onClick={() => (step ? setStep(step - 1) : navigate('/bienvenue'))} className="grid h-9 w-9 place-items-center rounded-full text-ink-2 hover:bg-white" aria-label="Retour">
-              <ArrowLeft className="h-[18px] w-[18px]" />
-            </button>
-            <div className="flex flex-1 gap-1.5">
-              {STEPS.map((s, i) => (
-                <div key={s} className="flex-1">
-                  <div className="h-1 overflow-hidden rounded-full bg-line2">
-                    <div className={cn('h-full rounded-full bg-ink transition-all duration-500', i < step ? 'w-full' : i === step ? 'w-1/2' : 'w-0')} />
-                  </div>
-                  <div className={cn('mt-1.5 hidden text-[11px] font-medium sm:block', i <= step ? 'text-ink' : 'text-ink-3')}>{s}</div>
-                </div>
-              ))}
-            </div>
-            <Wordmark className="hidden h-5 md:block" />
+    <div className="bx-root ob min-h-dvh lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,46%)]">
+      <div className="flex min-w-0 flex-col">
+        <header className="sticky top-0 z-20 bg-[#f4f3fa]/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+          <div className="mx-auto flex h-16 w-full max-w-[640px] items-center gap-5 px-4 md:px-8">
+            <span className="shrink-0 sm:hidden"><BrandLogo size={22} className="[&>span:last-child]:hidden" /></span>
+            <span className="hidden shrink-0 sm:block"><BrandLogo size={24} /></span>
+            <Progress step={step} done={!block} />
+            <span className="num shrink-0 text-[12.5px] font-medium text-[#9898a8]">{step + 1}/{STEPS.length}</span>
           </div>
         </header>
 
-        <main key={step} className="mx-auto w-full max-w-[720px] flex-1 animate-fade-up px-5 pb-36 pt-8 md:pt-12">
-          {step === 0 && <StepTrade d={d} set={set} />}
-          {step === 1 && <StepCompany d={d} set={set} />}
-          {step === 2 && <StepPriorities d={d} set={set} />}
-          {step === 3 && <StepModules d={d} set={set} plan={plan} />}
-          {step === 4 && <StepAccount d={d} set={set} />}
+        <div className="mx-auto w-full max-w-[640px] px-4 pt-2 md:px-8 lg:hidden">
+          <ApercuMobile d={d} />
+        </div>
+
+        <main id="ob-main" key={step} className={`mx-auto w-full max-w-[640px] flex-1 px-4 pb-40 pt-8 md:px-8 md:pt-12 ${dir === 'fwd' ? 'ob-step-fwd' : 'ob-step-back'}`}>
+          <span className="sr-only" aria-live="polite">Étape {step + 1} sur {STEPS.length} : {STEPS[step].label}</span>
+          {step === 0 && <MetierStep d={d} set={set} fromSite={fromSite} />}
+          {step === 1 && <EntrepriseStep d={d} set={set} />}
+          {step === 2 && <PrioritesStep d={d} set={set} />}
+          {step === 3 && <ModulesStep d={d} set={set} touched={touched} onReset={() => setTouched(false)} />}
+          {step === 4 && <AccesStep d={d} set={set} />}
         </main>
 
-        <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-line/70 bg-white/90 pb-[var(--safe-b)] backdrop-blur-xl lg:right-[420px]">
-          <div className="mx-auto flex h-[72px] max-w-[720px] items-center gap-3 px-5">
-            <span className="hidden flex-1 text-[13px] text-ink-3 sm:block">{!canNext && hint}</span>
+        <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-[#ececf1] bg-[#f4f3fa]/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:right-[46%]">
+          <div className="mx-auto flex h-[76px] w-full max-w-[640px] items-center gap-3 px-4 md:px-8">
+            <button type="button" onClick={back} className="ob-btn ob-btn-ghost h-12 w-12 shrink-0 px-0 sm:w-auto sm:px-4" aria-label={step === 0 ? 'Retour à l\'accueil' : 'Étape précédente'}>
+              <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.75} /> <span className="hidden sm:inline">Retour</span>
+            </button>
+            <span className="hidden min-w-0 flex-1 truncate text-[13px] text-[#9898a8] sm:block" aria-live="polite">{block}</span>
             <span className="flex-1 sm:hidden" />
-            {step < 4 ? (
-              <Button variant="primary" size="lg" disabled={!canNext} onClick={() => setStep(step + 1)} className="min-w-[160px] justify-center">
-                Continuer <ArrowRight className="h-4 w-4" />
-              </Button>
+            {step < PRET - 1 ? (
+              <button type="button" onClick={next} disabled={!!block} className="ob-btn ob-btn-ink h-12 min-w-0 flex-1 sm:min-w-[176px] sm:flex-none" title={block ?? undefined}>
+                Continuer <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                <span className="ob-kbd">Entrée</span>
+              </button>
             ) : (
-              <Button variant="dawn" size="lg" disabled={!canNext} onClick={finish} className="min-w-[200px] justify-center">
-                Créer mon Brix
-              </Button>
+              <button type="button" onClick={next} disabled={!!block} className="bx-btn-dawn ob-btn h-12 min-w-0 flex-1 sm:min-w-[200px] sm:flex-none" title={block ?? undefined}>
+                Créer mon Brix <ArrowRight className="h-4 w-4" strokeWidth={2} />
+              </button>
             )}
           </div>
+          {block && <p className="-mt-2 pb-2 text-center text-[12px] text-[#9898a8] sm:hidden">{block}</p>}
         </footer>
       </div>
 
-      <aside className="sticky top-0 hidden h-dvh w-[420px] shrink-0 items-center justify-center overflow-hidden border-l border-line bg-[radial-gradient(120%_90%_at_100%_0%,#ebe2fe_0%,#fde7f7_50%,#fff1e6_100%)] lg:flex">
-        <div className="absolute left-8 right-8 top-8 text-[12.5px] leading-relaxed text-ink-2">
-          <b className="block text-ink">Votre Brix se construit en direct</b>
-          Chaque réponse ajoute ou retire des outils. Rien d'inutile dans votre menu.
-        </div>
-        <OnboardingPreview trade={d.trade} size={d.size} enabled={d.enabled} companyName={d.companyName} />
+      <aside className="sticky top-0 hidden h-dvh p-4 pl-0 lg:block">
+        <ApercuDesktop d={d} step={step} />
       </aside>
     </div>
   );
 }
 
-function Building({ d }: { d: Draft }) {
-  const lines = [
-    `Installation des outils ${TRADE_BY_KEY[d.trade ?? 'autre'].plural.toLowerCase()}`,
-    'Bibliothèque de prix et modèles de devis',
-    'Mentions légales et facture électronique',
-    `${d.enabled.length} outils activés dans votre menu`,
-    'Bob apprend votre entreprise',
-  ];
-  const [k, setK] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setK((x) => Math.min(lines.length, x + 1)), 600);
-    return () => clearInterval(t);
-  }, []);
+function Progress({ step, done }: { step: number; done: boolean }) {
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden bg-[#fbfaff] px-6">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-[conic-gradient(from_0deg,#c4b5fd,#f0abfc,#fdba74,#c4b5fd)] opacity-30 blur-[90px]" />
-      <div className="relative w-full max-w-[380px]">
-        <Wordmark className="mb-8 h-8" />
-        <h1 className="font-display text-[28px] font-semibold leading-tight tracking-[-0.03em]">
-          On prépare le Brix de <span className="dawn-text">{d.companyName || 'votre entreprise'}</span>
-        </h1>
-        <ul className="mt-8 space-y-3.5">
-          {lines.map((l, i) => (
-            <li key={l} className={cn('flex items-center gap-3 text-[14px] transition-all duration-500', i < k ? 'text-ink opacity-100' : i === k ? 'text-ink-2 opacity-100' : 'translate-y-1 opacity-0')}>
-              <span className={cn('grid h-6 w-6 place-items-center rounded-full transition', i < k ? 'bg-ink text-white' : 'border border-line2 bg-white')}>
-                {i < k ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : <span className="h-2 w-2 animate-ping rounded-full bg-vi-500" />}
-              </span>
-              {l}
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="flex min-w-0 flex-1 items-center gap-1.5" role="progressbar" aria-label="Progression de l'inscription" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-valuetext={`Étape ${step + 1} sur ${STEPS.length}, ${STEPS[step].label}`}>
+      {STEPS.map((s, i) => (
+        <div key={s.key} className="min-w-0 flex-1">
+          <div className="ob-seg"><i style={{ transform: `scaleX(${i < step ? 1 : i === step ? (done ? 1 : 0.4) : 0})` }} /></div>
+          <div className={`mt-1.5 hidden truncate text-[11.5px] font-medium transition-colors md:block ${i <= step ? 'text-[#130f26]' : 'text-[#9898a8]'}`}>{s.label}</div>
+        </div>
+      ))}
     </div>
   );
 }
