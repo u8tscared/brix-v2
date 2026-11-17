@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Choice, Note, NumField, ResultRow, n1, n2 } from '../components/fields';
+import { SplitBar, Stack } from '../components/diagrams';
 import { ToolLayout } from '../components/ToolLayout';
 
 type Shape = 'dalle' | 'semelle' | 'poteau';
@@ -36,7 +37,18 @@ export default function Beton() {
           <Choice label="Approvisionnement" value={mode} onChange={setMode} options={[{ value: 'toupie', label: 'Toupie ou bétonnière' }, { value: 'sacs', label: 'Sacs de béton prêt' }]} />
         </>
       }
-      hero={{ label: 'Béton à prévoir', value: `${n2(v)} m³`, sub: `${n2(volume)} m³ en place + 5 % de pertes` }}
+      hero={{ label: 'Béton à prévoir', value: v, decimals: 2, unit: 'm³', sub: `${n2(volume)} m³ en place + 5 % de pertes` }}
+      visual={
+        mode === 'toupie' ? (
+          <SplitBar parts={[
+            { label: 'Ciment', value: MIX.ciment, color: '#6b7280', display: `${bags} sacs` },
+            { label: 'Sable 0/4', value: MIX.sable, color: '#e7b864', display: `${n1((MIX.sable * v) / 1000)} t` },
+            { label: 'Gravier 4/20', value: MIX.gravier, color: '#a8a29e', display: `${n1((MIX.gravier * v) / 1000)} t` },
+          ]} />
+        ) : (
+          <Stack count={readyBags} max={40} label={`${readyBags} sacs de 35 kg, soit ${Math.round(readyBags * 35 / 1000 * 10) / 10} t à porter`} tone="#78716c" />
+        )
+      }
       formulas={[
         'Volume = longueur × largeur × épaisseur, converti en mètres.',
         'Dosage 350 kg/m³ pour du béton armé : 350 kg de ciment, 680 kg de sable 0/4, 1 175 kg de gravier 4/20, 175 L d’eau par m³.',

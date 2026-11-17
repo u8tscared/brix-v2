@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Choice, NumField, ResultRow, n1 } from '../components/fields';
+import { WallSection } from '../components/diagrams';
 import { ToolLayout } from '../components/ToolLayout';
 
 const PLATE_W = 1.2;
@@ -40,13 +41,24 @@ export default function Cloison() {
           </div>
           <Choice label="Type" value={layers} onChange={setLayers} options={[{ value: 1, label: '72/48 (1 plaque par face)' }, { value: 2, label: '98/48 (2 plaques par face)' }]} />
           <Choice label="Entraxe des montants" value={spacing} onChange={setSpacing} options={[{ value: 0.6, label: '60 cm' }, { value: 0.4, label: '40 cm (carrelage, charges)' }]} />
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 2xl:grid-cols-2">
             <Choice label="Faces" value={faces} onChange={setFaces} options={[{ value: 2, label: 'Cloison (2 faces)' }, { value: 1, label: 'Doublage (1 face)' }]} />
             <Choice label="Isolant 45 mm" value={insul ? 1 : 0} onChange={(v) => setInsul(v === 1)} options={[{ value: 1, label: 'Oui' }, { value: 0, label: 'Non' }]} />
           </div>
         </>
       }
-      hero={{ label: 'Plaques BA13', value: `${plates} plaques`, sub: `1,20 × ${String(plateL).replace('.', ',')} m · ${n1(area)} m² de cloison ${label}` }}
+      hero={{ label: 'Plaques BA13', value: plates, unit: 'plaques', sub: `1,20 × ${String(plateL).replace('.', ',')} m · ${n1(area)} m² de cloison ${label}` }}
+      visual={
+        <div className="grid grid-cols-[1fr_auto] items-center gap-4">
+          <WallSection plates={layers as 1 | 2} studs={48} insulation={insul} />
+          <div className="space-y-1 text-[12px] text-ink-2">
+            <div className="text-[13px] font-semibold text-ink">Cloison {label}</div>
+            <div>{layers} plaque{layers > 1 ? 's' : ''} par face</div>
+            <div>Montants tous les {Math.round(spacing * 100)} cm</div>
+            {insul && <div>Isolant 45 mm</div>}
+          </div>
+        </div>
+      }
       formulas={[
         'Plaques : nombre de largeurs de 1,20 m × faces × couches, moins une demi-plaque par porte et par face.',
         'Rails : 2 × longueur, en barres de 3 m. Montants : longueur / entraxe + 1, plus 2 par porte.',

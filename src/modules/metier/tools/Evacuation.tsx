@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
 import { Choice, Note, NumField, ResultRow } from '../components/fields';
+import { PipeSlope } from '../components/diagrams';
 import { ToolLayout } from '../components/ToolLayout';
 
 const APPS = [
@@ -36,7 +37,7 @@ export default function Evacuation() {
       inputs={
         <>
           <div className="text-[12.5px] font-medium text-ink-2">Appareils raccordés</div>
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid gap-2 2xl:grid-cols-2">
             {APPS.map((a) => (
               <div key={a.key} className="flex items-center justify-between gap-2 rounded-[10px] border border-line px-3 py-1.5">
                 <span className="text-[13px]">{a.label} <span className="text-ink-3">· Ø {a.d}</span></span>
@@ -52,7 +53,8 @@ export default function Evacuation() {
           <Choice label="Pente" value={slope} onChange={setSlope} options={[1, 2, 3, 4].map((v) => ({ value: v, label: `${v} cm/m` }))} />
         </>
       }
-      hero={{ label: 'Collecteur principal', value: `Ø ${collecteur} mm`, sub: `Dénivelé à prévoir : ${drop} cm sur ${length} m` }}
+      hero={{ label: 'Collecteur principal', value: collecteur, unit: 'mm de Ø', sub: `Dénivelé à prévoir : ${drop} cm sur ${length} m` }}
+      visual={<PipeSlope slopePct={slope} diameter={collecteur} />}
       formulas={[
         'Lavabo et bidet : Ø 32. Douche, baignoire, évier, lave-linge, lave-vaisselle : Ø 40. WC : Ø 100 (80 possible en sortie directe courte).',
         'Collecteur eaux usées : Ø 40 jusqu’à 2 appareils, Ø 50 jusqu’à 4, Ø 63 au-delà. Dès qu’un WC est raccordé : Ø 100.',

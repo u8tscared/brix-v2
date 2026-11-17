@@ -44,7 +44,7 @@ export default function Express() {
           <Choice label="Déplacement" value={travel} onChange={setTravel} options={[{ value: 0, label: 'Offert' }, { value: 39, label: '39 € (ville)' }, { value: 59, label: '59 € (agglomération)' }]} />
         </>
       }
-      hero={{ label: 'Total à annoncer', value: money(ttc), sub: `${money(ht)} HT · TVA 10 %` }}
+      hero={{ label: 'Total à annoncer', value: ttc, decimals: 2, unit: '€ TTC', sub: `${money(ht)} HT · TVA 10 %` }}
       formulas={[
         'Total = prestations + majoration horaire + déplacement, TVA 10 % en logement de plus de 2 ans.',
         'Au-delà de 150 € TTC, un devis écrit est obligatoire avant l’intervention à domicile.',

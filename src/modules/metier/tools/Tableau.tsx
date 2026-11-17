@@ -79,7 +79,7 @@ export default function Tableau() {
           </form>
         </>
       }
-      hero={{ label: 'Tableau conseillé', value: `${rows} rangée${rows > 1 ? 's' : ''}`, sub: `${modules} modules occupés · ${free} libres pour plus tard` }}
+      hero={{ label: 'Tableau conseillé', value: rows, unit: `rangée${rows > 1 ? 's' : ''}`, sub: `${modules} modules occupés · ${free} libres pour plus tard` }}
       formulas={[
         'Chaque disjoncteur occupe 1 module, chaque interrupteur différentiel 2 modules.',
         '8 circuits au plus par différentiel 30 mA ; plaque de cuisson et lave-linge sur un différentiel type A.',

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Choice, Note, NumField, ResultRow, n1 } from '../components/fields';
+import { Choice, Note, NumField, ResultRow, n1, Gauge } from '../components/fields';
+import { Tank } from '../components/diagrams';
 import { ToolLayout } from '../components/ToolLayout';
 
 const SIZES = [50, 75, 100, 150, 200, 250, 300];
@@ -28,7 +29,16 @@ export default function Ballon() {
           {kind === 'electrique' && <Choice label="Puissance de la résistance" value={power} onChange={setPower} options={[1200, 1800, 2200, 3000].map((p) => ({ value: p, label: `${p} W` }))} />}
         </>
       }
-      hero={{ label: 'Volume conseillé', value: `${size} litres`, sub: `Besoin estimé : ${need} L d’eau à 60 °C par jour` }}
+      hero={{ label: 'Volume conseillé', value: size, unit: 'litres', sub: `Besoin estimé : ${need} L d’eau à 60 °C par jour` }}
+      visual={
+        <div className="flex items-center gap-5">
+          <Tank liters={size} />
+          <div className="min-w-0 flex-1 space-y-3">
+            <Gauge label="Besoin du foyer" value={need} max={size} unit=" L" format={(x) => String(Math.round(x))} />
+            {kind === 'electrique' && <Gauge label="Temps de chauffe" value={hours} max={12} limit={8} unit=" h" />}
+          </div>
+        </div>
+      }
       formulas={[
         'Besoin : environ 50 L à 60 °C par personne et par jour avec des douches, 70 L avec des bains.',
         'Temps de chauffe : volume × 1,163 × (60 − 12) / puissance, en heures (eau froide à 12 °C).',
