@@ -7,10 +7,10 @@ import { useBrix } from '@/lib/store';
 import type { Chantier, Devis, DevisLigne, Facture } from '@/lib/types';
 import { billedFor, buildSolde } from '@/modules/factures/lib/billing';
 import { nowISO } from './logic';
-import { sendForSignature, simulateClientEvent } from './service';
-import { useDevisMeta, type Channel } from './store';
+import { sendDevis, type SendDevisInput } from './send';
+import { simulateClientEvent } from './service';
+import { useDevisMeta } from './store';
 
-const channelLabel = (c: Channel) => (c === 'email' ? 'e-mail' : c === 'sms' ? 'SMS' : 'WhatsApp');
 
 export function useDevisActions(id: string) {
   const navigate = useNavigate();
@@ -18,15 +18,11 @@ export function useDevisActions(id: string) {
   const get = () => useBrix.getState().devis.find((x) => x.id === id);
   const client = (d: Devis) => useBrix.getState().clients.find((c) => c.id === d.clientId);
 
-  const send = async (opts: { channel: Channel; to: string; message: string }) => {
+  const send = async (opts: SendDevisInput) => {
     const d = get();
     if (!d) return;
-    const meta = useDevisMeta.getState().meta[id];
-    const variants = meta ? (Object.keys(meta.variants) as (keyof typeof meta.variants)[]).filter((k) => meta.variants[k]) : ['confort' as const];
-    const res = await sendForSignature(d, { ...opts, variants, payment: meta?.payment ?? { card: true, transfer: true, split3: true } });
-    useBrix.getState().upsertDevis({ ...d, status: d.status === 'brouillon' || d.status === 'refuse' || d.status === 'expire' ? 'envoye' : d.status, sentAt: res.sentAt });
-    log(id, `Envoyé à ${client(d)?.name ?? 'le client'} par ${channelLabel(opts.channel)}`, 'me');
-    toast(`Devis envoyé à ${opts.to} (démo)`);
+    await sendDevis(id, opts);
+    toast(`Devis envoyé à ${client(d)?.name ?? opts.to}`);
   };
 
   const simulateOpen = async () => {

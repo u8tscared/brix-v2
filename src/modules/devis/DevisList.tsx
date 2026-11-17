@@ -1,24 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Phone, Plus, Search } from 'lucide-react';
-import { Button, EmptyState, Input, PageHeader, Segmented, Select, toast } from '@/components/ui';
+import { ArrowRight, FileText, Phone, Plus, Search } from 'lucide-react';
+import { Button, EmptyState, IconTile, Input, PageHeader, Segmented, Select, toast } from '@/components/ui';
+import { LiveDot } from '@/components/motion';
+import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Devis } from '@/lib/types';
 import { DevisCard, DevisRow, ROW_GRID } from './components/list/DevisItem';
+import { DevisPreview } from './components/list/DevisPreview';
 import { Pipeline, type Stage, type StageKey } from './components/list/Pipeline';
 import { signatureScore } from './logic';
 import { remindClient } from './service';
 import { defaultMeta, useDevisMeta } from './store';
-import { useMediaQuery } from '@/components/layout/useMediaQuery';
 
 type Filter = StageKey | 'tous' | 'relancer';
 type Sort = 'recent' | 'montant' | 'proba';
 
 const STAGES: { key: StageKey; label: string; color: string; match: (d: Devis) => boolean }[] = [
-  { key: 'brouillon', label: 'Brouillons', color: '#c9c9d6', match: (d) => d.status === 'brouillon' },
-  { key: 'envoye', label: 'Envoyés', color: '#1f389d', match: (d) => d.status === 'envoye' },
-  { key: 'vu', label: 'Vus', color: '#8b5cf6', match: (d) => d.status === 'vu' },
+  { key: 'brouillon', label: 'Brouillons', color: '#cfcbdd', match: (d) => d.status === 'brouillon' },
+  { key: 'envoye', label: 'Envoyés', color: '#6366f1', match: (d) => d.status === 'envoye' },
+  { key: 'vu', label: 'Vus', color: '#c026d3', match: (d) => d.status === 'vu' },
   { key: 'signe', label: 'Signés', color: '#16a34a', match: (d) => d.status === 'signe' },
   { key: 'refuse', label: 'Refusés', color: '#f87171', match: (d) => d.status === 'refuse' || d.status === 'expire' },
 ];
@@ -34,8 +36,9 @@ export default function DevisList() {
   const [filter, setFilter] = useState<Filter>('tous');
   const [sort, setSort] = useState<Sort>('recent');
   const [busy, setBusy] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
-  // Raccourci N : géré globalement par la barre du haut (TopBar).
+  // Raccourci N : géré globalement par la barre du haut.
 
   const rows = useMemo(
     () =>
@@ -52,20 +55,19 @@ export default function DevisList() {
   });
   const decided = rows.filter((r) => ['signe', 'refuse', 'expire'].includes(r.d.status));
   const rate = decided.length ? (rows.filter((r) => r.d.status === 'signe').length / decided.length) * 100 : 0;
-  const pending = rows.filter((r) => r.d.status === 'envoye' || r.d.status === 'vu').reduce((a, r) => a + r.ttc, 0);
   const toRemind = rows.filter((r) => r.d.status === 'envoye' || r.d.status === 'vu');
+  const pending = toRemind.reduce((a, r) => a + r.ttc, 0);
   const hot = rows.filter((r) => r.d.status === 'vu' && (r.d.views ?? 0) >= 2).sort((a, b) => (b.d.viewedAt ?? '').localeCompare(a.d.viewedAt ?? ''))[0];
 
   const list = useMemo(() => {
     const term = q.trim().toLowerCase();
-    let l = rows.filter((r) => {
+    const l = rows.filter((r) => {
       if (filter === 'relancer' && !(r.d.status === 'envoye' || r.d.status === 'vu')) return false;
       if (filter !== 'tous' && filter !== 'relancer' && !STAGES.find((s) => s.key === filter)!.match(r.d)) return false;
       if (!term) return true;
       return `${r.d.number} ${r.d.title} ${r.client?.name ?? ''} ${r.client?.city ?? ''}`.toLowerCase().includes(term);
     });
-    l = l.slice().sort((a, b) => (sort === 'montant' ? b.ttc - a.ttc : sort === 'proba' ? b.score.value - a.score.value : (b.d.createdAt + b.d.number).localeCompare(a.d.createdAt + a.d.number)));
-    return l;
+    return l.sort((a, b) => (sort === 'montant' ? b.ttc - a.ttc : sort === 'proba' ? b.score.value - a.score.value : (b.d.createdAt + b.d.number).localeCompare(a.d.createdAt + a.d.number)));
   }, [rows, q, filter, sort]);
 
   const remind = async (d: Devis) => {
@@ -76,7 +78,7 @@ export default function DevisList() {
     patch(d.id, { reminders: meta.reminders + 1, lastReminderAt: new Date().toISOString() });
     log(d.id, `Relance envoyée par ${meta.channel === 'email' ? 'e-mail' : meta.channel === 'sms' ? 'SMS' : 'WhatsApp'}`, 'me');
     setBusy(null);
-    toast(`Relance envoyée à ${client?.name ?? 'votre client'} (démo)`);
+    toast(`Relance envoyée à ${client?.name ?? 'votre client'}`);
   };
 
   const filters: { value: Filter; label: string; count?: number }[] = [
@@ -84,50 +86,62 @@ export default function DevisList() {
     { value: 'relancer', label: 'À relancer', count: toRemind.length },
     ...stages.map((s) => ({ value: s.key as Filter, label: s.label, count: s.count })),
   ];
+  const itemProps = (r: (typeof list)[number]) => ({
+    ...r,
+    onOpen: () => navigate(`/app/devis/${r.d.id}`),
+    onPreview: () => setPreview(r.d.id),
+    onRemind: r.d.status === 'envoye' || r.d.status === 'vu' ? () => remind(r.d) : undefined,
+    reminding: busy === r.d.id,
+  });
 
   return (
     <div className="space-y-5">
       <PageHeader
+        icon={<IconTile name="FileText" dept="vendre" size="lg" />}
         title="Devis"
-        subtitle={`${toRemind.length} en attente de réponse${phone ? '' : ' · tapez N pour un nouveau devis'}`}
+        subtitle={toRemind.length ? `${toRemind.length} devis attendent une réponse de vos clients.` : 'Tous vos devis ont reçu une réponse.'}
         actions={
-          <Button variant="dawn" size={phone ? 'lg' : 'md'} icon={<Plus className="h-4 w-4" />} kbd="N" onClick={() => navigate('/app/devis/nouveau')} className="max-sm:w-full max-sm:justify-center">
+          <Button variant="primary" size={phone ? 'lg' : 'md'} icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/devis/nouveau')} className="max-sm:w-full max-sm:justify-center">
             Nouveau devis
           </Button>
         }
       />
 
-      <Pipeline stages={stages} active={filter} onPick={(k) => setFilter(k)} rate={rate} pending={pending} />
+      <div className="animate-[fade-up_.5s_var(--ease)_.05s_both]">
+        <Pipeline stages={stages} active={filter} onPick={(k) => setFilter(k)} rate={rate} pending={pending} pendingCount={toRemind.length} />
+      </div>
 
       {hot?.client && (
-        <div className="flex flex-col gap-3 rounded-[14px] border border-vi-100 bg-vi-50/60 px-4 py-3 sm:flex-row sm:items-center">
+        <div className="flex animate-[fade-up_.5s_var(--ease)_.12s_both] flex-col gap-3 rounded-[16px] bg-night px-4 py-3.5 text-white shadow-ink sm:flex-row sm:items-center md:px-5">
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-ink text-[10px] font-bold text-white">Bob</span>
-            <p className="text-[13.5px] leading-snug text-ink">
-              <b className="font-semibold">{hot.client.name}</b> a ouvert son devis {hot.d.views} fois, la dernière {activityAgo(hot.d.viewedAt)}. C'est le bon moment pour l'appeler : {hot.score.value} % de chances de signer.
+            <LiveDot tone="peach" className="mt-1.5" />
+            <p className="text-[13.5px] leading-snug text-white/85">
+              <b className="font-semibold text-white">{hot.client.name}</b> a ouvert son devis {hot.d.views} fois, la dernière {activityAgo(hot.d.viewedAt)}. C’est le bon moment pour l’appeler : <b className="font-semibold text-white">{hot.score.value} %</b> de chances de signer.
             </p>
           </div>
-          <div className="flex shrink-0 gap-2 pl-10 sm:pl-0">
-            <a href={`tel:${hot.client.phone.replace(/\s/g, '')}`} className="inline-flex h-10 items-center gap-2 rounded-[10px] bg-ink px-4 text-sm font-medium text-white sm:h-8 sm:px-3 sm:text-[13px]">
+          <div className="flex shrink-0 gap-2 pl-5 sm:pl-0">
+            <a href={`tel:${hot.client.phone.replace(/\s/g, '')}`} className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-white px-4 text-[13.5px] font-semibold text-ink transition hover:bg-white/90 sm:h-9 sm:px-3.5">
               <Phone className="h-3.5 w-3.5" /> Appeler
             </a>
-            <Button size="sm" variant="secondary" className="max-sm:h-10" onClick={() => navigate(`/app/devis/${hot.d.id}`)}>
-              Ouvrir le devis
-            </Button>
+            <button onClick={() => navigate(`/app/devis/${hot.d.id}`)} className="inline-flex h-11 items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] font-medium text-white/85 transition hover:bg-white/10 hover:text-white sm:h-9">
+              Voir le devis <ArrowRight className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
       )}
 
       <div className="space-y-3">
-        <div className="flex flex-col gap-2.5 md:flex-row md:items-center">
-          <Input icon={<Search />} placeholder="Rechercher un client, un numéro, un chantier…" value={q} onChange={(e) => setQ(e.target.value)} className="md:flex-1" aria-label="Rechercher un devis" />
-          <Select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-11 md:w-[210px]" aria-label="Trier">
-            <option value="recent">Plus récents</option>
-            <option value="montant">Montant le plus élevé</option>
-            <option value="proba">Plus probables d'abord</option>
-          </Select>
+        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
+          <Segmented value={filter} onChange={setFilter} options={filters} className="w-full lg:w-auto" />
+          <div className="flex flex-1 gap-2">
+            <Input icon={<Search />} placeholder="Client, numéro, chantier…" value={q} onChange={(e) => setQ(e.target.value)} className="min-w-0 flex-1" aria-label="Rechercher un devis" />
+            <Select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="w-[150px] shrink-0 md:w-[190px]" aria-label="Trier">
+              <option value="recent">Plus récents</option>
+              <option value="montant">Plus gros montants</option>
+              <option value="proba">Plus probables</option>
+            </Select>
+          </div>
         </div>
-        <Segmented value={filter} onChange={setFilter} options={filters} className="w-full md:w-auto" />
 
         {list.length === 0 ? (
           <EmptyState
@@ -136,36 +150,40 @@ export default function DevisList() {
             text={rows.length ? 'Essayez un autre mot ou retirez le filtre.' : 'Dictez-le à Bob ou piochez dans la bibliothèque de prix : les lots, la TVA et les mentions légales se font tout seuls.'}
             action={
               rows.length ? (
-                <Button onClick={() => { setQ(''); setFilter('tous'); }}>Tout afficher</Button>
+                <Button onClick={() => (setQ(''), setFilter('tous'))}>Tout afficher</Button>
               ) : (
-                <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/devis/nouveau')}>Créer un devis</Button>
+                <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/devis/nouveau')}>
+                  Créer un devis
+                </Button>
               )
             }
           />
         ) : phone ? (
-          <div className="space-y-2.5 stagger">
+          <div key={filter} className="stagger-fast space-y-2.5">
             {list.map((r) => (
-              <DevisCard key={r.d.id} {...r} onOpen={() => navigate(`/app/devis/${r.d.id}`)} onRemind={r.d.status === 'envoye' || r.d.status === 'vu' ? () => remind(r.d) : undefined} reminding={busy === r.d.id} />
+              <DevisCard key={r.d.id} {...itemProps(r)} />
             ))}
           </div>
         ) : (
-          <div className="overflow-hidden rounded-[14px] border border-line bg-white">
-            <div className={`grid gap-4 border-b border-line bg-[#fafafc] px-4 py-2 text-[11.5px] font-medium text-ink-3 ${ROW_GRID}`}>
-              <span title="Probabilité de signature">Proba.</span>
+          <div className="overflow-hidden rounded-[18px] bg-white shadow-card">
+            <div className={`grid gap-4 border-b border-line px-5 py-2.5 text-[11.5px] font-medium text-ink-3 ${ROW_GRID}`}>
+              <span title="Probabilité de signature">Chances</span>
               <span>Client et devis</span>
-              <span>Statut et activité</span>
+              <span>Où en est-il</span>
               <span className="text-right">Montant TTC</span>
               <span />
             </div>
-            {list.map((r) => (
-              <DevisRow key={r.d.id} {...r} onOpen={() => navigate(`/app/devis/${r.d.id}`)} onRemind={r.d.status === 'envoye' || r.d.status === 'vu' ? () => remind(r.d) : undefined} reminding={busy === r.d.id} />
-            ))}
+            <div key={filter + sort} className="stagger-fast">
+              {list.map((r) => (
+                <DevisRow key={r.d.id} {...itemProps(r)} />
+              ))}
+            </div>
           </div>
         )}
-        {list.length > 0 && (
-          <p className="px-1 text-[12px] text-ink-3">La probabilité de signature tient compte du montant, du délai depuis l'envoi, du nombre d'ouvertures et de votre historique avec le client.</p>
-        )}
+        {list.length > 0 && <p className="px-1 text-[12px] leading-relaxed text-ink-3">Les chances de signature tiennent compte du montant, du délai depuis l’envoi, des ouvertures et de votre historique avec le client.</p>}
       </div>
+
+      <DevisPreview id={preview} onClose={() => setPreview(null)} />
     </div>
   );
 }

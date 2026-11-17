@@ -1,7 +1,8 @@
 // Suivi des paiements d'une facture : reste à payer, encaissements, lien de paiement, relances.
 
 import { BellRing, Link2, Plus, Trash2 } from 'lucide-react';
-import { Button, Progress, cn } from '@/components/ui';
+import { Button, cn } from '@/components/ui';
+import { AnimatedNumber, Ring } from '@/components/motion';
 import { dateFull, dateShort, money } from '@/lib/format';
 import type { Facture } from '@/lib/types';
 import { saveFacture } from '../lib/actions';
@@ -30,18 +31,21 @@ export function PaymentPanel({ f, onPay, onLink, onRemind }: { f: Facture; onPay
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-line p-4">
-        <div className="flex items-end justify-between gap-3">
+      <div className="rounded-[16px] bg-white p-4 shadow-card">
+        <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="text-[12px] text-ink-3">Reste à payer</div>
-            <div className={cn('num text-[26px] font-semibold tracking-[-0.02em]', st === 'en_retard' && 'text-bad')}>{money(a.remaining)}</div>
+            <div className="text-[12px] text-ink-3">{a.remaining > 0 ? 'Reste à payer' : 'Facture réglée'}</div>
+            <div className={cn('num text-[28px] font-semibold leading-tight tracking-[-0.03em]', st === 'en_retard' && 'text-bad')}>
+              <AnimatedNumber value={a.remaining > 0 ? a.remaining : a.paid} format={(n) => money(n)} duration={600} />
+            </div>
+            <div className="mt-0.5 text-[12px] text-ink-2">
+              Payé {money(a.paid)} sur {money(a.net)}
+            </div>
           </div>
-          <div className="text-right text-[12px] text-ink-2">
-            <div>Payé {money(a.paid)}</div>
-            <div>sur {money(a.net)}</div>
-          </div>
+          <Ring value={pct} size={52} stroke={4} tone={pct >= 100 ? 'ok' : st === 'en_retard' ? 'warn' : 'vi'}>
+            <span className="text-[11.5px]">{Math.round(pct)} %</span>
+          </Ring>
         </div>
-        <Progress value={pct} tone={pct >= 100 ? 'ok' : 'ink'} className="mt-3" />
         {a.retenue > 0 && (
           <div className="mt-3 flex justify-between rounded-lg bg-sub px-3 py-2 text-[12.5px]">
             <span className="text-ink-2">Retenue de garantie {f.retenueGarantie} %{extra.retenueReleaseDate ? `, libérable le ${dateFull(extra.retenueReleaseDate)}` : ''}</span>
@@ -58,7 +62,7 @@ export function PaymentPanel({ f, onPay, onLink, onRemind }: { f: Facture; onPay
       </div>
 
       {extra.paymentLink && a.remaining > 0 && (
-        <button onClick={onLink} className="flex w-full items-center gap-3 rounded-xl border border-line p-3 text-left transition hover:bg-[#fafafc]">
+        <button onClick={onLink} className="flex w-full items-center gap-3 rounded-[14px] bg-white p-3 text-left shadow-card transition hover:shadow-raise">
           <span className="grid h-9 w-9 place-items-center rounded-lg bg-vi-50 text-vi-700"><Link2 className="h-4 w-4" /></span>
           <div className="min-w-0 flex-1">
             <div className="truncate font-mono text-[12.5px]">{extra.paymentLink.url.replace('https://', '')}</div>
@@ -72,7 +76,7 @@ export function PaymentPanel({ f, onPay, onLink, onRemind }: { f: Facture; onPay
         {pays.length === 0 ? (
           <p className="text-[12.5px] text-ink-3">Aucun paiement pour l’instant. Brix rapproche automatiquement les virements de votre banque.</p>
         ) : (
-          <ul className="divide-y divide-line rounded-xl border border-line">
+          <ul className="divide-y divide-line rounded-[14px] bg-white shadow-card">
             {pays.map((p) => (
               <li key={p.id} className="flex items-center gap-3 px-3.5 py-2.5">
                 <div className="min-w-0 flex-1">
@@ -91,7 +95,7 @@ export function PaymentPanel({ f, onPay, onLink, onRemind }: { f: Facture; onPay
         )}
       </section>
 
-      {issued && (
+      {issued && (a.remaining > 0 || rems.length > 0) && (
         <section>
           <div className="mb-2 flex items-center justify-between">
             <h4 className="text-[12.5px] font-semibold text-ink-2">Relances</h4>

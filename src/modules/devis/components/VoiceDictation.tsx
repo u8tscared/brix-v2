@@ -106,7 +106,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
                   </span>
                   <span className="inline-flex items-center gap-1 rounded bg-sub px-1.5 py-px text-[10.5px] text-ink-2">
                     {l.source === 'taux' ? <Clock className="h-3 w-3" /> : <BookOpen className="h-3 w-3" />}
-                    {l.source === 'taux' ? 'Ton taux' : 'Bibliothèque'}
+                    {l.source === 'taux' ? 'Votre taux' : 'Bibliothèque'}
                   </span>
                 </div>
               </div>
