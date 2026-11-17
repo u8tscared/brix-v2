@@ -35,7 +35,7 @@ export function SiteSetup({ step, onStart, url }: { step: number | null; onStart
       </div>
 
       <div className="relative animate-[fade-up_.6s_var(--ease)_.1s_both]">
-        <div aria-hidden className="absolute -inset-6 rounded-[40px] bg-[radial-gradient(closest-side,#fdecef,transparent)]" />
+        <div aria-hidden className="absolute -inset-6 max-md:inset-x-0 rounded-[40px] bg-[radial-gradient(closest-side,#fdecef,transparent)]" />
         <div className="relative overflow-hidden rounded-[16px] bg-white shadow-pop">
           <div className="flex h-9 items-center gap-2 border-b border-line bg-sub px-3">
             <span className="flex gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><i className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><i className="h-2.5 w-2.5 rounded-full bg-[#28c840]" /></span>
