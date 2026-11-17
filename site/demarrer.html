@@ -5,41 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Composer mon Brix · Brix</title>
 <meta name="description" content="Dites-nous votre métier, votre taille et vos priorités : Brix se règle pour vous en deux minutes. Gratuit pour commencer, sans carte bancaire.">
-<meta name="theme-color" content="#6d28d9">
+<meta name="theme-color" content="#ffffff">
 <link rel="icon" href="logos/brix-icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="./src/styles/base.css">
 <link rel="stylesheet" href="./src/styles/layout.css">
-<link rel="stylesheet" href="./src/styles/home-1.css">
 <link rel="stylesheet" href="./src/styles/demarrer.css">
 </head>
 <body data-nav="solid">
 <!--@icons-->
 <!--@include nav-->
 <main id="main" class="onb">
-  <div class="onb-glow" aria-hidden="true"></div>
-  <div class="wrap onb-grid">
+  <div class="onb-bg" aria-hidden="true"><div class="onb-grid-l"></div><div class="onb-glow"></div></div>
+  <div class="wrap onb-in">
     <section class="wiz" aria-labelledby="wiz-h1">
       <h1 class="sr" id="wiz-h1">Composer mon Brix</h1>
       <div class="wiz-top">
-        <span class="mono" data-stepn>Étape 1 sur 5</span>
+        <div class="wiz-meta"><span class="mono" data-stepn>Étape 1 sur 5</span><span class="wiz-time"><svg class="i" aria-hidden="true"><use href="#i-clock"/></svg>Deux minutes</span></div>
         <div class="prog" role="progressbar" aria-label="Avancement" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" aria-valuetext="Étape 1 sur 5"><i data-prog></i></div>
+        <ol class="stp" data-stp>
+          <li><button type="button" data-go-step="0"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Métier</button></li>
+          <li><button type="button" data-go-step="1"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Équipe</button></li>
+          <li><button type="button" data-go-step="2"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Priorités</button></li>
+          <li><button type="button" data-go-step="3"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Départements</button></li>
+          <li><button type="button" data-go-step="4"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Offre</button></li>
+        </ol>
       </div>
 
       <form data-wiz novalidate>
         <fieldset class="st on" data-st="0">
-          <legend class="st-h"><span>Quel est votre métier ?</span><small>Brix charge la bibliothèque de prix, les outils et les mentions légales de votre corps d’état.</small></legend>
+          <legend class="st-h"><span>Quel est votre métier ?</span><small>Brix charge la bibliothèque de prix, les outils et les mentions légales de votre corps d’état.</small></legend>
           <div class="opts-grid" data-trades role="radiogroup" aria-label="Votre métier"></div>
         </fieldset>
 
         <fieldset class="st" data-st="1">
-          <legend class="st-h"><span>Combien êtes-vous dans l’entreprise ?</span><small>Vous, vos compagnons, vos apprentis et le bureau. Vous pourrez changer à tout moment.</small></legend>
+          <legend class="st-h"><span>Combien êtes-vous dans l’entreprise ?</span><small>Vous, vos compagnons, vos apprentis et le bureau. Vous pourrez changer à tout moment.</small></legend>
           <div class="opts-list" data-sizes role="radiogroup" aria-label="Taille de l’entreprise"></div>
         </fieldset>
 
         <fieldset class="st" data-st="2">
-          <legend class="st-h"><span>Qu’est-ce qui vous ferait gagner le plus de temps ?</span><small>Choisissez tout ce qui compte pour vous. Brix mettra ces outils en avant.</small></legend>
+          <legend class="st-h"><span>Qu’est-ce qui vous ferait gagner le plus de temps ?</span><small>Choisissez tout ce qui compte pour vous. Brix mettra ces outils en avant.</small></legend>
           <div class="opts-grid two" data-prios></div>
         </fieldset>
 
@@ -59,9 +65,10 @@
         </fieldset>
 
         <div class="wiz-nav">
-          <button type="button" class="btn line" data-back hidden><svg class="i" aria-hidden="true"><use href="#i-arrow-left"/></svg>Retour</button>
+          <button type="button" class="btn line lg" data-back hidden><svg class="i" aria-hidden="true"><use href="#i-arrow-left"/></svg>Retour</button>
           <button type="submit" class="btn dark lg" data-next>Continuer <svg class="i go" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
           <a class="btn dawn lg" data-go hidden href="/app/#/inscription">Créer mon compte <svg class="i go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
+          <span class="wiz-kbd" aria-hidden="true"><kbd>Entrée</kbd> pour continuer</span>
         </div>
         <p class="wiz-hint" data-hint aria-live="polite"></p>
       </form>
@@ -69,22 +76,26 @@
     </section>
 
     <aside class="prev" aria-label="Aperçu de votre Brix">
-      <div class="prev-card">
-        <div class="pc-h">
-          <span class="ws-logo"><!--@include brix-wordmark.svg--></span>
-          <span class="badge v" data-pv-plan>Brix Pro</span>
+      <div class="pv" data-pv>
+        <div class="pv-bar"><span class="pv-tl"><i></i><i></i><i></i></span><span class="pv-url mono"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg>brix-app.fr</span><span class="pv-plan"><span class="badge v" data-pv-plan>Brix Pro</span></span></div>
+        <div class="pv-app">
+          <div class="pv-side">
+            <div class="logo pv-logo"><!--@include brix-wordmark.svg--></div>
+            <ul class="pv-nav" data-pv-mods></ul>
+          </div>
+          <div class="pv-main">
+            <div class="pv-who"><span class="pv-av" data-pv-icon></span><div><b data-pv-trade>Votre métier</b><span data-pv-size>Taille à préciser</span></div></div>
+            <p class="pv-h">Votre tableau de bord</p>
+            <div class="pv-widgets" data-pv-widgets></div>
+          </div>
         </div>
-        <div class="pc-who">
-          <span class="pc-av" data-pv-icon></span>
-          <div><b data-pv-trade>Votre métier</b><span data-pv-size>Taille à préciser</span></div>
-        </div>
-        <ul class="pc-mods" data-pv-mods></ul>
-        <div class="pc-foot">
+        <div class="pv-foot">
           <div><small>Fonctions activées</small><b class="num" data-pv-count>0</b></div>
-          <div><small>Prix</small><b class="num" data-pv-price>29,99 €</b><span data-pv-per>HT par mois</span></div>
+          <div><small>Prix</small><b class="num" data-pv-price>29,99 €</b><span data-pv-per>HT par mois</span></div>
         </div>
+        <div class="pv-ready" aria-hidden="true"></div>
       </div>
-      <p class="prev-n">L’aperçu se met à jour à chaque réponse.</p>
+      <p class="prev-n"><span class="pv-live"></span>L’aperçu se met à jour à chaque réponse.</p>
     </aside>
   </div>
 </main>

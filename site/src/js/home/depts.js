@@ -8,15 +8,15 @@ const minPlan = (d) => { const order = ['start', 'pro', 'equipe', 'entreprise'];
 export function panelHTML(d, { link = true } = {}) {
   const only = d.features.filter((f) => f.tag === 'only').length;
   return `
-    <div class="dp-head" style="--c:${d.color}">
-      <span class="dp-ic" style="background:linear-gradient(135deg, ${d.color}, ${d.color}b3)">${ic(d.icon)}</span>
+    <div class="dp-head">
+      <span class="dp-ic">${ic(d.icon)}</span>
       <h3>${d.title} <em>${d.accent}</em></h3>
       <p>${d.pitch}</p>
       <div class="dp-meta"><span class="badge v">${d.features.length} fonctions</span><span class="badge ok">Dès Brix ${minPlan(d)}</span>${only ? `<span class="badge only">${only} exclusivité${only > 1 ? 's' : ''} Brix</span>` : ''}</div>
       ${link ? `<a class="link" href="fonctionnalites.html#${d.id}">Tout le détail ${ic('arrow-right')}</a>` : ''}
     </div>
     <div class="fgrid2">${d.features.map((f) => `
-      <article class="ft" style="--c:${d.color}">
+      <article class="ft">
         <div class="ft-top"><span class="ft-ic">${ic(f.icon)}</span>${f.tag ? `<span class="badge ${TAG[f.tag][0]}">${TAG[f.tag][1]}</span>` : ''}</div>
         <h4>${f.name}</h4><p>${f.desc}</p><span class="plan-t">Dès ${PLANS[f.plan]}</span>
       </article>`).join('')}
@@ -34,7 +34,6 @@ export function initDepts() {
   function movePill(b, d) {
     pill.style.width = `${b.offsetWidth}px`;
     pill.style.transform = `translateX(${b.offsetLeft}px)`;
-    pill.style.background = d.color;
   }
   function select(id, first) {
     const d = DEPARTMENTS.find((x) => x.id === id);

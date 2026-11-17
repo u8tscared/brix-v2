@@ -1,28 +1,37 @@
-/* ===== Pages secondaires : en-tête de page commun (fonctionnalités, tarifs, comparatif) ===== */
-.ph { position: relative; isolation: isolate; overflow: clip; padding-top: calc(var(--nav-h) + env(safe-area-inset-top, 0px)) }
-.ph::before, .ph::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; pointer-events: none }
-.ph::before { width: 900px; height: 900px; right: -260px; top: -520px; background: radial-gradient(circle, rgba(217, 70, 239, .16), transparent 62%) }
-.ph::after { width: 800px; height: 800px; left: -300px; top: -300px; background: radial-gradient(circle, rgba(139, 92, 246, .18), transparent 62%) }
-.ph-in { padding-block: clamp(64px, 9vw, 120px) clamp(40px, 5vw, 64px) }
-.ph-t { font-family: var(--display); font-weight: 800; font-size: clamp(46px, 7.4vw, 108px); line-height: .92; letter-spacing: -.055em; margin-top: 20px; max-width: 9.5em; text-wrap: balance }
-.ph .sub { max-width: 58ch }
-.ph-meta { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 34px; color: var(--mute); font-size: 15px }
-.ph-meta span { display: inline-flex; align-items: center; gap: 8px }
-.ph-meta b { font-family: var(--display); font-size: 22px; letter-spacing: -.03em; color: var(--ink); font-variant-numeric: tabular-nums }
-.ph-meta .i { width: 18px; height: 18px; color: var(--v) }
-.ph-meta:empty { min-height: 33px } /* rempli en JS : on réserve la place (pas de saut) */
+/* ===== Pages secondaires : en-tête de page commun (fonctionnalités, tarifs, comparatif) =====
+   Même famille que le hero de l'accueil : page blanche, fines lignes de grille qui s'effacent,
+   une lueur Aube à peine visible en haut à droite. */
+.ph { position: relative; isolation: isolate; overflow: clip; padding-top: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); background: #fff }
+.ph::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background-image: linear-gradient(to right, rgba(20, 17, 43, .045) 1px, transparent 1px), linear-gradient(to bottom, rgba(20, 17, 43, .045) 1px, transparent 1px); background-size: 72px 72px; background-position: -1px -1px; -webkit-mask-image: radial-gradient(60% 70% at 30% 0%, #000 0%, transparent 72%); mask-image: radial-gradient(60% 70% at 30% 0%, #000 0%, transparent 72%) }
+.ph::after { content: ""; position: absolute; z-index: -1; pointer-events: none; width: min(880px, 90vw); height: 520px; right: -12%; top: -260px; border-radius: 50%; background: radial-gradient(closest-side, rgba(196, 181, 253, .32), rgba(245, 180, 248, .16) 55%, transparent); filter: blur(30px) }
+.ph-in { padding-block: clamp(56px, 8vw, 104px) clamp(36px, 4.5vw, 56px) }
+.ph-t { font-family: var(--display); font-weight: 600; font-size: clamp(40px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -.048em; margin-top: 18px; max-width: 13.5em; text-wrap: balance }
+.ph .sub { max-width: 56ch; margin-top: 22px }
+
+/* chiffres de l'en-tête : une rangée sobre, séparée par de fines lignes */
+.ph-meta { display: flex; flex-wrap: wrap; margin-top: 40px; color: var(--mute); font-size: 13.5px; border-top: 1px solid var(--line) }
+.ph-meta > span { display: flex; flex-direction: column; gap: 6px; padding: 18px 28px 0 0; margin-right: 28px; border-right: 1px solid var(--line); line-height: 1.3 }
+.ph-meta > span:last-child { border-right: 0; margin-right: 0 }
+.ph-meta b { font-family: var(--mono); font-weight: 500; font-size: 26px; letter-spacing: -.04em; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1 }
+.ph-meta:empty { min-height: 81px } /* rempli en JS : on réserve la place (pas de saut) */
 
 /* titres de section secondaires */
-.sec-h { display: flex; justify-content: space-between; align-items: end; gap: 24px 50px; flex-wrap: wrap }
-.sec-h .sub { margin-top: 14px }
+.sec-h { display: flex; justify-content: space-between; align-items: end; gap: 20px 56px; flex-wrap: wrap }
+.sec-h .sub { margin-top: 14px; max-width: 46ch }
+.sec-h .h2 { font-size: clamp(32px, 3.8vw, 50px) }
 
 /* CTA final : un peu moins haut que sur l'accueil */
-.final.short .wrap { padding-block: clamp(90px, 11vw, 140px) }
-.final.short .h2 { font-size: clamp(42px, 6.6vw, 96px) }
-.page-end { padding-bottom: clamp(70px, 9vw, 110px) }
+.final.short .wrap { padding-block: clamp(80px, 9vw, 120px) }
+.final.short .h2 { font-size: clamp(36px, 5.2vw, 72px) }
+.page-end { padding-bottom: clamp(56px, 7vw, 96px) }
 
 @media (max-width: 560px) {
-  .ph-meta { gap: 10px 20px }
-  .ph-meta b { font-size: 19px }
-  .ph-meta:empty { min-height: 66px }
+  .ph-in { padding-top: 44px }
+  .ph-meta { display: grid; grid-template-columns: 1fr 1fr; margin-top: 30px }
+  .ph-meta > span { padding: 14px 0 14px; margin: 0; border-right: 0; border-bottom: 1px solid var(--line) }
+  .ph-meta > span:nth-child(odd) { border-right: 1px solid var(--line); padding-right: 14px }
+  .ph-meta > span:nth-child(even) { padding-left: 16px }
+  .ph-meta > span:nth-last-child(-n+2) { border-bottom: 0 }
+  .ph-meta b { font-size: 22px }
+  .ph-meta:empty { min-height: 140px }
 }
