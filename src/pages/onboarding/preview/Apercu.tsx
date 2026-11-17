@@ -79,7 +79,7 @@ export function ApercuDesktop({ d, step }: { d: Draft; step: number }) {
 /** Téléphone : bandeau compact sous l'en-tête, qui se déplie pour voir l'app en cours de construction. */
 export function ApercuMobile({ d }: { d: Draft }) {
   const [open, setOpen] = useState(false);
-  const { offer, trade, mode } = useView(d);
+  const { offer, trade } = useView(d);
   return (
     <div className="rounded-[18px] bg-white shadow-[0_0_0_1px_#ececf1,0_8px_24px_-16px_rgba(45,20,90,.25)]">
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="ob-apercu" className="flex min-h-[56px] w-full items-center gap-3 px-3.5 py-2 text-left">
@@ -89,7 +89,7 @@ export function ApercuMobile({ d }: { d: Draft }) {
             Votre Brix <span className="ob-dot-live" aria-hidden />
           </span>
           <span key={`${d.enabled.length}${trade?.key}`} className="ob-rise block truncate text-[12px] text-[#9898a8]">
-            {trade ? trade.name : 'Choisissez un métier'}{mode ? ` · ${mode}` : ''} · {d.enabled.length} outils · {offer.name}
+            {d.enabled.length} outils · {offer.name} · {trade ? trade.name : 'choisissez un métier'}
           </span>
         </span>
         <span className="text-[12px] font-medium text-[#5f5f70]">{open ? 'Masquer' : 'Aperçu'}</span>
