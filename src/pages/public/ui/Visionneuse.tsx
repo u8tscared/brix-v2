@@ -100,7 +100,7 @@ export function PleinEcran({ open, onClose, titre, children, onImprimer }: { ope
           <ScanLine className="h-4 w-4" strokeWidth={1.75} /> Ajuster
         </button>
         {onImprimer && (
-          <button onClick={onImprimer} className="grid h-11 w-11 place-items-center rounded-full transition hover:bg-[#f4f3fa] sm:w-auto sm:gap-2 sm:px-3 sm:text-[13.5px] sm:font-medium" aria-label="Télécharger en PDF">
+          <button onClick={onImprimer} className="inline-flex h-11 min-w-[44px] items-center justify-center gap-2 rounded-full transition hover:bg-[#f4f3fa] sm:px-3 sm:text-[13.5px] sm:font-medium" aria-label="Télécharger en PDF">
             <Download className="h-[18px] w-[18px]" strokeWidth={1.75} />
             <span className="hidden sm:inline">PDF</span>
           </button>
