@@ -136,8 +136,8 @@ export async function demanderAcompte(env: EnvParcours, jeton: string, request: 
   await limiter(env, `acompte:${lien.id}`, 10, 600_000);
   const { vue, interne } = await construireVueDevis(env, lien.organization_id, lien.document_id);
   if (vue.statut !== 'signe' || !vue.signature) throw new ErreurParcours(409, 'non_signe', 'Le devis doit être signé avant le versement de l’acompte.');
-  if (vue.retractation.applicable) {
-    const disponibleLe = vue.signature.signeLe + 7 * JOUR_MS;
+  if (vue.retractation.paiementBloqueJours > 0) {
+    const disponibleLe = vue.signature.signeLe + vue.retractation.paiementBloqueJours * JOUR_MS;
     if (Date.now() < disponibleLe)
       throw new ErreurParcours(409, 'acompte_trop_tot', 'La loi interdit de verser un paiement dans les 7 jours qui suivent la signature d’un contrat conclu hors établissement.', {
         disponibleLe: isoMs(disponibleLe),

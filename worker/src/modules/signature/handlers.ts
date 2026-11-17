@@ -107,7 +107,7 @@ async function finaliser(env: EnvParcours, f: Finalisation) {
     variante_id: f.varianteId,
     version_document: vue.version,
     mentions: JSON.stringify({ consentements: f.consentements, textes: vue.mentions }),
-    hors_etablissement: retractation ? 1 : 0,
+    hors_etablissement: vue.retractation.mode === 'hors_etablissement' ? 1 : 0,
     retractation_fin: retractationFin,
     demarrage_anticipe: f.consentements.demarrageAnticipe ? 1 : 0,
     empreinte_sha256: sha256,
@@ -176,7 +176,7 @@ async function finaliser(env: EnvParcours, f: Finalisation) {
     retractation: retractation ? { fin: retractationFin, demarrageAnticipe: f.consentements.demarrageAnticipe } : null,
     acompte:
       vue.acompte.pourcent > 0
-        ? { pourcent: vue.acompte.pourcent, montant: canonique.acompte.montant, disponibleLe: retractation ? signeLe + 7 * JOUR_MS : signeLe }
+        ? { pourcent: vue.acompte.pourcent, montant: canonique.acompte.montant, disponibleLe: signeLe + vue.retractation.paiementBloqueJours * JOUR_MS }
         : null,
   };
 }

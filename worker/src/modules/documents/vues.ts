@@ -25,7 +25,9 @@ export interface Complements {
   notes?: string;
   message?: string;
   validiteJours?: number;
-  horsEtablissement?: boolean;
+  horsEtablissement?: boolean; // ancien champ, équivaut à modeConclusion = 'hors_etablissement'
+  /** Où le contrat est conclu : en établissement (local de l'artisan), hors établissement (chez le client), à distance (en ligne sans rencontre). */
+  modeConclusion?: 'etablissement' | 'hors_etablissement' | 'distance';
   delaiExecution?: string;
   dateDebutPrevue?: string;
   iban?: string;
@@ -65,6 +67,7 @@ export function nettoyerComplements(v: Record<string, unknown>): Complements {
     message: str(v.message, 2000),
     validiteJours: num(v.validiteJours, 1, 365),
     horsEtablissement: typeof v.horsEtablissement === 'boolean' ? v.horsEtablissement : undefined,
+    modeConclusion: v.modeConclusion === 'etablissement' || v.modeConclusion === 'hors_etablissement' || v.modeConclusion === 'distance' ? v.modeConclusion : undefined,
     delaiExecution: str(v.delaiExecution, 200),
     dateDebutPrevue: str(v.dateDebutPrevue, 40),
     iban: str(v.iban, 40)?.replace(/\s+/g, ''),
@@ -145,8 +148,17 @@ const vueEntreprise = (o: Organisation) => ({
 
 const vueClient = (c: ClientRow | null) => (c ? { nom: c.name, type: c.kind, contact: c.contact, adresse: c.address, ville: c.city } : null);
 
-/** Hors établissement + particulier : droit de rétractation de 14 jours (C. consom. L221-18). */
-export const retractationApplicable = (client: ClientRow | null, c: Complements) => client?.kind !== 'pro' && c.horsEtablissement === true;
+export const modeConclusion = (c: Complements) => c.modeConclusion ?? (c.horsEtablissement ? 'hors_etablissement' : 'etablissement');
+
+/**
+ * Particulier + contrat hors établissement ou à distance : rétractation de 14 jours (C. consom. L221-18).
+ * Hors établissement seulement : aucun paiement avant 7 jours (L221-10).
+ */
+export function regleRetractation(client: ClientRow | null, c: Complements) {
+  const mode = modeConclusion(c);
+  const particulier = client?.kind !== 'pro';
+  return { applicable: particulier && mode !== 'etablissement', jours: 14, mode, paiementBloqueJours: particulier && mode === 'hors_etablissement' ? 7 : 0 };
+}
 
 // ---------- Devis ----------
 
@@ -213,8 +225,8 @@ export async function construireVueDevis(env: EnvParcours, orgId: string, devisI
       acompte: { pourcent: devis.deposit_percent, montant: enEuros(Math.round((enCentimes(varianteSignee.totaux.ttc) * devis.deposit_percent) / 100)) },
       notes: c.notes ?? null,
       message: c.message ?? null,
-      retractation: { applicable: retractationApplicable(client, c), jours: 14 },
-      mentions: mentionsDevis(devis.number, { cgv: !!c.cgv, retractation: retractationApplicable(client, c) }),
+      retractation: regleRetractation(client, c),
+      mentions: mentionsDevis(devis.number, { cgv: !!c.cgv, ...regleRetractation(client, c) }),
       signature,
       refus: refus ? { le: refus.created_at, motif: (JSON.parse(refus.donnees) as { motif?: string }).motif ?? null } : null,
     },

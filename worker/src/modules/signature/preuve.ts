@@ -85,13 +85,13 @@ ${ligne('Mention manuscrite', echapper(p.formule))}
 ${ligne('Signé le (heure de Paris)', echapper(dateFr(p.signeLe)))}
 ${ligne('Proposition acceptée', `${echapper(d.varianteChoisie.titre)} · ${echapper(euros(d.varianteChoisie.totaux.ttc))} TTC`)}
 ${ligne('Authentification', echapper(p.authentification.methode === 'code_sms' ? 'Code à usage unique envoyé par SMS' : p.authentification.methode === 'code_email' ? 'Code à usage unique envoyé par e-mail' : 'Prestataire de signature'))}
-${ligne('Envoyé à', echapper(p.authentification.destinataire ?? '—'))}
+${ligne('Envoyé à', echapper(p.authentification.destinataire ?? 'non renseigné'))}
 ${ligne('Adresse IP', `<code>${echapper(p.contexte.ip)}</code>`)}
 ${ligne('Navigateur', `<code>${echapper(p.contexte.userAgent)}</code>`)}
 ${ligne('Empreinte du document (SHA-256)', `<code>${echapper(p.empreinte)}</code>`)}
 ${ligne('Empreinte du dossier de preuve', `<code>${echapper(scelle.dossierSha256)}</code>`)}
 ${ligne('Sceau Brix', `<code>${echapper(scelle.sceau)}</code>`)}
-${p.retractation.applicable ? ligne('Fin du délai de rétractation', echapper(p.retractation.fin ? dateFr(p.retractation.fin) : '—')) : ''}
+${p.retractation.applicable ? ligne('Fin du délai de rétractation', echapper(p.retractation.fin ? dateFr(p.retractation.fin) : 'non renseigné')) : ''}
 ${p.retractation.applicable ? ligne('Démarrage avant la fin du délai', p.consentements.demarrageAnticipe ? 'Demandé expressément par le client' : 'Non demandé') : ''}
 ${imageDataUrl ? ligne('Signature', `<img alt="Signature de ${echapper(p.signataire.nom)}" src="${imageDataUrl}">`) : ''}
 </table>

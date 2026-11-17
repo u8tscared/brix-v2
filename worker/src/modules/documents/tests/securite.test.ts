@@ -133,6 +133,25 @@ describe('contrat hors établissement (particulier)', () => {
     expect((await appeler(env, 'POST', `/api/p/devis/${jeton}/acompte`, { body: { moyen: 'carte' } })).data.mode).toBe('redirection');
   });
 
+  it('contrat à distance : rétractation de 14 jours mais acompte possible tout de suite', async () => {
+    await appeler(env, 'PUT', '/api/documents/complements/devis/dv1', { token, body: { modeConclusion: 'distance' } });
+    const { jeton } = await lien();
+    const v = await appeler(env, 'GET', `/api/p/devis/${jeton}`);
+    expect(v.data.retractation).toMatchObject({ applicable: true, mode: 'distance', paiementBloqueJours: 0 });
+    expect(v.data.mentions.retractation).toContain('à distance');
+    await appeler(env, 'POST', `/api/p/devis/${jeton}/code`, { body: {} });
+    const s = await appeler(env, 'POST', `/api/p/devis/${jeton}/signer`, { body: corps(code()) });
+    expect(s.data.retractation.demarrageAnticipe).toBe(false);
+    expect((await appeler(env, 'POST', `/api/p/devis/${jeton}/acompte`, { body: { moyen: 'carte' } })).data.mode).toBe('redirection');
+  });
+
+  it('client professionnel : pas de rétractation', async () => {
+    env = creerEnv();
+    ({ token } = await semer(env, { pro: true, horsEtablissement: true }));
+    const { jeton } = await lien();
+    expect((await appeler(env, 'GET', `/api/p/devis/${jeton}`)).data.retractation.applicable).toBe(false);
+  });
+
   it('refuse de modifier un devis signé', async () => {
     const { jeton } = await lien();
     await appeler(env, 'POST', `/api/p/devis/${jeton}/code`, { body: {} });
