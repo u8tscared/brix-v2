@@ -104,13 +104,16 @@ export function TopBar({ notifications }: { notifications?: React.ReactNode }) {
           <span className="font-medium text-ink">Aujourd'hui</span>
         ) : (
           <>
-            {dept && (
-              <span className="flex items-center gap-1.5 text-ink-3">
-                <i className="h-1.5 w-1.5 rounded-full" style={{ background: DEPT_TONE[dept.key].solid }} />
-                {dept.name}
-              </span>
+            {dept && dept.name !== mod.name && (
+              <>
+                <span className="flex items-center gap-1.5 text-ink-3">
+                  <i className="h-1.5 w-1.5 rounded-full" style={{ background: DEPT_TONE[dept.key].solid }} />
+                  {dept.name}
+                </span>
+                <ChevronRight className="h-3.5 w-3.5 text-line2" />
+              </>
             )}
-            <ChevronRight className="h-3.5 w-3.5 text-line2" />
+            {dept && dept.name === mod.name && <i className="h-1.5 w-1.5 rounded-full" style={{ background: DEPT_TONE[dept.key].solid }} />}
             <Link to={`/app/${mod.path}`} className={cn('truncate font-medium transition hover:text-ink', leaf ? 'text-ink-2' : 'text-ink')}>
               {mod.name}
             </Link>
