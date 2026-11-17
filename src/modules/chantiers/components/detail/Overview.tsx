@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, CalendarClock, CloudRain, Phone } from 'lucide-react';
-import { Avatar, Button, Card, CardHeader, Progress, cn, toast } from '@/components/ui';
+import { Activity, AlertTriangle, Camera, CloudRain, FileSignature, Mic, Phone, Send, StickyNote } from 'lucide-react';
+import { GrowBar } from '@/components/motion';
+import { useChantiersLocal } from '../../store';
+import { Avatar, Button, Card, CardHeader, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { ROLE_LABEL } from '@/lib/catalog';
 import { capitalize, dateLong, dateShort, money, relative, todayISO } from '@/lib/format';
@@ -9,11 +11,15 @@ import { hoursOf, lotsOf } from '../../lib/metrics';
 import { forecast, isOutdoor, isRainy } from '../../lib/weather';
 import { WeatherIcon } from '../common/bits';
 
+const FEED_ICON: Record<string, JSX.Element> = { photo: <Camera />, vocal: <Mic />, note: <StickyNote />, rapport: <Send />, avenant: <FileSignature /> };
+
 const dayShort = (iso: string) => capitalize(new Date(iso + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', ''));
 
-export function Overview({ v, missingPhoto }: { v: ChantierView; missingPhoto?: string }) {
+export function Overview({ v, missingPhoto, onOpenJournal }: { v: ChantierView; missingPhoto?: string; onOpenJournal?: () => void }) {
   const navigate = useNavigate();
   const events = useBrix((s) => s.events);
+  const employees = useBrix((s) => s.employees);
+  const journal = useChantiersLocal((s) => s.journal);
   const { ch, m, devis, team } = v;
   const lots = lotsOf(ch, devis);
   const meteo = forecast(5, ch.city);
@@ -33,15 +39,14 @@ export function Overview({ v, missingPhoto }: { v: ChantierView; missingPhoto?: 
     { when: dateShort(ch.endDate), text: 'Fin prévue du chantier et réception' },
   ];
 
-  const hoursRatio = m.plannedHours ? (m.spentHours / m.plannedHours) * 100 : 0;
-  const hoursOver = m.spentHours > (m.plannedHours * ch.progress) / 100 + 2;
+  const feed = journal.filter((j) => j.chantierId === ch.id).sort((a, b) => b.at.localeCompare(a.at)).slice(0, 5);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] [&>*]:min-w-0">
       <div className="space-y-4">
         <Card>
           <CardHeader title="Avancement par lot" meta={devis ? `devis ${devis.number}` : undefined} />
-          <div className="space-y-3.5 p-4">
+          <div className="stagger-fast space-y-4 p-4 md:px-5">
             {lots.map((l) => (
               <div key={l.name}>
                 <div className="mb-1.5 flex items-baseline justify-between gap-3 text-[13px]">
@@ -51,7 +56,7 @@ export function Overview({ v, missingPhoto }: { v: ChantierView; missingPhoto?: 
                     <span className="font-medium text-ink">{l.progress} %</span>
                   </span>
                 </div>
-                <Progress value={l.progress} tone={l.progress === 100 ? 'ok' : 'ink'} />
+                <GrowBar value={l.progress} className="h-2" barClassName={l.progress === 100 ? 'bg-ok' : l.progress > 0 ? 'bg-ink' : ''} />
               </div>
             ))}
           </div>
@@ -72,20 +77,6 @@ export function Overview({ v, missingPhoto }: { v: ChantierView; missingPhoto?: 
                 <div className="mt-0.5 text-xs text-ink-3">{sub}</div>
               </div>
             ))}
-          </div>
-          <div className="border-t border-line p-4">
-            <div className="mb-1.5 flex items-baseline justify-between text-[13px]">
-              <span>Heures passées</span>
-              <span className="num">
-                <span className={cn('font-semibold', hoursOver && 'text-warn')}>{m.spentHours} h</span>
-                <span className="text-ink-3"> sur {m.plannedHours} h prévues</span>
-              </span>
-            </div>
-            <div className="relative">
-              <Progress value={hoursRatio} tone={hoursOver ? 'warn' : 'ink'} />
-              <span className="absolute -top-1 h-3.5 w-0.5 rounded bg-ink-3" style={{ left: `${ch.progress}%` }} title="Avancement réel" />
-            </div>
-            <div className="mt-1.5 text-xs text-ink-3">{hoursOver ? `Plus d'heures que l'avancement ne le justifie (repère à ${ch.progress} %).` : `En ligne avec l'avancement (repère à ${ch.progress} %).`}</div>
           </div>
         </Card>
 
@@ -160,10 +151,24 @@ export function Overview({ v, missingPhoto }: { v: ChantierView; missingPhoto?: 
           ))}
         </Card>
 
-        <Card className="p-4">
-          <div className="flex items-center gap-2 text-[13px] text-ink-2">
-            <CalendarClock className="h-4 w-4" /> Du {dateLong(ch.startDate)} au {dateLong(ch.endDate)}
-          </div>
+        <Card>
+          <CardHeader title="Fil d'activité" action={onOpenJournal && <Button size="sm" variant="ghost" onClick={onOpenJournal}>Tout voir</Button>} />
+          {feed.length === 0 && <p className="p-4 text-[13px] text-ink-3">Les photos, notes et pointages apparaîtront ici.</p>}
+          <ol className="stagger-fast px-4 py-2">
+            {feed.map((j, i) => {
+              const emp = employees.find((e) => e.id === j.author);
+              return (
+                <li key={j.id} className="relative flex gap-3 py-2.5">
+                  {i < feed.length - 1 && <span className="absolute left-[13px] top-10 h-[calc(100%-28px)] w-px bg-line" />}
+                  {emp ? <Avatar initials={emp.initials} color={emp.color} size={27} /> : <span className="grid h-[27px] w-[27px] shrink-0 place-items-center rounded-full bg-sub text-ink-2 [&_svg]:h-3.5 [&_svg]:w-3.5">{FEED_ICON[j.kind] ?? <Activity />}</span>}
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-[13px] leading-snug">{j.text}</p>
+                    <span className="num text-[11.5px] text-ink-3">{capitalize(relative(j.at.slice(0, 10)))} à {j.at.slice(11, 16).replace(':', ' h ')}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         </Card>
       </div>
     </div>

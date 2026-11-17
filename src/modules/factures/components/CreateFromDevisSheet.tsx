@@ -4,6 +4,7 @@ import { Check, ChevronLeft } from 'lucide-react';
 import { Button, EmptyState, Input, Segmented, Sheet, Switch, cn, toast } from '@/components/ui';
 import { dateFull, dayOffset, money, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
+import { AnimatedNumber } from '@/components/motion';
 import type { Devis, Facture } from '@/lib/types';
 import { billedFor, buildAcompte, buildSituation, buildSolde, planSituation, previousProgress } from '../lib/billing';
 import { amounts, round2, type FactureExtra, type SituationLot } from '../lib/model';
@@ -35,7 +36,7 @@ export function CreateFromDevisSheet({ open, onClose, devisId, kind: initialKind
         signed.length === 0 ? (
           <EmptyState title="Aucun devis signé" text="Dès qu’un client signe un devis, vous pourrez le facturer ici en deux clics." />
         ) : (
-          <div className="space-y-2">
+          <div className="stagger-fast space-y-2">
             {signed.map((d) => (
               <DevisPick key={d.id} d={d} onPick={() => setSelected(d.id)} />
             ))}
@@ -68,7 +69,7 @@ function DevisPick({ d, onPick }: { d: Devis; onPick: () => void }) {
   const billed = billedFor(d.id, factures).reduce((sum, f) => sum + amounts(f).ht, 0);
   const pct = ht ? Math.min(100, Math.round((billed / ht) * 100)) : 0;
   return (
-    <button onClick={onPick} className="flex w-full items-center gap-3 rounded-xl border border-line p-3.5 text-left transition hover:border-vi-200 hover:bg-vi-50/40">
+    <button onClick={onPick} className="group flex w-full items-center gap-3 rounded-[14px] bg-white p-3.5 text-left shadow-card transition duration-200 hover:-translate-y-px hover:shadow-raise">
       <div className="min-w-0 flex-1">
         <div className="truncate text-[14px] font-medium">{client?.name}</div>
         <div className="truncate text-[12.5px] text-ink-2">
@@ -168,7 +169,7 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
             Situation n°{prev.index}. Glissez l’avancement <b className="font-medium text-ink">cumulé</b> de chaque lot : Brix facture seulement la différence
             {prev.depositsHt > 0 ? ' et déduit l’acompte au prorata.' : '.'}
           </p>
-          <div className="divide-y divide-line rounded-xl border border-line">
+          <div className="divide-y divide-line rounded-[14px] bg-white shadow-card">
             {lots.map((l, i) => (
               <div key={l.name} className="p-3">
                 <div className="flex items-center justify-between gap-2 text-[13px]">
@@ -200,7 +201,7 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
               <span className="num font-medium">−{money(plan.deductionHt)} HT</span>
             </div>
           )}
-          <label className="flex items-center gap-3 rounded-xl border border-line p-3">
+          <label className="flex items-center gap-3 rounded-[14px] bg-white p-3 shadow-card">
             <div className="min-w-0 flex-1">
               <div className="text-[13.5px] font-medium">Retenue de garantie 5 %</div>
               <div className="text-[12px] text-ink-2">Gardée par le client un an, libérable le {dateFull(release)}. Brix vous le rappellera.</div>
@@ -233,7 +234,7 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
       <div className="flex items-center gap-3 border-t border-line pt-4">
         <div className="min-w-0 flex-1">
           <div className="text-[12px] text-ink-3">Montant de la facture</div>
-          <div className="num text-[20px] font-semibold">{money(previewTtc)} TTC</div>
+          <div className="num text-[24px] font-semibold tracking-[-0.03em]"><AnimatedNumber value={previewTtc} format={(n) => money(n)} duration={400} /> <span className="text-[13px] font-medium text-ink-3">TTC</span></div>
         </div>
         <Button variant="primary" size="lg" icon={<Check className="h-4 w-4" />} onClick={create}>
           Créer le brouillon

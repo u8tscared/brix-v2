@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { BadgeCheck, CreditCard, FileCheck2, PenLine } from 'lucide-react';
+import { BadgeCheck, CreditCard, Expand, FileCheck2, PenLine } from 'lucide-react';
 import { Segmented, cn } from '@/components/ui';
 import { money, totals } from '@/lib/format';
 import type { Client, Company, Devis } from '@/lib/types';
@@ -10,29 +10,27 @@ import { PdfDoc } from './PdfDoc';
 
 type Tab = 'pdf' | 'client' | 'mobile';
 
-/** Document A4 réduit pour tenir dans sa colonne. */
-export function ScaledDoc(props: Parameters<typeof PdfDoc>[0]) {
-  const box = useRef<HTMLDivElement>(null);
-  const doc = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(0.35);
-  const [h, setH] = useState(400);
+/** Pages A4 réduites pour tenir dans leur colonne. Un clic ouvre l'aperçu plein écran. */
+export function ScaledDoc({ onExpand, ...props }: Parameters<typeof PdfDoc>[0] & { onExpand?: () => void }) {
+  const box = useRef<HTMLButtonElement>(null);
+  const [w, setW] = useState(240);
   useLayoutEffect(() => {
-    const ro = new ResizeObserver(() => {
-      if (!box.current || !doc.current) return;
-      const s = box.current.clientWidth / 794;
-      setScale(s);
-      setH(doc.current.offsetHeight * s);
-    });
-    if (box.current) ro.observe(box.current);
-    if (doc.current) ro.observe(doc.current);
+    const el = box.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setW(el.clientWidth));
+    ro.observe(el);
+    setW(el.clientWidth);
     return () => ro.disconnect();
   }, []);
   return (
-    <div ref={box} className="relative w-full overflow-hidden rounded-md bg-white shadow-[0_1px_3px_rgba(20,20,40,.08),0_8px_24px_-12px_rgba(20,20,40,.18)]" style={{ height: h }}>
-      <div ref={doc} className="absolute left-0 top-0 origin-top-left" style={{ transform: `scale(${scale})` }}>
-        <PdfDoc {...props} />
-      </div>
-    </div>
+    <button ref={box} type="button" onClick={onExpand} className="group/doc relative block w-full cursor-zoom-in text-left" aria-label="Ouvrir l’aperçu plein écran">
+      <PdfDoc {...props} scale={w / 794} gap={10} />
+      <span className="pointer-events-none absolute inset-x-0 top-10 flex justify-center opacity-0 transition duration-300 ease-out-quint group-hover/doc:translate-y-0 group-hover/doc:opacity-100 translate-y-1">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-ink/90 px-3 py-1.5 text-[12px] font-medium text-white shadow-pop backdrop-blur">
+          <Expand className="h-3.5 w-3.5" /> Agrandir et vérifier
+        </span>
+      </span>
+    </button>
   );
 }
 
@@ -91,7 +89,7 @@ export function ClientView({ d, client, company, meta, compact }: { d: Devis; cl
   );
 }
 
-export function PreviewPane({ d, client, company, meta, signer, className }: { d: Devis; client?: Client; company: Company; meta: DevisMeta; signer?: string; className?: string }) {
+export function PreviewPane({ d, client, company, meta, signer, className, onExpand }: { d: Devis; client?: Client; company: Company; meta: DevisMeta; signer?: string; className?: string; onExpand?: () => void }) {
   const [tab, setTab] = useState<Tab>('pdf');
   const reduced = totals(d.lines).byVat.some((v) => v.rate < 20) && client?.kind !== 'pro';
   return (
@@ -99,7 +97,7 @@ export function PreviewPane({ d, client, company, meta, signer, className }: { d
       <div className="flex justify-center">
         <Segmented<Tab> size="sm" value={tab} onChange={setTab} options={[{ value: 'pdf', label: 'PDF' }, { value: 'client', label: 'Vue client' }, { value: 'mobile', label: 'Mobile' }]} />
       </div>
-      {tab === 'pdf' && <ScaledDoc d={d} client={client} company={company} signer={signer} />}
+      {tab === 'pdf' && <ScaledDoc d={d} client={client} company={company} signer={signer} onExpand={onExpand} />}
       {tab === 'client' && <ClientView d={d} client={client} company={company} meta={meta} />}
       {tab === 'mobile' && (
         <div className="mx-auto w-[236px] rounded-[30px] border-[7px] border-ink bg-ink shadow-pop">

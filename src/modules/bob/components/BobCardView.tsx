@@ -1,4 +1,5 @@
-import { Check, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { SuccessDot } from '@/components/motion';
 import { Button, Icon, Progress, cn } from '@/components/ui';
 import type { BobCard, BobCardAction } from '../engine';
 
@@ -8,10 +9,10 @@ const toneText: Record<string, string> = { ok: 'text-ok', warn: 'text-warn', bad
 export function BobCardView({ card, done, onAction, onOpen }: { card: BobCard; done?: string; onAction: (a: BobCardAction) => void; onOpen: (to: string) => void }) {
   const actions = (card.actions ?? []).filter((a) => !(done && a.run));
   return (
-    <div className="animate-fade-up overflow-hidden rounded-[14px] border border-line bg-white shadow-[0_1px_2px_rgba(20,20,40,.04)]">
+    <div className="overflow-hidden rounded-[16px] bg-white shadow-raise">
       <div className="flex items-start gap-3 px-4 pb-2 pt-3.5">
         {card.icon && (
-          <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-[9px]', card.kind === 'done' ? 'bg-ok-bg text-ok' : card.kind === 'lesson' ? 'bg-[#eef2ff] text-brand' : 'bg-sub text-ink-2')}>
+          <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-[9px]', card.kind === 'done' ? 'bg-ok-bg text-ok' : card.kind === 'lesson' ? 'bg-[#eef0fd] text-[#3730a3]' : 'bg-vi-50 text-vi-700')}>
             <Icon name={card.icon} className="h-4 w-4" />
           </span>
         )}
@@ -30,7 +31,7 @@ export function BobCardView({ card, done, onAction, onOpen }: { card: BobCard; d
       )}
 
       {card.rows && card.rows.length > 0 && (
-        <div className="mt-1 border-t border-line">
+        <div className="stagger-fast mt-1 border-t border-line">
           {card.rows.map((r, i) => (
             <button
               key={i}
@@ -64,10 +65,10 @@ export function BobCardView({ card, done, onAction, onOpen }: { card: BobCard; d
       {card.source && <div className="px-4 pb-3 text-[11.5px] text-ink-3">Référence : {card.source}</div>}
 
       {(actions.length > 0 || done) && (
-        <div className="flex flex-wrap items-center gap-2 border-t border-line bg-[#fbfbfd] px-3 py-2.5">
+        <div className="flex flex-wrap items-center gap-2 border-t border-line bg-[#fbfaff] px-3 py-2.5">
           {done && (
-            <span className="mr-auto flex items-center gap-1.5 text-[12.5px] font-medium text-ok">
-              <Check className="h-3.5 w-3.5" /> {done}
+            <span className="mr-auto flex items-center gap-2 text-[12.5px] font-medium text-ok">
+              <SuccessDot size={18} /> {done}
             </span>
           )}
           {actions.map((a) => (

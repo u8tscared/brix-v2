@@ -31,7 +31,7 @@ export default function EquipeTab() {
   };
 
   return (
-    <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.2fr_1fr]">
+    <div className="grid gap-5 [&>*]:min-w-0 min-[1700px]:grid-cols-[1.2fr_1fr]">
       <div className="space-y-5">
         <Card>
           <CardHeader title="Personnes" meta={`${employees.length} dans l’équipe`} action={<Button size="sm" variant="ghost" onClick={() => navigate('/app/equipe')}>Gérer l’équipe</Button>} />

@@ -76,10 +76,10 @@ export function demoState(devis: Devis[]) {
 
   if (lefevre) {
     const lignes = besoinsDuDevis(lefevre).map((l, i) => ({ ...l, id: `dpl_demo_${i}` }));
-    const prixDe = (fid: string) =>
-      lignes.map((l) => {
+    const prixDe = (fid: string, sousDelai: number[] = []) =>
+      lignes.map((l, i) => {
         const a = cat.find((x) => x.fournisseurId === fid && (x.reference === l.reference || x.designation.startsWith(l.designation.slice(0, 18))));
-        return { ligneId: l.id, prix: a ? a.prixNet : null };
+        return { ligneId: l.id, prix: a ? a.prixNet : null, ...(sousDelai.includes(i) ? { dispo: 'delai' as const, dispoJours: 2 } : { dispo: 'stock' as const }) };
       });
     demandes.push({
       id: 'dp_demo_1',
@@ -94,8 +94,8 @@ export function demoState(devis: Devis[]) {
       createdAt: at(-1, 8),
       lignes,
       destinataires: [
-        { id: 'dpd_demo_rexel', fournisseurId: 'frn_rexel', token: jeton(), statut: 'repondue', envoyeLe: at(-1, 8), vuLe: at(-1, 9), reponduLe: at(-1, 11), delaiJours: 1, port: 0, prix: prixDe('frn_rexel') },
-        { id: 'dpd_demo_sonepar', fournisseurId: 'frn_sonepar', token: jeton(), statut: 'repondue', envoyeLe: at(-1, 8), vuLe: at(-1, 10), reponduLe: at(0, 8), delaiJours: 2, port: 18, commentaire: 'Différentiels type F en stock à Vaulx, le reste sous 48 h.', prix: prixDe('frn_sonepar') },
+        { id: 'dpd_demo_rexel', fournisseurId: 'frn_rexel', token: jeton(), statut: 'repondue', envoyeLe: at(-1, 8), vuLe: at(-1, 9), reponduLe: at(-1, 11), delaiJours: 1, port: 0, conditions: '30 jours fin de mois', validiteJours: 30, prix: prixDe('frn_rexel', [6]) },
+        { id: 'dpd_demo_sonepar', fournisseurId: 'frn_sonepar', token: jeton(), statut: 'repondue', envoyeLe: at(-1, 8), vuLe: at(-1, 10), reponduLe: at(0, 8), delaiJours: 2, port: 18, commentaire: 'Différentiels type F en stock à Vaulx, le reste sous 48 h.', remise: 3, conditions: '45 jours fin de mois', validiteJours: 15, pieceJointe: { nom: 'Offre Sonepar DP-0001.pdf', taille: 184320 }, prix: prixDe('frn_sonepar', [0, 4, 7]) },
         { id: 'dpd_demo_yesss', fournisseurId: 'frn_yesss', token: jeton(), statut: 'vue', envoyeLe: at(-1, 8), vuLe: at(0, 7), prix: [] },
       ],
       journal: [

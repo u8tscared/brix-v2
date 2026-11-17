@@ -8,8 +8,12 @@ import type { Devis } from '@/lib/types';
 import { transitionAutorisee } from '../../../../worker/src/modules/fournisseurs/cycle-commande';
 import type { LigneImportee } from '../../../../worker/src/modules/fournisseurs/catalogue-import';
 import { demoState } from './demo';
-import { besoinsDuDevis, iso, jeton, prochainNumero } from './helpers';
+import { mailCommande, mailsDemande, signalerCommande, signalerReponse } from './evenements';
+import { besoinsDuDevis, comparatif, iso, jeton, prochainNumero } from './helpers';
 import type { Article, Commande, Demande, Destinataire, Evenement, Fournisseur, JetonIA, LigneDemande, ModeLivraison, StatutCommande } from './types';
+
+/** Ce que le fournisseur envoie (portail, API ou saisie par l'artisan). */
+export type ReponseFournisseur = Pick<Destinataire, 'prix' | 'port' | 'delaiJours' | 'commentaire' | 'remise' | 'conditions' | 'validiteJours' | 'pieceJointe'>;
 
 export interface AchatsState {
   init: boolean;
@@ -32,13 +36,15 @@ export interface AchatsState {
   annulerDemande: (demandeId: string) => void;
   simulerReponses: (demandeId: string) => number;
   marquerVu: (token: string) => void;
-  repondre: (token: string, r: { prix: Destinataire['prix']; port?: number; delaiJours?: number; commentaire?: string }, acteur?: Evenement['acteur']) => void;
+  repondre: (token: string, r: ReponseFournisseur, acteur?: Evenement['acteur']) => void;
   decliner: (token: string, motif?: string) => void;
   commanderDepuisDemande: (demandeId: string, repartition: { destinataireId: string; ligneIds: string[]; port: number }[]) => string[];
 
   creerCommande: (p: { fournisseurId: string; lignes: Omit<Commande['lignes'][number], 'id' | 'quantiteLivree'>[]; devisId?: string; chantierId?: string; adresse?: string; livraisonPrevue?: string; mode?: ModeLivraison; port?: number; message?: string }) => string;
   envoyerCommande: (id: string) => void;
   majStatutCommande: (idOuToken: string, statut: StatutCommande, extra?: { referenceFournisseur?: string; livraisonPrevue?: string; suivi?: string }, acteur?: Evenement['acteur']) => { ok: boolean; message?: string };
+  proposerModification: (token: string, texte: string, livraison?: string) => void;
+  marquerPreparee: (token: string) => void;
   reception: (id: string, recu: { ligneId: string; quantite: number }[]) => void;
   lierFacture: (id: string, montantHt: number) => { ecart: number; alerte: boolean };
 
@@ -135,12 +141,16 @@ export const useAchats = create<AchatsState>()(
             journal: [evt('Demande créée', 'artisan'), ...p.fournisseurIds.map((fid) => evt(`Envoyée à ${nom(fid)}`))],
           };
           set((s) => ({ demandes: [d, ...s.demandes] }));
+          mailsDemande(d, get().fournisseurs);
           return id;
         },
         relancer: (id) => {
           const d = get().demandes.find((x) => x.id === id);
           const cibles = d?.destinataires.filter((x) => x.statut === 'envoyee' || x.statut === 'vue') ?? [];
-          if (cibles.length) majDemande(id, (dd) => ({ ...dd, journal: [...cibles.map((c) => evt(`Relance envoyée à ${nom(c.fournisseurId)}`)), ...dd.journal] }));
+          if (cibles.length) {
+            majDemande(id, (dd) => ({ ...dd, journal: [...cibles.map((c) => evt(`Relance envoyée à ${nom(c.fournisseurId)}`)), ...dd.journal] }));
+            mailsDemande(d!, get().fournisseurs, cibles);
+          }
           return cibles.length;
         },
         annulerDemande: (id) => majDemande(id, (d) => ({ ...d, statut: 'annulee', journal: [evt('Demande annulée', 'artisan'), ...d.journal] })),
@@ -155,9 +165,9 @@ export const useAchats = create<AchatsState>()(
             const prix = d.lignes.map((l) => {
               const connu = cat.find((a) => a.fournisseurId === dest.fournisseurId && (a.reference === l.reference || a.designation === l.designation));
               const base = connu?.prixNet ?? (l.prixCible ? l.prixCible * coef : 10);
-              return { ligneId: l.id, prix: Math.round(base * (connu ? 1 : 1) * 100) / 100 };
+              return { ligneId: l.id, prix: Math.round(base * 100) / 100, dispo: i % 2 ? ('delai' as const) : ('stock' as const), dispoJours: i % 2 ? 1 + i : undefined };
             });
-            get().repondre(dest.token, { prix, port: i === 0 ? 0 : 15 + i * 5, delaiJours: 1 + i }, 'fournisseur');
+            get().repondre(dest.token, { prix, port: i === 0 ? 0 : 15 + i * 5, delaiJours: 1 + i, conditions: '30 jours fin de mois', validiteJours: 30 }, 'fournisseur');
             n++;
           });
           return n;
@@ -177,12 +187,20 @@ export const useAchats = create<AchatsState>()(
           majDemande(r.d.id, (d) => {
             const next: Demande = {
               ...d,
-              destinataires: d.destinataires.map((x) => (x.id === r.dest.id ? { ...x, statut: 'repondue', reponduLe: iso(), prix: rep.prix, port: rep.port, delaiJours: rep.delaiJours, commentaire: rep.commentaire } : x)),
+              destinataires: d.destinataires.map((x) => (x.id === r.dest.id ? { ...x, ...rep, statut: 'repondue', reponduLe: iso() } : x)),
               journal: [evt(`${nom(r.dest.fournisseurId)} a répondu (${rep.prix.filter((p) => p.prix != null).length}/${d.lignes.length} articles)`, acteur), ...d.journal],
             };
             return { ...next, statut: statutDemande(next) };
           });
           enrichirCatalogue(r.dest.fournisseurId, r.d.lignes, rep.prix);
+          if (acteur === 'fournisseur') {
+            const d = get().demandes.find((x) => x.id === r.d.id)!;
+            const comp = comparatif(d, get().fournisseurs);
+            const mien = comp.totaux.find((t) => t.destinataire_id === r.dest.id);
+            const montant = (mien?.total_cents ?? 0) / 100;
+            const meilleur = !!mien && comp.totaux.filter((t) => t.complet === mien.complet).every((t) => t.total_cents >= mien.total_cents);
+            signalerReponse(d, d.destinataires.find((x) => x.id === r.dest.id)!, get().fournisseurs.find((f) => f.id === r.dest.fournisseurId), montant, meilleur);
+          }
         },
         decliner: (token, motif) => {
           const r = parToken(token);
@@ -242,8 +260,13 @@ export const useAchats = create<AchatsState>()(
           set((s) => ({ commandes: [c, ...s.commandes] }));
           return id;
         },
-        envoyerCommande: (id) =>
-          majCommande(id, (c) => (c.statut !== 'brouillon' ? c : { ...c, statut: 'envoyee', token: jeton(), journal: [evt(`Envoyée à ${nom(c.fournisseurId)} (e-mail + bon EDI joint)`), ...c.journal] })),
+        envoyerCommande: (id) => {
+          const avant = get().commandes.find((c) => c.id === id);
+          if (!avant || avant.statut !== 'brouillon') return;
+          majCommande(id, (c) => ({ ...c, statut: 'envoyee', token: jeton(), journal: [evt(`Envoyée à ${nom(c.fournisseurId)} (e-mail + bon EDI joint)`), ...c.journal] }));
+          const c = get().commandes.find((x) => x.id === id)!;
+          mailCommande(c, get().fournisseurs.find((f) => f.id === c.fournisseurId));
+        },
         majStatutCommande: (idOuToken, statut, extra = {}, acteur = 'artisan') => {
           const c = get().commandes.find((x) => x.id === idOuToken || x.token === idOuToken);
           if (!c) return { ok: false, message: 'Commande introuvable' };
@@ -262,9 +285,25 @@ export const useAchats = create<AchatsState>()(
             livraisonPrevue: extra.livraisonPrevue ?? cc.livraisonPrevue,
             suivi: extra.suivi ?? cc.suivi,
             lignes: statut === 'livree' ? cc.lignes.map((l) => ({ ...l, quantiteLivree: Math.max(l.quantiteLivree, l.quantite) })) : cc.lignes,
+            proposition: statut === 'confirmee' ? undefined : cc.proposition,
             journal: [evt(textes[statut] ?? statut, acteur), ...cc.journal],
           }));
+          if (acteur === 'fournisseur' && (statut === 'confirmee' || statut === 'expediee' || statut === 'livree')) {
+            signalerCommande(get().commandes.find((x) => x.id === c.id)!, get().fournisseurs.find((f) => f.id === c.fournisseurId), statut);
+          }
           return { ok: true };
+        },
+        proposerModification: (token, texte, livraison) => {
+          const c = get().commandes.find((x) => x.token === token);
+          if (!c || !texte.trim()) return;
+          majCommande(c.id, (cc) => ({ ...cc, proposition: { texte: texte.trim(), at: iso(), livraison }, journal: [evt(`${nom(cc.fournisseurId)} propose une modification : ${texte.trim()}`, 'fournisseur'), ...cc.journal] }));
+          signalerCommande(get().commandes.find((x) => x.id === c.id)!, get().fournisseurs.find((f) => f.id === c.fournisseurId), 'modification');
+        },
+        marquerPreparee: (token) => {
+          const c = get().commandes.find((x) => x.token === token);
+          if (!c || c.prepareeLe || c.statut !== 'confirmee') return;
+          majCommande(c.id, (cc) => ({ ...cc, prepareeLe: iso(), journal: [evt(`Préparée par ${nom(cc.fournisseurId)}, prête à partir`, 'fournisseur'), ...cc.journal] }));
+          signalerCommande(get().commandes.find((x) => x.id === c.id)!, get().fournisseurs.find((f) => f.id === c.fournisseurId), 'preparee');
         },
         reception: (id, recu) =>
           majCommande(id, (c) => {

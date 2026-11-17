@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown, Copy, Phone, Volume2 } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, Field, Icon, Input, PageHeader, Select, Switch, Textarea, cn, toast } from '@/components/ui';
+import { AnimatedNumber, LiveDot, SuccessDot } from '@/components/motion';
+import { Badge, Button, Card, CardHeader, Field, Icon, IconTile, Input, PageHeader, Select, Switch, Textarea, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { todayISO, uid } from '@/lib/format';
 import { useBobLocal } from './store';
-import { BOB_LINE, DEMO_CALLS, type MissedCall } from './secretaryData';
+import { BOB_LINE, callsFor, type MissedCall } from './secretaryData';
 import { speak } from './useSpeech';
 import { BobNav } from './components/BobNav';
 import { Toggle } from './components/SettingToggle';
@@ -18,7 +19,11 @@ const URG: Record<MissedCall['urgency'], { label: string; tone: 'bad' | 'neutral
 export default function Secretaire() {
   const { secretary: sec, setSecretary, callsDone, markCall } = useBobLocal();
   const upsertLead = useBrix((s) => s.upsertLead);
-  const [open, setOpen] = useState<string | null>(DEMO_CALLS[0].id);
+  const trade = useBrix((s) => s.company.trade);
+  const company = useBrix((s) => s.company.name);
+  const boss = useBrix((s) => s.user.firstName);
+  const DEMO_CALLS = useMemo(() => callsFor(trade, company, boss), [trade, company, boss]);
+  const [open, setOpen] = useState<string | null>('call1');
   const [leads, setLeads] = useState<Record<string, boolean>>({});
   const todo = DEMO_CALLS.filter((c) => c.urgency !== 'info' && !callsDone[c.id]).length;
   const forwardCode = `**61*${BOB_LINE.replace(/\s/g, '')}**${sec.forwardAfter * 5}#`;
@@ -32,15 +37,26 @@ export default function Secretaire() {
 
   return (
     <div className="space-y-6">
-      <PageHeader kicker="Bob" title="Secrétaire téléphonique" subtitle="Quand tu ne peux pas décrocher, Bob répond, comprend la demande et prend les rendez-vous." />
+      <PageHeader
+        icon={<IconTile name="PhoneCall" dept="bob" size="lg" solid />}
+        kicker="Bob"
+        title="Secrétaire téléphonique"
+        subtitle="Quand tu ne peux pas décrocher, Bob répond, comprend la demande et prend les rendez-vous."
+        actions={
+          <span className={cn('inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium shadow-card', sec.enabled ? 'bg-white text-ink' : 'bg-sub text-ink-3')}>
+            {sec.enabled ? <LiveDot /> : <span className="h-2 w-2 rounded-full bg-ink-3" />}
+            {sec.enabled ? <>Bob décroche au <span className="num">{BOB_LINE}</span></> : 'Secrétaire coupée'}
+          </span>
+        }
+      />
       <BobNav />
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-5">
           <Card className="grid grid-cols-3 divide-x divide-line">
-            <Kpi label="Appels traités" value="23" sub="ce mois" />
-            <Kpi label="Rendez-vous pris" value="7" sub="sans toi" />
-            <Kpi label="À rappeler" value={String(todo)} sub="maintenant" strong={todo > 0} />
+            <Kpi label="Appels traités" value={23} sub="ce mois" />
+            <Kpi label="Rendez-vous pris" value={7} sub="sans toi" />
+            <Kpi label="À rappeler" value={todo} sub={todo ? 'maintenant' : 'tout est fait'} strong={todo > 0} />
           </Card>
 
           <Card>
@@ -51,8 +67,9 @@ export default function Secretaire() {
               return (
                 <div key={c.id} className="border-b border-line last:border-b-0">
                   <button onClick={() => setOpen(isOpen ? null : c.id)} className="flex w-full items-start gap-3 px-4 py-3.5 text-left hover:bg-[#fafafc]">
-                    <span className={cn('mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full', c.urgency === 'urgent' ? 'bg-bad-bg text-bad' : 'bg-sub text-ink-2')}>
-                      <Phone className="h-4 w-4" />
+                    <span className={cn('relative mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors', done ? 'bg-ok-bg text-ok' : c.urgency === 'urgent' ? 'bg-bad-bg text-bad' : 'bg-sub text-ink-2')}>
+                      {done ? <SuccessDot size={20} /> : <Phone className="h-4 w-4" strokeWidth={1.75} />}
+                      {!done && c.urgency === 'urgent' && <span className="absolute inset-0 animate-ping2 rounded-full ring-2 ring-[#ef444466]" aria-hidden />}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
@@ -75,6 +92,7 @@ export default function Secretaire() {
                       <div className="rounded-[12px] bg-sub p-3">
                         <div className="mb-2 text-[11.5px] font-medium text-ink-3">Transcription · {c.duration}</div>
                         <div className="space-y-2">
+                          <div className="stagger-fast space-y-2">
                           {c.transcript.map((t, i) => (
                             <div key={i} className={cn('flex', t.who === 'client' && 'justify-end')}>
                               <div className={cn('max-w-[88%] rounded-[12px] px-3 py-2 text-[13px] leading-snug', t.who === 'bob' ? 'bg-white text-ink' : 'bg-ink text-white')}>
@@ -82,6 +100,7 @@ export default function Secretaire() {
                               </div>
                             </div>
                           ))}
+                        </div>
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -91,7 +110,7 @@ export default function Secretaire() {
                           </a>
                         )}
                         {c.lead && <Button disabled={leads[c.id]} onClick={() => createLead(c)}>{leads[c.id] ? 'Demande créée' : 'Créer la demande'}</Button>}
-                        <Button variant="ghost" onClick={() => markCall(c.id, !done)}>{done ? 'Remettre à traiter' : 'Marquer comme traité'}</Button>
+                        <Button variant="ghost" onClick={() => { markCall(c.id, !done); if (!done) toast('Appel traité.', 'ok', { label: 'Annuler', run: () => markCall(c.id, false) }); }}>{done ? 'Remettre à traiter' : 'Marquer comme traité'}</Button>
                       </div>
                     </div>
                   )}
@@ -165,11 +184,11 @@ export default function Secretaire() {
   );
 }
 
-function Kpi({ label, value, sub, strong }: { label: string; value: string; sub: string; strong?: boolean }) {
+function Kpi({ label, value, sub, strong }: { label: string; value: number; sub: string; strong?: boolean }) {
   return (
     <div className="p-4">
       <div className="text-[12px] font-medium text-ink-2">{label}</div>
-      <div className={cn('num mt-1 font-display text-[24px] font-semibold leading-none', strong && 'dawn-text')}>{value}</div>
+      <div className={cn('num mt-1 font-display text-[24px] font-semibold leading-none', strong && 'dawn-text')}><AnimatedNumber value={value} /></div>
       <div className="mt-1 text-[11.5px] text-ink-3">{sub}</div>
     </div>
   );

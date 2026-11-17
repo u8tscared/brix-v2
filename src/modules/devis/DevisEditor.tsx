@@ -1,25 +1,32 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Copy, Download, FileText, History, Layers, Mic, Plus, Trash2 } from 'lucide-react';
-import { Button, EmptyState, Segmented, Sheet, cn } from '@/components/ui';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Copy, Expand, FileText, History, Layers, Mic, Plus, Printer, Receipt, Trash2 } from 'lucide-react';
+import { Badge, Button, EmptyState, Segmented, Sheet, cn, toast } from '@/components/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { todayISO, totals } from '@/lib/format';
+import { DEVIS_STATUS } from '@/lib/status';
 import { useBrix } from '@/lib/store';
 import type { Devis, DevisLigne } from '@/lib/types';
-import { BobColumn, SuggestionCard, useBobSuggestions, type BobMsg } from './components/BobColumn';
+import { checkDevis, checkScore, type FixTarget } from './checks';
+import { BobColumn, useBobSuggestions, type BobMsg } from './components/BobColumn';
 import { useSavedFlash, type MenuItem } from './components/bits';
 import { DemoStrip } from './components/DemoStrip';
+import { printDoc } from './components/doc/print';
 import { HeaderFields } from './components/HeaderFields';
 import { HistoryList } from './components/HistoryList';
 import type { LineHandlers } from './components/LineRow';
 import { LineSheet } from './components/LineSheet';
 import { LotBlock, type LotHandlers } from './components/LotBlock';
+import { MobileBobCard } from './components/MobileBobCard';
 import { MobileSummary } from './components/MobileSummary';
+import { devisDoc } from './components/PdfDoc';
 import { PreviewPane } from './components/PreviewPane';
 import { SendSheet } from './components/SendSheet';
-import { PrintPortal, TopBar } from './components/TopBar';
+import { TopBar } from './components/TopBar';
 import { MobileTotals, TotalsBar } from './components/TotalsBar';
+import { DocViewer } from './components/viewer/DocViewer';
 import { VoiceDictation } from './components/VoiceDictation';
+import { flashField, useEditorFocus } from './focus';
 import type { LibTrade } from './library';
 import { duplicateLine, duplicateLot, groupLots, insertGrouped, insertInLot, lotName, mainVat, moveBefore, moveLine, moveLot, newSection, removeLine, removeLot, renumber } from './logic';
 import { useDevisMeta, useMeta } from './store';
@@ -67,12 +74,12 @@ function Editor({ d }: { d: Devis }) {
   const tablet = useMediaQuery('(min-width: 768px)');
   const phone = !tablet;
 
+  const [params, setParams] = useSearchParams();
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [editLine, setEditLine] = useState<string | null>(null);
   const [voice, setVoice] = useState(false);
   const [send, setSend] = useState(false);
-  const [previewSheet, setPreviewSheet] = useState(false);
-  const [previewCol, setPreviewCol] = useState(true);
+  const [viewer, setViewer] = useState(params.get('apercu') === '1');
   const [tab, setTab] = useState<'devis' | 'apercu' | 'bob'>('devis');
   const [bobSheet, setBobSheet] = useState(false);
   const [historySheet, setHistorySheet] = useState(false);
@@ -104,6 +111,9 @@ function Editor({ d }: { d: Devis }) {
   const vat = mainVat(d.lines, company.defaultVat);
   const suggestions = useBobSuggestions(d, client, company);
   const signer = `${user.firstName} ${user.lastName}`.trim();
+  const spec = useMemo(() => devisDoc({ d, client, company, signer }), [d, client, company, signer]);
+  const checks = useMemo(() => checkDevis(d, client, company), [d, client, company]);
+  const score = checkScore(checks);
 
   const lh: LineHandlers = {
     onChange: (lid, p) => setLines((ls) => ls.map((l) => (l.id === lid ? { ...l, ...p } : l))),
@@ -123,31 +133,64 @@ function Editor({ d }: { d: Devis }) {
   };
   const addLot = () => setLines((ls) => renumber([...ls, newSection('Nouveau lot')]));
 
-  const openSend = () => setSend(true);
-  const mainLabel = d.status === 'brouillon' ? 'Envoyer pour signature' : d.status === 'signe' ? 'Convertir en facture' : 'Renvoyer';
+  const openSend = () => {
+    setViewer(false);
+    setSend(true);
+  };
+  const mainLabel = d.status === 'brouillon' ? 'Envoyer' : d.status === 'signe' ? 'Facturer' : 'Renvoyer';
   const onMain = d.status === 'signe' ? actions.convert : openSend;
-  const print = () => setTimeout(() => window.print(), 50);
+  const print = () => {
+    toast('Choisissez « Enregistrer au format PDF » pour le télécharger', 'info');
+    printDoc(spec, `Devis ${d.number}`);
+  };
+
+  // Ouverture directe depuis la liste : ?apercu=1 ou ?envoyer=1
+  useEffect(() => {
+    if (params.get('envoyer') === '1') setSend(true);
+    if (params.has('apercu') || params.has('envoyer')) setParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Correction demandée depuis la vérification : on amène l'artisan au bon champ.
+  const fix = (target: FixTarget) => {
+    if (target === 'company') return navigate('/app/reglages');
+    if (phone && target === 'deposit') return setSummary(true);
+    if (!desktop && tablet) setTab('devis');
+    setTimeout(() => {
+      if (target === 'client') useEditorFocus.getState().request('client');
+      else if (target === 'lines') flashField('lines');
+      else flashField(target);
+    }, 80);
+  };
 
   const menu: MenuItem[] = [
-    { label: 'Dupliquer', icon: <Copy />, onClick: actions.duplicate },
-    { label: 'Convertir en facture', icon: <FileText />, onClick: actions.convert },
-    { label: 'Télécharger le PDF', icon: <Download />, onClick: print, hint: 'Ctrl P' },
-    { label: 'Historique', icon: <History />, onClick: () => setHistorySheet(true) },
+    { label: 'Aperçu plein écran', icon: <Expand />, onClick: () => setViewer(true), hint: 'P' },
+    { label: 'Imprimer ou télécharger', icon: <Printer />, onClick: print, hint: 'Ctrl P' },
     { label: 'Dicter des lignes', icon: <Mic />, onClick: () => setVoice(true) },
+    { label: 'Dupliquer', icon: <Copy />, onClick: actions.duplicate, divider: true },
+    { label: 'Convertir en facture', icon: <Receipt />, onClick: actions.convert },
+    { label: 'Historique', icon: <History />, onClick: () => setHistorySheet(true) },
     ...(d.status === 'envoye' || d.status === 'vu' ? [{ label: 'Simuler : le client ouvre', icon: <Layers />, onClick: actions.simulateOpen, divider: true }, { label: 'Simuler : le client signe', icon: <Layers />, onClick: actions.simulateSign }] : []),
     { label: 'Supprimer le devis', icon: <Trash2 />, onClick: actions.remove, danger: true, divider: true },
   ];
 
-  // Raccourcis : « / » cherche un prix, Ctrl+Entrée envoie
+  // Raccourcis : « / » cherche un prix, P ouvre l'aperçu, Ctrl+P imprime, Ctrl+Entrée envoie
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
+      if (document.querySelector('[role="dialog"]')) return;
       const tg = e.target as HTMLElement;
-      const typing = /input|textarea|select/i.test(tg.tagName);
+      const typing = /input|textarea|select/i.test(tg.tagName) || tg.isContentEditable;
+      const mod = e.metaKey || e.ctrlKey;
       if (e.key === '/' && !typing) {
         e.preventDefault();
         firstSearch.current?.focus();
-      }
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      } else if (e.key.toLowerCase() === 'p' && mod) {
+        e.preventDefault();
+        print();
+      } else if (e.key.toLowerCase() === 'p' && !typing && !e.altKey) {
+        e.preventDefault();
+        setViewer(true);
+      } else if (e.key === 'Enter' && mod) {
         e.preventDefault();
         onMain();
       }
@@ -158,29 +201,38 @@ function Editor({ d }: { d: Devis }) {
 
   const lastLotId = [...lots].reverse().find((l) => l.section)?.section?.id;
   const editor = (
-    <div className={cn('mx-auto w-full max-w-[920px] space-y-5', phone ? 'px-4 pb-28 pt-4' : 'px-5 py-5 xl:px-6')}>
+    <div className={cn('mx-auto w-full max-w-[920px] space-y-5', phone ? 'px-4 pb-[150px] pt-4' : 'px-5 py-6 xl:px-8')}>
       <HeaderFields d={d} client={client} update={update} phone={phone || edW < 700} />
       <DemoStrip d={d} onOpen={actions.simulateOpen} onSign={actions.simulateSign} onConvert={actions.convert} />
       {phone && suggestions.length > 0 && (
-        <MobileBobCard count={suggestions.length} first={suggestions[0]} onApplyFirst={() => {
-          const s = suggestions[0];
-          if (!s.action) return;
-          update(s.action.apply(d));
-          useDevisMeta.getState().log(d.id, s.action.done, 'bob');
-        }} onDismissFirst={() => useDevisMeta.getState().dismiss(d.id, suggestions[0].key)} onAll={() => setBobSheet(true)} />
+        <MobileBobCard
+          count={suggestions.length}
+          first={suggestions[0]}
+          onApplyFirst={() => {
+            const s = suggestions[0];
+            if (!s.action) return;
+            update(s.action.apply(d));
+            useDevisMeta.getState().log(d.id, s.action.done, 'bob');
+          }}
+          onDismissFirst={() => useDevisMeta.getState().dismiss(d.id, suggestions[0].key)}
+          onAll={() => setBobSheet(true)}
+        />
       )}
-      <div className={cn(phone ? 'space-y-3' : 'space-y-1')}>
+      <div data-field="lines" className={cn('rounded-[14px]', phone ? 'space-y-3' : 'space-y-2')}>
         {lots.map((lot, i) => (
           <LotBlock
             key={lot.section?.id ?? 'nolot'}
             lot={lot}
             index={lots.filter((x, j) => x.section && j < i).length}
             collapsed={!!lot.section && collapsed.has(lot.section.id)}
-            onToggle={() => lot.section && setCollapsed((c) => {
-              const n = new Set(c);
-              n.has(lot.section!.id) ? n.delete(lot.section!.id) : n.add(lot.section!.id);
-              return n;
-            })}
+            onToggle={() =>
+              lot.section &&
+              setCollapsed((c) => {
+                const n = new Set(c);
+                n.has(lot.section!.id) ? n.delete(lot.section!.id) : n.add(lot.section!.id);
+                return n;
+              })
+            }
             vatRate={vat}
             h={lh}
             lh={lotH}
@@ -193,17 +245,17 @@ function Editor({ d }: { d: Devis }) {
         <Button variant="secondary" size={phone ? 'lg' : 'sm'} icon={<Plus className="h-4 w-4" />} onClick={addLot}>
           Ajouter un lot
         </Button>
-        <Button variant={phone ? 'primary' : 'ghost'} size={phone ? 'lg' : 'sm'} icon={<Mic className="h-4 w-4" />} onClick={() => setVoice(true)}>
+        <Button variant={phone ? 'secondary' : 'ghost'} size={phone ? 'lg' : 'sm'} icon={<Mic className="h-4 w-4" />} onClick={() => setVoice(true)}>
           {phone ? 'Dicter' : 'Dicter des lignes à Bob'}
         </Button>
       </div>
       {(d.aides ?? []).length > 0 && (
-        <div className="rounded-xl border border-line bg-white px-4 py-3 text-[13px]">
+        <div className="rounded-[14px] bg-white px-4 py-3 text-[13px] shadow-card">
           <div className="mb-1 text-[12px] font-medium text-ink-3">Aides affichées sur le devis</div>
           {(d.aides ?? []).map((a, i) => (
             <div key={a.label} className="flex items-center justify-between gap-3 py-1">
               <span className="min-w-0 truncate">{a.label}</span>
-              <button className="shrink-0 text-[12px] text-ink-3 hover:text-bad" onClick={() => update({ aides: (d.aides ?? []).filter((_, j) => j !== i) })}>
+              <button className="h-9 shrink-0 text-[12px] text-ink-3 hover:text-bad" onClick={() => update({ aides: (d.aides ?? []).filter((_, j) => j !== i) })}>
                 Retirer
               </button>
             </div>
@@ -213,23 +265,13 @@ function Editor({ d }: { d: Devis }) {
     </div>
   );
 
-  const preview = <PreviewPane d={d} client={client} company={company} meta={meta} signer={signer} />;
+  const preview = <PreviewPane d={d} client={client} company={company} meta={meta} signer={signer} onExpand={() => setViewer(true)} />;
   const bob = <BobColumn d={d} client={client} company={company} update={update} onVoice={() => setVoice(true)} messages={messages} setMessages={setMessages} className="h-full" />;
-  const showPreviewCol = desktop && (wide ? previewCol : !previewCol);
+  const st = DEVIS_STATUS[d.status];
 
   return (
     <div className={cn(tablet && 'flex h-dvh flex-col')}>
-      <TopBar
-        d={d}
-        saving={saving}
-        menu={menu}
-        phone={phone}
-        onBack={() => navigate('/app/devis')}
-        previewActive={desktop ? showPreviewCol : tab === 'apercu'}
-        onPreview={() => (phone ? setPreviewSheet(true) : desktop ? setPreviewCol((v) => !v) : setTab(tab === 'apercu' ? 'devis' : 'apercu'))}
-        onMain={onMain}
-        mainLabel={mainLabel}
-      />
+      <TopBar d={d} saving={saving} menu={menu} phone={phone} onBack={() => navigate('/app/devis')} onPreview={() => setViewer(true)} onMain={onMain} mainLabel={mainLabel} mainIcon={d.status === 'signe' ? <Receipt className="h-3.5 w-3.5" /> : undefined} checks={score} />
       {tablet && !desktop && (
         <div className="flex shrink-0 justify-center border-b border-line bg-white py-2">
           <Segmented value={tab} onChange={setTab} options={[{ value: 'devis', label: 'Devis' }, { value: 'apercu', label: 'Aperçu' }, { value: 'bob', label: 'Bob', count: suggestions.length || undefined }]} />
@@ -238,18 +280,18 @@ function Editor({ d }: { d: Devis }) {
       {phone ? (
         <>
           {editor}
-          <MobileTotals t={t} onSend={onMain} sendLabel={d.status === 'signe' ? 'Facturer' : d.status === 'brouillon' ? 'Envoyer' : 'Renvoyer'} onDetails={() => setSummary(true)} />
+          <MobileTotals t={t} onSend={onMain} sendLabel={mainLabel} onDetails={() => setSummary(true)} onVoice={() => setVoice(true)} />
         </>
       ) : (
         <div className="flex min-h-0 flex-1">
           {(desktop || tab === 'devis') && (
-            <section ref={edRef} className="flex min-w-0 flex-1 flex-col bg-white">
+            <section ref={edRef} className="flex min-w-0 flex-1 flex-col bg-page">
               <div className="min-h-0 flex-1 overflow-y-auto">{editor}</div>
               <TotalsBar d={d} t={t} update={update} />
             </section>
           )}
-          {(showPreviewCol || (!desktop && tab === 'apercu')) && (
-            <aside className={cn('min-h-0 overflow-y-auto border-l border-line bg-[#fafafc] px-4 py-5', desktop ? 'w-[264px] shrink-0 2xl:w-[300px]' : 'flex-1')}>
+          {((desktop && wide) || (!desktop && tab === 'apercu')) && (
+            <aside className={cn('min-h-0 overflow-y-auto border-l border-line bg-[#f4f3f8] px-4 py-5', desktop ? 'w-[268px] shrink-0 2xl:w-[300px]' : 'flex-1')}>
               <div className={cn(!desktop && 'mx-auto max-w-[520px]')}>{preview}</div>
             </aside>
           )}
@@ -257,6 +299,21 @@ function Editor({ d }: { d: Devis }) {
         </div>
       )}
 
+      <DocViewer
+        open={viewer}
+        onClose={() => setViewer(false)}
+        spec={spec}
+        kind="Devis"
+        reference={d.number}
+        subtitle={[client?.name, d.title].filter(Boolean).join(' · ')}
+        status={<Badge tone={st.tone}>{st.label}</Badge>}
+        checks={d.status === 'signe' ? undefined : checks}
+        onFix={fix}
+        onEdit={() => undefined}
+        editLabel="Modifier"
+        onSend={d.status === 'signe' ? undefined : openSend}
+        sendLabel={d.status === 'brouillon' ? 'Envoyer' : 'Renvoyer'}
+      />
       <LineSheet line={d.lines.find((l) => l.id === editLine)} onClose={() => setEditLine(null)} h={lh} />
       <VoiceDictation
         open={voice}
@@ -286,40 +343,26 @@ function Editor({ d }: { d: Devis }) {
         company={company}
         user={user}
         meta={meta}
+        checks={checks}
+        spec={spec}
         onPatchMeta={actions.patchMeta}
-        onPickClient={() => setSend(false)}
-        onSend={async (o) => {
-          await actions.send(o);
+        onPickClient={() => {
           setSend(false);
+          setTimeout(() => useEditorFocus.getState().request('client'), 260);
         }}
+        onPreview={() => {
+          setSend(false);
+          setViewer(true);
+        }}
+        onSend={actions.send}
       />
-      <Sheet open={previewSheet} onClose={() => setPreviewSheet(false)} title="Aperçu" subtitle={`${d.number} · ce que reçoit le client`}>
-        {preview}
-      </Sheet>
-      <Sheet open={bobSheet} onClose={() => setBobSheet(false)} title="Bob" subtitle="Suggestions sur ce devis">
+      <Sheet open={bobSheet} onClose={() => setBobSheet(false)} title="Bob" subtitle="Conseils sur ce devis">
         <div className="-mx-5 -mb-5 h-[70dvh]">{bob}</div>
       </Sheet>
       <Sheet open={historySheet} onClose={() => setHistorySheet(false)} title="Historique" subtitle={d.number}>
         <HistoryList d={d} client={client} meta={meta} limit={50} />
       </Sheet>
       <MobileSummary open={summary} onClose={() => setSummary(false)} d={d} t={t} update={update} />
-      <PrintPortal d={d} client={client} company={company} signer={signer} />
-    </div>
-  );
-}
-
-function MobileBobCard({ count, first, onApplyFirst, onDismissFirst, onAll }: { count: number; first: Parameters<typeof SuggestionCard>[0]['s']; onApplyFirst: () => void; onDismissFirst: () => void; onAll: () => void }) {
-  return (
-    <div className="rounded-2xl border border-vi-100 bg-vi-50/40 p-3">
-      <div className="mb-2 flex items-center justify-between px-1">
-        <span className="text-[12.5px] font-semibold text-vi-700">Bob a {count} suggestion{count > 1 ? 's' : ''}</span>
-        {count > 1 && (
-          <button onClick={onAll} className="h-9 px-1 text-[12.5px] font-medium text-ink-2">
-            Tout voir
-          </button>
-        )}
-      </div>
-      <SuggestionCard s={first} onApply={onApplyFirst} onDismiss={onDismissFirst} />
     </div>
   );
 }

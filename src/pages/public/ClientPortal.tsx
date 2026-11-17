@@ -1,5 +1,7 @@
 import { useParams } from 'react-router-dom';
-import { CalendarDays, MapPin, Phone } from 'lucide-react';
+import { CalendarDays, MapPin } from 'lucide-react';
+import '@/parcours/parcours.css';
+import { EnTete } from './ui/EnTete';
 import { LogoIcon } from '@/components/brand/Logo';
 import { Avatar, Toaster } from '@/components/ui';
 import { dateLong } from '@/lib/format';
@@ -19,21 +21,13 @@ export default function ClientPortal() {
   const civ = d.client.kind === 'particulier' ? first : d.client.contact ?? d.client.name;
 
   return (
-    <div className="min-h-dvh bg-page">
-      <header className="sticky top-0 z-30 border-b border-line/70 bg-page/85 pt-safe backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[560px] items-center gap-3 px-4">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand font-display text-[14px] font-semibold text-white">{d.company.logoInitials || 'BE'}</span>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[15px] font-semibold leading-tight">{d.company.name}</div>
-            <div className="text-[12px] text-ink-3">Votre espace chantier</div>
-          </div>
-          <a href={`tel:${d.company.phone.replace(/\s/g, '')}`} className="grid h-11 w-11 place-items-center rounded-full bg-white text-ink shadow-card" aria-label="Appeler"><Phone className="h-[18px] w-[18px]" strokeWidth={1.75} /></a>
-        </div>
-      </header>
+    <div className="bx-root relative min-h-dvh overflow-x-clip bg-page">
+      <div className="bx-sky bx-sky-top" />
+      <EnTete company={d.company} sous="Votre espace chantier" />
 
-      <main className="mx-auto max-w-[560px] space-y-3.5 px-4 pb-[calc(32px+var(--safe-b))] pt-5">
+      <main className="bx-stagger relative mx-auto max-w-[560px] space-y-3.5 px-4 pb-[calc(32px+var(--safe-b))] pt-5">
         <div className="px-1">
-          <h1 className="font-display text-[28px] font-semibold leading-tight tracking-[-0.025em]">Bonjour {civ}</h1>
+          <h1 className="text-[32px] font-semibold leading-tight tracking-[-0.04em]">Bonjour {civ}</h1>
           {settings.welcome && (
             <div className="mt-3 flex items-start gap-2.5">
               {boss && <Avatar initials={boss.initials} color="#1F389D" size={32} />}

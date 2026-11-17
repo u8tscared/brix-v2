@@ -17,7 +17,7 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
 
   if (readOnly) {
     return (
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line md:grid-cols-4">
+      <div data-field="client" className="grid grid-cols-2 gap-px overflow-hidden rounded-[16px] bg-line shadow-card md:grid-cols-4">
         <Cell label="Client" value={client?.name ?? '·'} />
         <Cell label="Émise le" value={dateFull(f.issueDate)} />
         <Cell label="Échéance" value={f.kind === 'avoir' ? '·' : dateFull(f.dueDate)} />
@@ -34,6 +34,7 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
       <div className="grid gap-3 md:grid-cols-2">
         <Field label="Client">
           <Select
+            data-field="client"
             value={f.clientId}
             onChange={(e) => {
               const c = clients.find((x) => x.id === e.target.value);
@@ -64,7 +65,7 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
           <Input type="date" value={f.issueDate} onChange={(e) => onChange({ issueDate: e.target.value, dueDate: dayOffset(terms, new Date(e.target.value + 'T12:00')) })} />
         </Field>
         <Field label="Échéance" hint={client?.kind === 'pro' ? 'Entre pros : 60 jours maximum (45 jours fin de mois).' : undefined}>
-          <div className="flex gap-1.5">
+          <div data-field="validity" className="flex gap-1.5 rounded-[10px]">
             {[0, 15, 30, 45].map((d) => (
               <button key={d} onClick={() => onChange({ dueDate: dayOffset(d, new Date(f.issueDate + 'T12:00')) })} className={cn('h-11 flex-1 whitespace-nowrap rounded-[10px] border px-1 text-[12.5px] font-medium transition', d === 0 && 'flex-[1.6]', terms === d ? 'border-ink bg-ink text-white' : 'border-line2 bg-white hover:bg-sub')}>
                 {d === 0 ? 'À réception' : `${d} j`}
@@ -74,7 +75,7 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
         </Field>
       </div>
 
-      <div className="rounded-xl border border-line">
+      <div data-field="chantier" className="rounded-[16px] bg-white shadow-card">
         <div className="border-b border-line px-4 py-2.5 text-[12.5px] font-semibold text-ink-2">Mentions obligatoires 2026</div>
         <div className="grid gap-3 p-4 md:grid-cols-2">
           <Field label="Catégorie de l’opération">

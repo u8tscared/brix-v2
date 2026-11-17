@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CalendarCheck, Check, Copy, Link2, MessageSquare, QrCode } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, cn, PageHeader, Select, Switch, toast } from '@/components/ui';
+import { Badge, Button, Card, CardHeader, cn, IconTile, PageHeader, Select, Switch, toast } from '@/components/ui';
 import { capitalize, dateLong, todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { BookingPreview } from './components/BookingPreview';
@@ -42,8 +42,8 @@ export default function RendezVous() {
   };
 
   return (
-    <div className="space-y-5">
-      <PageHeader title="Rendez-vous en ligne" subtitle="Vos clients réservent une visite tout seuls, uniquement sur vos créneaux libres." actions={<Button className="xl:hidden" icon={<CalendarCheck className="h-4 w-4" />} onClick={() => setPreview((v) => !v)}>{preview ? 'Masquer l\'aperçu' : 'Voir la page client'}</Button>} />
+    <div className="space-y-6">
+      <PageHeader icon={<IconTile name="CalendarCheck" dept="vendre" size="lg" />} title="Rendez-vous en ligne" subtitle="Vos clients réservent une visite tout seuls, uniquement sur vos créneaux libres." actions={<Button className="xl:hidden" icon={<CalendarCheck className="h-4 w-4" />} onClick={() => setPreview((v) => !v)}>{preview ? 'Masquer l\'aperçu' : 'Voir la page client'}</Button>} />
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-4">

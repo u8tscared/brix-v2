@@ -105,7 +105,7 @@ export function DayView({ day, people, events, conflicts, onSlot, onSwipe, outdo
                           <br />
                           <span className="text-ink-3">{e.end}</span>
                         </span>
-                        <span className={cn('w-1 shrink-0 rounded-full', KIND_STYLE[e.kind].bar)} />
+                        <span className="w-1 shrink-0 rounded-full" style={{ background: e.kind === 'absence' ? '#cfcbdd' : p.color === '#17171f' ? '#3d3758' : p.color }} />
                         <span className="min-w-0 flex-1">
                           <span className="flex items-center gap-1.5 text-[14px] font-medium">
                             <span className="truncate">{e.title}</span>

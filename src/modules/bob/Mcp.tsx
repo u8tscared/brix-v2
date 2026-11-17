@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, Lock } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, PageHeader, Segmented, cn, toast } from '@/components/ui';
+import { Badge, Button, Card, CardHeader, IconTile, PageHeader, Segmented, cn, toast } from '@/components/ui';
+import type { DepartmentKey } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import { planIncludes } from '@/lib/catalog';
 import ConnecterIA from '@/modules/fournisseurs/mcp/ConnecterIA';
@@ -25,6 +26,13 @@ const LOG = [
 
 type Tab = 'connecter' | 'outils';
 
+const TOOL_ICON: Record<string, [string, DepartmentKey]> = {
+  list_clients: ['Contact', 'vendre'], get_client: ['Contact', 'vendre'], create_client: ['Contact', 'vendre'],
+  list_devis: ['FileText', 'vendre'], create_devis: ['FileText', 'vendre'], invoice_status: ['Receipt', 'facturer'],
+  send_reminder: ['BellRing', 'facturer'], planning: ['CalendarRange', 'equipe'], add_event: ['CalendarRange', 'equipe'],
+  chantier_status: ['HardHat', 'chantiers'], cash: ['Landmark', 'gestion'],
+};
+
 export default function Mcp() {
   const plan = useBrix((s) => s.plan);
   const { mcp, setMcp, setPerm } = useBobLocal();
@@ -35,7 +43,7 @@ export default function Mcp() {
 
   return (
     <div className="space-y-6">
-      <PageHeader kicker="Bob" title="Brix AI MCP" subtitle="Interrogez Brix depuis Claude, ChatGPT ou tout assistant compatible MCP. Vous gardez la main sur ce qu’il peut lire." actions={<Badge tone={nbAcces ? 'ok' : 'neutral'} dot>{nbAcces ? `${nbAcces} accès actif${nbAcces > 1 ? 's' : ''}` : 'Pas encore connecté'}</Badge>} />
+      <PageHeader icon={<IconTile name="Plug" dept="bob" size="lg" solid />} kicker="Bob" title="Brix AI MCP" subtitle="Interrogez Brix depuis Claude, ChatGPT ou tout assistant compatible MCP. Vous gardez la main sur ce qu’il peut lire." actions={<Badge tone={nbAcces ? 'ok' : 'neutral'} dot>{nbAcces ? `${nbAcces} accès actif${nbAcces > 1 ? 's' : ''}` : 'Pas encore connecté'}</Badge>} />
       <BobNav />
 
       {!included && (
@@ -55,11 +63,15 @@ export default function Mcp() {
           <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.2fr_1fr]">
             <Card>
               <CardHeader title="Ce que l’assistant peut faire" meta={`${active} outils actifs`} />
+              <div className="stagger-fast">
               {MCP_TOOLS.map((t) => (
-                <div key={t.key} className="flex flex-col gap-2 border-b border-line px-4 py-3 last:border-b-0 sm:flex-row sm:items-center">
+                <div key={t.key} className={cn('flex flex-col gap-2 border-b border-line px-4 py-3 last:border-b-0 sm:flex-row sm:items-center', t.write && 'opacity-70')}>
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <IconTile name={TOOL_ICON[t.key]?.[0] ?? 'Plug'} dept={TOOL_ICON[t.key]?.[1] ?? 'bob'} size="sm" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 text-[13.5px] font-medium">{t.name} {t.write && <Badge tone="neutral" icon={<Lock />}>Bientôt</Badge>}</div>
                     <div className="text-[12px] text-ink-3">{t.desc} · <code className="font-mono">{t.key}</code></div>
+                  </div>
                   </div>
                   {t.write ? (
                     <span className="text-[12px] text-ink-3 sm:text-right">Modifie vos données : verrouillé, accès en lecture seule</span>
@@ -73,10 +85,12 @@ export default function Mcp() {
                   )}
                 </div>
               ))}
+              </div>
             </Card>
 
             <Card className="self-start">
               <CardHeader title="Journal des appels" meta="7 derniers jours" />
+              <div className="stagger-fast">
               {LOG.map((l, i) => (
                 <div key={i} className="flex items-start gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
                   <span className={cn('mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full', l.ok ? 'bg-ok-bg text-ok' : 'bg-bad-bg text-bad')}>
@@ -86,9 +100,10 @@ export default function Mcp() {
                     <div className="text-[13px]"><span className="font-medium">{l.client}</span> · <code className="font-mono text-[12px]">{l.tool}</code></div>
                     <div className="truncate text-[12px] text-ink-3">{l.detail}{l.why ? ` · refusé : ${l.why.toLowerCase()}` : ''}</div>
                   </div>
-                  <span className="shrink-0 text-[11.5px] text-ink-3">{l.at}</span>
+                  <span className="num shrink-0 text-[11.5px] text-ink-3">{l.at.replace(':', ' h ')}</span>
                 </div>
               ))}
+              </div>
             </Card>
           </div>
         )}

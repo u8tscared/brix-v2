@@ -65,10 +65,23 @@ export function createDevis(text: string, ctx: EngineContext): BobReply {
   const lines: DevisLigne[] = [];
   const nouns: string[] = [];
   let hours = 0;
+  // Surface citée plus tôt (« salon de 25 m², murs et plafond ») : reprise pour les ouvrages au m².
+  let area = 0;
   for (const p of pieces) {
-    const { qty, rest } = leadingQuantity(norm(p));
+    const lead = leadingQuantity(norm(p));
+    let { qty, rest } = lead;
+    rest = rest.replace(/^(m²|m2|metres? carres?)\s+(de |d')?/, '');
+    const inner = rest.match(/(\d+(?:[.,]\d+)?)\s*(m²|m2)(?![a-z0-9])/);
+    let ownArea = /^\d/.test(norm(p)) && /^(m²|m2)/.test(lead.rest) ? qty : 0;
+    if (inner) {
+      ownArea = Number(inner[1].replace(',', '.'));
+      rest = rest.replace(inner[0], '').replace(/\s+de\s*$/, '').replace(/\s+/g, ' ').trim();
+    }
+    if (ownArea) area = ownArea;
     if (!rest || /^(devis|nouveau|un devis)$/.test(rest)) continue;
     const it = findItem(rest);
+    if (!it && ownArea) continue; // juste la pièce et sa surface
+    if (it?.unit === 'm²' && area) qty = area;
     if (it) {
       lines.push(lineFrom(it, qty, vat));
       hours += it.hours * qty;
@@ -130,7 +143,7 @@ export function createDevis(text: string, ctx: EngineContext): BobReply {
         },
       ],
     }],
-    suggestions: ['Ajoute 2 spots', 'Quelle est ma marge sur les devis signés ?'],
+    suggestions: [s.company.trade === 'electricien' ? 'Ajoute 2 spots' : 'Quels devis attendent une signature ?', 'Quelle est ma marge sur les devis signés ?'],
   };
 }
 

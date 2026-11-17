@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronLeft, DoorOpen, FileText, Minus, Plus, RotateCcw, Square } from 'lucide-react';
-import { Button, Card, CardHeader, EmptyState, Field, Input, PageHeader, Select, Sheet, cn, toast } from '@/components/ui';
+import { Armchair, Bath, BedDouble, Briefcase, Check, ChevronLeft, CookingPot, DoorOpen, FileText, Footprints, LayoutGrid, Minus, Plus, RotateCcw, Ruler, Square, Toilet, type LucideIcon } from 'lucide-react';
+import { AnimatedNumber, SuccessDot } from '@/components/motion';
+import { Button, Card, CardHeader, Field, IconTile, Input, PageHeader, Select, Sheet, cn, toast } from '@/components/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { useBrix } from '@/lib/store';
 import { TRADE_BY_KEY } from '@/lib/catalog';
@@ -13,6 +14,7 @@ import { MeasureInput } from './components/cotes/MeasureInput';
 type Step = 'type' | 'L' | 'W' | 'H' | 'ouvertures' | 'recap';
 const FLOW: Step[] = ['L', 'W', 'H', 'ouvertures', 'recap'];
 const KEY = 'brix-v2-cotes';
+const ROOM_ICON: Record<RoomType, LucideIcon> = { sejour: Armchair, chambre: BedDouble, cuisine: CookingPot, sdb: Bath, entree: DoorOpen, wc: Toilet, couloir: Footprints, bureau: Briefcase, autre: LayoutGrid };
 
 const INSTR: Record<Exclude<Step, 'type' | 'recap'>, [string, string]> = {
   L: ['Mesurez la longueur', 'Le mur le plus long, d’un angle à l’autre, au ras du sol.'],
@@ -105,6 +107,7 @@ export default function Cotes() {
   return (
     <div className="space-y-5">
       <PageHeader
+        icon={<IconTile name="Ruler" dept="chantiers" size="lg" />}
         title="Prise de cotes"
         subtitle="Mesurez pièce par pièce : Brix calcule les surfaces et prépare le devis."
         actions={rooms.length > 0 && (
@@ -132,12 +135,18 @@ export default function Cotes() {
             <div className="p-4 md:p-6">
               <h2 className="text-[18px] font-semibold">Quelle pièce mesurez-vous ?</h2>
               <p className="mt-1 text-[13px] text-ink-2">Brix vous guide mur par mur. Comptez 30 secondes par pièce.</p>
-              <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {ROOM_TYPES.map((t) => (
-                  <button key={t.key} onClick={() => addRoom(t.key)} className="flex h-16 items-center justify-center rounded-2xl border border-line bg-white text-[15px] font-medium transition hover:border-ink active:scale-[.98]">
-                    {t.label}
-                  </button>
-                ))}
+              <div className="stagger-fast mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                {ROOM_TYPES.map((t) => {
+                  const I = ROOM_ICON[t.key];
+                  return (
+                    <button key={t.key} onClick={() => addRoom(t.key)} className="group lift press flex h-[76px] items-center gap-3 rounded-[16px] bg-white px-4 text-left text-[14.5px] font-medium shadow-card">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[#fff1e7] text-[#c2410c] shadow-[inset_0_0_0_1px_#fdd9bf] transition-transform duration-300 ease-spring group-hover:scale-110">
+                        <I className="h-[19px] w-[19px]" strokeWidth={1.9} />
+                      </span>
+                      {t.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -159,7 +168,7 @@ export default function Cotes() {
                     const m = measures(room);
                     return (
                       <div className="space-y-4">
-                        <h2 className="text-[18px] font-semibold">{room.name} : c’est mesuré</h2>
+                        <h2 className="flex items-center gap-2.5 text-[18px] font-semibold tracking-[-0.02em]"><SuccessDot size={24} /> {room.name} : c’est mesuré</h2>
                         <dl className="divide-y divide-line rounded-xl border border-line text-[13.5px]">
                           {[
                             ['Sol', m2(m.floor)],
@@ -213,7 +222,11 @@ export default function Cotes() {
           <Card>
             <CardHeader title="Métrés" meta={`${done.length} pièce${done.length > 1 ? 's' : ''}`} />
             {done.length === 0 ? (
-              <EmptyState className="m-4 border-0 py-8" title="Rien de mesuré" text="Les surfaces s’additionnent ici au fil des pièces." />
+              <div className="flex flex-col items-center px-6 py-9 text-center">
+                <span className="grid h-11 w-11 place-items-center rounded-full border border-dashed border-line2 text-ink-3"><Ruler className="h-[18px] w-[18px]" /></span>
+                <div className="mt-3 text-[14px] font-semibold">Rien de mesuré</div>
+                <p className="mt-1 text-[12.5px] text-ink-2">Les surfaces s’additionnent ici au fil des pièces.</p>
+              </div>
             ) : (
               <>
                 <div className="divide-y divide-line">
@@ -246,9 +259,9 @@ export default function Cotes() {
           </Card>
           <Card className="p-4">
             <div className="text-xs text-ink-2">Devis estimé · {TRADE_BY_KEY[company.trade]?.name.toLowerCase()}</div>
-            <div className="num mt-1 text-[26px] font-semibold tracking-[-0.02em]">{money(est.ht, true)} <span className="text-[14px] font-normal text-ink-3">HT</span></div>
+            <div className="num mt-1 text-[30px] font-semibold tracking-[-0.04em]"><AnimatedNumber value={est.ht} format={(n) => money(n, true)} /> <span className="text-[14px] font-normal text-ink-3">HT</span></div>
             <div className="mt-0.5 text-xs text-ink-3">{lines.filter((l) => l.kind !== 'section').length} lignes calculées · marge {Math.round(est.marginRate)} %</div>
-            <Button variant="dawn" size="lg" className="mt-4 w-full justify-center" icon={<FileText className="h-4 w-4" />} disabled={!done.length} onClick={openCreate}>
+            <Button variant={done.length ? 'dawn' : 'secondary'} size="lg" className="mt-4 w-full justify-center" icon={<FileText className="h-4 w-4" />} disabled={!done.length} onClick={openCreate}>
               Créer le devis
             </Button>
           </Card>

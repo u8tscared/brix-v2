@@ -54,7 +54,7 @@ export default function Nfc15100() {
           </div>
           <div>
             <div className="mb-2 text-[12.5px] font-medium text-ink-2">Équipements</div>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2 2xl:grid-cols-2">
               {EXTRAS.map((e) => (
                 <label key={e.key} className="flex min-h-[44px] items-center justify-between gap-2 rounded-[10px] border border-line px-3">
                   <span className="text-[13px]">{e.label}</span>
@@ -66,7 +66,7 @@ export default function Nfc15100() {
           <NumField label="Chauffage électrique total" value={ex.chauffage} onChange={(v) => setEx({ ...ex, chauffage: v })} suffix="W" hint="0 si pas de chauffage électrique. 4 500 W maximum par circuit." />
         </>
       }
-      hero={{ label: 'À prévoir au minimum', value: `${r.prises} prises`, sub: `${r.lumieres} points lumineux · ${r.rj45} prises RJ45 · ${r.circuits.length} circuits · ${r.rows} rangée${r.rows > 1 ? 's' : ''} de tableau` }}
+      hero={{ label: 'À prévoir au minimum', value: r.prises, unit: 'prises', sub: `${r.lumieres} points lumineux · ${r.rj45} prises RJ45 · ${r.circuits.length} circuits · ${r.rows} rangée${r.rows > 1 ? 's' : ''} de tableau` }}
       formulas={[
         'Séjour : 5 prises (7 au-delà de 28 m²). Chambre : 3. Cuisine : 6 dont 4 sur le plan de travail (3 si 4 m² ou moins). Entrée, garage : 1.',
         'Une prise RJ45 par pièce principale, un point lumineux par pièce.',

@@ -1,141 +1,64 @@
-// Portail fournisseur, bon de commande : confirmer, indiquer l'expédition, marquer livrée.
-import { useState } from 'react';
-import { CalendarClock, Check, MapPin, MessageSquareText, PackageCheck, Truck } from 'lucide-react';
-import { Button, Card, cn, Field, Input, toast } from '@/components/ui';
-import { dateLong, dayOffset, money } from '@/lib/format';
-import { totalCommande, useAchats } from '../../data/store';
-import type { Commande, StatutCommande } from '../../data/types';
-import { Info, pluriel } from './commun';
-import { Merci } from './PortailDemande';
+// Portail fournisseur, bon de commande : lire la commande, la confirmer (ou proposer une modification), suivre.
+import { useMemo } from 'react';
+import { CalendarClock, Hash, MapPin, Undo2 } from 'lucide-react';
+import { dateLong } from '@/lib/format';
+import { useBrix } from '@/lib/store';
+import { emetteurArtisan } from '@/modules/fournisseurs/data/evenements';
+import { useAchats } from '@/modules/fournisseurs/data/store';
+import type { Commande } from '@/modules/fournisseurs/data/types';
+import { pluriel } from '@/modules/fournisseurs/components/demandes/commun';
+import { Acquisition, Artisan, Bloc, Fait, Mot } from '@/modules/fournisseurs/components/portail/commun';
+import BonCommande from '@/modules/fournisseurs/components/portail/BonCommande';
+import ActionsCommande from '@/modules/fournisseurs/components/portail/ActionsCommande';
+import { Message } from '@/modules/fournisseurs/components/portail/Fin';
 
-const ETAPES: { s: StatutCommande[]; label: string }[] = [
-  { s: ['envoyee'], label: 'Reçue' },
-  { s: ['confirmee'], label: 'Confirmée' },
-  { s: ['expediee', 'livree_partiel'], label: 'Expédiée' },
-  { s: ['livree', 'facturee'], label: 'Livrée' },
-];
+const I = { strokeWidth: 1.75 } as const;
 
-function Suivi({ statut }: { statut: StatutCommande }) {
-  const i = ETAPES.findIndex((e) => e.s.includes(statut));
-  return (
-    <ol className="grid grid-cols-4 gap-1.5">
-      {ETAPES.map((e, k) => (
-        <li key={e.label} className="min-w-0">
-          <span className={cn('block h-1 rounded-full', k <= i ? 'bg-ok' : 'bg-line2')} />
-          <span className={cn('mt-1.5 flex items-center gap-1 truncate text-[11.5px] font-medium', k <= i ? 'text-ink' : 'text-ink-3')}>
-            {k < i && <Check className="h-3 w-3 text-ok" />}
-            {e.label}
-          </span>
-        </li>
-      ))}
-    </ol>
-  );
-}
+export default function PortailCommande({ c }: { c: Commande }) {
+  const e = useMemo(emetteurArtisan, []);
+  const company = useBrix((s) => s.company);
+  const chantier = useBrix((s) => s.chantiers.find((x) => x.id === c.chantierId)?.name);
+  const f = useAchats((s) => s.fournisseurs.find((x) => x.id === c.fournisseurId));
+  const prenom = e.prenom || e.entreprise;
 
-export default function PortailCommande({ c, entreprise }: { c: Commande; entreprise: string }) {
-  const maj = useAchats((s) => s.majStatutCommande);
-  const [ref, setRef] = useState(c.referenceFournisseur ?? '');
-  const [date, setDate] = useState(c.livraisonPrevue ?? dayOffset(1));
-  const [suivi, setSuivi] = useState(c.suivi ?? '');
-
-  const agir = (statut: StatutCommande, extra: Parameters<typeof maj>[2], msg: string) => {
-    const r = maj(c.token!, statut, extra, 'fournisseur');
-    if (r.ok) toast(msg);
-    else toast(r.message ?? 'Action impossible pour le moment.', 'warn');
-  };
+  if (c.statut === 'annulee') return <Message icon={<Undo2 />} titre="Commande annulée" texte={`${e.entreprise} a annulé cette commande. Vous n’avez rien à préparer.`} />;
 
   return (
-    <div className="space-y-4">
-      <Card className="p-5">
-        <div className="text-[12.5px] text-ink-3"><span className="num font-medium">{c.numero}</span> · {pluriel(c.lignes.length, 'article')}</div>
-        <h1 className="mt-1 font-display text-[21px] font-semibold leading-tight tracking-[-0.02em]">Commande de {entreprise}</h1>
-        <div className="mt-4"><Suivi statut={c.statut} /></div>
-        <div className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
-          <Info icon={<MapPin />} label={c.mode === 'retrait_agence' ? 'Retrait' : 'Livraison'}>{c.mode === 'retrait_agence' ? 'Retrait en agence' : c.adresse ?? 'Adresse à confirmer'}</Info>
-          <Info icon={<CalendarClock />} label="Date souhaitée">{c.livraisonPrevue ? dateLong(c.livraisonPrevue) : 'Dès que possible'}</Info>
+    <div className="space-y-5 lg:space-y-7">
+      <Bloc className="bx-rise relative overflow-hidden">
+        <div className="fx-grain pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+        <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
+          <div className="min-w-0 space-y-5">
+            <div>
+              <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#9898a8]">
+                <span className="inline-flex h-6 items-center rounded-full bg-[#130f26] px-2.5 text-[11.5px] font-semibold text-white">Bon de commande</span>
+                <span className="bx-mono">{c.numero}</span>
+              </div>
+              <h1 className="mt-3 text-[26px] font-semibold leading-[1.1] tracking-[-0.035em] sm:text-[32px]">
+                {pluriel(c.lignes.length, 'article commandé', 'articles commandés')}
+                <span className="block text-[#9898a8]">par {e.entreprise}</span>
+              </h1>
+            </div>
+            <Artisan e={e} chantier={chantier} />
+            {c.message && <Mot texte={c.message} auteur={prenom} />}
+          </div>
+          <div className="grid content-start gap-4 border-t border-[#ececf1] pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1">
+            <Fait icon={<CalendarClock {...I} />} label={c.statut === 'envoyee' ? 'Livraison souhaitée' : 'Livraison prévue'}>{c.livraisonPrevue ? dateLong(c.livraisonPrevue) : 'Dès que possible'}</Fait>
+            <Fait icon={<MapPin {...I} />} label={c.mode === 'retrait_agence' ? 'Retrait' : 'Livrer au'}>{c.mode === 'retrait_agence' ? 'Au comptoir de votre agence' : c.adresse ?? 'Adresse à confirmer'}</Fait>
+            {c.referenceFournisseur && <Fait icon={<Hash {...I} />} label="Votre référence"><span className="bx-mono">{c.referenceFournisseur}</span></Fait>}
+          </div>
         </div>
-        {c.message && (
-          <p className="mt-4 flex gap-2.5 rounded-[12px] bg-sub px-3.5 py-3 text-[13.5px] text-ink-2">
-            <MessageSquareText className="mt-0.5 h-4 w-4 shrink-0 text-ink-3" strokeWidth={1.75} />« {c.message} »
-          </p>
-        )}
-      </Card>
+      </Bloc>
 
-      <Card className="overflow-hidden">
-        <ul>
-          {c.lignes.map((l) => (
-            <li key={l.id} className="flex items-start gap-3 border-b border-line px-4 py-3 last:border-b-0">
-              <span className="num grid h-9 min-w-[44px] shrink-0 place-items-center rounded-[10px] bg-sub px-2 text-[13.5px] font-semibold">
-                {String(l.quantite).replace('.', ',')}
-                <span className="-mt-1 text-[10px] font-medium text-ink-3">{l.unite}</span>
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block text-[14px] leading-snug">{l.designation}</span>
-                {l.reference && <span className="text-[12px] text-ink-3">réf. {l.reference}</span>}
-              </span>
-              <span className="num text-right text-[13px]">
-                <span className="block font-medium">{money(l.prix * l.quantite)}</span>
-                <span className="text-[11.5px] text-ink-3">{money(l.prix)} / {l.unite}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-        <div className="flex items-center justify-between border-t border-line bg-[#fafafc] px-4 py-3 text-[13.5px]">
-          <span className="text-ink-2">Total HT{c.port ? `, dont ${money(c.port)} de port` : ''}</span>
-          <span className="num text-[16px] font-semibold">{money(totalCommande(c) + c.port)}</span>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-start">
+        <div className="min-w-0 pb-2">
+          <BonCommande c={c} f={f} e={e} adresseArtisan={[company.address, company.city].filter(Boolean).join(', ')} />
         </div>
-      </Card>
-
-      {c.statut === 'annulee' && <Merci titre="Commande annulée" texte={`${entreprise} a annulé cette commande. Vous n’avez rien à préparer.`} />}
-
-      {c.statut === 'envoyee' && (
-        <Card className="space-y-4 p-5">
-          <div>
-            <h2 className="text-[15px] font-semibold">Vous préparez cette commande ?</h2>
-            <p className="text-[13px] text-ink-2">{entreprise} est prévenu dès que vous confirmez.</p>
-          </div>
-          <Field label="Votre numéro de commande (facultatif)">
-            <Input value={ref} onChange={(e) => setRef(e.target.value)} placeholder="Ex. : ARC-558120" className="text-[16px] sm:text-[14px]" />
-          </Field>
-          <Button variant="dawn" size="lg" className="w-full justify-center" icon={<Check className="h-[18px] w-[18px]" />} onClick={() => agir('confirmee', { referenceFournisseur: ref.trim() || undefined }, 'Commande confirmée. Merci !')}>
-            Confirmer la commande
-          </Button>
-        </Card>
-      )}
-
-      {c.statut === 'confirmee' && (
-        <Card className="space-y-4 p-5">
-          <div>
-            <h2 className="text-[15px] font-semibold">La commande est partie ?</h2>
-            <p className="text-[13px] text-ink-2">Indiquez quand elle arrive : l’équipe s’organise sur le chantier.</p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Field label="Livraison prévue le">
-              <Input type="date" value={date} min={dayOffset(0)} onChange={(e) => setDate(e.target.value)} />
-            </Field>
-            <Field label="Transporteur ou créneau (facultatif)">
-              <Input value={suivi} onChange={(e) => setSuivi(e.target.value)} placeholder="Ex. : camion, 7 h 30 – 9 h" className="text-[16px] sm:text-[14px]" />
-            </Field>
-          </div>
-          <Button variant="dawn" size="lg" className="w-full justify-center" icon={<Truck className="h-[18px] w-[18px]" />} onClick={() => agir('expediee', { livraisonPrevue: date || undefined, suivi: suivi.trim() || undefined }, 'Expédition indiquée. Merci !')}>
-            Indiquer l’expédition
-          </Button>
-        </Card>
-      )}
-
-      {(c.statut === 'expediee' || c.statut === 'livree_partiel') && (
-        <Card className="space-y-4 p-5">
-          <div>
-            <h2 className="text-[15px] font-semibold">En route{c.livraisonPrevue ? `, arrivée prévue ${dateLong(c.livraisonPrevue)}` : ''}</h2>
-            {c.suivi && <p className="text-[13px] text-ink-2">{c.suivi}</p>}
-          </div>
-          <Button variant="dawn" size="lg" className="w-full justify-center" icon={<PackageCheck className="h-[18px] w-[18px]" />} onClick={() => agir('livree', {}, 'Livraison enregistrée. Merci !')}>
-            Marquer livrée
-          </Button>
-        </Card>
-      )}
-
-      {(c.statut === 'livree' || c.statut === 'facturee') && <Merci titre="Commande livrée" texte={`Tout est en ordre côté ${entreprise}. Merci pour la livraison.`} />}
+        <aside className="space-y-4 lg:sticky lg:top-20">
+          <ActionsCommande c={c} prenom={prenom} />
+          <Acquisition />
+        </aside>
+      </div>
     </div>
   );
 }

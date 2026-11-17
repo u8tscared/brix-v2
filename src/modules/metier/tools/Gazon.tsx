@@ -25,7 +25,7 @@ export default function Gazon() {
           {kind === 'semis' && <Choice label="Dose de semences" value={dose} onChange={setDose} options={[{ value: 25, label: 'Regarnissage 25 g/m²' }, { value: 35, label: 'Création 35 g/m²' }, { value: 45, label: 'Sport, terrain en pente 45 g/m²' }]} />}
         </>
       }
-      hero={{ label: kind === 'semis' ? 'Semences' : 'Rouleaux de gazon', value: kind === 'semis' ? `${n1(seeds)} kg` : `${rolls} m²`, sub: `${n1(soil)} m³ de terre végétale (${n1(tons)} t)` }}
+      hero={{ label: kind === 'semis' ? 'Semences' : 'Rouleaux de gazon', value: kind === 'semis' ? seeds : rolls, decimals: kind === 'semis' ? 1 : 0, unit: kind === 'semis' ? 'kg' : 'm²', sub: `${n1(soil)} m³ de terre végétale (${n1(tons)} t)` }}
       formulas={[
         'Terre : surface × épaisseur. Une terre végétale pèse environ 1,4 tonne par m³.',
         'Semis : 25 à 45 g/m² selon l’usage. Placage : surface + 5 % de coupes.',

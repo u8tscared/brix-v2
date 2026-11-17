@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { CheckCircle2, Send } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, cn, PageHeader, Segmented, Select, Stat, Switch, toast } from '@/components/ui';
+import { Badge, Button, Card, CardHeader, cn, IconTile, PageHeader, Segmented, Select, Switch, toast } from '@/components/ui';
+import { GrowBar } from '@/components/motion';
+import { KpiBand } from '@/modules/chantiers/components/common/KpiBand';
 import { dateShort, relative, todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { ReviewCard, Stars } from './components/ReviewCard';
-import { StatStrip } from './components/StatStrip';
 import { sendReviewRequest } from './service';
 import { useVendre } from './store';
 
@@ -33,15 +34,36 @@ export default function Avis() {
   };
 
   return (
-    <div className="space-y-5">
-      <PageHeader title="Avis clients" subtitle="Plus d'avis Google, c'est plus d'appels. Bob demande au bon moment et répond pour vous." />
+    <div className="space-y-6">
+      <PageHeader icon={<IconTile name="Star" dept="vendre" size="lg" />} title="Avis clients" subtitle="Plus d'avis Google, c'est plus d'appels. Bob demande au bon moment et répond pour vous." />
 
-      <StatStrip>
-        <Stat label="Note Google" hero value={avg.toFixed(1).replace('.', ',')} sub={<Stars value={avg} size={13} />} />
-        <Stat label="Avis publiés" value={reviews.length} sub={`${month} ce mois-ci`} />
-        <Stat label="Sans réponse" value={unanswered} sub={unanswered ? 'Répondre aide votre classement' : 'Tout est répondu'} />
-        <Stat label="Taux de retour" value="64 %" sub="des clients sollicités laissent un avis" />
-      </StatStrip>
+      <KpiBand
+        hero={{
+          label: 'Note Google',
+          value: avg,
+          format: (n) => n.toFixed(1).replace('.', ','),
+          sub: `sur ${reviews.length} avis`,
+          extra: (
+            <div className="space-y-1.5">
+              <Stars value={avg} size={16} />
+              <div className="flex max-w-[260px] flex-col gap-1 pt-1">
+                {dist.map((d) => (
+                  <div key={d.n} className="flex items-center gap-2 text-[11px] text-ink-3">
+                    <span className="num w-2">{d.n}</span>
+                    <GrowBar value={(d.c / Math.max(1, reviews.length)) * 100} className="h-1 flex-1" barClassName="bg-[#f59e0b]" />
+                    <span className="num w-3 text-right">{d.c}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ),
+        }}
+        items={[
+          { label: 'Ce mois-ci', value: month, sub: 'nouveaux avis' },
+          { label: 'Sans réponse', value: unanswered, tone: unanswered ? 'warn' : 'ok', sub: unanswered ? 'Répondre aide votre classement' : 'Tout est répondu' },
+          { label: 'Taux de retour', value: '64 %', sub: 'des clients sollicités' },
+        ]}
+      />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <Card className="min-w-0 self-start">
@@ -87,16 +109,6 @@ export default function Avis() {
             })}
           </Card>
 
-          <Card className="p-4">
-            <div className="mb-3 text-[13px] font-semibold">Répartition</div>
-            {dist.map(({ n, c }) => (
-              <div key={n} className="flex items-center gap-2 py-1 text-[12px]">
-                <span className="num w-3 text-ink-2">{n}</span>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-sub"><div className="h-full rounded-full bg-[#f59e0b]" style={{ width: `${(c / (reviews.length || 1)) * 100}%` }} /></div>
-                <span className="num w-4 text-right text-ink-3">{c}</span>
-              </div>
-            ))}
-          </Card>
         </div>
       </div>
     </div>

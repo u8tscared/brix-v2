@@ -2,6 +2,7 @@
 // worker, importée telle quelle : un seul calcul, côté app comme côté serveur.
 
 import type { Tone } from '@/components/ui';
+import { lienPublic } from '@/parcours/liens';
 import type { Devis } from '@/lib/types';
 import { extraireBesoins } from '../../../../worker/src/modules/fournisseurs/besoins';
 import { comparer, type Comparatif } from '../../../../worker/src/modules/fournisseurs/comparateur';
@@ -118,4 +119,4 @@ export const ETAPES_COMMANDE: { statut: StatutCommande; label: string }[] = [
 
 export const ORDRE_COMMANDE: StatutCommande[] = ['brouillon', 'envoyee', 'confirmee', 'expediee', 'livree_partiel', 'livree', 'facturee'];
 
-export const lienPortail = (token: string) => `${location.origin}${location.pathname}#/portail-fournisseur/${token}`;
+export const lienPortail = (token: string) => lienPublic('fournisseur', token);

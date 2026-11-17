@@ -1,20 +1,26 @@
 import { useState } from 'react';
-import { CalendarClock, Check, Facebook, Instagram, Linkedin, MapPin, Send } from 'lucide-react';
+import { CalendarClock, Check, Facebook, Heart, Instagram, Linkedin, MapPin, Send, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Badge, Button, Card, cn, Input, Textarea, toast } from '@/components/ui';
 import { capitalize, dateLong, dayOffset } from '@/lib/format';
 import { useBrix } from '@/lib/store';
-import { PhotoArt } from '@/modules/chantiers/components/common/PhotoArt';
 import { artFor } from '../lib';
 import { publishPost } from '../service';
 import { useVisi, type Post } from '../store';
+import { BeforeAfter } from './BeforeAfter';
 
-export const NETWORKS: { key: string; label: string; icon: LucideIcon }[] = [
-  { key: 'facebook', label: 'Facebook', icon: Facebook },
-  { key: 'instagram', label: 'Instagram', icon: Instagram },
-  { key: 'google', label: 'Fiche Google', icon: MapPin },
-  { key: 'linkedin', label: 'LinkedIn', icon: Linkedin },
+export const NETWORKS: { key: string; label: string; icon: LucideIcon; color: string }[] = [
+  { key: 'facebook', label: 'Facebook', icon: Facebook, color: '#1877f2' },
+  { key: 'instagram', label: 'Instagram', icon: Instagram, color: '#e1306c' },
+  { key: 'google', label: 'Fiche Google', icon: MapPin, color: '#34a853' },
+  { key: 'linkedin', label: 'LinkedIn', icon: Linkedin, color: '#0a66c2' },
 ];
+
+/** Prochain samedi (pour la suggestion « samedi matin », le meilleur moment pour les artisans). */
+const nextSaturday = () => {
+  const d = new Date();
+  return dayOffset(((6 - d.getDay() + 7) % 7) || 7);
+};
 
 export function PostCard({ post }: { post: Post }) {
   const chantier = useBrix((s) => s.chantiers.find((c) => c.id === post.chantierId));
@@ -23,6 +29,7 @@ export function PostCard({ post }: { post: Post }) {
   const [planning, setPlanning] = useState(false);
   const [date, setDate] = useState(post.date > dayOffset(0) ? post.date : dayOffset(1));
   const done = post.status === 'publie';
+  const linked = NETWORKS.filter((n) => accounts[n.key]);
 
   const publish = async () => {
     setBusy(true);
@@ -31,57 +38,74 @@ export function PostCard({ post }: { post: Post }) {
     setBusy(false);
     toast(`Publié sur ${post.networks.length} réseau${post.networks.length > 1 ? 'x' : ''} (démo)`);
   };
-  const schedule = () => {
-    upsertPost({ ...post, status: 'programme', date });
+  const schedule = (d = date) => {
+    upsertPost({ ...post, status: 'programme', date: d });
     setPlanning(false);
-    toast(`Programmé pour le ${dateLong(date)}`);
+    toast(`Programmé pour ${dateLong(d)}`);
   };
 
   return (
     <Card className="overflow-hidden">
-      <div className="grid grid-cols-2 gap-px bg-line">
-        {(['avant', 'apres'] as const).map((ph) => (
-          <div key={ph} className="relative aspect-[4/3] bg-white">
-            <PhotoArt art={artFor(post.chantierId)} phase={ph} seed={post.chantierId + ph} />
-            <span className="absolute left-2 top-2 rounded-md bg-white/90 px-2 py-0.5 text-[11px] font-semibold backdrop-blur">{ph === 'avant' ? 'Avant' : 'Après'}</span>
-          </div>
-        ))}
-      </div>
+      <BeforeAfter art={artFor(post.chantierId)} seed={post.chantierId} />
       <div className="space-y-3 p-4">
         <div className="flex items-center gap-2">
-          <span className="min-w-0 flex-1 truncate text-[13.5px] font-semibold">{chantier?.name ?? 'Chantier'}</span>
-          {post.status === 'pret' && <Badge tone="violet">Prête</Badge>}
+          <span className="min-w-0 flex-1 truncate text-[14px] font-semibold tracking-[-0.01em]">{chantier?.name ?? 'Chantier'}</span>
+          {post.status === 'pret' && <Badge tone="mag" dot>À valider</Badge>}
           {post.status === 'programme' && <Badge tone="info" icon={<CalendarClock />}>{capitalize(dateLong(post.date))}</Badge>}
-          {done && <Badge tone="ok" icon={<Check />}>Publiée · {post.likes ?? 0} j'aime</Badge>}
+          {done && <Badge tone="ok" icon={<Check />}>Publiée</Badge>}
         </div>
         {done ? (
-          <p className="text-[13px] leading-relaxed text-ink-2">{post.text}</p>
+          <>
+            <p className="text-[13px] leading-relaxed text-ink-2">{post.text}</p>
+            <div className="flex items-center gap-3 border-t border-line pt-3 text-[12.5px] text-ink-2">
+              <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5 text-[#e11d48]" /><span className="num font-medium text-ink">{post.likes ?? 0}</span> j’aime</span>
+              <span className="flex -space-x-1">{NETWORKS.filter((n) => post.networks.includes(n.key)).map((n) => <span key={n.key} className="grid h-5 w-5 place-items-center rounded-full ring-2 ring-white" style={{ background: n.color }}><n.icon className="h-2.5 w-2.5 text-white" /></span>)}</span>
+            </div>
+          </>
         ) : (
-          <Textarea value={post.text} onChange={(e) => upsertPost({ ...post, text: e.target.value })} className="h-[128px] text-[13px]" aria-label="Texte de la publication" />
+          <Textarea value={post.text} onChange={(e) => upsertPost({ ...post, text: e.target.value })} className="min-h-[104px] text-[13px]" aria-label="Texte de la publication" />
         )}
-        <div className="flex flex-wrap gap-1.5">
-          {NETWORKS.filter((n) => accounts[n.key]).map((n) => {
-            const on = post.networks.includes(n.key);
-            return (
-              <button key={n.key} disabled={done} onClick={() => upsertPost({ ...post, networks: on ? post.networks.filter((x) => x !== n.key) : [...post.networks, n.key] })} className={cn('flex h-9 items-center gap-1.5 rounded-full border px-3 text-[12px] font-medium transition disabled:cursor-default', on ? 'border-ink bg-ink text-white' : 'border-line text-ink-3')}>
-                <n.icon className="h-3.5 w-3.5" strokeWidth={1.75} />{n.label}
-              </button>
-            );
-          })}
-        </div>
         {!done && (
-          planning ? (
-            <div className="flex gap-2">
-              <Input type="date" value={date} min={dayOffset(0)} onChange={(e) => setDate(e.target.value)} className="flex-1" />
-              <Button className="h-11" variant="primary" onClick={schedule}>Programmer</Button>
+          <div className="flex flex-wrap gap-1.5">
+            {linked.map((n) => {
+              const on = post.networks.includes(n.key);
+              return (
+                <button
+                  key={n.key}
+                  onClick={() => upsertPost({ ...post, networks: on ? post.networks.filter((x) => x !== n.key) : [...post.networks, n.key] })}
+                  aria-pressed={on}
+                  className={cn('press flex h-9 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-[background,color,box-shadow] duration-200', on ? 'text-white' : 'bg-white text-ink-3 shadow-[0_0_0_1px_var(--line2)] hover:text-ink')}
+                  style={on ? { background: n.color } : undefined}
+                >
+                  <n.icon className="h-3.5 w-3.5" strokeWidth={1.75} />{n.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {!done &&
+          (planning ? (
+            <div className="animate-[fade-up_.3s_var(--ease)_both] space-y-2 rounded-[12px] bg-[#f7f6fb] p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[12.5px] font-medium text-ink-2">Quand publier ?</span>
+                <button onClick={() => setPlanning(false)} className="grid h-7 w-7 place-items-center rounded-full text-ink-3 hover:bg-white hover:text-ink" aria-label="Fermer"><X className="h-3.5 w-3.5" /></button>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <Button size="xs" onClick={() => schedule(dayOffset(1))}>Demain</Button>
+                <Button size="xs" onClick={() => schedule(nextSaturday())}>Samedi matin</Button>
+                <Button size="xs" onClick={() => schedule(dayOffset(7))}>Dans une semaine</Button>
+              </div>
+              <div className="flex gap-2">
+                <Input type="date" value={date} min={dayOffset(0)} onChange={(e) => setDate(e.target.value)} className="min-w-0 flex-1" aria-label="Date de publication" />
+                <Button className="h-11" variant="primary" onClick={() => schedule()}>Programmer</Button>
+              </div>
             </div>
           ) : (
             <div className="flex gap-2">
-              <Button variant="primary" className="flex-1 justify-center" icon={<Send className="h-4 w-4" />} loading={busy} disabled={!post.networks.length} onClick={publish}>Publier maintenant</Button>
-              <Button icon={<CalendarClock className="h-4 w-4" />} onClick={() => setPlanning(true)}>Plus tard</Button>
+              <Button variant="primary" className="flex-1 justify-center" icon={<Send />} loading={busy} disabled={!post.networks.length} onClick={publish}>Publier</Button>
+              <Button icon={<CalendarClock />} onClick={() => setPlanning(true)}>{post.status === 'programme' ? 'Changer' : 'Plus tard'}</Button>
             </div>
-          )
-        )}
+          ))}
       </div>
     </Card>
   );

@@ -56,7 +56,7 @@ export default function BilanThermique() {
           <Choice label="Générateur" value={gen} onChange={setGen} options={[{ value: 'pac', label: 'Pompe à chaleur' }, { value: 'chaudiere', label: 'Chaudière' }]} />
         </>
       }
-      hero={{ label: gen === 'pac' ? 'Pompe à chaleur conseillée' : 'Chaudière conseillée', value: `${model} kW`, sub: `Déperditions ${n1(loss)} kW à ${tBase} °C dehors (${Math.round(perM2)} W/m²)` }}
+      hero={{ label: gen === 'pac' ? 'Pompe à chaleur conseillée' : 'Chaudière conseillée', value: model, decimals: 1, unit: 'kW', sub: `Déperditions ${n1(loss)} kW à ${tBase} °C dehors (${Math.round(perM2)} W/m²)` }}
       formulas={[
         'Déperditions : P = G × V × (T intérieure − T de base). G selon l’isolation, V = surface × hauteur.',
         `Ici : ${G.toString().replace('.', ',')} × ${Math.round(volume)} m³ × ${dT} °C = ${n1(loss)} kW.`,

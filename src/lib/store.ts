@@ -6,9 +6,9 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { ModuleKey, Plan, PriorityKey } from './catalog';
 import { recommendModules } from './catalog';
-import * as demo from './demo';
+import { demoFor } from './demoTrades';
 import { uid } from './format';
-import type { BankTx, BobAction, Chantier, Client, Company, Devis, Employee, Expense, Facture, Lead, PlanningEvent, User } from './types';
+import type { BankTx, BobAction, Chantier, Client, Company, Devis, Employee, Expense, Facture, Lead, PlanningEvent, TradeKey, User } from './types';
 
 export interface Prefs {
   favorites: string[]; // chemins épinglés dans le menu
@@ -41,7 +41,8 @@ export interface BrixState {
   setupTasks: Record<string, boolean>;
 
   // actions
-  loadDemo: () => void;
+  /** Charge la démo, adaptée au métier (par défaut : le métier actuel, sinon électricien). */
+  loadDemo: (trade?: TradeKey) => void;
   completeOnboarding: (p: { company: Partial<Company>; user: Partial<User>; priorities: PriorityKey[]; enabled: ModuleKey[]; plan?: Plan; withDemoData: boolean }) => void;
   reset: () => void;
   toggleModule: (k: ModuleKey, on?: boolean) => void;
@@ -81,27 +82,30 @@ const upsert = <T extends { id: string }>(list: T[], item: T) => {
   return copy;
 };
 
-const demoState = () => ({
-  onboarded: true,
-  isDemo: true,
-  plan: 'equipe' as Plan,
-  priorities: ['devis_rapides', 'argent', 'organisation'] as PriorityKey[],
-  enabled: [...new Set(recommendModules('electricien', 'petite', ['devis_rapides', 'argent', 'organisation', 'achats', 'equipe']).concat(['fournisseurs', 'agent_nuit', 'mcp', 'secretaire', 'portail', 'avis', 'rdv', 'leads', 'cotes', 'pv', 'sav', 'frais', 'site', 'reseaux', 'compta', 'paie', 'conges', 'habilitations', 'documents', 'stocks', 'vehicules', 'soustraitants', 'pointage', 'equipe'] as ModuleKey[]))],
-  company: demo.demoCompany,
-  user: demo.demoUser,
-  clients: demo.demoClients,
-  chantiers: demo.demoChantiers,
-  devis: demo.demoDevis,
-  factures: demo.demoFactures,
-  employees: demo.demoEmployees,
-  events: demo.demoEvents,
-  leads: demo.demoLeads,
-  bob: demo.demoBob,
-  expenses: demo.demoExpenses,
-  bank: demo.demoBank,
-  cashBalance: demo.DEMO_CASH_BALANCE,
-  setupTasks: { profil: true, logo: true, premier_devis: true, banque: false, equipe: true, efacture: false, import: false },
-});
+const demoState = (trade?: string) => {
+  const x = demoFor(trade);
+  return {
+    onboarded: true,
+    isDemo: true,
+    plan: 'equipe' as Plan,
+    priorities: ['devis_rapides', 'argent', 'organisation'] as PriorityKey[],
+    enabled: [...new Set(recommendModules(x.company.trade, 'petite', ['devis_rapides', 'argent', 'organisation', 'achats', 'equipe']).concat(['fournisseurs', 'agent_nuit', 'mcp', 'secretaire', 'portail', 'avis', 'rdv', 'leads', 'cotes', 'pv', 'sav', 'frais', 'site', 'reseaux', 'compta', 'paie', 'conges', 'habilitations', 'documents', 'stocks', 'vehicules', 'soustraitants', 'pointage', 'equipe'] as ModuleKey[]))],
+    company: x.company,
+    user: x.user,
+    clients: x.clients,
+    chantiers: x.chantiers,
+    devis: x.devis,
+    factures: x.factures,
+    employees: x.employees,
+    events: x.events,
+    leads: x.leads,
+    bob: x.bob,
+    expenses: x.expenses,
+    bank: x.bank,
+    cashBalance: x.cashBalance,
+    setupTasks: { profil: true, logo: true, premier_devis: true, banque: false, equipe: true, efacture: false, import: false },
+  };
+};
 
 const initialPrefs: Prefs = { favorites: [], sidebarCollapsed: false, tourDone: false, checklistDismissed: false, voice: true };
 
@@ -129,10 +133,13 @@ export const useBrix = create<BrixState>()(
       prefs: initialPrefs,
       setupTasks: {},
 
-      loadDemo: () => set({ ...demoState(), prefs: { ...initialPrefs, tourDone: true } }),
+      loadDemo: (trade) => {
+        const t = typeof trade === 'string' ? trade : get().onboarded ? get().company.trade : undefined;
+        set({ ...demoState(t), prefs: { ...initialPrefs, tourDone: true } });
+      },
 
       completeOnboarding: ({ company, user, priorities, enabled, plan, withDemoData }) => {
-        const base = withDemoData ? demoState() : {};
+        const base = withDemoData ? demoState(company.trade) : {};
         const meId = 'e_me';
         const fullUser = { ...get().user, ...user } as User;
         const me: Employee = {
@@ -142,15 +149,15 @@ export const useBrix = create<BrixState>()(
         const soloDemo = withDemoData && company.size === 'solo';
         set({
           ...base,
-          ...(soloDemo ? { events: demo.demoEvents.filter((e) => e.employeeId === 'e_karim').map((e) => ({ ...e, employeeId: meId })) } : {}),
+          ...(soloDemo ? { events: (base as ReturnType<typeof demoState>).events.filter((e) => e.employeeId === 'e_karim').map((e) => ({ ...e, employeeId: meId })) } : {}),
           onboarded: true,
           isDemo: withDemoData,
           priorities,
           enabled,
           plan: plan ?? 'pro',
-          company: { ...(withDemoData ? demo.demoCompany : emptyCompany), ...company } as Company,
+          company: { ...(withDemoData ? (base as ReturnType<typeof demoState>).company : emptyCompany), ...company } as Company,
           user: fullUser,
-          employees: withDemoData && !soloDemo ? demo.demoEmployees : [me],
+          employees: withDemoData && !soloDemo ? (base as ReturnType<typeof demoState>).employees.map((e) => (e.id === 'e_karim' ? { ...e, firstName: me.firstName, lastName: me.lastName, initials: me.initials, email: me.email } : e)) : [me],
           prefs: { ...initialPrefs },
           setupTasks: { profil: true },
         });

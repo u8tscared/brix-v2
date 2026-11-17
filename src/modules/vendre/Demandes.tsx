@@ -1,16 +1,19 @@
 import { useMemo, useState } from 'react';
 import { Inbox, Plus } from 'lucide-react';
-import { Button, cn, EmptyState, PageHeader, Segmented, Stat } from '@/components/ui';
+import { Button, cn, EmptyState, IconTile, PageHeader, Segmented, toast } from '@/components/ui';
+import { KpiBand } from '@/modules/chantiers/components/common/KpiBand';
+import { useLeadActions } from './components/useLeadActions';
 import { money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Lead } from '@/lib/types';
 import { LeadCard } from './components/LeadCard';
-import { StatStrip } from './components/StatStrip';
 import { LeadSheet } from './components/LeadSheet';
 import { NewLeadSheet } from './components/NewLeadSheet';
 import { LEAD_FLOW, LEAD_SOURCE, LEAD_STATUS } from './lib';
 
 type Filter = 'actives' | Lead['status'];
+
+const STAGE_DOT: Record<Lead['status'], string> = { nouveau: '#c026d3', qualifie: '#7c3aed', rdv: '#d97706', devis: '#4f46e5', gagne: '#16a34a', perdu: '#9794aa' };
 
 export default function Demandes() {
   const leads = useBrix((s) => s.leads);
@@ -19,6 +22,18 @@ export default function Demandes() {
   const [source, setSource] = useState<'all' | Lead['source']>('all');
   const [filter, setFilter] = useState<Filter>('actives');
   const [showLost, setShowLost] = useState(false);
+  const [moved, setMoved] = useState<string | null>(null);
+  const { prepareDevis, setStatus } = useLeadActions();
+  const nextOf = (l: Lead) => LEAD_FLOW[LEAD_FLOW.indexOf(l.status) + 1];
+  const advance = (l: Lead) => {
+    const next = nextOf(l);
+    if (!next) return;
+    if (next === 'devis') return prepareDevis(l);
+    setStatus(l, next);
+    setMoved(l.id);
+    setTimeout(() => setMoved((m) => (m === l.id ? null : m)), 900);
+    toast(`${l.name} passe en « ${LEAD_STATUS[next].label} »`, 'ok', { label: 'Annuler', run: () => setStatus(l, l.status) });
+  };
 
   const visible = useMemo(() => leads.filter((l) => source === 'all' || l.source === source).sort((a, b) => b.receivedAt.localeCompare(a.receivedAt) || (b.score ?? 0) - (a.score ?? 0)), [leads, source]);
   const open = leads.find((l) => l.id === openId) ?? null;
@@ -33,19 +48,22 @@ export default function Demandes() {
   const columns: Lead['status'][] = showLost ? [...LEAD_FLOW, 'perdu'] : LEAD_FLOW;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <PageHeader
+        icon={<IconTile name="Inbox" dept="vendre" size="lg" />}
         title="Demandes"
         subtitle="Site, téléphone, WhatsApp, plateformes : tout arrive ici, Bob trie et estime."
         actions={<Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>Nouvelle demande</Button>}
       />
 
-      <StatStrip>
-        <Stat label="CA possible en cours" value={money(potential, true)} hero sub={`${active.length} demandes ouvertes`} />
-        <Stat label="À rappeler" value={fresh} sub={fresh ? 'Rappeler dans l\'heure double les chances' : 'Tout le monde a été rappelé'} />
-        <Stat label="Transformées en devis" value={`${rate} %`} sub="sur les 30 derniers jours" />
-        <Stat label="Temps de réponse" value="38 min" sub="Bob répond la nuit à votre place" />
-      </StatStrip>
+      <KpiBand
+        hero={{ label: 'Chiffre possible en cours', value: potential, format: (n) => money(n, true), sub: `${active.length} demande${active.length > 1 ? 's' : ''} ouverte${active.length > 1 ? 's' : ''}` }}
+        items={[
+          { label: 'À rappeler', value: fresh, tone: fresh ? 'warn' : 'ok', sub: fresh ? "Rappeler dans l'heure double les chances" : 'Tout le monde a été rappelé' },
+          { label: 'Devenues devis', value: rate, format: (n) => `${Math.round(n)} %`, sub: 'sur 30 jours' },
+          { label: 'Temps de réponse', value: '38 min', sub: 'Bob répond la nuit' },
+        ]}
+      />
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 scrollbar-none md:mx-0 md:px-0">
@@ -75,7 +93,7 @@ export default function Demandes() {
             />
             {mobileList.length ? (
               <div className="grid gap-2.5 md:grid-cols-2 stagger">
-                {mobileList.map((l) => <LeadCard key={l.id} lead={l} onOpen={() => setOpenId(l.id)} />)}
+                {mobileList.map((l) => <LeadCard key={l.id} lead={l} highlight={moved === l.id} onOpen={() => setOpenId(l.id)} />)}
               </div>
             ) : (
               <EmptyState title="Rien ici" text="Aucune demande à cette étape." />
@@ -88,16 +106,17 @@ export default function Demandes() {
               const items = visible.filter((l) => l.status === st);
               const sum = items.reduce((a, l) => a + (l.estimate ?? 0), 0);
               return (
-                <div key={st} className="flex min-w-0 flex-col rounded-[14px] bg-[#ecebf4]/60 p-2">
-                  <div className="flex items-center gap-2 px-1.5 pb-2 pt-1">
-                    <span className="text-[13px] font-semibold">{LEAD_STATUS[st].label}</span>
+                <div key={st} className="flex min-w-0 flex-col rounded-[16px] bg-[#efedf6] p-2">
+                  <div className="flex items-center gap-2 px-1.5 pb-2.5 pt-1">
+                    <i className="h-2 w-2 rounded-full" style={{ background: STAGE_DOT[st] }} />
+                    <span className="truncate text-[13px] font-semibold">{LEAD_STATUS[st].label}</span>
                     <span className="text-[12px] text-ink-3">{items.length}</span>
                     <div className="flex-1" />
-                    {sum > 0 && <span className="num text-[11.5px] text-ink-3">{money(sum, true)}</span>}
+                    {sum > 0 && <span className="num hidden text-[11.5px] text-ink-3 xl:inline">{money(sum, true)}</span>}
                   </div>
-                  <div className="flex flex-col gap-2">
-                    {items.map((l) => <LeadCard key={l.id} lead={l} compact onOpen={() => setOpenId(l.id)} />)}
-                    {!items.length && <div className="rounded-xl border border-dashed border-line2 px-3 py-6 text-center text-[12px] text-ink-3">{LEAD_STATUS[st].hint}</div>}
+                  <div className="stagger-fast flex flex-col gap-2">
+                    {items.map((l) => <LeadCard key={l.id} lead={l} compact highlight={moved === l.id} onOpen={() => setOpenId(l.id)} onDevis={() => prepareDevis(l)} onAdvance={nextOf(l) ? () => advance(l) : undefined} nextLabel={nextOf(l) ? LEAD_STATUS[nextOf(l)].label : undefined} />)}
+                    {!items.length && <div className="rounded-[12px] border border-dashed border-[#d6d3e2] px-3 py-6 text-center text-[12px] text-ink-3">{LEAD_STATUS[st].hint}</div>}
                   </div>
                 </div>
               );

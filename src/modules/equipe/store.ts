@@ -89,10 +89,15 @@ interface EquipeState {
 }
 
 const d = dayOffset;
+/** Jour ouvré (lundi à vendredi) le plus proche après n jours : une demande de congé ne tombe pas un week-end. */
+const wd = (n: number) => {
+  const day = new Date(d(n) + 'T12:00:00').getDay();
+  return n + (day === 6 ? 2 : day === 0 ? 1 : 0);
+};
 
 export const demoLeaves = (): LeaveRequest[] => [
   { id: 'lv1', employeeId: 'e_yanis', type: 'cp', from: d(35), to: d(46), days: 9, status: 'en_attente', note: 'Fêtes en famille au Portugal', createdAt: d(-1) },
-  { id: 'lv2', employeeId: 'e_mehdi', type: 'cp', from: d(11), to: d(12), days: 2, status: 'en_attente', note: 'Déménagement', createdAt: d(0) },
+  { id: 'lv2', employeeId: 'e_mehdi', type: 'cp', from: d(wd(11)), to: d(wd(wd(11) + 1)), days: 2, status: 'en_attente', note: 'Déménagement', createdAt: d(0) },
   { id: 'lv3', employeeId: 'e_lucas', type: 'formation', from: d(16), to: d(18), days: 3, status: 'validee', note: 'Semaine au CFA', createdAt: d(-10) },
   { id: 'lv4', employeeId: 'e_mehdi', type: 'cp', from: d(-24), to: d(-23), days: 2, status: 'validee', createdAt: d(-40) },
   { id: 'lv5', employeeId: 'e_yanis', type: 'recup', from: d(4), to: d(4), days: 1, status: 'validee', note: 'Récupération samedi Tilleuls', createdAt: d(-5) },

@@ -1,40 +1,83 @@
-import type { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Lock } from 'lucide-react';
-import { Badge, Button, Icon } from '@/components/ui';
+import { useState, type ReactNode } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Check, Lock, Settings2 } from 'lucide-react';
+import { Button, IconTile, DEPT_TONE, toast } from '@/components/ui';
+import { DrawCheck } from '@/components/motion';
 import { DEPARTMENTS, MODULE_BY_KEY, OFFERS, planIncludes, type ModuleKey } from '@/lib/catalog';
+import { money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 
-/** Affiche la page si le module est activé, sinon propose de l'activer en un clic. */
+/** Affiche la page si le module est activé, sinon propose de l'activer en un clic (avec l'offre requise, clairement). */
 export function ModuleGate({ module, children }: { module: ModuleKey | null; children: ReactNode }) {
   const enabled = useBrix((s) => (module ? s.enabled.includes(module) : true));
   const plan = useBrix((s) => s.plan);
   const toggle = useBrix((s) => s.toggleModule);
   const setPlan = useBrix((s) => s.setPlan);
   const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
   if (!module || enabled) return <>{children}</>;
+
   const m = MODULE_BY_KEY[module];
   const dept = DEPARTMENTS.find((d) => d.key === m.dept)!;
+  const tone = DEPT_TONE[m.dept];
   const allowed = planIncludes(plan, m.plan);
   const offer = OFFERS.find((o) => o.key === m.plan)!;
+  const current = OFFERS.find((o) => o.key === plan);
+
+  const activate = () => {
+    setBusy(true);
+    setTimeout(() => {
+      if (!allowed) setPlan(m.plan);
+      toggle(module, true);
+      toast(allowed ? `${m.name} est maintenant dans votre menu` : `Offre ${offer.name} activée, 14 jours offerts. ${m.name} est dans votre menu.`);
+    }, 650);
+  };
+
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center py-16 text-center">
-      <div className="relative mb-5 grid h-16 w-16 place-items-center rounded-[20px] bg-vi-50 text-vi-700">
-        <Icon name={m.icon} className="h-7 w-7" />
-        {!allowed && <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-ink text-white ring-4 ring-page"><Lock className="h-3 w-3" /></span>}
+    <div className="grid min-h-[calc(100dvh-220px)] place-items-center py-8">
+      <div className="w-full max-w-[460px] animate-[fade-up_.45s_var(--ease)_both]">
+        <div className="relative overflow-hidden rounded-[22px] bg-white px-6 pb-6 pt-9 text-center shadow-card sm:px-8">
+          <div aria-hidden className="absolute inset-x-0 top-0 h-36" style={{ background: `radial-gradient(60% 100% at 50% 0%, ${tone.bg}, transparent)` }} />
+          <div className="relative mx-auto w-fit">
+            <IconTile name={m.icon} dept={m.dept} size="xl" solid className={busy ? 'scale-105 transition-transform duration-300 ease-spring' : 'transition-transform duration-300'} />
+            {busy ? (
+              <span className="absolute -bottom-1.5 -right-1.5 grid h-7 w-7 animate-pop place-items-center rounded-full bg-ok text-white ring-4 ring-white"><DrawCheck className="h-3.5 w-3.5" /></span>
+            ) : (
+              !allowed && <span className="absolute -bottom-1.5 -right-1.5 grid h-7 w-7 place-items-center rounded-full bg-[#15122a] text-white ring-4 ring-white"><Lock className="h-3 w-3" strokeWidth={2.2} /></span>
+            )}
+          </div>
+          <div className="relative mt-5 text-[12px] font-semibold uppercase tracking-[0.08em]" style={{ color: tone.fg }}>{dept.name}</div>
+          <h1 className="relative mt-1.5 text-[26px] font-semibold leading-tight tracking-[-0.03em]">{m.name}</h1>
+          <p className="relative mx-auto mt-2 max-w-[340px] text-[14px] leading-relaxed text-ink-2">{m.short}</p>
+
+          {allowed ? (
+            <p className="mt-5 rounded-[12px] bg-[#f7f6fb] px-4 py-3 text-[13px] text-ink-2">Compris dans votre offre {current?.name}. Il apparaîtra dans votre menu, vous pourrez le retirer à tout moment.</p>
+          ) : (
+            <div className="mt-5 rounded-[14px] bg-[#f7f6fb] p-4 text-left">
+              <div className="flex items-baseline justify-between gap-2">
+                <span className="text-[13.5px] font-semibold">Inclus dans l’offre {offer.name}</span>
+                <span className="num shrink-0 text-[13.5px] font-semibold">{offer.price ? money(offer.price, offer.price % 1 === 0) : 'Sur devis'}<span className="ml-1 text-[11.5px] font-normal text-ink-3">{offer.price ? 'HT / mois' : ''}</span></span>
+              </div>
+              <ul className="stagger-fast mt-2.5 space-y-1.5">
+                {offer.includes.slice(0, 3).map((i) => (
+                  <li key={i} className="flex gap-2 text-[12.5px] text-ink-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-ok" strokeWidth={2.2} />{i}</li>
+                ))}
+              </ul>
+              <p className="mt-3 text-[11.5px] text-ink-3">Vous êtes en offre {current?.name}. 14 jours offerts, sans engagement.</p>
+            </div>
+          )}
+
+          <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row">
+            <Button variant="ghost" size="lg" icon={<ArrowLeft />} className="justify-center sm:flex-none" onClick={() => navigate(-1)}>Retour</Button>
+            <Button variant="dawn" size="lg" className="justify-center sm:flex-1" loading={busy} onClick={activate}>
+              {allowed ? 'Activer ce module' : `Essayer ${offer.name} et activer`}
+            </Button>
+          </div>
+        </div>
+        <Link to="/app/reglages/modules" className="mx-auto mt-4 flex min-h-[44px] w-fit items-center gap-1.5 text-[12.5px] font-medium text-ink-2 transition-colors hover:text-ink">
+          <Settings2 className="h-3.5 w-3.5" strokeWidth={1.75} />Voir tous les modules
+        </Link>
       </div>
-      <Badge tone="violet">{dept.name}</Badge>
-      <h1 className="mt-3 text-2xl font-semibold">{m.name}</h1>
-      <p className="mt-2 text-[14px] text-ink-2">{m.short}</p>
-      <div className="mt-6 flex gap-2">
-        <Button variant="ghost" onClick={() => navigate(-1)}>Retour</Button>
-        {allowed ? (
-          <Button variant="dawn" onClick={() => toggle(module, true)}>Activer {m.name}</Button>
-        ) : (
-          <Button variant="dawn" onClick={() => { setPlan(m.plan); toggle(module, true); }}>Passer à {offer.name} et activer</Button>
-        )}
-      </div>
-      {!allowed && <p className="mt-3 text-xs text-ink-3">Inclus dans l'offre {offer.name}{offer.price ? ` à ${String(offer.price).replace('.', ',')} € ${offer.unit}` : ''}. Essai gratuit 14 jours.</p>}
     </div>
   );
 }

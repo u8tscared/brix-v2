@@ -9,7 +9,7 @@ export const VAT_RATES = [20, 10, 5.5, 0];
 
 export function sourceInfo(l: DevisLigne): { icon: JSX.Element; text: string; bob?: boolean } {
   if (l.source === 'bob') return { icon: <AudioLines className="h-3 w-3" />, text: l.detail && /bob/i.test(l.detail) ? l.detail : 'Proposé par Bob', bob: true };
-  if (l.source === 'taux' || l.unit === 'h') return { icon: <Clock className="h-3 w-3" />, text: l.detail ?? "Main d'œuvre · ton taux" };
+  if (l.source === 'taux' || l.unit === 'h') return { icon: <Clock className="h-3 w-3" />, text: (l.detail ?? "Main d'œuvre · votre taux").replace(/ton taux/, 'votre taux') };
   if (l.supplierRef || l.supplier) return { icon: <BookOpen className="h-3 w-3" />, text: [l.supplierRef, l.supplier].filter(Boolean).join(' · ') };
   if (l.source === 'bibliotheque') return { icon: <BookOpen className="h-3 w-3" />, text: l.detail ?? 'Bibliothèque de prix' };
   if (l.detail) return { icon: <PenLine className="h-3 w-3" />, text: l.detail };
@@ -130,7 +130,7 @@ export function LineCard({ l, onOpen }: { l: DevisLigne; onOpen: () => void }) {
           </span>
           <span className={cn('inline-flex max-w-[180px] items-center gap-1 truncate rounded-md px-1.5 py-0.5 text-[11px]', src.bob ? 'bg-vi-50 text-vi-700' : 'bg-sub text-ink-2')}>
             {src.icon}
-            <span className="truncate">{src.bob ? 'Proposé par Bob' : l.source === 'taux' || l.unit === 'h' ? 'Ton taux' : l.supplier || l.source === 'bibliotheque' ? 'Bibliothèque' : 'Ligne libre'}</span>
+            <span className="truncate">{src.bob ? 'Proposé par Bob' : l.source === 'taux' || l.unit === 'h' ? 'Votre taux' : l.supplier || l.source === 'bibliotheque' ? 'Bibliothèque' : 'Ligne libre'}</span>
           </span>
         </div>
       </div>

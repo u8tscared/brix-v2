@@ -118,16 +118,16 @@ export function FeesCard() {
   const keys = ['virement', 'instantane', 'carte', 'apple_pay', 'tap', 'x3', 'x4'];
   return (
     <Card>
-      <CardHeader title="Frais, sans surprise" meta="pas d’abonnement, pas de terminal" />
-      <ul className="divide-y divide-line">
+      <CardHeader title="Frais, sans surprise" meta="pas d’abonnement" />
+      <dl className="px-4 py-1 md:px-5">
         {keys.map((k) => (
-          <li key={k} className="flex min-h-[46px] items-center justify-between gap-3 px-4 py-2 text-[13px]">
-            <span>{METHOD_FEES[k].label}</span>
-            <span className="num font-medium">{METHOD_FEES[k].text}</span>
-          </li>
+          <div key={k} className="flex min-h-[40px] items-center justify-between gap-3 border-b border-dashed border-line text-[13px] last:border-b-0">
+            <dt className="text-ink-2">{METHOD_FEES[k].label}</dt>
+            <dd className={'num font-medium ' + (METHOD_FEES[k].text === 'Gratuit' ? 'text-ok' : '')}>{METHOD_FEES[k].text}</dd>
+          </div>
         ))}
-      </ul>
-      <p className="border-t border-line px-4 py-3 text-[12px] text-ink-3">Exemple : 1 000 € par carte = 15,25 € de frais. Argent sur votre compte sous 2 jours ouvrés (virement instantané : 10 secondes).</p>
+      </dl>
+      <p className="px-4 pb-4 pt-2 text-[12px] leading-relaxed text-ink-3 md:px-5">Exemple : 1 000 € par carte = 15,25 € de frais. Argent sur votre compte sous 2 jours ouvrés, ou 10 secondes en virement instantané.</p>
     </Card>
   );
 }

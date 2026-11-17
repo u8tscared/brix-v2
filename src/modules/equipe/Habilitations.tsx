@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { AlertOctagon, BadgeCheck, CalendarPlus, Check, Plus } from 'lucide-react';
-import { Avatar, Badge, Button, Card, CardHeader, EmptyState, PageHeader, cn, toast } from '@/components/ui';
+import { Avatar, Badge, Button, Card, CardHeader, EmptyState, IconTile, PageHeader, cn, toast } from '@/components/ui';
+import { SuccessDot } from '@/components/motion';
+import { DaysRing, SectionHead } from '@/modules/finance/components/kit';
 import { useBrix } from '@/lib/store';
 import { dateFull, dateShort, money, uid } from '@/lib/format';
 import { addDays } from './data';
@@ -44,47 +46,58 @@ export default function Habilitations() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Habilitations" subtitle={`Électriques, CACES, hauteur, secourisme, amiante. Alerte ${ALERT_DAYS} jours avant chaque échéance.`}
-        actions={<Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setOpen(true)}>Ajouter</Button>} />
+      <PageHeader icon={<IconTile name="BadgeCheck" dept="equipe" size="lg" />} title="Habilitations" subtitle={`Électriques, CACES, hauteur, secourisme, amiante. Brix vous prévient ${ALERT_DAYS} jours avant chaque échéance.`}
+        actions={<Button variant="secondary" icon={<Plus />} onClick={() => setOpen(true)} className="max-sm:w-full">Ajouter</Button>} />
 
       {employees.length === 0 ? <EmptyState icon={<BadgeCheck />} title="Aucune personne à suivre" text="Ajoutez votre équipe pour suivre ses habilitations." /> : (
         <>
-          {alerts.length > 0 && (
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {alerts.map(({ h, st }) => {
-                const e = empOf(h.employeeId);
-                const t = habType(h.type)!;
-                const planned = trainings.find((x) => x.employeeId === h.employeeId && x.type === h.type && x.status === 'inscrit');
-                return (
-                  <Card key={h.id} className={cn('p-4', st.level === 'expired' && 'border-[#fbd1d1] bg-bad-bg/50')}>
-                    <div className="flex items-start gap-3">
-                      <Avatar initials={e.initials} color={e.color} size={36} />
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[14px] font-semibold">{e.firstName} · {t.short}</div>
-                        <div className="truncate text-[12.5px] text-ink-2">{t.label}</div>
+          {alerts.length > 0 ? (
+            <section className="space-y-3">
+              <SectionHead title="À renouveler" meta={`${alerts.length} habilitation${alerts.length > 1 ? 's' : ''}`} />
+              <div className="stagger grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {alerts.map(({ h, st }) => {
+                  const e = empOf(h.employeeId);
+                  const t = habType(h.type)!;
+                  const planned = trainings.find((x) => x.employeeId === h.employeeId && x.type === h.type && x.status === 'inscrit');
+                  return (
+                    <Card key={h.id} className="relative flex flex-col overflow-hidden p-4">
+                      <span aria-hidden className={cn('absolute inset-y-0 left-0 w-[3px]', st.level === 'expired' ? 'bg-bad' : 'bg-[#f59e0b]')} />
+                      <div className="flex items-start gap-3.5">
+                        <DaysRing days={st.days} horizon={ALERT_DAYS} size={58} stroke={5} />
+                        <div className="min-w-0 flex-1 pt-0.5">
+                          <div className="flex items-center gap-2">
+                            <Avatar initials={e.initials} color={e.color} size={20} />
+                            <span className="truncate text-[14px] font-semibold">{e.firstName} · {t.short}</span>
+                          </div>
+                          <div className="mt-0.5 truncate text-[12.5px] text-ink-2">{t.label}</div>
+                          <div className={cn('mt-1 text-[12.5px] font-medium', st.level === 'expired' ? 'text-bad' : 'text-warn')}>{st.level === 'expired' ? `Expirée depuis ${-st.days} jours` : `Expire le ${dateShort(h.expires)}`}</div>
+                        </div>
                       </div>
-                      <Badge tone={st.tone}>{st.label}</Badge>
-                    </div>
-                    {st.level === 'expired' && (
-                      <div className="mt-3 flex items-start gap-2 rounded-lg bg-white/70 px-3 py-2 text-[12.5px] text-bad">
-                        <AlertOctagon className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                        <span>{h.type.startsWith('caces') ? `${e.firstName} ne doit plus conduire de nacelle jusqu’au recyclage.` : `${e.firstName} ne doit plus faire ces travaux jusqu’au recyclage.`}</span>
-                      </div>
-                    )}
-                    <div className="mt-3 flex items-center gap-2">
-                      {planned ? <span className="text-[12.5px] text-ink-2">Recyclage prévu le {dateShort(planned.date)}</span> : (
-                        <Button size="sm" variant={st.level === 'expired' ? 'primary' : 'secondary'} icon={<CalendarPlus className="h-3.5 w-3.5" />} onClick={() => plan(h)}>Planifier le recyclage</Button>
+                      {st.level === 'expired' && (
+                        <p className="mt-3 flex items-start gap-2 text-[12.5px] leading-snug text-ink-2">
+                          <AlertOctagon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-bad" />
+                          {h.type.startsWith('caces') ? `${e.firstName} ne conduit plus de nacelle jusqu’au recyclage.` : `${e.firstName} ne fait plus ces travaux jusqu’au recyclage.`}
+                        </p>
                       )}
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
+                      <div className="mt-auto pt-3.5">
+                        {planned ? (
+                          <span className="flex h-10 items-center gap-2 text-[13px] font-medium text-ok"><SuccessDot size={20} />Recyclage le {dateShort(planned.date)} · {planned.organisme}</span>
+                        ) : (
+                          <Button size="sm" variant={st.level === 'expired' ? 'primary' : 'secondary'} icon={<CalendarPlus />} onClick={() => plan(h)} className="max-sm:w-full">Planifier le recyclage</Button>
+                        )}
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            </section>
+          ) : (
+            <Card className="flex items-center gap-3 p-5 text-[13.5px]"><SuccessDot size={24} />Tout le monde est à jour. Brix vous prévient {ALERT_DAYS} jours avant la prochaine échéance.</Card>
           )}
 
           {/* Tableau complet (ordinateur) */}
           <Card className="hidden overflow-hidden xl:block">
-            <CardHeader title="Tableau des habilitations" meta="date d’échéance" />
+            <CardHeader title="Toute l’équipe" meta="date de fin de validité" />
             <table className="w-full table-fixed text-[12.5px]">
               <colgroup><col className="w-[180px]" />{COLS.map((c) => <col key={c} />)}</colgroup>
               <thead>
@@ -104,7 +117,7 @@ export default function Habilitations() {
                       return (
                         <td key={c} className="px-1 py-2 text-center">
                           {h && st ? (
-                            <span className={cn('num inline-block rounded-md px-1.5 py-1 text-[11.5px] font-medium', st.level === 'expired' ? 'bg-bad-bg text-bad' : st.level === 'soon' ? 'bg-warn-bg text-warn' : 'bg-ok-bg text-ok')}>{dateFull(h.expires).slice(0, 6) + dateFull(h.expires).slice(8)}</span>
+                            <span title={st.label} className={cn('num inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[11.5px] font-medium', st.level === 'expired' ? 'bg-bad-bg text-bad' : st.level === 'soon' ? 'bg-warn-bg text-warn' : 'text-ink-2')}>{st.level === 'ok' && <i className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />}{dateFull(h.expires).slice(0, 6) + dateFull(h.expires).slice(8)}</span>
                           ) : <span className="text-line2">·</span>}
                         </td>
                       );
@@ -134,7 +147,7 @@ export default function Habilitations() {
                           <div className="truncate text-[13.5px] font-medium">{habType(h.type)?.label}</div>
                           <div className="text-[11.5px] text-ink-3">jusqu’au {dateFull(h.expires)} · {h.organisme}</div>
                         </div>
-                        <Badge tone={st.tone} dot={st.level !== 'ok'}>{st.level === 'ok' ? 'Valide' : st.label}</Badge>
+                        {st.level === 'ok' ? <Badge tone="ok" dot>Valide</Badge> : <DaysRing days={st.days} horizon={ALERT_DAYS} size={40} />}
                       </div>
                     );
                   })}

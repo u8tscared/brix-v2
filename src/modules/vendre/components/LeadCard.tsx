@@ -1,5 +1,5 @@
-import { Phone } from 'lucide-react';
-import { Badge, cn } from '@/components/ui';
+import { ArrowRight, FileText, Phone } from 'lucide-react';
+import { Badge, Tip, cn } from '@/components/ui';
 import { money, relative } from '@/lib/format';
 import type { Lead } from '@/lib/types';
 import { LEAD_SOURCE, readLead, telHref, URGENCY } from '../lib';
@@ -15,7 +15,8 @@ export function ScoreDot({ score }: { score?: number }) {
 }
 
 /** Carte compacte d'une demande (colonne kanban ou liste sur téléphone). */
-export function LeadCard({ lead, onOpen, compact }: { lead: Lead; onOpen: () => void; compact?: boolean }) {
+export function LeadCard({ lead, onOpen, compact, onDevis, onAdvance, nextLabel, highlight }: { lead: Lead; onOpen: () => void; compact?: boolean; onDevis?: () => void; onAdvance?: () => void; nextLabel?: string; highlight?: boolean }) {
+  const live = lead.status !== 'perdu' && lead.status !== 'gagne';
   const r = readLead(lead);
   const src = LEAD_SOURCE[lead.source];
   const SrcIcon = src.icon;
@@ -25,7 +26,7 @@ export function LeadCard({ lead, onOpen, compact }: { lead: Lead; onOpen: () => 
       tabIndex={0}
       onClick={onOpen}
       onKeyDown={(e) => e.key === 'Enter' && onOpen()}
-      className={cn('group w-full cursor-pointer rounded-xl border border-line bg-white p-3.5 text-left transition hover:border-line2 hover:shadow-[0_4px_14px_-8px_rgba(30,20,70,.25)]', lead.status === 'perdu' && 'opacity-60')}
+      className={cn('group lift relative w-full cursor-pointer rounded-[14px] bg-white p-3.5 text-left shadow-card', lead.status === 'perdu' && 'opacity-60', highlight && 'animate-[pop_.5s_var(--ease)_both] shadow-[0_0_0_2px_#b9a2f5,0_12px_28px_-14px_rgba(109,40,217,.5)]')}
     >
       <div className="flex items-start gap-2.5">
         <div className="min-w-0 flex-1">
@@ -46,7 +47,25 @@ export function LeadCard({ lead, onOpen, compact }: { lead: Lead; onOpen: () => 
         <Badge tone={URGENCY[r.urgency].tone}>{URGENCY[r.urgency].label}</Badge>
         {lead.estimate !== undefined && <span className="num whitespace-nowrap text-[12.5px] font-semibold text-ink-2">≈ {money(lead.estimate, true)}</span>}
         <div className="flex-1" />
-        {!compact && lead.status !== 'perdu' && lead.status !== 'gagne' && (
+        {compact && live && (onDevis || onAdvance) && (
+          <span className="flex items-center gap-1 rounded-full bg-white p-0.5 transition duration-200 ease-out-quint lg:absolute lg:bottom-2.5 lg:right-2.5 lg:translate-y-1 lg:opacity-0 lg:shadow-raise lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+            {onDevis && lead.status !== 'devis' && (
+              <Tip label="Préparer le devis">
+                <button onClick={(e) => { e.stopPropagation(); onDevis(); }} aria-label="Préparer le devis" className="grid h-7 w-7 place-items-center rounded-full bg-sub text-ink-2 transition hover:bg-ink hover:text-white">
+                  <FileText className="h-3.5 w-3.5" />
+                </button>
+              </Tip>
+            )}
+            {onAdvance && nextLabel && (
+              <Tip label={`Passer en « ${nextLabel} »`}>
+                <button onClick={(e) => { e.stopPropagation(); onAdvance(); }} aria-label={`Passer en ${nextLabel}`} className="grid h-7 w-7 place-items-center rounded-full bg-vi-50 text-vi-700 transition hover:bg-vi-700 hover:text-white">
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </Tip>
+            )}
+          </span>
+        )}
+        {!compact && live && (
           <a
             href={telHref(lead.phone)}
             onClick={(e) => e.stopPropagation()}

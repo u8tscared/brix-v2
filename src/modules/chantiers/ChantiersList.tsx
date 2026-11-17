@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { HardHat, List, Map as MapIcon, Plus, Search } from 'lucide-react';
-import { Button, Card, EmptyState, Input, PageHeader, Segmented, Stat } from '@/components/ui';
+import { HardHat, LayoutGrid, List, Map as MapIcon, Plus, Search } from 'lucide-react';
+import { Button, EmptyState, IconTile, Input, PageHeader, Segmented } from '@/components/ui';
 import { money } from '@/lib/format';
 import type { ChantierStatus } from '@/lib/types';
 import { useChantierViews } from './lib/useChantier';
@@ -9,6 +9,10 @@ import { useChantiersSeed } from './store';
 import { ChantierTable } from './components/list/ChantierTable';
 import { ChantierMap } from './components/list/ChantierMap';
 import { NewChantierSheet } from './components/list/NewChantierSheet';
+import { ChantierCards } from './components/list/ChantierCards';
+import { KpiBand, VersusBars } from './components/common/KpiBand';
+
+type View = 'cartes' | 'liste' | 'carte';
 
 type Filter = 'actifs' | ChantierStatus | 'tous';
 
@@ -19,11 +23,12 @@ export default function ChantiersList() {
   const views = useChantierViews();
   const [params, setParams] = useSearchParams();
   const [filter, setFilter] = useState<Filter>('actifs');
-  const [view, setView] = useState<'liste' | 'carte'>(() => {
+  const [view, setView] = useState<View>(() => {
     try {
-      return (localStorage.getItem('brix-chantiers-view') as 'liste' | 'carte') || 'liste';
+      const v = localStorage.getItem('brix-chantiers-view2') as View | null;
+      return v && ['cartes', 'liste', 'carte'].includes(v) ? v : 'cartes';
     } catch {
-      return 'liste';
+      return 'cartes';
     }
   });
   const [q, setQ] = useState('');
@@ -34,10 +39,10 @@ export default function ChantiersList() {
     else p.delete('nouveau');
     setParams(p, { replace: true });
   };
-  const changeView = (v: 'liste' | 'carte') => {
+  const changeView = (v: View) => {
     setView(v);
     try {
-      localStorage.setItem('brix-chantiers-view', v);
+      localStorage.setItem('brix-chantiers-view2', v);
     } catch {
       /* stockage indisponible */
     }
@@ -59,52 +64,65 @@ export default function ChantiersList() {
   const avgPlanned = active.length ? active.reduce((s, v) => s + v.m.plannedMarginRate * v.ch.budgetHt, 0) / Math.max(1, inProgressAmount) : 0;
   const watch = views.filter((v) => v.ch.status !== 'termine' && v.m.risk !== 'faible');
 
+  const toProduce = active.reduce((s, v) => s + v.ch.budgetHt * (1 - v.ch.progress / 100), 0);
+  const filters = (
+    [
+      ['actifs', 'Actifs'],
+      ['en_cours', 'En cours'],
+      ['a_planifier', 'À planifier'],
+      ['en_pause', 'En pause'],
+      ['reception', 'Réception'],
+      ['termine', 'Terminés'],
+      ['tous', 'Tous'],
+    ] as [Filter, string][]
+  )
+    .filter(([f]) => f === 'actifs' || f === 'tous' || f === filter || count(f) > 0)
+    .map(([value, label]) => ({ value, label, count: count(value) }));
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <PageHeader
+        icon={<IconTile name="HardHat" dept="chantiers" size="lg" />}
         title="Chantiers"
-        subtitle={views.length ? `${active.length} en cours · ${count('a_planifier')} à planifier` : 'Suivez avancement, marge et photos de chaque chantier.'}
+        subtitle={views.length ? `${active.length} en cours, ${count('a_planifier')} à planifier` : 'Suivez avancement, marge et photos de chaque chantier.'}
         actions={
-          <>
-            <Segmented
-              value={view}
-              onChange={changeView}
-              options={[
-                { value: 'liste', label: <span className="flex items-center gap-1.5"><List className="h-3.5 w-3.5" />Liste</span> },
-                { value: 'carte', label: <span className="flex items-center gap-1.5"><MapIcon className="h-3.5 w-3.5" />Carte</span> },
-              ]}
-            />
-            <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>
-              Nouveau chantier
-            </Button>
-          </>
+          <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)} className="max-sm:w-full">
+            Nouveau chantier
+          </Button>
         }
       />
 
       {views.length > 0 && (
-        <Card className="grid grid-cols-2 gap-px overflow-hidden bg-line md:grid-cols-4">
-          <Stat className="bg-white" label="Marge réelle moyenne" value={`${Math.round(avgMargin)} %`} hero sub={`prévue ${Math.round(avgPlanned)} % au devis`} />
-          <Stat className="bg-white" label="En cours" value={money(inProgressAmount, true)} sub={`${active.length} chantiers HT`} />
-          <Stat className="bg-white" label="Reste à produire" value={money(active.reduce((s, v) => s + v.ch.budgetHt * (1 - v.ch.progress / 100), 0), true)} sub="sur les chantiers en cours" />
-          <Stat className="bg-white" label="À surveiller" value={String(watch.length)} sub={watch.length ? watch.map((w) => w.client?.name.split(' ').slice(-1)[0]).join(', ') : 'tout est dans les clous'} />
-        </Card>
-      )}
-
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <Segmented
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: 'actifs', label: 'Actifs', count: count('actifs') },
-            { value: 'en_cours', label: 'En cours', count: count('en_cours') },
-            { value: 'a_planifier', label: 'À planifier', count: count('a_planifier') },
-            { value: 'en_pause', label: 'En pause', count: count('en_pause') },
-            { value: 'reception', label: 'Réception', count: count('reception') },
-            { value: 'termine', label: 'Terminés', count: count('termine') },
-            { value: 'tous', label: 'Tous', count: count('tous') },
+        <KpiBand
+          hero={{
+            label: 'Marge réelle des chantiers en cours',
+            value: avgMargin,
+            format: (n) => `${Math.round(n)} %`,
+            sub: avgMargin < avgPlanned - 2 ? `${Math.round(avgPlanned - avgMargin)} pts sous le devis` : 'conforme au devis',
+            extra: <VersusBars real={avgMargin} planned={avgPlanned} realLabel="Réelle" plannedLabel="Au devis" />,
+          }}
+          items={[
+            { label: 'En cours', value: inProgressAmount, format: (n) => money(n, true), sub: `${active.length} chantier${active.length > 1 ? 's' : ''} HT` },
+            { label: 'Reste à produire', value: toProduce, format: (n) => money(n, true), sub: 'avant facturation finale' },
+            { label: 'À surveiller', value: watch.length, tone: watch.length ? 'warn' : 'ok', sub: watch.length ? watch.map((w) => w.client?.name.split(' ').slice(-1)[0]).join(', ') : 'tout est dans les clous' },
           ]}
         />
-        <Input icon={<Search />} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Chercher un chantier, un client, une ville" className="md:w-80" />
+      )}
+
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <Segmented value={filter} onChange={setFilter} options={filters} />
+        <div className="flex flex-1 items-center gap-2 lg:justify-end">
+          <Input icon={<Search />} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Chantier, client, ville" className="min-w-0 flex-1 lg:max-w-72" />
+          <Segmented
+            value={view}
+            onChange={changeView}
+            options={[
+              { value: 'cartes', label: <span className="flex items-center gap-1.5" aria-label="Cartes"><LayoutGrid className="h-3.5 w-3.5" /><span className="max-sm:hidden">Cartes</span></span> },
+              { value: 'liste', label: <span className="flex items-center gap-1.5" aria-label="Liste"><List className="h-3.5 w-3.5" /><span className="max-sm:hidden">Liste</span></span> },
+              { value: 'carte', label: <span className="flex items-center gap-1.5" aria-label="Plan"><MapIcon className="h-3.5 w-3.5" /><span className="max-sm:hidden">Plan</span></span> },
+            ]}
+          />
+        </div>
       </div>
 
       {views.length === 0 ? (
@@ -116,10 +134,10 @@ export default function ChantiersList() {
         />
       ) : rows.length === 0 ? (
         <EmptyState icon={<Search />} title="Aucun chantier ne correspond" text="Changez le filtre ou la recherche." action={<Button onClick={() => { setFilter('tous'); setQ(''); }}>Tout afficher</Button>} />
-      ) : view === 'liste' ? (
-        <ChantierTable rows={rows} />
       ) : (
-        <ChantierMap rows={rows} />
+        <div key={view} className="animate-fade-up">
+          {view === 'cartes' ? <ChantierCards rows={rows} /> : view === 'liste' ? <ChantierTable rows={rows} /> : <ChantierMap rows={rows} />}
+        </div>
       )}
 
       <NewChantierSheet open={creating} onClose={() => setCreating(false)} />

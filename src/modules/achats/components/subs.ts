@@ -3,7 +3,7 @@ import { dateFull, daysBetween, todayISO } from '@/lib/format';
 import { addDays } from '@/modules/equipe/data';
 import type { SubContractor } from '../data';
 
-export interface DocState { key: string; label: string; detail: string; tone: Tone; status: string; level: 0 | 1 | 2 }
+export interface DocState { key: string; label: string; detail: string; tone: Tone; status: string; level: 0 | 1 | 2; days: number }
 
 /** Contrôle des documents obligatoires (vigilance, art. L8222-1 du code du travail). */
 export function subDocs(s: SubContractor): DocState[] {
@@ -13,10 +13,10 @@ export function subDocs(s: SubContractor): DocState[] {
   const kbisAge = daysBetween(s.kbisAt, today);
   const dec = daysBetween(today, s.decennale.expires);
   const rc = daysBetween(today, s.rcproExpires);
-  const st = (days: number, soon: number) => (days < 0 ? { tone: 'bad' as Tone, status: `Expirée depuis ${-days} j`, level: 2 as const } : days <= soon ? { tone: 'warn' as Tone, status: `Expire dans ${days} j`, level: 1 as const } : { tone: 'ok' as Tone, status: 'À jour', level: 0 as const });
+  const st = (days: number, soon: number) => (days < 0 ? { tone: 'bad' as Tone, status: `Expirée depuis ${-days} j`, level: 2 as const, days } : days <= soon ? { tone: 'warn' as Tone, status: `Expire dans ${days} j`, level: 1 as const, days } : { tone: 'ok' as Tone, status: 'À jour', level: 0 as const, days });
   return [
     { key: 'urssaf', label: 'Attestation URSSAF de vigilance', detail: `Datée du ${dateFull(s.urssafAt)}, valable jusqu’au ${dateFull(urssafEnd)} · à renouveler tous les 6 mois`, ...st(u, 30) },
-    { key: 'kbis', label: 'Extrait Kbis', detail: `Daté du ${dateFull(s.kbisAt)}${kbisAge > 90 ? ' · plus de 3 mois' : ''}`, ...(kbisAge > 90 ? { tone: 'warn' as Tone, status: 'À actualiser', level: 1 as const } : { tone: 'ok' as Tone, status: 'À jour', level: 0 as const }) },
+    { key: 'kbis', label: 'Extrait Kbis', detail: `Daté du ${dateFull(s.kbisAt)}${kbisAge > 90 ? ' · plus de 3 mois' : ''}`, days: 90 - kbisAge, ...(kbisAge > 90 ? { tone: 'warn' as Tone, status: 'À actualiser', level: 1 as const } : { tone: 'ok' as Tone, status: 'À jour', level: 0 as const }) },
     { key: 'decennale', label: 'Assurance décennale', detail: `${s.decennale.insurer} · jusqu’au ${dateFull(s.decennale.expires)}`, ...st(dec, 45) },
     { key: 'rcpro', label: 'Responsabilité civile pro', detail: `jusqu’au ${dateFull(s.rcproExpires)}`, ...st(rc, 45) },
   ];

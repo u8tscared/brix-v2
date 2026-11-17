@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, ArrowDownLeft, ArrowUpRight, Landmark } from 'lucide-react';
-import { Card, CardHeader, cn, PageHeader, Stat, Switch, toast } from '@/components/ui';
-import { capitalize, dateLong, money } from '@/lib/format';
+import { useNavigate } from 'react-router-dom';
+import { ArrowDownLeft, ArrowUpRight, BellRing, RefreshCw, TrendingDown, TrendingUp } from 'lucide-react';
+import { Button, Card, cn, IconTile, PageHeader, Segmented, Switch, toast } from '@/components/ui';
+import { daysBetween, money, todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
-import { StatStrip } from '@/modules/vendre/components/StatStrip';
+import { BigMoney, BobSays, Label, SplitBar } from './components/kit';
 import { AccountsCard } from './components/tresorerieAccounts';
 import { ForecastChart } from './components/tresorerieChart';
 import { buildForecast } from './components/tresorerieForecast';
@@ -11,15 +12,20 @@ import { applyPayment, autoMatch, syncBank, useTreso } from './components/tresor
 import { TransactionsCard } from './components/tresorerieTransactions';
 
 const dm = (iso: string) => new Date(iso + 'T12:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' });
+const short = (iso: string) => new Date(iso + 'T12:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }).replace('.', '');
 
 export default function Tresorerie() {
   const s = useBrix();
+  const nav = useNavigate();
   const treso = useTreso();
   const [syncing, setSyncing] = useState(false);
+  const [dir, setDir] = useState<'tout' | 'in' | 'out'>('tout');
   const extra = treso.accounts.filter((a) => !a.main).reduce((a, x) => a + (x.balance ?? 0), 0);
   const f = useMemo(() => buildForecast(s, { withProbable: treso.withProbable, extraBalance: extra }), [s.factures, s.devis, s.chantiers, s.employees, s.cashBalance, treso.withProbable, extra]);
   const total = s.cashBalance + extra;
-  const upcoming = f.events.slice(0, 8);
+  const upcoming = f.events.filter((e) => dir === 'tout' || (dir === 'in' ? e.amount > 0 : e.amount < 0)).slice(0, 9);
+  const delta = f.end - total;
+  const today = todayISO();
 
   const sync = async () => {
     setSyncing(true);
@@ -44,70 +50,108 @@ export default function Tresorerie() {
   const tva = f.nextTva;
   const tvaEvent = tva?.events.find((e) => e.kind === 'tva');
   const low = f.min.balance < f.payroll;
+  const lateCount = s.factures.filter((x) => x.status === 'en_retard').length;
 
   return (
-    <div className="space-y-5">
-      <PageHeader title="Trésorerie" subtitle="Votre argent aujourd'hui, et ce qu'il sera dans 90 jours." />
+    <div className="space-y-6">
+      <PageHeader
+        icon={<IconTile name="Landmark" dept="facturer" size="lg" />}
+        title="Trésorerie"
+        subtitle="Votre argent aujourd'hui, et ce qu'il sera dans 90 jours."
+        actions={<Button variant="secondary" loading={syncing} icon={<RefreshCw />} onClick={sync} className="max-sm:w-full">Actualiser la banque</Button>}
+      />
 
-      <StatStrip>
-        <Stat label={<><Landmark className="h-3.5 w-3.5" />Sur vos comptes</>} hero value={money(total, true)} sub={`${treso.accounts.length} compte${treso.accounts.length > 1 ? 's' : ''} relié${treso.accounts.length > 1 ? 's' : ''}`} />
-        <Stat label="Va rentrer (90 j)" value={<span className="text-ok">+{money(f.ins, true)}</span>} sub="factures et devis signés" />
-        <Stat label="Va sortir (90 j)" value={money(f.outs, true)} sub="salaires, URSSAF, TVA, charges" />
-        <Stat label="Dans 90 jours" value={money(f.end, true)} sub={`point bas ${money(f.min.balance, true)} le ${dm(f.min.date)}`} />
-      </StatStrip>
-
-      {tva && tvaEvent && (
-        <Card className={cn('flex items-start gap-3 p-4', low && 'border-[#fde3b5] bg-warn-bg/40')}>
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-semibold text-white">B</span>
-          <div className="min-w-0 flex-1">
-            <p className="text-[14px] leading-relaxed">
-              Le {new Date(tva.date + 'T12:00').getDate()}, la TVA passe (<b className="num">{money(-tvaEvent.amount, true)}</b>) avec l'URSSAF : il te restera <b className="num">{money(tva.balance, true)}</b>.{' '}
-              {low ? (
-                <span className="text-warn"><AlertTriangle className="mr-1 inline h-3.5 w-3.5" />Le {dm(f.min.date)}, tu descends à {money(f.min.balance, true)}, moins qu'un mois de salaires. Je relance les factures en retard dès ce soir ?</span>
-              ) : (
-                <>Pas d'inquiétude, ton point le plus bas reste à {money(f.min.balance, true)}, le {dm(f.min.date)}.</>
-              )}
-            </p>
+      <Card className="overflow-hidden">
+        <div className="grid gap-6 p-5 md:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end">
+          <div className="min-w-0">
+            <Label>Sur vos comptes aujourd'hui</Label>
+            <BigMoney value={total} dawn className="mt-3 block text-[46px] md:text-[56px]" />
+            <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-2">
+              <span>Dans 90 jours : <b className="num font-semibold text-ink">{money(f.end, true)}</b></span>
+              <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] font-medium', delta >= 0 ? 'bg-ok-bg text-ok' : 'bg-sub text-ink-2')}>
+                {delta >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+                <span className="num">{delta >= 0 ? '+' : ''}{money(delta, true)}</span>
+              </span>
+            </div>
           </div>
-        </Card>
-      )}
+          <div className="min-w-0">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label><span className="h-2 w-2 rounded-full bg-[#16a34a]" />Va rentrer</Label>
+                <BigMoney value={f.ins} signed className="mt-1.5 block text-[24px] text-ok" />
+                <div className="mt-1 text-[12px] text-ink-3">factures et devis signés</div>
+              </div>
+              <div>
+                <Label><span className="h-2 w-2 rounded-full bg-[#a78bfa]" />Va sortir</Label>
+                <BigMoney value={f.outs} className="mt-1.5 block text-[24px]" />
+                <div className="mt-1 text-[12px] text-ink-3">salaires, URSSAF, TVA, charges</div>
+              </div>
+            </div>
+            <SplitBar className="mt-4" parts={[{ value: f.ins, color: '#16a34a', label: 'Entrées' }, { value: -f.outs, color: '#c4b5fd', label: 'Sorties' }]} />
+          </div>
+        </div>
 
-      <Card className="min-w-0">
-        <CardHeader
-          title="Prévision à 90 jours"
-          meta={<span className="hidden md:inline">survolez la courbe</span>}
-          action={
+        <div className="border-t border-line px-2 pb-3 pt-4 md:px-5">
+          <div className="mb-1 flex flex-wrap items-center justify-between gap-2 px-2 md:px-0">
+            <div className="flex items-baseline gap-2">
+              <h2 className="text-[14.5px] font-semibold tracking-[-0.015em]">Prévision à 90 jours</h2>
+              <span className="hidden text-[12.5px] text-ink-3 md:inline">passez la souris sur la courbe</span>
+            </div>
             <label className="flex cursor-pointer items-center gap-2 text-[12.5px] text-ink-2">
-              <span className="hidden sm:inline">Compter les devis en attente</span>
-              <span className="sm:hidden">Devis en attente</span>
+              Compter les devis en attente
               <Switch checked={treso.withProbable} onChange={treso.setWithProbable} label="Compter les devis en attente" />
             </label>
-          }
-        />
-        <div className="px-2 pb-2 pt-3 md:px-4">
-          <ForecastChart points={f.points} />
+          </div>
+          <ForecastChart key={String(treso.withProbable)} points={f.points} threshold={f.payroll} />
         </div>
       </Card>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
+      {tva && tvaEvent && (
+        <BobSays
+          tone={low ? 'warn' : 'calm'}
+          actions={low && lateCount > 0 ? <Button size="sm" variant="primary" icon={<BellRing />} onClick={() => nav('/app/relances')}>Voir les relances</Button> : undefined}
+        >
+          Le {new Date(tva.date + 'T12:00').getDate()}, la TVA (<b className="num">{money(-tvaEvent.amount, true)}</b>) et l'URSSAF passent : il te restera <b className="num">{money(tva.balance, true)}</b>.{' '}
+          {low ? (
+            <span>Le {dm(f.min.date)}, tu descends à <b className="num">{money(f.min.balance, true)}</b>, moins d'un mois de salaires. On relance les retards ?</span>
+          ) : (
+            <span className="text-ink-2">Ton point le plus bas reste à {money(f.min.balance, true)} le {dm(f.min.date)}, au-dessus du seuil. Tout va bien.</span>
+          )}
+        </BobSays>
+      )}
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_380px]">
         <TransactionsCard />
-        <div className="space-y-4">
-          <AccountsCard onSync={sync} syncing={syncing} />
-          <Card>
-            <CardHeader title="Prochains mouvements" />
-            {upcoming.map((e, i) => (
-              <div key={i} className="flex min-h-[52px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0">
-                <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full', e.amount > 0 ? 'bg-ok-bg text-ok' : 'bg-sub text-ink-2')}>
-                  {e.amount > 0 ? <ArrowDownLeft className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5" />}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13px] font-medium">{e.label}</div>
-                  <div className="text-[11.5px] text-ink-3">{capitalize(dateLong(e.date))}</div>
-                </div>
-                <span className={cn('num shrink-0 text-[13px] font-semibold', e.amount > 0 && 'text-ok')}>{e.amount > 0 ? '+' : ''}{money(e.amount, true)}</span>
-              </div>
-            ))}
+        <div className="space-y-5">
+          <Card className="overflow-hidden">
+            <div className="flex min-h-[56px] items-center justify-between gap-2 border-b border-line px-4">
+              <h4 className="text-[14px] font-semibold tracking-[-0.015em]">À venir</h4>
+              <Segmented size="sm" value={dir} onChange={setDir} options={[{ value: 'tout', label: 'Tout' }, { value: 'in', label: 'Entrées' }, { value: 'out', label: 'Sorties' }]} />
+            </div>
+            <ul key={dir} className="stagger-fast">
+              {upcoming.map((e, i) => {
+                const n = daysBetween(today, e.date);
+                return (
+                  <li key={i} className="flex min-h-[54px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0">
+                    <span className="w-11 shrink-0 text-center">
+                      <span className="block text-[13px] font-semibold leading-none">{short(e.date).split(' ')[0]}</span>
+                      <span className="mt-0.5 block text-[10.5px] uppercase tracking-wide text-ink-3">{short(e.date).split(' ')[1]}</span>
+                    </span>
+                    <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full', e.amount > 0 ? 'bg-ok-bg text-ok' : 'bg-vi-50 text-vi-700')}>
+                      {e.amount > 0 ? <ArrowDownLeft className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5" />}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[13px] font-medium">{e.label}</div>
+                      <div className="text-[11.5px] text-ink-3">{n <= 1 ? 'demain' : `dans ${n} jours`}</div>
+                    </div>
+                    <span className={cn('num shrink-0 text-[13px] font-semibold', e.amount > 0 && 'text-ok')}>{e.amount > 0 ? '+' : ''}{money(e.amount, true)}</span>
+                  </li>
+                );
+              })}
+              {!upcoming.length && <li className="px-4 py-8 text-center text-[13px] text-ink-3">Rien de prévu sur 90 jours.</li>}
+            </ul>
           </Card>
+          <AccountsCard onSync={sync} syncing={syncing} />
         </div>
       </div>
     </div>
