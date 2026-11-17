@@ -150,7 +150,7 @@ function Viewer({ onClose, spec, kind, reference, subtitle, status, checks, onFi
           {zoomCtl}
         </div>
         {score && !wideChecks && (
-          <button onClick={() => setChecksOpen(true)} className="flex h-10 shrink-0 items-center gap-1.5 rounded-[10px] px-2.5 text-[13px] font-medium text-ink transition hover:bg-sub" aria-label="Vérification avant envoi">
+          <button onClick={() => setChecksOpen(true)} className="flex h-10 shrink-0 max-md:hidden items-center gap-1.5 rounded-[10px] px-2.5 text-[13px] font-medium text-ink transition hover:bg-sub" aria-label="Vérification avant envoi">
             {score.bad + score.warn ? <CheckIcon state={score.bad ? 'bad' : 'warn'} /> : <CheckIcon state="ok" />}
             <span className="num">
               {score.ok}/{score.total}
