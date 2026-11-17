@@ -30,8 +30,8 @@ export function KpiBand({ hero, items, aside, className }: { hero: Kpi & { extra
       <div className="relative grid gap-0 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,2fr)]">
         <div className="p-5 md:p-6">
           <div className="eyebrow">{hero.label}</div>
-          <div className="mt-2 flex items-baseline gap-3">
-            <Value k={hero} className="dawn-text text-[40px] font-semibold leading-none tracking-[-0.05em] md:text-[46px]" />
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <Value k={hero} className="dawn-text whitespace-nowrap text-[40px] font-semibold leading-none tracking-[-0.05em] md:text-[46px]" />
             {hero.sub && <span className="text-[13px] text-ink-2">{hero.sub}</span>}
           </div>
           {hero.extra && <div className="mt-4">{hero.extra}</div>}
@@ -39,7 +39,7 @@ export function KpiBand({ hero, items, aside, className }: { hero: Kpi & { extra
         <div className="grid grid-cols-3 border-t border-line lg:border-l lg:border-t-0">
           {items.map((k, i) => (
             <div key={i} className={cn('min-w-0 px-4 py-4 md:px-5 md:py-6', i > 0 && 'border-l border-line')}>
-              <div className="truncate text-[12px] font-medium text-ink-3 md:text-[12.5px]">{k.label}</div>
+              <div className="text-[12px] font-medium leading-tight text-ink-3 md:truncate md:text-[12.5px]">{k.label}</div>
               <Value k={k} className="mt-1.5 block text-[19px] font-semibold leading-none tracking-[-0.035em] md:text-[24px]" />
               {k.sub && <div className="mt-1.5 line-clamp-2 text-[11.5px] leading-snug text-ink-2 md:text-[12px]">{k.sub}</div>}
             </div>

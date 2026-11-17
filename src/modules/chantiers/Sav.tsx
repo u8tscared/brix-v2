@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { Button, Card, PageHeader, Segmented, Stat } from '@/components/ui';
+import { Button, IconTile, PageHeader, Segmented } from '@/components/ui';
+import { KpiBand } from './components/common/KpiBand';
 import { useBrix } from '@/lib/store';
 import { dateShort, money, todayISO } from '@/lib/format';
 import { useChantiersLocal, useChantiersSeed } from './store';
@@ -30,8 +31,9 @@ export default function Sav() {
   const nextReminder = myContracts.filter((c) => c.reminder && contractState(c).key !== 'planifie').map((c) => addMonths(dueOf(c), -1)).filter((d) => d >= todayISO()).sort()[0];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <PageHeader
+        icon={<IconTile name="Wrench" dept="chantiers" size="lg" />}
         title="SAV et entretien"
         subtitle="Pannes à traiter, contrats d’entretien et rappels annuels automatiques."
         actions={
@@ -42,12 +44,14 @@ export default function Sav() {
         }
       />
 
-      <Card className="grid grid-cols-2 gap-px overflow-hidden bg-line md:grid-cols-4">
-        <Stat className="bg-white" label="Revenu d’entretien annuel" value={money(recurring, true)} hero sub={`${myContracts.length} contrats HT`} />
-        <Stat className="bg-white" label="Demandes ouvertes" value={String(open.length)} sub={urgent ? <span className="text-bad">{urgent} urgente{urgent > 1 ? 's' : ''}</span> : 'rien d’urgent'} />
-        <Stat className="bg-white" label="Entretiens à planifier" value={String(toPlan.length)} sub={toPlan.length ? `dont ${toPlan.filter((c) => contractState(c).key === 'retard').length} en retard` : 'tout est calé'} />
-        <Stat className="bg-white" label="Rappels automatiques" value={String(myContracts.filter((c) => c.reminder).length)} sub={nextReminder ? `prochain le ${dateShort(nextReminder)}${nextReminder.slice(0, 4) !== todayISO().slice(0, 4) ? ' ' + nextReminder.slice(0, 4) : ''}` : 'envoyés par Bob au client'} />
-      </Card>
+      <KpiBand
+        hero={{ label: "Revenu d'entretien par an", value: recurring, format: (n) => money(n, true), sub: `${myContracts.length} contrats HT, qui reviennent tout seuls` }}
+        items={[
+          { label: 'Ouvertes', value: open.length, tone: urgent ? 'bad' : undefined, sub: urgent ? `${urgent} urgente${urgent > 1 ? 's' : ''}` : "rien d'urgent" },
+          { label: 'À planifier', value: toPlan.length, tone: toPlan.some((c) => contractState(c).key === 'retard') ? 'warn' : undefined, sub: toPlan.length ? `dont ${toPlan.filter((c) => contractState(c).key === 'retard').length} en retard` : 'tout est calé' },
+          { label: 'Rappels auto', value: myContracts.filter((c) => c.reminder).length, sub: nextReminder ? `prochain le ${dateShort(nextReminder)}${nextReminder.slice(0, 4) !== todayISO().slice(0, 4) ? ' ' + nextReminder.slice(0, 4) : ''}` : 'envoyés par Bob' },
+        ]}
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Segmented
