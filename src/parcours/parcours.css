@@ -1,6 +1,6 @@
 /* Parcours externes (client, fournisseur, e-mails, notifications) : typo et motion propres.
    Préfixe bx- pour ne jamais entrer en collision avec le kit de l'app. */
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap');
 
 .bx-geist { font-family: 'Geist', 'Inter', system-ui, sans-serif; }
 .bx-mono { font-family: 'Geist Mono', ui-monospace, monospace; }
@@ -73,3 +73,4 @@
   .bx-sky::before, .bx-sky::after, .bx-tile-sheen, .bx-ring, .bx-live, .bx-confetti { animation: none !important; }
   .bx-rise, .bx-pop, .bx-stagger > *, .bx-draw, .bx-fade { animation-duration: .01ms !important; animation-delay: 0s !important; }
 }
+.bx-script { font-family: 'Caveat', 'Segoe Script', cursive; }
