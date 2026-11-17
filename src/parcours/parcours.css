@@ -79,3 +79,9 @@
 .bx-sky-top { inset: 0 0 auto 0; height: 560px; -webkit-mask-image: linear-gradient(#000 40%, transparent); mask-image: linear-gradient(#000 40%, transparent); }
 .bx-sky-top::before { left: -10%; top: -320px; width: 60vw; height: 640px; max-width: 760px; }
 .bx-sky-top::after { right: -10%; left: auto; top: -300px; width: 55vw; height: 600px; max-width: 720px; }
+
+/* Cloche qui sonne, bannière qui descend */
+@keyframes bx-bell { 0%,100% { transform: rotate(0); } 15% { transform: rotate(16deg); } 30% { transform: rotate(-14deg); } 45% { transform: rotate(10deg); } 60% { transform: rotate(-6deg); } 75% { transform: rotate(3deg); } }
+.bx-bell { animation: bx-bell .8s ease; transform-origin: 50% 10%; }
+@keyframes bx-banner { from { opacity: 0; transform: translateY(-120%) scale(.96); } to { opacity: 1; transform: none; } }
+.bx-banner { animation: bx-banner .55s cubic-bezier(.2,.9,.25,1.15) both; }

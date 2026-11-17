@@ -78,3 +78,18 @@ export const useNotifs = create<NotifState>()(
     { name: 'brix-v2-notifications', version: 1 },
   ),
 );
+
+/** Quelques notifications réalistes pour la démo (une seule fois, si la liste est vide). */
+export function amorcerDemo() {
+  const s = useNotifs.getState();
+  if (s.items.length) return;
+  const il = (min: number) => new Date(Date.now() - min * 60000).toISOString();
+  useNotifs.setState({
+    items: [
+      { id: 'n_demo1', at: il(12), type: 'devis_ouvert', titre: 'Thomas Garnier consulte votre devis', texte: 'D-2026-118 · 3e ouverture, il compare peut-être', qui: 'Thomas Garnier', vers: '/app/devis/q_118', lu: false },
+      { id: 'n_demo2', at: il(95), type: 'fournisseur_reponse', titre: 'Votre fournisseur a répondu', texte: 'Demande de prix tableau triphasé · 1 184,00 € HT, livré jeudi', vers: '/app/fournisseurs', lu: false },
+      { id: 'n_demo3', at: il(60 * 26), type: 'paiement_recu', titre: 'Paiement reçu : 490,00 €', texte: 'Cabinet Dr Nguyen · F-2026-195 · virement', montant: 490, vers: '/app/factures/f_195', lu: true },
+      { id: 'n_demo4', at: il(60 * 28), type: 'devis_question', titre: 'Claire Lefèvre a une question', texte: 'Peut-on ajouter une prise USB à côté du lit ?', qui: 'Claire Lefèvre', vers: '/app/devis/q_121', lu: true },
+    ],
+  });
+}
