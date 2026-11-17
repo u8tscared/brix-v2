@@ -8,7 +8,7 @@ import type { Employee, PlanningEvent } from '@/lib/types';
 import { hoursOf } from '../../lib/metrics';
 import { isOutdoor, isRainy, weatherFor } from '../../lib/weather';
 import { WeatherIcon } from '../common/bits';
-import { KIND_STYLE } from './kinds';
+import { KIND_STYLE, personTone } from './kinds';
 import { fromMin, nowMin, sortByStart, toMin } from './utils';
 import type { SlotDraft } from './SlotSheet';
 
@@ -77,7 +77,7 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
   const cols = `var(--namecol) repeat(${days.length}, minmax(0, 1fr))`;
 
   return (
-    <div className={cn('overflow-hidden rounded-[14px] border border-line bg-white', drag && 'select-none')}>
+    <div className={cn('overflow-hidden rounded-[18px] bg-white shadow-card', drag && 'select-none')}>
       <div className="grid [--namecol:150px] xl:[--namecol:200px]" style={{ gridTemplateColumns: cols }}>
         {/* En-tête : jours et météo */}
         <div className="border-b border-line bg-[#fbfbfd]" />
@@ -130,7 +130,7 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
                         onSlot({ employeeId: p.id, date: d, start, end });
                       }
                     }}
-                    className={cn('group relative min-h-[104px] cursor-cell space-y-1 border-b border-l border-line p-1.5 transition-colors', isToday && 'bg-vi-50/30', isTarget && 'bg-vi-100/60 ring-2 ring-inset ring-vi-300')}
+                    className={cn('group relative min-h-[104px] cursor-cell space-y-1 border-b border-l border-line p-1.5 transition-colors', isToday && 'bg-vi-50/30', isTarget && 'bg-vi-50 shadow-[inset_0_0_0_2px_#b9a2f5]')}
                   >
                     {list.map((e, i) => {
                       const conflict = conflicts.has(e.id);
@@ -141,16 +141,17 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
                           {isToday && i === nowIdx && <NowLine />}
                           <div
                             onPointerDown={(ev) => onDown(ev, e)}
+                            style={personTone(p.color, e.kind)}
                             title={`${e.title} · ${e.start} – ${e.end}${conflict ? ' · conflit d’horaires' : ''}`}
                             className={cn(
-                              'relative cursor-grab touch-none rounded-lg border px-2 py-1.5 text-left transition active:cursor-grabbing',
-                              KIND_STYLE[e.kind].block,
+                              'relative cursor-grab touch-none rounded-[8px] py-1.5 pl-2 pr-1.5 text-left transition duration-200 ease-out-quint hover:-translate-y-px hover:shadow-raise active:cursor-grabbing',
                               conflict && 'ring-2 ring-bad',
                               past && 'opacity-55',
                               drag?.id === e.id && drag.moving && 'opacity-30',
                             )}
                           >
-                            <div className="num flex items-center gap-1 text-[10.5px] opacity-80">
+                            <div className="num flex items-center gap-1 text-[10.5px] text-ink-2">
+                              {e.kind !== 'chantier' && <i className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: KIND_STYLE[e.kind].dot }} title={KIND_STYLE[e.kind].label} />}
                               {e.start}–{e.end}
                               {conflict && <AlertTriangle className="ml-auto h-3 w-3 text-bad" />}
                               {rain && <CloudRain className={cn('h-3 w-3 text-[#3b82f6]', !conflict && 'ml-auto')} />}
@@ -173,8 +174,8 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
       </div>
 
       {drag?.moving && dragged && (
-        <div className={cn('pointer-events-none fixed z-[95] rotate-[1.5deg] rounded-lg border px-2 py-1.5 shadow-pop', KIND_STYLE[dragged.kind].block)} style={{ left: drag.x - drag.ox, top: drag.y - drag.oy, width: drag.w }}>
-          <div className="num text-[10.5px] opacity-80">{dragged.start}–{dragged.end}</div>
+        <div className="pointer-events-none fixed z-[95] rotate-[1.5deg] scale-[1.04] rounded-[8px] py-1.5 pl-2 pr-1.5 shadow-pop" style={{ left: drag.x - drag.ox, top: drag.y - drag.oy, width: drag.w, ...personTone(people.find((x) => x.id === dragged.employeeId)?.color ?? '#7c3aed', dragged.kind), background: '#fff' }}>
+          <div className="num text-[10.5px] text-ink-2">{dragged.start}–{dragged.end}</div>
           <div className="truncate text-[12px] font-medium">{dragged.title}</div>
         </div>
       )}

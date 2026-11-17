@@ -107,16 +107,27 @@ export function NewChantierSheet({ open, onClose }: { open: boolean; onClose: ()
       }
     >
       <div className="space-y-4">
-        <Field label="Devis lié" hint={devisId ? undefined : 'Facultatif : un chantier peut exister sans devis.'}>
-          <Select value={devisId} onChange={(e) => pickDevis(e.target.value)}>
-            <option value="">Sans devis</option>
-            {freeDevis.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.number} · {d.title} · {money(totals(d.lines).ht, true)} HT ({DEVIS_STATUS[d.status].label.toLowerCase()})
-              </option>
-            ))}
-          </Select>
-        </Field>
+        <div>
+          <span className="mb-1.5 block text-[12.5px] font-medium text-ink-2">Partir d'un devis</span>
+          <div className="stagger-fast space-y-1.5">
+            {freeDevis.slice(0, 4).map((d) => {
+              const on = devisId === d.id;
+              const c = clients.find((x) => x.id === d.clientId);
+              return (
+                <button key={d.id} type="button" onClick={() => pickDevis(on ? '' : d.id)} className={cn('press flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-left transition-shadow duration-200', on ? 'bg-vi-25 shadow-[0_0_0_1.5px_#8b5cf6]' : 'bg-white shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_#cfcbdd]')}>
+                  <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-full transition', on ? 'bg-vi-600 text-white' : 'shadow-[inset_0_0_0_1.5px_#cfcbdd]')}>{on && <Check className="h-3 w-3" strokeWidth={3} />}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13.5px] font-medium">{d.title}</span>
+                    <span className="block truncate text-[12px] text-ink-3"><span className="font-mono">{d.number}</span> · {c?.name} · {DEVIS_STATUS[d.status].label.toLowerCase()}</span>
+                  </span>
+                  <span className="num shrink-0 text-[13px] font-semibold">{money(totals(d.lines).ht, true)}</span>
+                </button>
+              );
+            })}
+            {!freeDevis.length && <p className="rounded-[12px] bg-sub px-3 py-2.5 text-[12.5px] text-ink-2">Aucun devis libre pour ce client : le chantier sera créé sans devis.</p>}
+          </div>
+          <span className="mt-1.5 block text-xs text-ink-3">Facultatif : un chantier peut exister sans devis.</span>
+        </div>
         <Field label="Client">
           <Select value={clientId} onChange={(e) => pickClient(e.target.value)}>
             <option value="">Choisir un client</option>

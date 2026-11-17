@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, ChevronRight, FileText, HardHat, Link2, Mail, MessageCircle, Pencil, Phone, Plus, Receipt } from 'lucide-react';
-import { Avatar, Badge, Button, Card, EmptyState, Progress, Stat, toast, UnderlineTabs } from '@/components/ui';
+import { ArrowLeft, AudioLines, ChevronRight, FileText, HardHat, Link2, Mail, MessageCircle, Pencil, Phone, Plus, Receipt } from 'lucide-react';
+import { AnimatedNumber } from '@/components/motion';
+import { Avatar, Badge, Button, Card, EmptyState, Progress, toast, UnderlineTabs } from '@/components/ui';
 import { dateShort, initials, money, relative, todayISO, totals, uid } from '@/lib/format';
 import { CHANTIER_STATUS, DEVIS_STATUS, FACTURE_STATUS } from '@/lib/status';
 import { useBrix, useClient } from '@/lib/store';
@@ -9,7 +10,7 @@ import type { Client } from '@/lib/types';
 import { ClientFormSheet } from './components/ClientFormSheet';
 import { InfoCard, MaintenanceCard } from './components/ClientSide';
 import { ClientTimeline } from './components/ClientTimeline';
-import { StatStrip } from './components/StatStrip';
+import { ClientFrise } from './components/ClientFrise';
 import { clientColor, clientStats, telHref, waHref } from './lib';
 import { useVendre } from './store';
 
@@ -64,40 +65,64 @@ export default function ClientDetail() {
         <ArrowLeft className="h-4 w-4" /> Clients
       </Link>
 
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-        <div className="flex min-w-0 flex-1 items-center gap-3.5">
-          <Avatar initials={initials(client.name)} color={clientColor(client.id)} size={56} />
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <h1 className="truncate text-[24px] font-semibold leading-tight tracking-[-0.025em]">{client.name}</h1>
-              <Badge tone={client.kind === 'pro' ? 'info' : 'neutral'}>{client.kind === 'pro' ? 'Professionnel' : 'Particulier'}</Badge>
+      <div className="animate-[page-in_.5s_var(--ease)_both] overflow-hidden rounded-[20px] bg-white shadow-card">
+        <div className="relative flex flex-col gap-5 p-5 md:p-6 lg:flex-row lg:items-center">
+          <div aria-hidden className="pointer-events-none absolute -left-16 -top-24 h-56 w-80 rounded-full opacity-70 blur-2xl" style={{ background: clientColor(client.id) }} />
+          <div className="relative flex min-w-0 flex-1 items-center gap-4">
+            <Avatar initials={initials(client.name)} color={clientColor(client.id)} size={64} className="text-[22px] shadow-raise ring-4 ring-white" />
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="truncate text-[24px] font-semibold leading-tight tracking-[-0.035em] md:text-[28px]">{client.name}</h1>
+                <Badge tone={client.kind === 'pro' ? 'info' : 'neutral'}>{client.kind === 'pro' ? 'Professionnel' : 'Particulier'}</Badge>
+              </div>
+              <div className="mt-1 truncate text-[13px] text-ink-2">{[client.contact, client.city, client.phone].filter(Boolean).join(' · ')}</div>
             </div>
-            <div className="mt-0.5 truncate text-[13px] text-ink-2">{[client.contact, client.phone, client.email].filter(Boolean).join(' · ')}</div>
+          </div>
+          <div className="relative grid grid-cols-4 gap-2 lg:flex">
+            {[
+              { href: telHref(client.phone), icon: Phone, label: 'Appeler' },
+              { href: `mailto:${client.email}`, icon: Mail, label: 'Écrire' },
+              { href: waHref(client.phone, `Bonjour ${first}, `), icon: MessageCircle, label: 'WhatsApp', ext: true },
+            ].map((a) => (
+              <a key={a.label} href={a.href} target={a.ext ? '_blank' : undefined} rel="noreferrer" className="press flex h-16 flex-col items-center justify-center gap-1 rounded-[14px] bg-sub text-[11.5px] font-medium transition hover:bg-[#ebe9f2] lg:h-10 lg:flex-row lg:gap-2 lg:rounded-[11px] lg:bg-white lg:px-3.5 lg:text-[13px] lg:shadow-[0_0_0_1px_var(--line2)]">
+                <a.icon className="h-[18px] w-[18px] lg:h-4 lg:w-4" strokeWidth={1.75} />
+                {a.label}
+              </a>
+            ))}
+            <button onClick={() => setEditing(true)} className="press flex h-16 flex-col items-center justify-center gap-1 rounded-[14px] bg-sub text-[11.5px] font-medium transition hover:bg-[#ebe9f2] lg:h-10 lg:flex-row lg:gap-2 lg:rounded-[11px] lg:bg-white lg:px-3.5 lg:text-[13px] lg:shadow-[0_0_0_1px_var(--line2)]">
+              <Pencil className="h-[18px] w-[18px] lg:h-4 lg:w-4" strokeWidth={1.75} />
+              Modifier
+            </button>
+            <Button variant="dawn" size="lg" className="col-span-4 justify-center lg:h-10 lg:text-sm" icon={<Plus className="h-4 w-4" />} onClick={newDevis}>
+              Nouveau devis
+            </Button>
           </div>
         </div>
-        <div className="grid grid-cols-4 gap-2 lg:flex">
-          <a href={telHref(client.phone)} className="flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl border border-line bg-white text-[11.5px] font-medium hover:bg-sub lg:h-10 lg:flex-row lg:gap-2 lg:px-3.5 lg:text-[13px]"><Phone className="h-[18px] w-[18px] lg:h-4 lg:w-4" strokeWidth={1.75} />Appeler</a>
-          <a href={`mailto:${client.email}`} className="flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl border border-line bg-white text-[11.5px] font-medium hover:bg-sub lg:h-10 lg:flex-row lg:gap-2 lg:px-3.5 lg:text-[13px]"><Mail className="h-[18px] w-[18px] lg:h-4 lg:w-4" strokeWidth={1.75} />Écrire</a>
-          <a href={waHref(client.phone, `Bonjour ${first}, `)} target="_blank" rel="noreferrer" className="flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl border border-line bg-white text-[11.5px] font-medium hover:bg-sub lg:h-10 lg:flex-row lg:gap-2 lg:px-3.5 lg:text-[13px]"><MessageCircle className="h-[18px] w-[18px] lg:h-4 lg:w-4" strokeWidth={1.75} />WhatsApp</a>
-          <button onClick={() => setEditing(true)} className="flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl border border-line bg-white text-[11.5px] font-medium hover:bg-sub lg:h-10 lg:flex-row lg:gap-2 lg:px-3.5 lg:text-[13px]"><Pencil className="h-[18px] w-[18px] lg:h-4 lg:w-4" strokeWidth={1.75} />Modifier</button>
-          <Button variant="dawn" size="lg" className="col-span-4 justify-center lg:h-10 lg:text-sm" icon={<Plus className="h-4 w-4" />} onClick={newDevis}>Nouveau devis</Button>
+
+        <div className="grid grid-cols-2 border-t border-line md:grid-cols-4 [&>*]:border-line max-md:[&>*:nth-child(2n)]:border-l max-md:[&>*:nth-child(n+3)]:border-t md:[&>*+*]:border-l">
+          {[
+            { l: "Valeur client HT", v: st.caHt, sub: `${st.factures.length} facture${st.factures.length > 1 ? 's' : ''}` },
+            { l: 'Encaissé TTC', v: st.paid, sub: st.billed ? `${Math.round((st.paid / st.billed) * 100)} % du facturé` : 'rien à encaisser' },
+            { l: 'Reste à payer', v: st.due, sub: st.late.length ? `${st.late.length} en retard` : 'rien en retard', bad: st.late.length > 0 },
+            { l: 'Devis en attente', v: st.pendingHt, sub: 'HT, brouillons compris' },
+          ].map((k) => (
+            <div key={k.l} className="min-w-0 px-4 py-4 md:px-6">
+              <div className="text-[12px] font-medium text-ink-3">{k.l}</div>
+              <div className={`num mt-1.5 text-[20px] font-semibold leading-none tracking-[-0.035em] md:text-[22px] ${k.bad ? 'text-bad' : ''}`}>
+                <AnimatedNumber value={k.v} format={(n) => money(n, true)} />
+              </div>
+              <div className="mt-1.5 truncate text-[12px] text-ink-2">{k.sub}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-start gap-3 border-t border-line bg-[#fbfaff] px-5 py-3.5 md:px-6">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-night text-white">
+            <AudioLines className="h-4 w-4" />
+          </span>
+          <p className="min-w-0 flex-1 pt-1 text-[13.5px] leading-relaxed text-ink-2">{summary(client, st, reminder)}</p>
         </div>
       </div>
-
-      <Card className="flex gap-3 p-4">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-semibold text-white">B</span>
-        <div className="min-w-0">
-          <div className="text-[12px] font-medium text-ink-3">Bob résume</div>
-          <p className="mt-0.5 text-[14px] leading-relaxed">{summary(client, st, reminder)}</p>
-        </div>
-      </Card>
-
-      <StatStrip>
-        <Stat label="Chiffre d'affaires HT" value={money(st.caHt, true)} sub={`${st.factures.length} facture${st.factures.length > 1 ? 's' : ''}`} />
-        <Stat label="Encaissé" value={money(st.paid, true)} sub="TTC" />
-        <Stat label="Reste à payer" value={<span className={st.late.length ? 'text-bad' : ''}>{money(st.due, true)}</span>} sub={st.late.length ? `${st.late.length} en retard` : 'Rien en retard'} />
-        <Stat label="Devis en attente" value={money(st.pendingHt, true)} sub="HT, brouillons compris" />
-      </StatStrip>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0 space-y-4">
@@ -125,6 +150,7 @@ export default function ClientDetail() {
               </>
             )}
           </Card>
+          <ClientFrise devis={st.devis} factures={st.factures} chantiers={st.chantiers} />
           <ClientTimeline clientId={client.id} devis={st.devis} factures={st.factures} />
         </div>
         <div className="space-y-4">
