@@ -45,4 +45,10 @@ export interface Env {
   APNS_BUNDLE_ID?: string;
   APNS_SANDBOX?: string;
   FCM_SERVICE_ACCOUNT_JSON?: string;
+  // E-mails (Brevo ou Resend)
+  RESEND_API_KEY?: string;
+  EMAIL_FROM?: string;
+  EMAIL_FROM_NAME?: string;
+  EMAIL_WEBHOOK_SECRET?: string;
+  ENVIRONMENT?: string;
 }

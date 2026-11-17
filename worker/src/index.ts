@@ -10,6 +10,7 @@ import { handleSignatureRoutes } from './modules/signature/routes';
 import { handlePaiementsRoutes } from './modules/paiements/routes';
 import { handleNotificationsRoutes } from './modules/notifications/routes';
 import { cronParcours } from './modules/notifications/cron';
+import { handleEmailsRoutes } from './modules/emails/routes';
 
 // Point d'entrée du worker Brix V2. Chaque module expose handleXRoutes(request, env, pathname)
 // qui renvoie null si la route ne le concerne pas (convention du CLAUDE.md).
@@ -39,7 +40,7 @@ export default {
     if (request.method === 'OPTIONS' && !selfCors) return new Response(null, { status: 204, headers: h });
     try {
       if (url.pathname.startsWith('/api/')) {
-        const handlers = [handleCoreRoutes, handleDocumentsRoutes, handleSignatureRoutes, handlePaiementsRoutes, handleNotificationsRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes];
+        const handlers = [handleCoreRoutes, handleDocumentsRoutes, handleSignatureRoutes, handlePaiementsRoutes, handleNotificationsRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes, handleEmailsRoutes];
         for (const handle of handlers) {
           const res = await handle(request, env, url.pathname);
           if (res) return withHeaders(res, h);
