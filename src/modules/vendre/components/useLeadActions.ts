@@ -3,6 +3,7 @@ import { toast } from '@/components/ui';
 import { dateLong, uid } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Devis, Lead } from '@/lib/types';
+import { renumber } from '@/modules/devis/logic';
 import { readLead } from '../lib';
 import { clientFromLead, linesFromLead, sendSms } from '../service';
 import { useVendre } from '../store';
@@ -26,7 +27,7 @@ export function useLeadActions() {
       createdAt: new Date().toISOString().slice(0, 10),
       validityDays: 30,
       depositPercent: 30,
-      lines: linesFromLead(l, s.company.hourlyRate || 55),
+      lines: renumber(linesFromLead(l, s.company.hourlyRate || 55)),
       notes: `Demande reçue : « ${l.request} »`,
     };
     s.upsertDevis(d);

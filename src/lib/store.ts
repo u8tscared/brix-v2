@@ -139,8 +139,10 @@ export const useBrix = create<BrixState>()(
           id: meId, firstName: fullUser.firstName || 'Moi', lastName: fullUser.lastName || '', initials: `${(fullUser.firstName || 'M')[0]}${(fullUser.lastName || '')[0] || ''}`.toUpperCase(),
           role: 'patron', color: '#17171f', phone: company.phone || '', email: fullUser.email, hourlyCost: 0, contract: 'Gérant', grossMonthly: 0, hireDate: new Date().toISOString().slice(0, 10), habilitations: [], leaveBalance: 0,
         };
+        const soloDemo = withDemoData && company.size === 'solo';
         set({
           ...base,
+          ...(soloDemo ? { events: demo.demoEvents.filter((e) => e.employeeId === 'e_karim').map((e) => ({ ...e, employeeId: meId })) } : {}),
           onboarded: true,
           isDemo: withDemoData,
           priorities,
@@ -148,7 +150,7 @@ export const useBrix = create<BrixState>()(
           plan: plan ?? 'pro',
           company: { ...(withDemoData ? demo.demoCompany : emptyCompany), ...company } as Company,
           user: fullUser,
-          employees: withDemoData ? demo.demoEmployees : [me],
+          employees: withDemoData && !soloDemo ? demo.demoEmployees : [me],
           prefs: { ...initialPrefs },
           setupTasks: { profil: true },
         });

@@ -1,19 +1,29 @@
 import { useMemo } from 'react';
-import { daysBetween, todayISO, totals } from '@/lib/format';
+import { todayISO, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
+import { allPayments, useFactures } from '@/modules/factures/store';
+import { amounts, liveStatus } from '@/modules/factures/lib/model';
 
 /** Chiffres du cockpit, calculés depuis les données de l'entreprise. */
 export function useCockpitData() {
   const s = useBrix();
+  const payments = useFactures((x) => x.payments);
   return useMemo(() => {
     const today = todayISO();
     const month = today.slice(0, 7);
-    const factTotals = s.factures.map((f) => ({ f, t: totals(f.lines) }));
-    const paidThisMonth = factTotals.filter(({ f }) => f.status === 'payee' && f.issueDate.slice(0, 7) === month).reduce((a, { f }) => a + f.paidAmount, 0)
-      + s.bank.filter((t) => t.amount > 0 && t.date.slice(0, 7) === month && !t.matchedFactureId).reduce((a, t) => a + t.amount, 0);
-    const unpaid = factTotals.filter(({ f }) => !['payee', 'annulee', 'brouillon'].includes(f.status));
-    const toCollect = unpaid.reduce((a, { f, t }) => a + (t.ttc - f.paidAmount), 0);
-    const late = unpaid.filter(({ f }) => f.status === 'en_retard' || daysBetween(f.dueDate, today) > 0);
+    // Mêmes règles que l'écran Factures : paiements réellement reçus ce mois-ci,
+    // reste à payer hors retenue de garantie, retard selon l'échéance.
+    const monthPayments = allPayments(s.factures, payments).filter((p) => p.date.startsWith(month));
+    const paidThisMonth = monthPayments.reduce((a, p) => a + p.amount, 0);
+    // Comparaison honnête avec le mois dernier à la même date (pas de tendance sans historique).
+    const prev = new Date(`${month}-01T12:00:00`);
+    prev.setMonth(prev.getMonth() - 1);
+    const prevMonth = prev.toISOString().slice(0, 7);
+    const prevPaid = allPayments(s.factures, payments).filter((p) => p.date.startsWith(prevMonth) && p.date.slice(8, 10) <= today.slice(8, 10)).reduce((a, p) => a + p.amount, 0);
+    const trend = prevPaid > 0 ? Math.round(((paidThisMonth - prevPaid) / prevPaid) * 100) : null;
+    const unpaid = s.factures.map((f) => ({ f, a: amounts(f), st: liveStatus(f, today) })).filter(({ st, a }) => st !== 'payee' && st !== 'annulee' && st !== 'brouillon' && a.remaining > 0);
+    const toCollect = unpaid.reduce((a, x) => a + x.a.remaining, 0);
+    const late = unpaid.filter(({ st }) => st === 'en_retard');
     const devisT = s.devis.map((d) => ({ d, t: totals(d.lines) }));
     const pending = devisT.filter(({ d }) => d.status === 'envoye' || d.status === 'vu');
     const signed = devisT.filter(({ d }) => d.status === 'signe');
@@ -27,10 +37,11 @@ export function useCockpitData() {
     const days = Number(today.slice(8, 10));
     const curve = Array.from({ length: Math.max(2, days) }, (_, i) => {
       const day = `${month}-${String(i + 1).padStart(2, '0')}`;
-      return s.factures.filter((f) => f.status === 'payee' && f.issueDate <= day && f.issueDate.slice(0, 7) === month).reduce((a, f) => a + f.paidAmount, 0) + i * 30;
+      return monthPayments.filter((p) => p.date.slice(0, 10) <= day).reduce((a, p) => a + p.amount, 0);
     });
     return {
       paidThisMonth,
+      trend,
       toCollect,
       unpaidCount: unpaid.length,
       late,
@@ -48,5 +59,5 @@ export function useCockpitData() {
       todayEvents: s.events.filter((e) => e.date === today),
       goal: 30000,
     };
-  }, [s.factures, s.devis, s.chantiers, s.events, s.employees, s.bank, s.cashBalance]);
+  }, [payments, s.factures, s.devis, s.chantiers, s.events, s.employees, s.bank, s.cashBalance]);
 }

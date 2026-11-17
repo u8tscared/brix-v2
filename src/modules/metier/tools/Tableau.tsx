@@ -56,22 +56,26 @@ export default function Tableau() {
           <div className="text-[12.5px] font-medium text-ink-2">Circuits du logement</div>
           <div className="space-y-1.5">
             {circuits.map((c) => (
-              <div key={c.id} className="flex items-center gap-2 rounded-[10px] border border-line px-3 py-1.5">
+              <div key={c.id} className="flex items-center gap-1.5 rounded-[10px] border border-line py-1 pl-3 pr-1.5">
                 <span className="min-w-0 flex-1 truncate text-[13px]">{c.label}</span>
-                <Select value={c.amps} onChange={(e) => setCircuits((cs) => cs.map((x) => (x.id === c.id ? { ...x, amps: Number(e.target.value) } : x)))} className="h-9 w-[92px] text-[13px]" aria-label="Calibre">
+                <div className="w-[84px] shrink-0">
+                <Select value={c.amps} onChange={(e) => setCircuits((cs) => cs.map((x) => (x.id === c.id ? { ...x, amps: Number(e.target.value) } : x)))} className="h-10 text-[13px]" aria-label={`Calibre ${c.label}`}>
                   {[2, 10, 16, 20, 25, 32, 40].map((a) => <option key={a} value={a}>{a} A</option>)}
                 </Select>
-                <button onClick={() => setCircuits((cs) => cs.map((x) => (x.id === c.id ? { ...x, typeA: !x.typeA } : x)))} className={cn('h-9 rounded-lg border px-2 text-[11.5px] font-medium', c.typeA ? 'border-vi-200 bg-vi-50 text-vi-700' : 'border-line2 text-ink-3')} title="Sur le différentiel type A dédié">Type A</button>
-                <button onClick={() => setCircuits((cs) => cs.filter((x) => x.id !== c.id))} className="grid h-9 w-9 place-items-center rounded-lg text-ink-3 hover:text-bad" aria-label="Retirer"><X className="h-4 w-4" /></button>
+                </div>
+                <button onClick={() => setCircuits((cs) => cs.map((x) => (x.id === c.id ? { ...x, typeA: !x.typeA } : x)))} aria-pressed={c.typeA} className={cn('h-10 shrink-0 whitespace-nowrap rounded-lg border px-2 text-[11.5px] font-medium', c.typeA ? 'border-vi-200 bg-vi-50 text-vi-700' : 'border-line2 text-ink-3')} title="Sur le différentiel type A dédié">Type A</button>
+                <button onClick={() => setCircuits((cs) => cs.filter((x) => x.id !== c.id))} className="-mr-1.5 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-ink-3 hover:text-bad" aria-label={`Retirer ${c.label}`}><X className="h-4 w-4" /></button>
               </div>
             ))}
           </div>
           <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); add(); }}>
             <Input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Nouveau circuit (ex. Borne garage)" className="min-w-0 flex-1" />
-            <Select value={amps} onChange={(e) => setAmps(Number(e.target.value))} className="w-[92px]" aria-label="Calibre">
-              {[2, 10, 16, 20, 25, 32, 40].map((a) => <option key={a} value={a}>{a} A</option>)}
-            </Select>
-            <Button type="submit" icon={<Plus className="h-4 w-4" />} aria-label="Ajouter" />
+            <div className="w-[84px] shrink-0">
+              <Select value={amps} onChange={(e) => setAmps(Number(e.target.value))} aria-label="Calibre du nouveau circuit">
+                {[2, 10, 16, 20, 25, 32, 40].map((a) => <option key={a} value={a}>{a} A</option>)}
+              </Select>
+            </div>
+            <Button type="submit" size="icon" className="h-11 w-11" icon={<Plus className="h-4 w-4" />} aria-label="Ajouter le circuit" />
           </form>
         </>
       }

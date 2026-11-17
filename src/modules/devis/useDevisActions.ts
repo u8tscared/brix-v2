@@ -5,7 +5,8 @@ import { toast } from '@/components/ui';
 import { dayOffset, money, todayISO, totals, uid } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Chantier, Devis, DevisLigne, Facture } from '@/lib/types';
-import { isPriced, nowISO } from './logic';
+import { billedFor, buildSolde } from '@/modules/factures/lib/billing';
+import { nowISO } from './logic';
 import { sendForSignature, simulateClientEvent } from './service';
 import { useDevisMeta, type Channel } from './store';
 
@@ -72,6 +73,10 @@ export function useDevisActions(id: string) {
     }
     useBrix.getState().upsertDevis({ ...d, status: 'signe', signedAt: now, viewedAt: d.viewedAt ?? now, views: Math.max(1, d.views ?? 0), chantierId });
     log(id, `Signé électroniquement par ${c?.name ?? 'le client'}`, 'client');
+    // La demande d'origine (même nom ou même téléphone) passe en « Gagnée »
+    const norm = (x?: string) => (x ?? '').replace(/\s/g, '').toLowerCase();
+    for (const l of useBrix.getState().leads)
+      if (c && l.status !== 'gagne' && l.status !== 'perdu' && (norm(l.name) === norm(c.name) || (!!l.phone && norm(l.phone) === norm(c.phone)))) useBrix.getState().upsertLead({ ...l, status: 'gagne' });
     useDevisMeta.getState().patch(id, { chosenVariant: 'confort' });
 
     if (d.depositPercent > 0) {
@@ -140,15 +145,20 @@ export function useDevisActions(id: string) {
       navigate(`/app/factures/${existing.id}`);
       return;
     }
-    const acomptes = s.factures.filter((f) => f.devisId === d.id && f.kind === 'acompte');
+    // Déjà facturé (acompte, situations) : facture de solde qui déduit tout, taux par taux.
+    if (billedFor(d.id, s.factures).length) {
+      const f = buildSolde(d, s.nextNumber('facture'), s.factures);
+      s.upsertFacture(f);
+      log(id, `Facture de solde ${f.number} créée`, 'me');
+      toast(`Facture de solde ${f.number} créée en brouillon`);
+      navigate(`/app/factures/${f.id}`);
+      return;
+    }
     const lines: DevisLigne[] = d.lines.filter((l) => l.kind !== 'texte').map((l) => ({ ...l, id: uid('l') }));
-    for (const a of acomptes)
-      for (const al of a.lines.filter(isPriced))
-        lines.push({ id: uid('l'), kind: 'ouvrage', designation: `Déduction acompte ${a.number}`, quantity: 1, unit: 'forfait', unitPriceHt: -al.quantity * al.unitPriceHt, unitCostHt: 0, vatRate: al.vatRate });
     const f: Facture = {
       id: uid('f'),
       number: s.nextNumber('facture'),
-      kind: acomptes.length ? 'solde' : 'facture',
+      kind: 'facture',
       clientId: d.clientId,
       chantierId: d.chantierId,
       devisId: d.id,

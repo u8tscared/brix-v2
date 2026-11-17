@@ -70,8 +70,8 @@ export function PdfDoc({ d, client, company, signer }: { d: Devis; client?: Clie
           <div className="text-[9.5px] font-semibold uppercase tracking-[.08em] text-[#9898a8]">Objet et lieu des travaux</div>
           <div className="mt-1">
             <b className="font-semibold">{d.title}</b>
-            <div>{client ? `${client.address}, ${client.city}` : '—'}</div>
-            <div className="text-[10.5px] text-[#5f5f70]">Durée estimée : {Math.max(1, Math.ceil(d.lines.filter((l) => l.unit === 'h').reduce((s, l) => s + l.quantity, 0) / 14))} jour(s) ouvré(s) · démarrage à convenir</div>
+            <div>{client ? [client.address, client.city].filter(Boolean).join(', ') || '—' : '—'}</div>
+            <div className="text-[10.5px] text-[#5f5f70]">Durée estimée : {((n) => `${n} jour${n > 1 ? 's' : ''} ouvré${n > 1 ? 's' : ''}`)(Math.max(1, Math.ceil(d.lines.filter((l) => l.unit === 'h').reduce((s, l) => s + l.quantity, 0) / 14)))} · démarrage à convenir</div>
           </div>
         </div>
       </div>

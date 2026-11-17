@@ -146,9 +146,9 @@ export default function Documents() {
                   {!selecting && (
                     <div className="flex shrink-0 items-center gap-1">
                       {d.auto && st.days <= 45 ? (
-                        <Button size="sm" variant="soft" className="h-10 min-w-10 justify-center sm:h-8" loading={fetching === d.id} icon={<RefreshCw className="h-3.5 w-3.5" />} onClick={() => fetchAuto(d)}><span className="hidden sm:inline">Récupérer</span></Button>
+                        <Button size="sm" variant="soft" className="justify-center max-sm:h-10 max-sm:min-w-10" aria-label={`Récupérer ${d.label}`} loading={fetching === d.id} icon={<RefreshCw className="h-3.5 w-3.5" />} onClick={() => fetchAuto(d)}><span className="hidden sm:inline">Récupérer</span></Button>
                       ) : (
-                        <Button size="sm" className="h-10 min-w-10 justify-center sm:h-8" variant={st.tone === 'bad' ? 'primary' : 'ghost'} icon={<Upload className="h-3.5 w-3.5" />} onClick={() => upload(d.id)}><span className="hidden sm:inline">{st.tone === 'bad' ? 'Remplacer' : 'Mettre à jour'}</span></Button>
+                        <Button size="sm" className="justify-center max-sm:h-10 max-sm:min-w-10" aria-label={`${st.tone === 'bad' ? 'Remplacer' : 'Mettre à jour'} ${d.label}`} variant={st.tone === 'bad' ? 'primary' : 'ghost'} icon={<Upload className="h-3.5 w-3.5" />} onClick={() => upload(d.id)}><span className="hidden sm:inline">{st.tone === 'bad' ? 'Remplacer' : 'Mettre à jour'}</span></Button>
                       )}
                       <button onClick={() => toast(`${d.file} téléchargé (démo)`)} className="grid h-10 w-10 place-items-center rounded-lg text-ink-3 hover:bg-sub hover:text-ink" aria-label="Télécharger"><Download className="h-4 w-4" /></button>
                     </div>

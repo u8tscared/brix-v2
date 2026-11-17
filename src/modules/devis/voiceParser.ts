@@ -228,5 +228,26 @@ export function chunksToLines(chunks: VoiceChunk[], ctx: { hourlyRate?: number; 
     });
 }
 
+/** Exemples de dictée par métier : démo et texte d'aide. */
+export const DICTATION_BY_TRADE: Partial<Record<LibTrade, { demo: string; hint: string }>> = {
+  peinture: {
+    demo: 'Pour le salon de Mme Lefèvre : protection des sols sur quarante mètres carrés, rebouchage sur quarante mètres carrés, impression sur quarante mètres carrés, peinture murs sur quarante mètres carrés, peinture plafond sur vingt-cinq mètres carrés et deux peintures de porte.',
+    hint: '« rebouchage sur quarante mètres carrés, peinture murs sur quarante mètres carrés et peinture plafond sur vingt-cinq »',
+  },
+  plomberie: {
+    demo: 'Pour la salle de bain de M. Martin : un WC suspendu, dix mètres de multicouche, deux vannes d’arrêt, un siphon, et des raccords.',
+    hint: '« un WC suspendu, dix mètres de multicouche, deux vannes d’arrêt »',
+  },
+  carrelage: {
+    demo: 'Pour M. Martin : dépose carrelage sur vingt mètres carrés, ragréage sur vingt mètres carrés, carrelage grès sur vingt mètres carrés, pose carrelage sur vingt mètres carrés et douze mètres de plinthes.',
+    hint: '« ragréage, carrelage grès sur vingt mètres carrés, pose carrelage et douze mètres de plinthes »',
+  },
+};
+
+export const dictationFor = (trade?: LibTrade) => DICTATION_BY_TRADE[trade ?? 'electricite'];
+const LIB_OF: Record<string, LibTrade> = { electricien: 'electricite', plombier: 'plomberie', peintre: 'peinture', carreleur: 'carrelage' };
+/** Texte d'exemple selon le métier de l'entreprise (électricité par défaut). */
+export const dictationHintForCompany = (trade: string) => DICTATION_BY_TRADE[LIB_OF[trade] ?? 'electricite']?.hint ?? '« trois prises, deux différentiels 30 mA type A et six heures de pose »';
+
 export const DEMO_DICTATION =
   'Alors pour Mme Lefèvre : un coffret trois rangées Legrand, deux différentiels 30 mA type A, un différentiel type F pour la plaque, huit disjoncteurs 16 A, trois prises et compte six heures de pose.';

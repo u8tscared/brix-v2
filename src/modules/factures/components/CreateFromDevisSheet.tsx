@@ -95,7 +95,7 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
   const [retenue, setRetenue] = useState(true);
   const chantier = s.chantiers.find((c) => c.id === devis.chantierId);
   const release = dayOffset(365, chantier ? new Date(chantier.endDate + 'T12:00') : new Date());
-  const plan = planSituation(lots, prev.depositsHt, prev.depositNumbers);
+  const plan = planSituation(lots, prev.depositsHt, prev.depositNumbers, prev.depositsByRate);
   const already = billedFor(devis.id, s.factures);
 
   const create = () => {

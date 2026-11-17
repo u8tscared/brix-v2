@@ -44,7 +44,7 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
                 <Badge tone={CHANTIER_STATUS[v.ch.status].tone} className="hidden xl:inline-flex">{CHANTIER_STATUS[v.ch.status].label}</Badge>
               </span>
               <span className="mt-0.5 block truncate text-xs text-ink-3">
-                {v.client?.name ?? 'Client'} · {v.ch.address}, {v.ch.city}
+                {[v.client?.name ?? 'Client', [v.ch.address, v.ch.city].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}
               </span>
             </span>
             <TeamAvatars team={v.team} size={24} max={3} />
@@ -70,7 +70,7 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
                 </div>
                 <div className="mt-0.5 flex items-center gap-1 truncate text-[12.5px] text-ink-3">
                   <MapPin className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{v.ch.address}, {v.ch.city}</span>
+                  <span className="truncate">{[v.ch.address, v.ch.city].filter(Boolean).join(', ')}</span>
                 </div>
               </div>
               <Badge tone={CHANTIER_STATUS[v.ch.status].tone}>{CHANTIER_STATUS[v.ch.status].label}</Badge>

@@ -97,13 +97,13 @@ export function bobSummary(ch: Chantier, m: ChantierMetrics, team: Employee[], r
   const who = team.map((e) => e.firstName).join(', ') || "personne d'affecté";
   let l1: string;
   if (ch.status === 'termine') l1 = `Chantier terminé, marge finale ${Math.round(m.realMarginRate)} %.`;
-  else if (ch.status === 'a_planifier') l1 = `Pas encore démarré : début prévu dans ${Math.max(0, daysBetween(todayISO(), ch.startDate))} jours avec ${who}.`;
+  else if (ch.status === 'a_planifier') l1 = `Pas encore démarré : début prévu ${((n) => (n <= 0 ? "aujourd'hui" : n === 1 ? 'demain' : `dans ${n} jours`))(daysBetween(todayISO(), ch.startDate))} ${team.length ? `avec ${who}` : "et personne n'est encore affecté"}.`;
   else if (m.delayDays > 0) l1 = `${ch.progress} % fait, ${m.delayDays} jour${m.delayDays > 1 ? 's' : ''} de retard sur le prévu (${m.expectedProgress} % attendus).`;
   else l1 = `${ch.progress} % fait, ${ch.progress > m.expectedProgress + 4 ? 'en avance' : 'dans les temps'}, fin prévue dans ${Math.max(0, m.daysLeft)} jours.`;
 
   let l2: string;
   const step = ch.nextStep.charAt(0).toLowerCase() + ch.nextStep.slice(1).replace(/\.$/, '');
-  const marge = `Marge ${Math.round(m.realMarginRate)} % au lieu de ${Math.round(m.plannedMarginRate)} %`;
+  const marge = Math.round(m.realMarginRate) === Math.round(m.plannedMarginRate) ? `Marge ${Math.round(m.realMarginRate)} %, comme prévu au devis` : `Marge ${Math.round(m.realMarginRate)} % au lieu de ${Math.round(m.plannedMarginRate)} %`;
   if (m.marginDelta < -6) {
     const extraH = Math.max(2, Math.round((m.spentHours - (m.plannedHours * ch.progress) / 100) || 6));
     l2 = `${marge} : propose un avenant de ${extraH} h (${money(extraH * 55, true)}) avant de continuer.`;

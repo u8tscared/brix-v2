@@ -68,7 +68,7 @@ export default function Menuiserie() {
     >
       <ResultRow label="Largeur de fabrication" value={`${Math.round(fw)} mm`} />
       <ResultRow label="Hauteur de fabrication" value={`${Math.round(fh)} mm`} />
-      <ResultRow label="Surface vitrée totale" value={`${n2(area * qty)} m²`} />
+      <ResultRow label="Surface totale des menuiseries" value={`${n2(area * qty)} m²`} />
       <ResultRow label="Éligible aux aides" value={eligible ? 'Oui' : 'Non'} tone={eligible ? 'ok' : 'warn'} sub={eligible ? 'TVA 5,5 % et CEE (pose RGE)' : 'TVA 10 %'} />
       {!eligible && <div className="mt-2"><Note tone="warn">Pour la TVA 5,5 % et les aides : Uw ≤ 1,3 avec Sw ≥ 0,3, ou Uw ≤ 1,7 avec Sw ≥ 0,36.</Note></div>}
     </ToolLayout>

@@ -21,7 +21,9 @@ function SetupChecklist() {
   const s = useBrix();
   const navigate = useNavigate();
   const tasks = SETUP.filter((t) => t.key !== 'equipe' || s.company.size !== 'solo');
-  const done = tasks.filter((t) => s.setupTasks[t.key]).length;
+  // Une étape faite ailleurs dans l'app compte aussi (ex. un devis créé depuis le bouton « Nouveau devis »).
+  const isDone = (k: string) => !!s.setupTasks[k] || (k === 'premier_devis' && s.devis.length > 0) || (k === 'import' && s.clients.length > 2);
+  const done = tasks.filter((t) => isDone(t.key)).length;
   if (s.prefs.checklistDismissed || done === tasks.length) return null;
   return (
     <Card className="overflow-hidden">
@@ -35,7 +37,7 @@ function SetupChecklist() {
       <Progress value={(done / tasks.length) * 100} tone="dawn" className="mx-4 mb-2" />
       <div className="grid sm:grid-cols-2 xl:grid-cols-3">
         {tasks.map((t) => {
-          const ok = !!s.setupTasks[t.key];
+          const ok = isDone(t.key);
           return (
             <button key={t.key} onClick={() => { s.markTask(t.key); navigate(t.to); }} className="flex min-h-[60px] items-center gap-3 border-t border-line px-4 text-left hover:bg-[#fafafc] sm:[&:nth-child(odd)]:border-r xl:[&:nth-child(odd)]:border-r-0 xl:[&:not(:nth-child(3n))]:border-r">
               <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-full', ok ? 'bg-ok text-white' : 'border-[1.5px] border-line2')}>{ok && <Check className="h-3.5 w-3.5" strokeWidth={3} />}</span>
@@ -54,13 +56,14 @@ function SetupChecklist() {
 
 function TradeTools() {
   const trade = useBrix((s) => TRADE_BY_KEY[s.company.trade]);
+  const canOrder = useBrix((s) => s.enabled.includes('fournisseurs'));
   const navigate = useNavigate();
   if (!trade) return null;
   return (
     <div>
       <div className="mb-2 flex items-baseline justify-between px-1">
         <h3 className="text-[15px] font-semibold">Outils {trade.name.toLowerCase()}</h3>
-        <button onClick={() => navigate('/app/outils')} className="text-xs text-ink-3">Tout voir</button>
+        <button onClick={() => navigate('/app/outils')} className="-my-2 py-2 pl-3 text-xs font-medium text-ink-2">Tout voir</button>
       </div>
       <div className="grid grid-cols-4 gap-2">
         {trade.tools.slice(0, 3).map((t) => (
@@ -69,10 +72,10 @@ function TradeTools() {
             {t.name}
           </button>
         ))}
-        <button onClick={() => navigate('/app/fournisseurs')} className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-white px-1 py-3 text-center text-[11px] font-medium leading-tight active:scale-[.97]">
+        {canOrder && <button onClick={() => navigate('/app/fournisseurs')} className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-white px-1 py-3 text-center text-[11px] font-medium leading-tight active:scale-[.97]">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-vi-50 text-vi-700"><Icon name="Truck" className="h-4 w-4" /></span>
           Commander
-        </button>
+        </button>}
       </div>
     </div>
   );
@@ -100,13 +103,13 @@ export default function Cockpit() {
         </div>
         <div className="hidden items-center gap-2 md:flex">
           {!solo && onSite > 0 && (
-            <span className="mr-2 flex items-center gap-2 text-xs text-ink-2">
+            <span className="mr-2 hidden items-center gap-2 whitespace-nowrap text-xs text-ink-2 xl:flex">
               <i className="h-2 w-2 animate-pulse2 rounded-full bg-ok" />
               {onSite} pointés · synchronisé à l'instant
             </span>
           )}
           <Button size="icon-sm" onClick={() => navigate('/app/bob/brief')} aria-label="Notifications"><Bell className="h-4 w-4" /></Button>
-          <Button variant="dawn" size="sm" icon={<Plus className="h-4 w-4" />} kbd="N" onClick={() => navigate('/app/devis/nouveau')}>Nouveau devis</Button>
+          <Button variant="primary" size="sm" icon={<Plus className="h-4 w-4" />} kbd="N" onClick={() => navigate('/app/devis/nouveau')}>Nouveau devis</Button>
         </div>
       </div>
 
@@ -117,7 +120,9 @@ export default function Cockpit() {
         <Card className="p-4">
           <div className="flex items-start justify-between">
             <span className="text-[13px] text-ink-2">Encaissé ce mois-ci</span>
-            <span className="rounded-full bg-ok-bg px-2 py-0.5 text-[11.5px] font-semibold text-ok">+18 % vs mois dernier</span>
+            {data.trend !== null && (
+              <span className={cn('rounded-full px-2 py-0.5 text-[11.5px] font-semibold', data.trend >= 0 ? 'bg-ok-bg text-ok' : 'bg-bad-bg text-bad')}>{data.trend >= 0 ? '+' : '−'}{Math.abs(data.trend)} % vs mois dernier</span>
+            )}
           </div>
           <div className="num mt-1 font-display text-[38px] font-semibold leading-tight tracking-[-0.03em] dawn-text">{money(data.paidThisMonth, true)}</div>
           <div className="mt-2 flex items-center gap-3 text-[12px] text-ink-3"><Progress value={(data.paidThisMonth / data.goal) * 100} className="flex-1" />{Math.round((data.paidThisMonth / data.goal) * 100)} % de {money(data.goal, true)}</div>
@@ -125,7 +130,7 @@ export default function Cockpit() {
             <button onClick={() => navigate('/app/factures')} className="border-r border-line pr-3 text-left">
               <div className="text-[12px] text-ink-2">À encaisser</div>
               <div className="num text-[19px] font-semibold">{money(data.toCollect, true)}</div>
-              <div className="text-[11.5px] text-ink-2">{data.unpaidCount} factures{data.late.length > 0 && <span className="text-bad"> · {data.late.length} en retard</span>}</div>
+              <div className="text-[11.5px] text-ink-2">{data.unpaidCount} facture{data.unpaidCount > 1 ? 's' : ''}{data.late.length > 0 && <span className="text-bad"> · {data.late.length} en retard</span>}</div>
             </button>
             <button onClick={() => navigate('/app/devis')} className="pl-4 text-left">
               <div className="text-[12px] text-ink-2">Devis à signer</div>
@@ -134,6 +139,16 @@ export default function Cockpit() {
             </button>
           </div>
         </Card>
+        {empty && (
+          <Card className="p-4">
+            <h3 className="text-[15px] font-semibold">Votre premier devis, en 2 minutes</h3>
+            <p className="mt-1 text-[13px] leading-snug text-ink-2">Dites-le à Bob ou tapez-le. Une fois signé, le chantier et la facture d'acompte se créent tout seuls.</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Button variant="secondary" className="justify-center" onClick={() => ui.askBob('', true)}>Dicter à Bob</Button>
+              <Button variant="primary" className="justify-center" onClick={() => navigate('/app/devis/nouveau')}>Nouveau devis</Button>
+            </div>
+          </Card>
+        )}
         <TodayList data={data} />
         {s.enabled.includes('outils_metier') && <TradeTools />}
         <BobNight />

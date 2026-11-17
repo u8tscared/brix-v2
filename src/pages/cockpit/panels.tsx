@@ -12,8 +12,8 @@ export function KpiStrip({ data }: { data: Data }) {
   const navigate = useNavigate();
   const progress = (data.paidThisMonth / data.goal) * 100;
   const cells = [
-    { label: 'À encaisser', value: money(data.toCollect, true), sub: <>{data.unpaidCount} factures{data.late.length > 0 && <> · <span className="inline-flex items-center gap-1 text-bad"><i className="h-1.5 w-1.5 rounded-full bg-bad" />{data.late.length} en retard</span></>}</>, to: '/app/factures' },
-    { label: 'Devis à signer', value: money(data.pendingTotal, true), sub: <>{data.pending.length} devis · {data.pending.filter((p) => p.d.status === 'vu').length} vus</>, to: '/app/devis' },
+    { label: 'À encaisser', value: money(data.toCollect, true), sub: <>{data.unpaidCount} facture{data.unpaidCount > 1 ? 's' : ''}{data.late.length > 0 && <> · <span className="inline-flex items-center gap-1 text-bad"><i className="h-1.5 w-1.5 rounded-full bg-bad" />{data.late.length} en retard</span></>}</>, to: '/app/factures' },
+    { label: 'Devis à signer', value: money(data.pendingTotal, true), sub: <>{data.pending.length} devis · {((n) => `${n} ${n > 1 ? 'vus' : 'vu'}`)(data.pending.filter((p) => p.d.status === 'vu').length)}</>, to: '/app/devis' },
     { label: 'Marge moyenne', value: `${Math.round(data.marginRate)} %`, sub: <Progress value={data.marginRate * 2} className="mt-1 w-full" tone={data.marginRate >= 30 ? 'ok' : 'warn'} />, to: '/app/chantiers' },
     { label: 'Trésorerie à 30 jours', value: money(data.cash30, true), sub: <>après salaires et charges</>, to: '/app/tresorerie' },
   ];
@@ -22,9 +22,13 @@ export function KpiStrip({ data }: { data: Data }) {
       <button onClick={() => navigate('/app/tresorerie')} className="relative border-b border-line p-4 text-left md:col-span-2 xl:col-span-1 xl:border-b-0 xl:border-r">
         <div className="text-xs font-medium text-ink-2">Encaissé ce mois-ci</div>
         <div className="num mt-1 font-display text-[34px] font-semibold leading-[1.15] tracking-[-0.025em] dawn-text">{money(data.paidThisMonth, true)}</div>
-        <div className="mt-1 flex items-center gap-1.5 text-xs text-ink-2">
-          <span className="inline-flex items-center gap-1 font-semibold text-ok"><TrendingUp className="h-3.5 w-3.5" />+18 %</span> vs le mois dernier à date
-        </div>
+        {data.trend !== null ? (
+          <div className="mt-1 flex items-center gap-1.5 text-xs text-ink-2">
+            <span className={cn('inline-flex items-center gap-1 font-semibold', data.trend >= 0 ? 'text-ok' : 'text-bad')}>{data.trend >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}{data.trend >= 0 ? '+' : '−'}{Math.abs(data.trend)} %</span> vs le mois dernier à date
+          </div>
+        ) : (
+          <div className="mt-1 text-xs text-ink-3">Premier mois avec Brix</div>
+        )}
         <Sparkline data={data.curve} className="absolute right-4 top-6 hidden h-11 w-28 sm:block" />
         <div className="mt-3 flex items-center gap-2 text-[11.5px] text-ink-3"><Progress value={progress} className="flex-1" />{Math.round(progress)} % de l'objectif</div>
       </button>
@@ -146,7 +150,7 @@ export function ChantiersPanel({ data }: { data: Data }) {
           <button key={c.id} onClick={() => navigate(`/app/chantiers/${c.id}`)} className="grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 border-b border-line px-4 py-3 text-left last:border-0 hover:bg-[#fafafc] lg:grid-cols-[1.6fr_.7fr_1fr_.6fr_1.3fr]">
             <span className="min-w-0">
               <b className="block truncate text-[13px] font-semibold">{c.name}</b>
-              <span className="block truncate text-xs text-ink-3">{c.city} · {c.address}</span>
+              <span className="block truncate text-xs text-ink-3">{[c.city, c.address].filter(Boolean).join(' · ')}</span>
             </span>
             <span className="flex -space-x-1.5">
               {c.team.map((id) => {
@@ -223,7 +227,7 @@ export function TodayList({ data }: { data: Data }) {
   const ui = useUI();
   const items: { key: string; title: string; sub: string; bob?: string; action: React.ReactNode; onClick: () => void }[] = [];
   const ch = data.activeChantiers.find((c) => c.status === 'en_cours');
-  if (ch) items.push({ key: 'ch', title: `${ch.name.split('·')[0].trim()} · 8 h`, sub: `${ch.address} · ${ch.city}`, onClick: () => navigate(`/app/chantiers/${ch.id}`), action: <span className="num grid h-11 w-11 place-items-center rounded-full border-[3px] border-vi-100 text-[11px] font-semibold" style={{ borderTopColor: '#6d28d9' }}>{ch.progress} %</span> });
+  if (ch) items.push({ key: 'ch', title: `${ch.name.split('·')[0].trim()} · 8 h`, sub: [ch.address, ch.city].filter(Boolean).join(' · '), onClick: () => navigate(`/app/chantiers/${ch.id}`), action: <span className="num grid h-11 w-11 place-items-center rounded-full border-[3px] border-vi-100 text-[11px] font-semibold" style={{ borderTopColor: '#6d28d9' }}>{ch.progress} %</span> });
   const seen = data.pending.find((p) => p.d.status === 'vu');
   if (seen) {
     const c = clients.find((x) => x.id === seen.d.clientId);
@@ -232,7 +236,7 @@ export function TodayList({ data }: { data: Data }) {
   const late = data.late[0];
   if (late) {
     const c = clients.find((x) => x.id === late.f.clientId);
-    items.push({ key: 'late', title: `Retard de paiement`, sub: `${c?.name} · ${money(late.t.ttc - late.f.paidAmount, true)}`, onClick: () => navigate(`/app/factures/${late.f.id}`), action: <button onClick={(e) => { e.stopPropagation(); ui.askBob('Relance les factures en retard'); }} className="flex h-10 items-center gap-1.5 rounded-full bg-vi-50 px-3.5 text-[13px] font-semibold text-vi-700"><Send className="h-4 w-4" />Relancer</button> });
+    items.push({ key: 'late', title: `Retard de paiement`, sub: `${c?.name} · ${money(late.a.remaining, true)}`, onClick: () => navigate(`/app/factures/${late.f.id}`), action: <button onClick={(e) => { e.stopPropagation(); ui.askBob('Relance les factures en retard'); }} className="flex h-10 items-center gap-1.5 rounded-full bg-vi-50 px-3.5 text-[13px] font-semibold text-vi-700"><Send className="h-4 w-4" />Relancer</button> });
   }
   if (!items.length) return null;
   return (

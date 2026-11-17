@@ -72,7 +72,7 @@ export function TopBar({ d, saving, menu, onPreview, previewActive, onMain, main
         Aperçu
       </Button>
       {more}
-      <Button variant="dawn" size="sm" icon={<Send className="h-3.5 w-3.5" />} onClick={onMain} className="h-9 px-3.5">
+      <Button variant="primary" size="sm" icon={<Send className="h-3.5 w-3.5" />} onClick={onMain} className="h-9 px-3.5">
         {mainLabel}
       </Button>
     </div>

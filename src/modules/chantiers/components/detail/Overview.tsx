@@ -64,7 +64,7 @@ export function Overview({ v, missingPhoto }: { v: ChantierView; missingPhoto?: 
               ['Budget HT', money(ch.budgetHt, true), 'devis signé'],
               ['Coûts engagés', money(ch.costHt, true), 'achats et heures'],
               ['Coût final estimé', money(m.projectedCost, true), `prévu ${money(m.plannedCost, true)}`],
-              ['Marge finale estimée', money(ch.budgetHt - m.projectedCost, true), `${Math.round(m.realMarginRate)} % au lieu de ${Math.round(m.plannedMarginRate)} %`],
+              ['Marge finale estimée', money(ch.budgetHt - m.projectedCost, true), Math.round(m.realMarginRate) === Math.round(m.plannedMarginRate) ? `${Math.round(m.realMarginRate)} %, comme prévu` : `${Math.round(m.realMarginRate)} % au lieu de ${Math.round(m.plannedMarginRate)} %`],
             ].map(([l, val, sub], i) => (
               <div key={l} className="bg-white p-4">
                 <div className="text-xs text-ink-2">{l}</div>

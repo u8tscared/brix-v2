@@ -15,7 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function Textarea({ className, ...p }, ref) {
-  return <textarea ref={ref} className={cn(base, 'min-h-[96px] py-2.5 leading-relaxed', className)} {...p} />;
+  return <textarea ref={ref} className={cn(base, !/(^|\s)min-h-/.test(className ?? '') && 'min-h-[96px]', 'py-2.5 leading-relaxed', className)} {...p} />;
 });
 
 export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(function Select({ className, children, ...p }, ref) {

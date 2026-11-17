@@ -44,7 +44,7 @@ export function HeaderFields({ d, client, update, phone }: { d: Devis; client?: 
             className={cn(value, 'w-full cursor-pointer appearance-none bg-transparent pr-4 focus:outline-none')}
             aria-label="Chantier"
           >
-            <option value="">{client ? `${client.address}, ${client.city.replace(/^\d+\s*/, '')}` : 'Adresse du client'}</option>
+            <option value="">{client ? [client.address, client.city.replace(/^\d+\s*/, '')].filter(Boolean).join(', ') || 'Adresse du client' : 'Adresse du client'}</option>
             {mine.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
@@ -180,7 +180,7 @@ function ClientPicker({ open, onClose, current, onPick }: { open: boolean; onClo
             ))}
             {!list.length && (
               <button onClick={() => { setForm((f) => ({ ...f, name: q })); setCreating(true); }} className="flex w-full items-center gap-2 px-3 py-4 text-[13.5px] text-vi-700">
-                <Plus className="h-4 w-4" /> Créer « {q} »
+                <Plus className="h-4 w-4" /> {q.trim() ? <>Créer « {q.trim()} »</> : 'Nouveau client'}
               </button>
             )}
           </div>

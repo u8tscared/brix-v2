@@ -41,9 +41,9 @@ export default function Evacuation() {
               <div key={a.key} className="flex items-center justify-between gap-2 rounded-[10px] border border-line px-3 py-1.5">
                 <span className="text-[13px]">{a.label} <span className="text-ink-3">· Ø {a.d}</span></span>
                 <span className="flex items-center gap-1">
-                  <button className="grid h-9 w-9 place-items-center rounded-lg bg-sub" aria-label="Moins" onClick={() => setCounts({ ...counts, [a.key]: Math.max(0, counts[a.key] - 1) })}><Minus className="h-4 w-4" /></button>
+                  <button className="grid h-10 w-10 place-items-center rounded-lg bg-sub" aria-label={`${a.label} : un de moins`} onClick={() => setCounts({ ...counts, [a.key]: Math.max(0, counts[a.key] - 1) })}><Minus className="h-4 w-4" /></button>
                   <span className="num w-6 text-center text-[14px] font-semibold">{counts[a.key]}</span>
-                  <button className="grid h-9 w-9 place-items-center rounded-lg bg-sub" aria-label="Plus" onClick={() => setCounts({ ...counts, [a.key]: counts[a.key] + 1 })}><Plus className="h-4 w-4" /></button>
+                  <button className="grid h-10 w-10 place-items-center rounded-lg bg-sub" aria-label={`${a.label} : un de plus`} onClick={() => setCounts({ ...counts, [a.key]: counts[a.key] + 1 })}><Plus className="h-4 w-4" /></button>
                 </span>
               </div>
             ))}

@@ -4,11 +4,27 @@ import { AudioLines, FileText, Hand, LayoutGrid, Search } from 'lucide-react';
 import { Button, cn } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 
-const STEPS = [
+// Exemple de phrase à dicter, dans les mots du métier de l'artisan.
+const EXAMPLES: Record<string, string> = {
+  electricien: 'fais un devis pour Mme Martin, 3 prises et un radiateur',
+  plombier: 'fais un devis pour Mme Martin, remplacement du ballon de 200 litres',
+  peintre: 'fais un devis pour Mme Martin, salon de 25 m², murs et plafond en deux couches',
+  carreleur: 'fais un devis pour Mme Martin, 12 m² de carrelage dans la salle de bain',
+  plaquiste: 'fais un devis pour Mme Martin, une cloison de 15 m² avec isolation',
+  menuisier: 'fais un devis pour Mme Martin, deux fenêtres PVC double vitrage',
+  couvreur: 'fais un devis pour Mme Martin, reprise de 20 m² de tuiles',
+  macon: 'fais un devis pour Mme Martin, une dalle béton de 20 m²',
+  paysagiste: 'fais un devis pour Mme Martin, 80 m² de gazon et une haie',
+  climaticien: 'fais un devis pour Mme Martin, une clim réversible dans le séjour',
+  serrurier: 'fais un devis pour Mme Martin, une serrure 3 points sur la porte d\'entrée',
+  cuisiniste: 'fais un devis pour Mme Martin, une douche à l\'italienne',
+};
+
+const buildSteps = (trade: string, solo: boolean) => [
   { icon: Hand, title: 'Bienvenue dans votre Brix', text: "Tout ce que vous avez choisi est prêt. Cette visite dure 30 secondes, et vous pouvez la relancer à tout moment dans Réglages." },
-  { icon: AudioLines, title: 'Parlez à Bob', text: "Le gros bouton micro, c'est Bob. Dites « fais un devis pour Mme Martin, 3 prises et un radiateur » : il le prépare, vous validez." },
+  { icon: AudioLines, title: 'Parlez à Bob', text: `Le gros bouton micro, c'est Bob. Dites « ${EXAMPLES[trade] ?? 'fais un devis pour Mme Martin'} » : il le prépare, vous validez.` },
   { icon: FileText, title: 'Un devis en 2 minutes', text: 'Chaque devis se remplit à la voix, depuis la bibliothèque de prix, ou depuis la prise de cotes. Bob vérifie les oublis et la marge avant l\'envoi.' },
-  { icon: LayoutGrid, title: 'Vos outils, rangés par département', text: 'Vendre, Facturer, Chantiers, Équipe, Achats… Vous ne voyez que ce que vous utilisez. Ajoutez un outil quand vous en avez besoin.' },
+  { icon: LayoutGrid, title: 'Vos outils, rangés par département', text: solo ? 'Vendre, Facturer, Chantiers, vos outils de calcul… Vous ne voyez que ce que vous utilisez. Ajoutez un outil quand vous en avez besoin.' : 'Vendre, Facturer, Chantiers, Équipe, Achats… Vous ne voyez que ce que vous utilisez. Ajoutez un outil quand vous en avez besoin.' },
   { icon: Search, title: 'Tout trouver en 2 touches', text: 'Sur ordinateur, ⌘K (ou Ctrl K) cherche un client, un devis ou un outil. Sur téléphone, la loupe en haut fait pareil.' },
 ];
 
@@ -17,8 +33,11 @@ export function GuidedTour() {
   const done = useBrix((s) => s.prefs.tourDone);
   const onboarded = useBrix((s) => s.onboarded);
   const setPrefs = useBrix((s) => s.setPrefs);
+  const trade = useBrix((s) => s.company.trade);
+  const solo = useBrix((s) => s.company.size === 'solo');
   const [i, setI] = useState(0);
   if (done || !onboarded) return null;
+  const STEPS = buildSteps(trade, solo);
   const S = STEPS[i];
   const last = i === STEPS.length - 1;
   return createPortal(

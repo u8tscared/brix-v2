@@ -29,7 +29,7 @@ export function InvoicePaper({ f, company, client, extra, devis, chantier, origi
   const a = amounts(f);
   const pro = client?.kind === 'pro';
   const siren = sirenOf(extra.clientSiren || client?.siret);
-  const delivery = extra.deliveryAddress || (chantier ? `${chantier.address}, ${chantier.city}` : client ? `${client.address}, ${client.city}` : '');
+  const delivery = extra.deliveryAddress || (chantier ? [chantier.address, chantier.city].filter(Boolean).join(', ') : client ? [client.address, client.city].filter(Boolean).join(', ') : '');
   const category = extra.category ?? 'services';
   const sign = a.sign === -1 ? '−' : '';
   let lot = '';
@@ -64,7 +64,7 @@ export function InvoicePaper({ f, company, client, extra, devis, chantier, origi
           <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9898a8]">Client</div>
           <div className="font-semibold">{client?.name ?? 'Client à choisir'}</div>
           {client?.contact && <div>{client.contact}</div>}
-          <div className="text-[#5f5f70]">{client ? `${client.address}, ${client.city}` : '·'}</div>
+          <div className="text-[#5f5f70]">{client ? [client.address, client.city].filter(Boolean).join(', ') || '·' : '·'}</div>
           {pro && <div className={cn(!siren && 'font-medium text-[#dc2626]')}>SIREN {siren ? siren.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3') : 'à renseigner'}</div>}
         </div>
         <div className="rounded-md bg-[#f6f6f9] p-2.5">

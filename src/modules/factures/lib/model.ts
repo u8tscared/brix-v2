@@ -61,6 +61,8 @@ export interface SituationLot {
   name: string;
   totalHt: number;
   vatRate: number;
+  /** Ventilation HT par taux de TVA quand le lot mélange plusieurs taux. */
+  rates?: { rate: number; ht: number }[];
   prevPct: number;
   pct: number;
 }
@@ -156,7 +158,7 @@ export function billingFrame(category: OperationCategory, kind: FactureKind, alr
 }
 
 /** Lots d'un devis : regroupement des lignes par section. */
-export function lotsOf(lines: Facture['lines']): { name: string; totalHt: number; vatRate: number }[] {
+export function lotsOf(lines: Facture['lines']): { name: string; totalHt: number; vatRate: number; rates: { rate: number; ht: number }[] }[] {
   const lots: { name: string; totalHt: number; rates: Map<number, number> }[] = [];
   let cur: (typeof lots)[number] | null = null;
   for (const l of lines) {
@@ -176,5 +178,5 @@ export function lotsOf(lines: Facture['lines']): { name: string; totalHt: number
   }
   return lots
     .filter((l) => l.totalHt > 0)
-    .map((l) => ({ name: l.name, totalHt: round2(l.totalHt), vatRate: [...l.rates.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 10 }));
+    .map((l) => ({ name: l.name, totalHt: round2(l.totalHt), vatRate: [...l.rates.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 10, rates: [...l.rates.entries()].filter(([, ht]) => ht !== 0).map(([rate, ht]) => ({ rate, ht: round2(ht) })) }));
 }

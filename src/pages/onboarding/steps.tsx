@@ -140,7 +140,7 @@ export function StepPriorities({ d, set }: { d: Draft; set: (p: Partial<Draft>) 
     <>
       <StepTitle kicker="Étape 3 sur 5" title="Qu'est-ce qui compte le plus pour vous ?" text="Choisissez jusqu'à 3 priorités. Brix mettra ces outils en avant et Bob s'en occupera en premier." />
       <div className="grid gap-2.5 sm:grid-cols-2">
-        {PRIORITIES.map((p) => {
+        {PRIORITIES.filter((p) => p.key !== 'equipe' || (d.size && d.size !== 'solo')).map((p) => {
           const on = d.priorities.includes(p.key);
           return (
             <Choice
@@ -164,6 +164,9 @@ export function StepPriorities({ d, set }: { d: Draft; set: (p: Partial<Draft>) 
 export function StepModules({ d, set, plan }: { d: Draft; set: (p: Partial<Draft>) => void; plan: Plan }) {
   const size = d.size ?? 'solo';
   const offer = OFFERS.find((o) => o.key === plan)!;
+  // Seul : les outils pensés pour une équipe sont rangés à part, pour garder la liste courte.
+  const [showTeam, setShowTeam] = useState(false);
+  const hidden = MODULES.filter((m) => !sizeAtLeast(size, m.minSize) && !d.enabled.includes(m.key));
   return (
     <>
       <StepTitle kicker="Étape 4 sur 5" title="Votre Brix sur mesure" text="Voici ce qu'on vous propose, cochez ou décochez. Rien n'est définitif : vous ajoutez un outil en un clic quand vous en avez besoin." />
@@ -176,7 +179,8 @@ export function StepModules({ d, set, plan }: { d: Draft; set: (p: Partial<Draft
       </div>
       <div className="space-y-5">
         {DEPARTMENTS.map((dep) => {
-          const mods = MODULES.filter((m) => m.dept === dep.key);
+          const mods = MODULES.filter((m) => m.dept === dep.key && (showTeam || !hidden.includes(m)));
+          if (!mods.length) return null;
           return (
             <div key={dep.key}>
               <div className="mb-2 flex items-baseline gap-2">
@@ -208,6 +212,11 @@ export function StepModules({ d, set, plan }: { d: Draft; set: (p: Partial<Draft
             </div>
           );
         })}
+        {hidden.length > 0 && (
+          <button type="button" onClick={() => setShowTeam(!showTeam)} className="h-11 w-full rounded-xl border border-dashed border-line2 text-[13px] font-medium text-ink-2">
+            {showTeam ? 'Masquer les outils pour les équipes' : `Voir aussi ${hidden.length} outils pour les équipes`}
+          </button>
+        )}
       </div>
     </>
   );
@@ -220,11 +229,11 @@ export function StepAccount({ d, set }: { d: Draft; set: (p: Partial<Draft>) => 
     <>
       <StepTitle kicker="Étape 5 sur 5" title="Dernière étape, et c'est prêt" text="Créez votre accès. Si vous venez d'un autre logiciel, déposez votre export : Bob récupère vos clients, vos prix et vos devis." />
       <div className="grid grid-cols-2 gap-2.5">
-        <button className="flex h-11 items-center justify-center gap-2 rounded-[10px] border border-line2 bg-white text-[13.5px] font-medium" onClick={() => set({ email: d.email || 'karim@exemple.fr' })}>
+        <button className="flex h-11 items-center justify-center gap-2 rounded-[10px] border border-line2 bg-white text-[13.5px] font-medium" onClick={() => set({ email: d.email || 'vous@gmail.com' })}>
           <svg viewBox="0 0 24 24" className="h-4 w-4"><path fill="#4285F4" d="M22.6 12.2c0-.8-.1-1.5-.2-2.2H12v4.2h6a5 5 0 0 1-2.2 3.3v2.7h3.6c2-1.9 3.2-4.7 3.2-8Z" /><path fill="#34A853" d="M12 23c3 0 5.5-1 7.4-2.7l-3.6-2.8c-1 .7-2.3 1.1-3.8 1.1-2.9 0-5.4-2-6.3-4.6H2v2.9A11 11 0 0 0 12 23Z" /><path fill="#FBBC05" d="M5.7 14c-.2-.7-.4-1.3-.4-2s.1-1.4.4-2V7.1H2a11 11 0 0 0 0 9.8L5.7 14Z" /><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2 7.1L5.7 10C6.6 7.4 9.1 5.4 12 5.4Z" /></svg>
           Google
         </button>
-        <button className="flex h-11 items-center justify-center gap-2 rounded-[10px] bg-ink text-[13.5px] font-medium text-white" onClick={() => set({ email: d.email || 'karim@icloud.com' })}>
+        <button className="flex h-11 items-center justify-center gap-2 rounded-[10px] bg-ink text-[13.5px] font-medium text-white" onClick={() => set({ email: d.email || 'vous@icloud.com' })}>
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1ZM13.9 4.9c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.2.1 2.4-.6 3.1-1.5Z" /></svg>
           Apple
         </button>

@@ -6,7 +6,7 @@ import { money, num, pct, totals } from '@/lib/format';
 import type { DevisLigne } from '@/lib/types';
 import type { LibTrade } from '../library';
 import { useDictation } from '../useDictation';
-import { chunksToLines, parseDictation, type VoiceChunk } from '../voiceParser';
+import { chunksToLines, dictationFor, parseDictation, type VoiceChunk } from '@/modules/devis/voiceParser';
 
 interface Props {
   open: boolean;
@@ -54,7 +54,8 @@ function Wave({ on }: { on: boolean }) {
 }
 
 export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, trade, subtitle, fullscreen }: Props) {
-  const dict = useDictation();
+  const ex = dictationFor(trade);
+  const dict = useDictation(ex?.demo);
   useEffect(() => {
     if (open) dict.start();
     else dict.reset();
@@ -84,7 +85,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
           <span>Tu dictes</span>
           <span>{dict.demo ? 'Dictée de démonstration' : 'Bob structure en direct'}</span>
         </div>
-        {dict.text || dict.interim ? <Highlighted text={dict.text} chunks={chunks} interim={dict.interim} /> : <p className="text-[16px] leading-relaxed text-ink-3">Parle normalement : « trois prises, deux différentiels 30 mA type A, huit disjoncteurs 16 A et six heures de pose ».</p>}
+        {dict.text || dict.interim ? <Highlighted text={dict.text} chunks={chunks} interim={dict.interim} /> : <p className="text-[16px] leading-relaxed text-ink-3">Parle normalement : {ex?.hint ?? '« trois prises, deux différentiels 30 mA type A, huit disjoncteurs 16 A et six heures de pose »'}.</p>}
       </div>
 
       {groups.map(([lot, ls]) => (

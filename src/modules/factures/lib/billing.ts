@@ -49,7 +49,7 @@ export function buildAcompte(devis: Devis, number: string, percent: number): Fac
 }
 
 /** Avancement déjà facturé par lot (dernière situation), sinon avancement global. */
-export function previousProgress(devis: Devis, factures: Facture[], extras: Record<string, FactureExtra>): { index: number; lots: SituationLot[]; depositsHt: number; depositNumbers: string[] } {
+export function previousProgress(devis: Devis, factures: Facture[], extras: Record<string, FactureExtra>): { index: number; lots: SituationLot[]; depositsHt: number; depositsByRate: { rate: number; ht: number }[]; depositNumbers: string[] } {
   const lots = lotsOf(devis.lines);
   const billed = billedFor(devis.id, factures);
   const situations = billed.filter((f) => f.kind === 'situation').sort((a, b) => a.issueDate.localeCompare(b.issueDate));
@@ -66,6 +66,7 @@ export function previousProgress(devis: Devis, factures: Facture[], extras: Reco
       return { ...l, prevPct: prev, pct: prev };
     }),
     depositsHt: round2(acomptes.reduce((s, f) => s + amounts(f).ht, 0)),
+    depositsByRate: [...acomptes.flatMap((f) => amounts(f).byVat).reduce((m, v) => m.set(v.rate, (m.get(v.rate) || 0) + v.base), new Map<number, number>())].map(([rate, ht]) => ({ rate, ht: round2(ht) })),
     depositNumbers: acomptes.map((f) => f.number),
   };
 }
@@ -79,8 +80,8 @@ export interface SituationPlan {
   deductionHt: number;
 }
 
-/** Lignes d'une situation : avancement de chaque lot, moins l'acompte au prorata. */
-export function planSituation(lots: SituationLot[], depositsHt: number, depositNumbers: string[]): SituationPlan {
+/** Lignes d'une situation : avancement de chaque lot (une ligne par taux de TVA si le lot en mélange plusieurs), moins l'acompte au prorata, ventilé par taux. */
+export function planSituation(lots: SituationLot[], depositsHt: number, depositNumbers: string[], depositsByRate?: { rate: number; ht: number }[]): SituationPlan {
   const devisHt = lots.reduce((s, l) => s + l.totalHt, 0);
   const lines: DevisLigne[] = [];
   let workHt = 0;
@@ -88,16 +89,22 @@ export function planSituation(lots: SituationLot[], depositsHt: number, depositN
   for (const l of lots) {
     const delta = Math.max(0, l.pct - l.prevPct);
     if (!delta) continue;
-    const v = round2((l.totalHt * delta) / 100);
-    workHt += v;
+    const rates = l.rates?.length ? l.rates : [{ rate: l.vatRate, ht: l.totalHt }];
+    for (const r of rates) {
+      const v = round2((r.ht * delta) / 100);
+      workHt += v;
+      lines.push(line(`${l.name} · ${l.pct} % cumulés${rates.length > 1 ? ` (TVA ${String(r.rate).replace('.', ',')} %)` : ''}`, v, r.rate, `Avancement précédent ${l.prevPct} %, ce mois-ci +${delta} %`));
+    }
     deltaShare += (l.totalHt * delta) / 100;
-    lines.push(line(`${l.name} · ${l.pct} % cumulés`, v, l.vatRate, `Avancement précédent ${l.prevPct} %, ce mois-ci +${delta} %`));
   }
   const ratio = devisHt ? deltaShare / devisHt : 0;
   const deductionHt = round2(depositsHt * ratio);
   if (deductionHt > 0) {
-    const rate = lots[0]?.vatRate ?? 10;
-    lines.push(line(`Déduction acompte ${depositNumbers.join(', ')} au prorata`, -deductionHt, rate, `${Math.round(ratio * 1000) / 10} % de l'acompte`));
+    const parts = depositsByRate?.length ? depositsByRate : [{ rate: lots[0]?.vatRate ?? 10, ht: depositsHt }];
+    for (const p of parts) {
+      const d = round2(p.ht * ratio);
+      if (d > 0) lines.push(line(`Déduction acompte ${depositNumbers.join(', ')} au prorata${parts.length > 1 ? ` (TVA ${String(p.rate).replace('.', ',')} %)` : ''}`, -d, p.rate, `${Math.round(ratio * 1000) / 10} % de l'acompte`));
+    }
   }
   return { lines, workHt: round2(workHt), deductionHt };
 }

@@ -2,7 +2,7 @@
 // Elles écrivent dans le store global (factures) et dans le store local du module.
 
 import { useBrix } from '@/lib/store';
-import { todayISO } from '@/lib/format';
+import { money, todayISO } from '@/lib/format';
 import type { EInvoiceStatus, Facture } from '@/lib/types';
 import { transmitToPlatform, PLATFORMS } from '../service';
 import { useFactures } from '../store';
@@ -38,7 +38,7 @@ export function recordPayment(id: string, amount: number, method: PaymentMethod,
   next.status = liveStatus({ ...next, status: f.status === 'brouillon' ? 'emise' : f.status });
   useBrix.getState().upsertFacture(next);
   // Facture B2B transmise et soldée : le statut « encaissée » est envoyé au fisc (prestations de services).
-  if (next.status === 'payee' && f.einvoice.status !== 'non_transmise' && f.einvoice.status !== 'encaissee') pushEinvoice(id, 'encaissee', `${amounts(next).paid.toFixed(2).replace('.', ',')} € reçus`);
+  if (next.status === 'payee' && f.einvoice.status !== 'non_transmise' && f.einvoice.status !== 'encaissee') pushEinvoice(id, 'encaissee', `${money(amounts(next).paid)} reçus`);
 }
 
 /** Émet la facture : elle n'est plus modifiable (correction par avoir). */

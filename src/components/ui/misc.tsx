@@ -72,6 +72,7 @@ export function Row({ children, className, onClick }: { children: ReactNode; cla
 export function Switch({ checked, onChange, label, disabled }: { checked: boolean; onChange: (v: boolean) => void; label?: string; disabled?: boolean }) {
   return (
     <button
+      type="button"
       role="switch"
       aria-checked={checked}
       aria-label={label}
@@ -80,7 +81,7 @@ export function Switch({ checked, onChange, label, disabled }: { checked: boolea
         e.stopPropagation();
         onChange(!checked);
       }}
-      className={cn('relative h-6 w-10 shrink-0 rounded-full transition disabled:opacity-50', checked ? 'bg-vi-700' : 'bg-line2')}
+      className={cn('relative h-6 w-10 shrink-0 rounded-full transition before:absolute before:-inset-x-2 before:-inset-y-2.5 before:content-[\'\'] disabled:opacity-50', checked ? 'bg-vi-700' : 'bg-line2')}
     >
       <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all', checked ? 'left-[18px]' : 'left-0.5')} />
     </button>

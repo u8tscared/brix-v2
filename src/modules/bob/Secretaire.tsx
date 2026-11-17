@@ -151,7 +151,7 @@ export default function Secretaire() {
                 <div className="text-[12px] text-ink-2">Sur ton portable, compose ce code puis appuie sur Appeler :</div>
                 <div className="mt-1 flex items-center gap-2">
                   <code className="num min-w-0 flex-1 truncate font-mono text-[15px] font-semibold">{forwardCode}</code>
-                  <button onClick={() => { void navigator.clipboard?.writeText(forwardCode); toast('Code copié.'); }} className="grid h-10 w-10 place-items-center rounded-lg text-ink-2 hover:bg-white" aria-label="Copier"><Copy className="h-4 w-4" /></button>
+                  <button onClick={() => { navigator.clipboard?.writeText(forwardCode).then(() => toast('Code copié.'), () => toast('Copie impossible : recopiez le code à la main.', 'info')); }} className="grid h-10 w-10 place-items-center rounded-lg text-ink-2 hover:bg-white" aria-label="Copier le code"><Copy className="h-4 w-4" /></button>
                 </div>
               </div>
               <Button className="w-full justify-center" disabled={!sec.forwardNumber.trim()} onClick={() => toast(`Appel test lancé vers ${sec.forwardNumber} (simulé en démo).`, 'info')}>

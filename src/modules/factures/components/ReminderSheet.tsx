@@ -61,7 +61,7 @@ export function ReminderSheet({ f, open, onClose, level: initial }: { f: Facture
       open={open}
       onClose={onClose}
       title={`Relancer ${client?.name ?? ''}`}
-      subtitle={`${f.number} · ${money(amounts(f).remaining)} · ${daysLate(f) ? `${daysLate(f)} jours de retard` : 'pas encore en retard'} · ${f.remindersSent} relance${f.remindersSent > 1 ? 's' : ''} déjà`}
+      subtitle={`${f.number} · ${money(amounts(f).remaining)} · ${daysLate(f) ? `${daysLate(f)} jour${daysLate(f) > 1 ? 's' : ''} de retard` : 'pas encore en retard'} · ${f.remindersSent ? `${f.remindersSent} relance${f.remindersSent > 1 ? 's' : ''} déjà envoyée${f.remindersSent > 1 ? 's' : ''}` : 'aucune relance envoyée'}`}
       width={560}
       footer={
         <>
@@ -98,7 +98,7 @@ export function ReminderSheet({ f, open, onClose, level: initial }: { f: Facture
             <RotateCcw className="h-3.5 w-3.5" /> Autre version
           </button>
         </div>
-        <Textarea value={drafting ? '' : text} placeholder={drafting ? 'Bob rédige…' : ''} onChange={(e) => setText(e.target.value)} className={level === 2 ? 'min-h-[120px]' : 'min-h-[300px]'} />
+        <Textarea value={drafting ? '' : text} placeholder={drafting ? 'Bob rédige…' : ''} onChange={(e) => setText(e.target.value)} style={{ minHeight: level === 2 ? 140 : 340 }} />
         {level === 2 && <div className="text-right text-[11.5px] text-ink-3">{text.length} caractères · {Math.max(1, Math.ceil(text.length / 160))} SMS</div>}
         {level === 3 && <p className="rounded-lg bg-sub px-3 py-2 text-[12px] text-ink-2">Envoi en lettre recommandée électronique (AR24) en un clic, ou imprimez-la. En démo, rien n’est envoyé.</p>}
       </div>

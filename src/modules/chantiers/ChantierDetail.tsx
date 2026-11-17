@@ -72,7 +72,7 @@ export default function ChantierDetail() {
             <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-2">
               {client && <Link to={`/app/clients/${client.id}`} className="font-medium text-ink hover:underline">{client.name}</Link>}
               <a href={`https://maps.google.com/?q=${encodeURIComponent(`${ch.address} ${ch.city}`)}`} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-ink">
-                <MapPin className="h-3.5 w-3.5" /> {ch.address}, {ch.city}
+                <MapPin className="h-3.5 w-3.5" /> {[ch.address, ch.city].filter(Boolean).join(', ')}
               </a>
               <span className="num">{dateShort(ch.startDate)} → {dateShort(ch.endDate)}</span>
               <TeamAvatars team={team} size={24} />

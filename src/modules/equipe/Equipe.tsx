@@ -112,7 +112,7 @@ export default function Equipe() {
       {tab === 'now' && employees.length > 0 && (
         <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
           <Card>
-            <CardHeader title="Qui est où" meta={new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} action={<Link to="/app/planning" className="text-[12.5px] font-medium text-ink-2 hover:text-ink">Planning</Link>} />
+            <CardHeader title="Qui est où" meta={new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} action={<Link to="/app/planning" className="-my-2 inline-flex min-h-10 items-center px-1 text-[12.5px] font-medium text-ink-2 hover:text-ink">Planning</Link>} />
             {team.map((t) => <NowRow key={t.emp.id} t={t} onOpen={() => setOpen(t.emp)} />)}
           </Card>
           <div className="space-y-4">
@@ -126,13 +126,13 @@ export default function Equipe() {
             {habAlerts.length > 0 && (
               <Card className="p-4">
                 <div className="text-[13.5px] font-semibold">À surveiller</div>
-                <ul className="mt-2 space-y-2">
+                <ul className="mt-1 space-y-0.5">
                   {habAlerts.slice(0, 3).map((h) => {
                     const e = employees.find((x) => x.id === h.employeeId)!;
                     const st = habState(h.expires);
                     return (
                       <li key={h.id}>
-                        <Link to="/app/habilitations" className="flex items-center gap-2 text-[13px]">
+                        <Link to="/app/habilitations" className="-mx-2 flex min-h-10 items-center gap-2 rounded-lg px-2 text-[13px] hover:bg-sub">
                           <Avatar initials={e.initials} color={e.color} size={24} />
                           <span className="min-w-0 flex-1 truncate">{e.firstName} · {h.type.startsWith('caces') ? 'CACES' : h.type.startsWith('elec') ? 'Habilitation électrique' : h.type === 'sst' ? 'SST' : 'Formation'}</span>
                           <Badge tone={st.tone}>{st.label}</Badge>

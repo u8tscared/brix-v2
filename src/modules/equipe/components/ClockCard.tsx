@@ -60,9 +60,11 @@ export function ClockCard() {
           <div className="text-[13.5px] font-semibold">Pointer pour</div>
           <div className="hidden text-[11.5px] text-ink-3 sm:block">Chacun pointe depuis son téléphone, ou ici en cas d’oubli.</div>
         </div>
-        <Select value={who} onChange={(e) => setWho(e.target.value)} className="!h-10 w-[150px] text-[13px]" aria-label="Salarié">
-          {employees.map((e) => <option key={e.id} value={e.id}>{e.firstName} {e.lastName[0]}.</option>)}
-        </Select>
+        <div className="w-[150px] shrink-0">
+          <Select value={who} onChange={(e) => setWho(e.target.value)} className="!h-10 text-[13px]" aria-label="Salarié">
+            {employees.map((e) => <option key={e.id} value={e.id}>{e.firstName} {e.lastName[0]}.</option>)}
+          </Select>
+        </div>
       </div>
       <div className="space-y-3 p-4">
         <button

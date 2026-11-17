@@ -104,7 +104,8 @@ export function CommandPalette() {
             placeholder="Chercher un client, un devis, un outil… ou demander à Bob"
             className="h-14 flex-1 bg-transparent text-[15px] outline-none placeholder:text-ink-3"
           />
-          <Kbd>Échap</Kbd>
+          <span className="hidden md:inline-flex"><Kbd>Échap</Kbd></span>
+          <button onClick={() => ui.set({ palette: false })} className="-mr-2 h-11 px-2 text-[14px] font-medium text-ink-2 md:hidden">Annuler</button>
         </div>
         <div className="max-h-[56vh] overflow-y-auto p-2">
           {results.length === 0 && <div className="px-3 py-10 text-center text-sm text-ink-3">Rien trouvé.</div>}

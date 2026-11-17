@@ -13,7 +13,7 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
   const chantier = chantiers.find((c) => c.id === f.chantierId);
   const terms = daysBetween(f.issueDate, f.dueDate);
   const siren = sirenOf(extra.clientSiren ?? client?.siret);
-  const deliveryPlaceholder = chantier ? `${chantier.address}, ${chantier.city}` : client ? `${client.address}, ${client.city}` : 'Adresse du chantier';
+  const deliveryPlaceholder = (chantier ? [chantier.address, chantier.city].filter(Boolean).join(', ') : client ? [client.address, client.city].filter(Boolean).join(', ') : '') || 'Adresse du chantier';
 
   if (readOnly) {
     return (

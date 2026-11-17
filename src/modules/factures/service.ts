@@ -119,7 +119,7 @@ export function reminderText(f: Facture, client: Client | undefined, company: Co
   const sum = money(a.remaining);
   const hello = civ(client);
   if (level === 2) {
-    if (tone === 'ferme') return `${company.name} : la facture ${f.number} (${sum}) est impayée depuis ${late} jours. Merci de la régler sous 48 h : lien de paiement ci-joint. ${userFirstName}`;
+    if (tone === 'ferme') return `${company.name} : la facture ${f.number} (${sum}) ${late > 0 ? `est impayée depuis ${late} jour${late > 1 ? 's' : ''}` : `arrive à échéance le ${due}`}. Merci de la régler sous 48 h : lien de paiement ci-joint. ${userFirstName}`;
     if (tone === 'direct') return `${hello}, la facture ${f.number} de ${sum} attend toujours son règlement. Vous pouvez payer ici en 1 minute : [lien]. Merci ! ${userFirstName}, ${company.name}`;
     return `${hello}, c'est ${userFirstName} de ${company.name}. Petit rappel pour la facture ${f.number} (${sum}) : vous pouvez la régler ici par carte ou virement : [lien]. Bonne journée !`;
   }
@@ -143,8 +143,8 @@ ${userFirstName}, ${company.name}`;
     tone === 'ferme'
       ? `Sauf erreur de notre part, la facture ${f.number} de ${sum}, échue le ${due}, n'est toujours pas réglée.`
       : tone === 'direct'
-        ? `La facture ${f.number} de ${sum} est arrivée à échéance le ${due} et je n'ai pas encore reçu le règlement.`
-        : `J'espère que tout va bien${f.chantierId ? ' depuis les travaux' : ''}. Je me permets un petit rappel : la facture ${f.number} de ${sum} est arrivée à échéance le ${due}.`;
+        ? late > 0 ? `La facture ${f.number} de ${sum} est arrivée à échéance le ${due} et je n'ai pas encore reçu le règlement.` : `La facture ${f.number} de ${sum} arrive à échéance le ${due}.`
+        : `J'espère que tout va bien${f.chantierId && f.kind !== 'acompte' ? ' depuis les travaux' : ''}. Je me permets un petit rappel : la facture ${f.number} de ${sum} ${late > 0 ? `est arrivée à échéance le ${due}` : `arrive à échéance le ${due}`}.`;
   const outro =
     tone === 'ferme'
       ? 'Merci de procéder au paiement sous 8 jours.'

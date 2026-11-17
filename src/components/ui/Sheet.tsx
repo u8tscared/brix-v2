@@ -46,7 +46,7 @@ export function Sheet({ open, onClose, title, subtitle, children, footer, side =
             </button>
           </div>
         )}
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">{children}</div>
+        <div className={cn('min-h-0 flex-1 overflow-y-auto overscroll-contain px-5', footer ? 'pb-5' : 'pb-[calc(20px+var(--safe-b))]')}>{children}</div>
         {footer && <div className="flex items-center justify-end gap-2 border-t border-line px-5 py-3 pb-[calc(12px+var(--safe-b))]">{footer}</div>}
       </div>
     </div>,

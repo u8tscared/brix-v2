@@ -5,7 +5,7 @@ import type { Client, Company, Devis, DevisLigne } from '@/lib/types';
 import { money, pct, totals, uid } from '@/lib/format';
 import { findLibItemForLine, fold, LIBRARY, type LibItem } from './library';
 import { groupLots, insertInLot, insertGrouped, isPriced, lineFromLib, lotName, mainVat, raiseMargin } from './logic';
-import { chunksToLines, parseDictation } from './voiceParser';
+import { chunksToLines, dictationHintForCompany, parseDictation } from './voiceParser';
 
 export interface Suggestion {
   key: string;
@@ -29,7 +29,7 @@ export function buildSuggestions(d: Devis, client: Client | undefined, company: 
   const add = (it: LibItem, qty = 1, section: string | null = firstSection(/tableau|mise en service/)) => (x: Devis) => ({ lines: insertInLot(x.lines, section, [lineFromLib(it, vat, qty, 'bob')]) });
 
   if (!priced.length) {
-    out.push({ key: 'empty', icon: 'plus', title: 'Dicte-moi ton devis.', text: 'Dis par exemple « trois prises, deux différentiels 30 mA type A et six heures de pose » : je range tout dans les bons lots, avec tes prix.' });
+    out.push({ key: 'empty', icon: 'plus', title: 'Dicte-moi ton devis.', text: `Dis par exemple ${dictationHintForCompany(company.trade)} : je range tout dans les bons lots, avec tes prix.` });
     return out;
   }
 

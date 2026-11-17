@@ -61,7 +61,7 @@ export default function Irve() {
       <ResultRow label="Protection" value={`${p.amps} A courbe C`} />
       <ResultRow label="Différentiel 30 mA" value={dc === 'oui' ? 'Type A' : 'Type B'} tone={dc === 'oui' ? undefined : 'warn'} />
       <ResultRow label="Câble" value={`R2V ${conductors}${fmtS(r.section)} mm²`} strong />
-      <ResultRow label="Temps de charge 50 kWh" value={`environ ${n1(50 / p.kw)} h`} sub="batterie moyenne, de 20 à 80 % ≈ la moitié" />
+      <ResultRow label="Recharge de 20 à 80 %" value={`environ ${n1((50 * 0.6 * 1.1) / p.kw)} h`} sub="batterie moyenne de 50 kWh, pertes comprises" />
       <div className="mt-3 space-y-2">
         {!subscribedOk && <Note tone="warn">Abonnement de {kva} kVA un peu juste pour une borne de {String(p.kw).replace('.', ',')} kW : prévoir le pilotage{pilot === 'oui' ? ' (prévu)' : ''} ou passer à {p.phase === 'tri' ? '12' : Math.ceil(p.kw + 3)} kVA.</Note>}
         {p.kw > 3.7 && <Note>Pose réservée à un installateur qualifié IRVE. Particulier : crédit d’impôt de 75 %, 500 € au plus par borne.</Note>}

@@ -37,10 +37,10 @@ export default function Welcome() {
           Devis à la voix, factures payées plus vite, chantiers, planning, équipe et paie. Brix s'adapte à votre métier et à votre taille, de l'auto-entrepreneur à 200 salariés.
         </p>
         <div className="mx-auto mt-9 flex w-full max-w-[420px] flex-col gap-3 sm:flex-row">
-          <Button variant="dawn" size="lg" className="flex-1 justify-center" onClick={() => navigate('/inscription')}>
+          <Button variant="dawn" size="lg" className="w-full justify-center sm:w-auto sm:flex-1" onClick={() => navigate('/inscription')}>
             Créer mon Brix <ArrowRight className="h-4 w-4" />
           </Button>
-          <Button variant="secondary" size="lg" className="flex-1 justify-center" onClick={() => navigate('/demo')} icon={<Play className="h-4 w-4" />}>
+          <Button variant="secondary" size="lg" className="w-full justify-center sm:w-auto sm:flex-1" onClick={() => navigate('/demo')} icon={<Play className="h-4 w-4" />}>
             Voir la démo
           </Button>
         </div>

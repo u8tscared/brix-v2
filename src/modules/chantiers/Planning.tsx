@@ -108,7 +108,7 @@ export default function Planning() {
           {weekConflicts.length > 0 && (
             <div className="flex items-center gap-2.5 rounded-xl border border-[#fbd1d1] bg-bad-bg px-3.5 py-2.5 text-[13px] text-bad">
               <AlertTriangle className="h-4 w-4 shrink-0" />
-              <span className="flex-1">{nConflicts} conflit{nConflicts > 1 ? 's' : ''} d’horaires cette semaine : {employees.find((p) => p.id === weekConflicts[0].employeeId)?.firstName} le {dateShort(weekConflicts[0].date)}.</span>
+              <span className="flex-1">{nConflicts} conflit{nConflicts > 1 ? 's' : ''} d’horaires cette semaine : {employees.find((p) => p.id === weekConflicts[0].employeeId)?.firstName} le {dateShort(weekConflicts[0].date).replace(/\.$/, "")}.</span>
               <Button size="sm" variant="secondary" onClick={() => setDraft({ ...weekConflicts[0] })}>Voir</Button>
             </div>
           )}
