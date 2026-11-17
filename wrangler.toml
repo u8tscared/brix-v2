@@ -11,6 +11,10 @@ not_found_handling = "single-page-application"
 
 [vars]
 APP_ORIGIN = "https://app.brix-app.fr"
+PUBLIC_BASE_URL = "https://brix-app.fr"
+SIGNATURE_PROVIDER = "brix"
+STRIPE_PLATFORM_FEE_BPS = "0"
+VAPID_SUBJECT = "mailto:contact@brix-app.fr"
 
 [[d1_databases]]
 binding = "DB"
