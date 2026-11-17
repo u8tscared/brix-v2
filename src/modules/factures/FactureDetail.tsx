@@ -1,16 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, BellRing, Check, Copy, FileCode2, FileMinus2, FileSignature, Link2, Printer, Send, Trash2, Wallet } from 'lucide-react';
-import { Button, EmptyState, Segmented, UnderlineTabs, cn, toast } from '@/components/ui';
+import { ArrowLeft, BellRing, Copy, Expand, FileCode2, FileMinus2, FileSignature, Link2, Printer, Send, Trash2, Wallet } from 'lucide-react';
+import { Button, EmptyState, Segmented, UnderlineTabs, toast } from '@/components/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { PageLoader } from '@/components/layout/AppShell';
-import { money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Facture } from '@/lib/types';
+import type { FixTarget } from '@/modules/devis/checks';
+import { printDoc } from '@/modules/devis/components/doc/print';
+import { SavedPill } from '@/modules/devis/components/TopBar';
+import { DocViewer } from '@/modules/devis/components/viewer/DocViewer';
+import { flashField } from '@/modules/devis/focus';
 import { EDot, KindBadge, StatusBadge } from './components/bits';
 import { CreateFromDevisSheet } from './components/CreateFromDevisSheet';
 import { EInvoicePanel } from './components/EInvoicePanel';
-import { InvoicePaper, PrintableInvoice } from './components/InvoicePaper';
+import { DetailTotals, ScaledInvoice } from './components/DetailParts';
+import { invoiceDoc, INVOICE_TITLE } from './components/invoiceDoc';
 import { LineEditor } from './components/LineEditor';
 import { MetaForm } from './components/MetaForm';
 import { MoreMenu } from './components/MoreMenu';
@@ -19,6 +24,7 @@ import { PaymentPanel } from './components/PaymentPanel';
 import { ReminderSheet } from './components/ReminderSheet';
 import { SendSheet } from './components/SendSheet';
 import { blankFacture, buildAvoir } from './lib/billing';
+import { checkFacture } from './lib/checks';
 import { fromFacture, validateEInvoice } from './lib/einvoice-input';
 import { buildFacturX, downloadText } from './lib/facturx';
 import { amounts, liveStatus } from './lib/model';
@@ -39,7 +45,12 @@ export default function FactureDetail() {
     navigate(`/app/factures/${draft.id}`, { replace: true });
   }, [id]);
 
-  if (id === 'nouvelle') return <div className="p-6"><PageLoader /></div>;
+  if (id === 'nouvelle')
+    return (
+      <div className="p-6">
+        <PageLoader />
+      </div>
+    );
   if (!f)
     return (
       <div className="p-6">
@@ -70,6 +81,7 @@ function Detail({ f }: { f: Facture }) {
   const [side, setSide] = useState<Side>(draft ? 'apercu' : st === 'payee' ? 'efacture' : 'paiement');
   const [tab, setTab] = useState<Tab>('facture');
   const [sheet, setSheet] = useState<null | 'pay' | 'link' | 'remind' | 'send' | 'devis'>(null);
+  const [viewer, setViewer] = useState(false);
   const close = () => setSheet(null);
 
   const input = useMemo(() => fromFacture(f, s.company, client, extra, { devisNumber: devis?.number, original }), [f, s.company, client, extra, devis, original]);
@@ -78,6 +90,9 @@ function Detail({ f }: { f: Facture }) {
     if (!f.clientId) m.unshift('Client');
     return [...new Set(m)];
   }, [input, pro, f.clientId]);
+  const paperProps = { f, company: s.company, client, extra, devis, chantier, original };
+  const spec = useMemo(() => invoiceDoc(paperProps), [f, s.company, client, extra, devis, chantier, original]);
+  const checks = useMemo(() => checkFacture(f, client, s.company, extra, missing), [f, client, s.company, extra, missing]);
 
   const update = (p: Partial<Facture>) => s.upsertFacture({ ...f, ...p });
   const download = (fmt: 'cii' | 'ubl') => {
@@ -85,8 +100,8 @@ function Detail({ f }: { f: Facture }) {
     toast(fmt === 'cii' ? 'Fichier Factur-X téléchargé' : 'Fichier UBL téléchargé');
   };
   const print = () => {
-    toast('Choisissez « Enregistrer au format PDF »', 'info');
-    setTimeout(() => window.print(), 250);
+    toast('Choisissez « Enregistrer au format PDF » pour le télécharger', 'info');
+    printDoc(spec, `${INVOICE_TITLE[f.kind]} ${f.number}`);
   };
   const avoir = () => {
     const n = buildAvoir(f, s.nextNumber('facture'));
@@ -101,36 +116,67 @@ function Detail({ f }: { f: Facture }) {
     fx.setExtra(n.id, { category: extra.category, deliveryAddress: extra.deliveryAddress });
     navigate(`/app/factures/${n.id}`);
   };
+  const fix = (t: FixTarget) => {
+    if (t === 'company') return navigate('/app/reglages');
+    setTab('facture');
+    setTimeout(() => flashField(t === 'lines' ? 'lines' : t), 80);
+  };
+  const openSend = () => {
+    if (!f.clientId) return toast('Choisissez d’abord un client', 'warn');
+    setViewer(false);
+    setSheet('send');
+  };
+
+  // Raccourcis : P aperçu, Ctrl+P impression
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      if (document.querySelector('[role="dialog"]')) return;
+      const typing = /input|textarea|select/i.test((e.target as HTMLElement).tagName);
+      if (e.key.toLowerCase() === 'p' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        print();
+      } else if (e.key.toLowerCase() === 'p' && !typing && !e.altKey) setViewer(true);
+    };
+    window.addEventListener('keydown', k);
+    return () => window.removeEventListener('keydown', k);
+  });
 
   // Action principale selon l'état de la facture.
   const primary = draft
-    ? { label: 'Émettre et envoyer', short: 'Émettre', icon: <Send className="h-4 w-4" />, run: () => (f.clientId ? setSheet('send') : toast('Choisissez d’abord un client', 'warn')) }
+    ? { label: 'Émettre et envoyer', short: 'Émettre', icon: <Send className="h-4 w-4" />, run: openSend }
     : f.kind === 'avoir'
-      ? { label: 'Envoyer l’avoir', short: 'Envoyer', icon: <Send className="h-4 w-4" />, run: () => setSheet('send') }
+      ? { label: 'Envoyer l’avoir', short: 'Envoyer', icon: <Send className="h-4 w-4" />, run: openSend }
       : a.remaining > 0
         ? { label: 'Paiement reçu', short: 'Encaisser', icon: <Wallet className="h-4 w-4" />, run: () => setSheet('pay') }
         : null;
 
   const menu = [
-    { label: 'Télécharger le PDF', icon: <Printer />, onClick: print },
+    { label: 'Aperçu plein écran', icon: <Expand />, onClick: () => setViewer(true) },
+    { label: 'Imprimer ou télécharger le PDF', icon: <Printer />, onClick: print },
     { label: 'Fichier Factur-X (XML)', icon: <FileCode2 />, onClick: () => download('cii') },
-    { label: 'Renvoyer au client', icon: <Send />, onClick: () => setSheet('send'), hidden: draft },
+    { label: 'Renvoyer au client', icon: <Send />, onClick: openSend, hidden: draft },
     { label: 'Lien de paiement', icon: <Link2 />, onClick: () => setSheet('link'), hidden: draft || a.remaining <= 0 },
     { label: 'Relancer', icon: <BellRing />, onClick: () => setSheet('remind'), hidden: draft || a.remaining <= 0 },
     { label: 'Facturer un devis signé', icon: <FileSignature />, onClick: () => setSheet('devis'), hidden: !draft },
     { label: 'Dupliquer', icon: <Copy />, onClick: duplicate },
     { label: 'Créer un avoir', icon: <FileMinus2 />, onClick: avoir, hidden: draft || f.kind === 'avoir' },
-    { label: 'Supprimer le brouillon', icon: <Trash2 />, danger: true, hidden: !draft, onClick: () => { update({ status: 'annulee' }); toast('Brouillon supprimé'); navigate('/app/factures'); } },
+    { label: 'Supprimer le brouillon', icon: <Trash2 />, danger: true, hidden: !draft, onClick: () => (update({ status: 'annulee' }), toast('Brouillon supprimé'), navigate('/app/factures')) },
   ];
 
-  const paper = <InvoicePaper f={f} company={s.company} client={client} extra={extra} devis={devis} chantier={chantier} original={original} />;
   const sidePanels: Record<Side, React.ReactNode> = {
     apercu: (
       <div className="space-y-3">
-        <div className="rounded-xl bg-white p-5 shadow-card">{paper}</div>
+        <ScaledInvoice spec={spec} onExpand={() => setViewer(true)} />
         <div className="flex gap-2">
-          <Button variant="secondary" size="sm" icon={<Printer className="h-3.5 w-3.5" />} onClick={print}>PDF</Button>
-          <Button variant="secondary" size="sm" icon={<FileCode2 className="h-3.5 w-3.5" />} onClick={() => download('cii')}>Factur-X</Button>
+          <Button variant="secondary" size="sm" icon={<Expand className="h-3.5 w-3.5" />} onClick={() => setViewer(true)}>
+            Agrandir
+          </Button>
+          <Button variant="secondary" size="sm" icon={<Printer className="h-3.5 w-3.5" />} onClick={print}>
+            Imprimer
+          </Button>
+          <Button variant="ghost" size="sm" icon={<FileCode2 className="h-3.5 w-3.5" />} onClick={() => download('cii')}>
+            Factur-X
+          </Button>
         </div>
       </div>
     ),
@@ -145,7 +191,7 @@ function Detail({ f }: { f: Facture }) {
           <KindBadge kind={f.kind} />
           {devis && (
             <Link to={`/app/devis/${devis.id}`} className="text-[12.5px] text-ink-2 hover:text-ink hover:underline">
-              Devis {devis.number}
+              Devis <span className="font-mono">{devis.number}</span>
             </Link>
           )}
           {original && (
@@ -167,36 +213,47 @@ function Detail({ f }: { f: Facture }) {
             onChange={(e) => update({ title: e.target.value.replace(/\n/g, ' ') })}
             placeholder="Objet de la facture"
             aria-label="Objet de la facture"
-            className="block w-full resize-none overflow-hidden bg-transparent font-display text-[22px] font-semibold leading-tight tracking-[-0.02em] placeholder:text-ink-3 focus:outline-none md:text-[26px]"
+            className="-ml-1.5 block w-[calc(100%+12px)] resize-none overflow-hidden rounded-[10px] bg-transparent px-1.5 py-0.5 text-[24px] font-semibold leading-tight tracking-[-0.035em] transition placeholder:text-ink-3 hover:bg-white/60 focus:bg-white focus:outline-none md:text-[28px]"
           />
         ) : (
-          <h1 className="font-display text-[22px] font-semibold tracking-[-0.02em] md:text-[26px]">{f.title || f.number}</h1>
+          <h1 className="text-[24px] font-semibold tracking-[-0.035em] md:text-[28px]">{f.title || f.number}</h1>
         )}
       </div>
       <MetaForm f={f} extra={extra} readOnly={!draft} onChange={update} onExtra={(p) => fx.setExtra(f.id, p)} />
-      <div className="rounded-[14px] border border-line bg-white p-3 md:p-4">
+      <div data-field="lines" className="rounded-[16px] bg-white p-3 shadow-card md:p-4">
         <LineEditor lines={f.lines} readOnly={!draft} defaultVat={s.company.defaultVat || 10} onChange={(lines) => update({ lines })} negativeNote={f.kind === 'situation' || f.kind === 'solde' ? 'Les lignes en violet sont des déductions (acomptes ou situations déjà facturés).' : undefined} />
       </div>
-      <Totals f={f} />
+      <DetailTotals f={f} />
     </div>
   );
 
   return (
     <div className="min-h-full">
-      <header className="sticky top-14 z-20 flex h-14 items-center gap-2 border-b border-line bg-page/90 px-3 backdrop-blur-xl md:top-0 md:h-[60px] md:px-6">
+      <header className="sticky top-14 z-20 flex h-14 items-center gap-2 border-b border-line bg-white/90 px-3 backdrop-blur-xl md:top-0 md:h-[60px] md:px-6">
         <Button variant="ghost" size="icon" aria-label="Retour aux factures" onClick={() => navigate('/app/factures')}>
           <ArrowLeft className="h-[18px] w-[18px]" />
         </Button>
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <span className="num truncate text-[14px] font-semibold">{f.number}</span>
-          <span className="hidden sm:inline-flex"><StatusBadge status={st} /></span>
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <span className="truncate font-mono text-[13.5px] font-semibold">{f.number}</span>
+          <span className="hidden sm:inline-flex">
+            <StatusBadge status={st} />
+          </span>
           {pro && !draft && <EDot status={f.einvoice.status} showLabel className="hidden lg:inline-flex" />}
-          {draft && <span className="hidden items-center gap-1 text-[12px] text-ink-3 md:inline-flex"><Check className="h-3.5 w-3.5" /> Enregistré</span>}
+          {draft && (
+            <span className="hidden md:inline-flex">
+              <SavedPill saving={false} />
+            </span>
+          )}
         </div>
-        <Button variant="secondary" className="hidden md:inline-flex" icon={<Printer className="h-4 w-4" />} onClick={print}>PDF</Button>
+        <Button variant="secondary" className="hidden md:inline-flex" size="sm" icon={<Expand className="h-4 w-4" />} onClick={() => setViewer(true)} kbd="P">
+          Aperçu
+        </Button>
+        <Button variant="secondary" size="icon" className="md:hidden" aria-label="Aperçu plein écran" onClick={() => setViewer(true)}>
+          <Expand />
+        </Button>
         <MoreMenu items={menu} />
         {primary && (
-          <Button variant="dawn" icon={primary.icon} onClick={primary.run}>
+          <Button variant="dawn" size="sm" className="h-9 max-md:h-10" icon={primary.icon} onClick={primary.run}>
             <span className="sm:hidden">{primary.short}</span>
             <span className="hidden sm:inline">{primary.label}</span>
           </Button>
@@ -204,22 +261,15 @@ function Detail({ f }: { f: Facture }) {
       </header>
 
       {wide ? (
-        <div className="grid grid-cols-[minmax(0,1fr)_460px]">
+        <div className="grid grid-cols-[minmax(0,1fr)_440px]">
           <div className="min-w-0 px-8 py-7">
-            <div className="mx-auto max-w-[860px]">{editor}</div>
+            <div className="mx-auto max-w-[860px] animate-[fade-up_.45s_var(--ease)_both]">{editor}</div>
           </div>
-          <aside className="sticky top-[60px] h-[calc(100dvh-60px)] overflow-y-auto border-l border-line bg-[#fbfbfd] p-5">
-            <Segmented
-              value={side}
-              onChange={setSide}
-              className="mb-4 w-full [&>button]:flex-1 [&>button]:justify-center"
-              options={[
-                { value: 'apercu', label: 'Aperçu' },
-                { value: 'paiement', label: 'Paiement' },
-                { value: 'efacture', label: 'E-facture' },
-              ]}
-            />
-            {sidePanels[side]}
+          <aside className="sticky top-[60px] h-[calc(100dvh-60px)] overflow-y-auto border-l border-line bg-[#f4f3f8] p-5">
+            <Segmented value={side} onChange={setSide} className="mb-4 w-full [&>button]:flex-1 [&>button]:justify-center" options={[{ value: 'apercu', label: 'Aperçu' }, { value: 'paiement', label: 'Paiement' }, { value: 'efacture', label: 'E-facture' }]} />
+            <div key={side} className="animate-[fade-up_.35s_var(--ease)_both]">
+              {sidePanels[side]}
+            </div>
           </aside>
         </div>
       ) : (
@@ -229,52 +279,36 @@ function Detail({ f }: { f: Facture }) {
             onChange={setTab}
             options={[
               { value: 'facture', label: draft ? 'Modifier' : 'Facture' },
-              { value: 'apercu', label: 'Aperçu PDF' },
+              { value: 'apercu', label: 'Aperçu' },
               { value: 'paiement', label: 'Paiement' },
               { value: 'efacture', label: 'E-facture' },
             ]}
           />
-          <div className="mx-auto max-w-[760px] pt-5">{tab === 'facture' ? editor : sidePanels[tab]}</div>
+          <div key={tab} className="mx-auto max-w-[760px] animate-[fade-up_.35s_var(--ease)_both] pt-5">
+            {tab === 'facture' ? editor : sidePanels[tab]}
+          </div>
         </div>
       )}
 
-      <PrintableInvoice f={f} company={s.company} client={client} extra={extra} devis={devis} chantier={chantier} original={original} />
+      <DocViewer
+        open={viewer}
+        onClose={() => setViewer(false)}
+        spec={spec}
+        kind={INVOICE_TITLE[f.kind]}
+        reference={f.number}
+        subtitle={[client?.name, f.title].filter(Boolean).join(' · ')}
+        status={<StatusBadge status={st} />}
+        checks={draft ? checks : undefined}
+        onFix={fix}
+        onEdit={draft ? () => setTab('facture') : undefined}
+        onSend={draft || f.kind === 'avoir' ? openSend : a.remaining > 0 ? () => (setViewer(false), setSheet('remind')) : undefined}
+        sendLabel={draft ? 'Émettre et envoyer' : f.kind === 'avoir' ? 'Envoyer' : 'Relancer'}
+      />
       <RecordPaymentSheet f={f} open={sheet === 'pay'} onClose={close} />
       <PaymentLinkSheet f={f} open={sheet === 'link'} onClose={close} clientEmail={client?.email} clientPhone={client?.phone} />
       <ReminderSheet f={f} open={sheet === 'remind'} onClose={close} />
-      <SendSheet f={f} open={sheet === 'send'} onClose={close} missing={missing} />
+      <SendSheet f={f} open={sheet === 'send'} onClose={close} missing={missing} checks={checks} onPreview={() => (close(), setViewer(true))} />
       <CreateFromDevisSheet open={sheet === 'devis'} onClose={close} />
-    </div>
-  );
-}
-
-function Totals({ f }: { f: Facture }) {
-  const a = amounts(f);
-  const sign = a.sign === -1 ? '−' : '';
-  return (
-    <div className="flex flex-col gap-4 rounded-[14px] border border-line bg-white p-4 md:flex-row md:items-end md:justify-between">
-      <div className="space-y-1 text-[13px] text-ink-2">
-        <div className="flex gap-6">
-          <span>Total HT</span>
-          <span className="num ml-auto text-ink md:ml-0">{sign}{money(a.ht)}</span>
-        </div>
-        {a.byVat.map((v) => (
-          <div key={v.rate} className="flex gap-6">
-            <span>TVA {String(v.rate).replace('.', ',')} %</span>
-            <span className="num ml-auto text-ink md:ml-0">{sign}{money(v.tva)}</span>
-          </div>
-        ))}
-        {a.retenue > 0 && (
-          <div className="flex gap-6">
-            <span>Retenue de garantie {f.retenueGarantie} %</span>
-            <span className="num ml-auto text-ink md:ml-0">−{money(a.retenue)}</span>
-          </div>
-        )}
-      </div>
-      <div className="text-right">
-        <div className="text-[12px] text-ink-3">{f.kind === 'avoir' ? 'Montant de l’avoir' : a.retenue ? 'Net à payer TTC' : 'Total TTC'}</div>
-        <div className={cn('num font-display text-[28px] font-semibold leading-tight tracking-[-0.02em]')}>{sign}{money(f.kind === 'avoir' ? a.ttc : a.net)}</div>
-      </div>
     </div>
   );
 }
