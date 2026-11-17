@@ -1,20 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRightLeft, Boxes, PackageMinus, ScanLine, Search, ShoppingCart, Truck } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, Input, PageHeader, Segmented, cn } from '@/components/ui';
+import { ArrowDownLeft, ArrowRightLeft, ArrowUpRight, PackageMinus, ScanLine, Search, ShoppingCart, Truck } from 'lucide-react';
+import { Avatar, Button, IconTile, Input, PageHeader, Segmented, cn } from '@/components/ui';
+import { AnimatedNumber, GrowBar } from '@/components/motion';
 import { useBrix } from '@/lib/store';
-import { money, num, relative } from '@/lib/format';
-import { LOCATIONS, type Article, type LocationKey } from './data';
+import { money, relative } from '@/lib/format';
+import { LOCATIONS, type LocationKey } from './data';
 import { isLow, totalQty, useAchats, vanLow } from './store';
 import { MoveSheet } from './components/MoveSheet';
 import { ScanSheet } from './components/ScanSheet';
+import { StockList } from './components/StockList';
+import { BigMoney, Label, SectionHead, SplitBar } from '@/modules/finance/components/kit';
 
 type Filter = 'all' | LocationKey | 'low';
-
-function QtyCell({ a, loc }: { a: Article; loc: LocationKey }) {
-  const low = loc === 'depot' ? isLow(a) : vanLow(a, loc);
-  return <span className={cn('num', low ? 'font-semibold text-bad' : a.qty[loc] === 0 ? 'text-ink-3' : '')}>{num(a.qty[loc], 1)}</span>;
-}
+const LOC_COLOR: Record<LocationKey, string> = { depot: '#0d9488', van_yanis: '#5eead4', van_mehdi: '#b7ece2' };
+const short = (name: string) => name.split(' ').slice(0, 3).join(' ');
 
 export default function Stock() {
   const nav = useNavigate();
@@ -25,11 +25,25 @@ export default function Stock() {
   const [q, setQ] = useState('');
   const [move, setMove] = useState<{ id?: string; kind: 'sortie' | 'transfert' | 'entree' } | null>(null);
   const [scan, setScan] = useState(false);
+  const [flash, setFlash] = useState<string | null>(null);
+
+  // Après un mouvement, la ligne concernée s'éclaire un instant avec une coche.
+  const lastId = useRef(movements[0]?.id);
+  useEffect(() => {
+    const m = movements[0];
+    if (!m || m.id === lastId.current) return;
+    lastId.current = m.id;
+    setFlash(m.articleId);
+    const t = setTimeout(() => setFlash(null), 1800);
+    return () => clearTimeout(t);
+  }, [movements]);
 
   const low = articles.filter(isLow);
-  const vansLow = LOCATIONS.filter((l) => l.key !== 'depot').map((l) => ({ l, items: articles.filter((a) => vanLow(a, l.key)) }));
+  const vansLow = LOCATIONS.filter((l) => l.key !== 'depot').map((l) => ({ l, items: articles.filter((a) => vanLow(a, l.key)) })).filter((v) => v.items.length);
   const value = articles.reduce((s, a) => s + totalQty(a) * a.cost, 0);
+  const byLoc = LOCATIONS.map((l) => ({ ...l, value: articles.reduce((s, a) => s + a.qty[l.key] * a.cost, 0) }));
   const toOrder = low.reduce((s, a) => s + Math.max(0, a.min * 2 - a.qty.depot) * a.cost, 0);
+  const lowCount = low.length + vansLow.reduce((s, v) => s + v.items.length, 0);
 
   const list = useMemo(() => {
     const t = q.trim().toLowerCase();
@@ -44,123 +58,138 @@ export default function Stock() {
     });
     return [...m.entries()].sort((a, b) => b[1] - a[1]);
   }, [movements, articles]);
+  const maxCh = byChantier[0]?.[1] ?? 1;
 
   return (
     <div className="space-y-5">
-      <PageHeader title="Stock" subtitle="Ce qu’il reste au dépôt et dans chaque camion."
+      <PageHeader
+        icon={<IconTile name="Boxes" dept="achats" size="lg" />}
+        title="Stock"
+        subtitle="Ce qu’il reste au dépôt et dans chaque camion."
         actions={<>
-          <Button variant="secondary" icon={<ScanLine className="h-4 w-4" />} onClick={() => setScan(true)}>Inventaire</Button>
-          <Button variant="primary" icon={<PackageMinus className="h-4 w-4" />} onClick={() => setMove({ kind: 'sortie' })}>Sortie chantier</Button>
-        </>} />
+          <Button variant="secondary" icon={<ScanLine />} onClick={() => setScan(true)} className="max-sm:flex-1">Inventaire</Button>
+          <Button variant="primary" icon={<PackageMinus />} onClick={() => setMove({ kind: 'sortie' })} className="max-sm:flex-1">Sortie chantier</Button>
+        </>}
+      />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <Card className={cn('flex flex-col gap-4 p-4 sm:flex-row sm:items-center', low.length && 'border-[#fbd1d1]')}>
-          <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-xl', low.length ? 'bg-bad-bg text-bad' : 'bg-ok-bg text-ok')}><ShoppingCart className="h-5 w-5" /></span>
-          <div className="min-w-0 flex-1">
-            <div className="text-[15px] font-semibold">{low.length ? `${low.length} article${low.length > 1 ? 's' : ''} sous le seuil au dépôt` : 'Rien à recommander'}</div>
-            <div className="mt-0.5 text-[12.5px] text-ink-2">{low.length ? <>{low.map((a) => a.name.split(' ').slice(0, 3).join(' ')).join(', ')}. Commande conseillée : <span className="num font-medium text-ink">{money(toOrder, true)} HT</span>.</> : 'Tous les articles sont au-dessus de leur seuil.'}</div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+        {/* Valeur et répartition */}
+        <div className="rounded-[16px] bg-white p-5 shadow-card">
+          <Label>Valeur du stock, au prix d’achat HT</Label>
+          <BigMoney value={value} dawn className="mt-2 block text-[40px] md:text-[44px]" />
+          <div className="mt-1 text-[12.5px] text-ink-3"><AnimatedNumber value={articles.length} className="num font-medium text-ink-2" /> articles suivis sur 3 emplacements</div>
+          <SplitBar className="mt-5 h-2.5" parts={byLoc.map((l) => ({ value: l.value, color: LOC_COLOR[l.key], label: l.name }))} />
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {byLoc.map((l) => (
+              <div key={l.key} className="min-w-0">
+                <div className="flex items-center gap-1.5 text-[11.5px] text-ink-3"><i className="h-2 w-2 shrink-0 rounded-full" style={{ background: LOC_COLOR[l.key] }} /><span className="truncate">{l.short}</span></div>
+                <div className="num mt-0.5 text-[14px] font-semibold">{money(l.value, true)}</div>
+              </div>
+            ))}
           </div>
-          {low.length > 0 && <Button variant="dawn" icon={<ShoppingCart className="h-4 w-4" />} onClick={() => nav('/app/fournisseurs')}>Commander</Button>}
-        </Card>
-        <Card className="grid grid-cols-2">
-          <div className="border-r border-line p-4">
-            <div className="text-xs font-medium text-ink-2">Valeur du stock</div>
-            <div className="num mt-1 text-[22px] font-semibold">{money(value, true)}</div>
-            <div className="text-xs text-ink-3">au prix d’achat HT</div>
+        </div>
+
+        {/* À recommander : présent, mais sans crier */}
+        <div className="relative overflow-hidden rounded-[16px] bg-white p-5 shadow-card">
+          {low.length > 0 && <span aria-hidden className="absolute inset-y-0 left-0 w-[3px] bg-[#f59e0b]" />}
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <Label><ShoppingCart className="h-3.5 w-3.5" />À recommander</Label>
+              <div className="mt-1 text-[17px] font-semibold tracking-[-0.02em]">{low.length ? `${low.length} article${low.length > 1 ? 's' : ''} sous le seuil au dépôt` : 'Rien à recommander'}</div>
+            </div>
+            {low.length > 0 && <Button variant="primary" icon={<ShoppingCart />} onClick={() => nav('/app/fournisseurs')} className="max-sm:hidden">Commander</Button>}
           </div>
-          <div className="p-4">
-            <div className="text-xs font-medium text-ink-2">Articles suivis</div>
-            <div className="num mt-1 text-[22px] font-semibold">{articles.length}</div>
-            <div className="text-xs text-ink-3">sur 3 emplacements</div>
-          </div>
-        </Card>
+          {low.length ? (
+            <>
+              <div className="mt-3 divide-y divide-dashed divide-line">
+                {low.map((a) => (
+                  <div key={a.id} className="flex items-center gap-3 py-2">
+                    <span className="min-w-0 flex-1 truncate text-[13px]">{short(a.name)}</span>
+                    <GrowBar value={(a.qty.depot / a.min) * 100} className="w-16 shrink-0 sm:w-24" barClassName="bg-[#f59e0b]" />
+                    <span className="num w-14 shrink-0 text-right text-[12.5px] text-ink-2"><span className="font-semibold text-ink">{a.qty.depot}</span> / {a.min}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-[12.5px] text-ink-2">
+                <span>Commande conseillée : <span className="num font-semibold text-ink">{money(toOrder, true)} HT</span></span>
+                <Button variant="primary" icon={<ShoppingCart />} onClick={() => nav('/app/fournisseurs')} className="w-full sm:hidden">Commander</Button>
+              </div>
+            </>
+          ) : (
+            <p className="mt-2 text-[13px] text-ink-2">Tous les articles sont au-dessus de leur seuil. Brix vous prévient dès que l’un passe en dessous.</p>
+          )}
+        </div>
       </div>
 
-      {vansLow.some((v) => v.items.length) && (
+      {vansLow.length > 0 && (
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {vansLow.filter((v) => v.items.length).map(({ l, items }) => {
+          {vansLow.map(({ l, items }) => {
             const driver = employees.find((e) => e.id === l.employeeId);
             return (
-              <Card key={l.key} className="flex items-center gap-3 p-3.5">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-warn-bg text-warn"><Truck className="h-[18px] w-[18px]" /></span>
+              <div key={l.key} className="lift flex items-center gap-3 rounded-[16px] bg-white p-3.5 shadow-card">
+                <span className="relative">
+                  <IconTile icon={<Truck />} dept="achats" />
+                  {driver && <Avatar initials={driver.initials} color={driver.color} size={20} className="absolute -bottom-1 -right-1 ring-2 ring-white" />}
+                </span>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[13.5px] font-semibold">{l.name} : {items.length} à compléter</div>
-                  <div className="truncate text-[12px] text-ink-2">{items.map((a) => a.name.split(' ').slice(0, 3).join(' ')).join(', ')}{driver ? ` · à préparer pour ${driver.firstName}` : ''}</div>
+                  <div className="text-[13.5px] font-semibold">{l.name} <span className="font-normal text-ink-3">· {items.length} à compléter</span></div>
+                  <div className="truncate text-[12px] text-ink-2">{items.map((a) => short(a.name)).join(', ')}</div>
                 </div>
-                <Button size="sm" variant="secondary" icon={<ArrowRightLeft className="h-3.5 w-3.5" />} onClick={() => setMove({ id: items[0].id, kind: 'transfert' })}>Remplir</Button>
-              </Card>
+                <Button size="sm" variant="secondary" icon={<ArrowRightLeft />} onClick={() => setMove({ id: items[0].id, kind: 'transfert' })}>Remplir</Button>
+              </div>
             );
           })}
         </div>
       )}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Segmented<Filter> value={filter} onChange={setFilter} options={[{ value: 'all', label: 'Tout' }, ...LOCATIONS.map((l) => ({ value: l.key as Filter, label: l.short })), { value: 'low', label: 'À commander', count: low.length + vansLow.reduce((s, v) => s + v.items.length, 0) }]} />
+        <div className="-mx-4 overflow-x-auto px-4 scrollbar-none sm:mx-0 sm:px-0">
+          <Segmented<Filter> value={filter} onChange={setFilter} options={[{ value: 'all', label: 'Tout' }, ...LOCATIONS.map((l) => ({ value: l.key as Filter, label: l.short })), { value: 'low', label: 'À commander', count: lowCount }]} />
+        </div>
         <Input icon={<Search />} placeholder="Chercher un article ou une référence" value={q} onChange={(e) => setQ(e.target.value)} className="sm:ml-auto sm:w-[300px]" />
       </div>
 
-      <Card className="overflow-hidden">
-        <div className="hidden grid-cols-[minmax(0,2.2fr)_repeat(3,.6fr)_.6fr_.7fr_.8fr_88px] gap-3 border-b border-line bg-[#fafafc] px-4 py-2.5 text-[11.5px] font-medium text-ink-2 lg:grid">
-          <span>Article</span>{LOCATIONS.map((l) => <span key={l.key} className="text-right">{l.short}</span>)}<span className="text-right">Total</span><span className="text-right">Seuil</span><span className="text-right">Valeur</span><span />
-        </div>
-        {list.length === 0 && <div className="px-4 py-10 text-center text-[13px] text-ink-3">Aucun article ne correspond.</div>}
-        {list.map((a) => (
-          <div key={a.id} className="border-b border-line px-4 py-3 last:border-0 lg:grid lg:grid-cols-[minmax(0,2.2fr)_repeat(3,.6fr)_.6fr_.7fr_.8fr_88px] lg:items-center lg:gap-3 lg:py-2.5">
-            <div className="flex min-w-0 items-start gap-2">
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[13.5px] font-medium">{a.name}</div>
-                <div className="truncate text-[11.5px] text-ink-3">{a.ref} · {a.supplier} · {money(a.cost)} / {a.unit}</div>
-              </div>
-              {isLow(a) && <Badge tone="bad" className="lg:hidden">Sous le seuil</Badge>}
-            </div>
-            {LOCATIONS.map((l) => <span key={l.key} className="hidden text-right text-[13px] lg:block"><QtyCell a={a} loc={l.key} /></span>)}
-            <span className="num hidden text-right text-[13px] font-semibold lg:block">{num(totalQty(a), 1)}</span>
-            <span className="num hidden text-right text-[12.5px] text-ink-3 lg:block">{a.min}{a.vanMin ? ` · ${a.vanMin}` : ''}</span>
-            <span className="num hidden text-right text-[13px] text-ink-2 lg:block">{money(totalQty(a) * a.cost, true)}</span>
-            <span className="hidden justify-end lg:flex"><Button size="sm" variant="ghost" onClick={() => setMove({ id: a.id, kind: 'sortie' })}>Sortir</Button></span>
-
-            <div className="mt-2 flex items-center gap-1.5 lg:hidden">
-              {LOCATIONS.map((l) => (
-                <span key={l.key} className={cn('flex h-8 items-center gap-1.5 rounded-lg bg-sub px-2 text-[12px]', (l.key === 'depot' ? isLow(a) : vanLow(a, l.key)) && 'bg-bad-bg')}>
-                  <span className="text-ink-3">{l.short}</span><QtyCell a={a} loc={l.key} />
-                </span>
-              ))}
-              <button onClick={() => setMove({ id: a.id, kind: 'sortie' })} className="ml-auto h-11 rounded-lg px-3 text-[13px] font-medium text-ink-2 hover:bg-sub">Sortir</button>
-            </div>
-          </div>
-        ))}
-      </Card>
+      <StockList list={list} flash={flash} onOut={(id) => setMove({ id, kind: 'sortie' })} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader title="Sorties par chantier" meta="matériel imputé au coût réel" icon={<Boxes className="h-4 w-4 text-ink-3" />} />
-          {byChantier.map(([id, v]) => {
-            const c = chantiers.find((x) => x.id === id);
-            return (
-              <div key={id} className="flex min-h-[48px] items-center gap-3 border-b border-line px-4 py-2 last:border-0">
-                <span className="min-w-0 flex-1 truncate text-[13.5px]">{c?.name ?? 'Chantier'}</span>
-                <span className="num text-[13.5px] font-medium">{money(v)}</span>
-              </div>
-            );
-          })}
-        </Card>
-        <Card>
-          <CardHeader title="Derniers mouvements" />
-          {movements.slice(0, 6).map((m) => {
-            const a = articles.find((x) => x.id === m.articleId);
-            const e = employees.find((x) => x.id === m.employeeId);
-            const c = chantiers.find((x) => x.id === m.chantierId);
-            return (
-              <div key={m.id} className="flex min-h-[48px] items-center gap-3 border-b border-line px-4 py-2 last:border-0">
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13px]"><span className="num font-medium">{m.kind === 'entree' ? '+' : '−'}{m.qty} {a?.unit}</span> {a?.name}</div>
-                  <div className="truncate text-[11.5px] text-ink-3">{LOCATIONS.find((l) => l.key === m.from)?.short}{m.kind === 'transfert' ? ` → ${LOCATIONS.find((l) => l.key === m.to)?.short}` : c ? ` → ${c.name}` : ''}{e ? ` · ${e.firstName}` : ''}</div>
+        <div className="rounded-[16px] bg-white p-4 shadow-card md:p-5">
+          <SectionHead title="Sorties par chantier" meta="ajoutées à leur coût réel" />
+          <div className="mt-3 space-y-3.5">
+            {byChantier.map(([id, v]) => {
+              const c = chantiers.find((x) => x.id === id);
+              return (
+                <div key={id}>
+                  <div className="flex items-baseline justify-between gap-3 text-[13.5px]">
+                    <span className="min-w-0 truncate">{c?.name ?? 'Chantier'}</span>
+                    <span className="num shrink-0 font-medium">{money(v)}</span>
+                  </div>
+                  <GrowBar value={(v / maxCh) * 100} className="mt-1.5" barClassName="bg-[#0d9488]" />
                 </div>
-                <span className="shrink-0 text-[11.5px] text-ink-3">{relative(m.date)}</span>
-              </div>
-            );
-          })}
-        </Card>
+              );
+            })}
+          </div>
+        </div>
+        <div className="rounded-[16px] bg-white p-4 shadow-card md:p-5">
+          <SectionHead title="Derniers mouvements" />
+          <div className="mt-2">
+            {movements.slice(0, 6).map((m) => {
+              const a = articles.find((x) => x.id === m.articleId);
+              const e = employees.find((x) => x.id === m.employeeId);
+              const c = chantiers.find((x) => x.id === m.chantierId);
+              const Ico = m.kind === 'entree' ? ArrowDownLeft : m.kind === 'transfert' ? ArrowRightLeft : ArrowUpRight;
+              return (
+                <div key={m.id} className="flex min-h-[52px] items-center gap-3 border-b border-dashed border-line py-2 last:border-0">
+                  <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-full', m.kind === 'entree' ? 'bg-[#e7f6f3] text-[#0f766e]' : 'bg-sub text-ink-2')}><Ico className="h-4 w-4" /></span>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[13px]"><span className="num font-semibold">{m.kind === 'entree' ? '+' : '−'}{m.qty} {a?.unit}</span> {a?.name}</div>
+                    <div className="truncate text-[11.5px] text-ink-3">{LOCATIONS.find((l) => l.key === m.from)?.short}{m.kind === 'transfert' ? ` vers ${LOCATIONS.find((l) => l.key === m.to)?.short}` : c ? ` vers ${c.name}` : ''}{e ? ` · ${e.firstName}` : ''}</div>
+                  </div>
+                  <span className="shrink-0 text-[11.5px] text-ink-3">{relative(m.date)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <MoveSheet open={!!move} onClose={() => setMove(null)} articleId={move?.id} kind={move?.kind} />

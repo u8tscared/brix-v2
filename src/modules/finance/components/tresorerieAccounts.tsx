@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Check, Lock, Plus, RefreshCw } from 'lucide-react';
-import { Button, Card, cn, Input, Sheet, toast } from '@/components/ui';
+import { Card, cn, Input, Sheet, toast } from '@/components/ui';
+import { LiveDot } from '@/components/motion';
 import { money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { BANK_COLOR, BANKS, connectBank, useTreso } from './tresorerieService';
@@ -37,12 +38,15 @@ export function AccountsCard({ onSync, syncing }: { onSync: () => void; syncing:
   return (
     <Card>
       <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-        <h4 className="text-[13.5px] font-semibold">Comptes reliés</h4>
+        <h4 className="text-[14px] font-semibold tracking-[-0.015em]">Comptes reliés</h4>
         <div className="flex-1" />
-        <Button size="sm" variant="ghost" loading={syncing} icon={<RefreshCw className="h-3.5 w-3.5" />} onClick={onSync}>Actualiser</Button>
+        <button onClick={onSync} disabled={syncing} className="flex h-9 items-center gap-1.5 rounded-full px-2.5 text-[12px] text-ink-2 transition hover:bg-sub hover:text-ink">
+          {syncing ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <LiveDot />}
+          {syncing ? 'Synchronisation…' : 'Synchronisé'}
+        </button>
       </div>
       {accounts.map((a) => (
-        <div key={a.id} className="flex min-h-[60px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0">
+        <div key={a.id} className="flex min-h-[60px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0 animate-[fade-up_.4s_var(--ease)_both]">
           <BankLogo bank={a.bank} />
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13.5px] font-medium">{a.bank} · {a.label}</div>

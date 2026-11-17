@@ -8,8 +8,14 @@ import type { LeaveRequest } from '../store';
 import { LEAVE_TYPES } from './leaveTypes';
 
 /** Calendrier d'équipe du mois : une ligne par personne, une colonne par jour. */
-export function LeaveCalendar({ employees, leaves }: { employees: Employee[]; leaves: LeaveRequest[] }) {
-  const [offset, setOffset] = useState(0);
+export function LeaveCalendar({ employees, leaves, focus }: { employees: Employee[]; leaves: LeaveRequest[]; focus?: string }) {
+  // Ouvre le mois de la prochaine demande, pour qu'on voie tout de suite qui part.
+  const [offset, setOffset] = useState(() => {
+    if (!focus) return 0;
+    const n = new Date();
+    const f = new Date(focus + 'T12:00:00');
+    return Math.max(0, (f.getFullYear() - n.getFullYear()) * 12 + f.getMonth() - n.getMonth());
+  });
   const base = new Date();
   base.setDate(1);
   base.setMonth(base.getMonth() + offset);
@@ -27,8 +33,8 @@ export function LeaveCalendar({ employees, leaves }: { employees: Employee[]; le
         <Button size="icon-sm" variant="ghost" aria-label="Mois suivant" onClick={() => setOffset(offset + 1)}><ChevronRight className="h-4 w-4" /></Button>
         <div className="flex-1" />
         <div className="hidden items-center gap-3 text-[11.5px] text-ink-2 sm:flex">
-          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-brand" />Validé</span>
-          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-dashed border-brand bg-[#eef2ff]" />En attente</span>
+          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[#0891b2]" />Validé</span>
+          <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-dashed border-[#0891b2] bg-[#e8f7fa]" />En attente</span>
           <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-vi-300" />Formation</span>
         </div>
       </div>
@@ -59,13 +65,13 @@ export function LeaveCalendar({ employees, leaves }: { employees: Employee[]; le
                 const start = l && (l.from === d || dow === 1);
                 const end = l && (l.to === d || dow === 5);
                 return (
-                  <span key={d} className={cn('relative h-10', we && 'bg-sub/70')} title={l ? `${LEAVE_TYPES[l.type].label}${l.status === 'en_attente' ? ' (en attente)' : ''}` : undefined}>
+                  <span key={d} className={cn('relative h-11', we && 'bg-sub/70')} title={l ? `${LEAVE_TYPES[l.type].label}${l.status === 'en_attente' ? ' (en attente)' : ''}` : undefined}>
                     {l && !we && (
                       <i className={cn(
-                        'absolute inset-y-2.5 left-0 right-0',
+                        'absolute inset-y-2.5 left-0 right-0 origin-left animate-grow',
                         start && 'left-0.5 rounded-l-md',
                         end && 'right-0.5 rounded-r-md',
-                        l.status === 'en_attente' ? 'border-y border-dashed border-brand bg-[#eef2ff]' : l.type === 'formation' ? 'bg-vi-300' : l.type === 'maladie' ? 'bg-warn' : 'bg-brand',
+                        l.status === 'en_attente' ? 'border-y border-dashed border-[#0891b2] bg-[#e8f7fa]' : l.type === 'formation' ? 'bg-vi-300' : l.type === 'maladie' ? 'bg-warn' : 'bg-[#0891b2]',
                         l.status === 'en_attente' && start && 'border-l',
                         l.status === 'en_attente' && end && 'border-r',
                       )} />

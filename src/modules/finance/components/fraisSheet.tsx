@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ScanLine } from 'lucide-react';
-import { Badge, Button, Field, Input, Select, Sheet, toast } from '@/components/ui';
+import { Button, Field, Input, Select, Sheet, toast } from '@/components/ui';
 import { todayISO, uid } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Expense } from '@/lib/types';
-import { FRAIS_CATEGORIES, readReceipt } from './fraisService';
+import { FRAIS_CATEGORIES, readReceipt, type ReceiptSample } from './fraisService';
+import { ReceiptScan } from './frais/ReceiptScan';
 
 /** Saisie d'une note de frais : depuis une photo (lecture par Bob) ou à la main, ou modification. */
-export function FraisSheet({ open, onClose, file, initial, photos, setPhoto }: { open: boolean; onClose: () => void; file: File | null; initial?: Expense; photos: Record<string, string>; setPhoto: (id: string, url: string) => void }) {
+export function FraisSheet({ open, onClose, file, sample, initial, photos, setPhoto }: { open: boolean; onClose: () => void; file: File | null; sample?: ReceiptSample; initial?: Expense; photos: Record<string, string>; setPhoto: (id: string, url: string) => void }) {
   const s = useBrix();
   const me = s.employees.find((e) => e.role === 'patron') ?? s.employees[0];
   const blank = (): Expense => ({ id: uid('x'), date: todayISO(), supplier: '', category: 'Petites fournitures', amountTtc: 0, vat: 0, employeeId: me?.id, status: 'a_valider' });
@@ -22,18 +22,20 @@ export function FraisSheet({ open, onClose, file, initial, photos, setPhoto }: {
     setX(base);
     setRead(false);
     setPreview(initial ? photos[initial.id] ?? null : null);
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPreview(url);
-      setPhoto(base.id, url);
+    if (file || sample) {
+      if (file) {
+        const url = URL.createObjectURL(file);
+        setPreview(url);
+        setPhoto(base.id, url);
+      }
       setReading(true);
-      readReceipt(file).then((r) => {
+      readReceipt(file, sample).then((r) => {
         setX((p) => ({ ...p, supplier: r.supplier, category: r.category, amountTtc: r.amountTtc, vat: r.vat, date: r.date }));
         setReading(false);
         setRead(true);
       });
     }
-  }, [open, file, initial?.id]);
+  }, [open, file, sample, initial?.id]);
 
   const set = (p: Partial<Expense>) => setX((v) => ({ ...v, ...p }));
   const ok = x.supplier.trim() && x.amountTtc > 0 && !reading;
@@ -45,7 +47,7 @@ export function FraisSheet({ open, onClose, file, initial, photos, setPhoto }: {
   const chantiers = s.chantiers.filter((c) => c.status !== 'termine');
 
   return (
-    <Sheet open={open} onClose={onClose} title={initial ? 'Note de frais' : 'Nouveau ticket'} footer={
+    <Sheet open={open} onClose={onClose} title={initial ? 'Note de frais' : file || sample ? 'Lecture du ticket' : 'Nouvelle dépense'} footer={
         <>
           <Button variant="ghost" onClick={onClose}>Annuler</Button>
           {initial?.status === 'a_valider' ? (
@@ -64,18 +66,8 @@ export function FraisSheet({ open, onClose, file, initial, photos, setPhoto }: {
         </>
       }>
       <div className="space-y-4">
-        {preview && (
-          <div className="relative mx-auto h-48 w-full overflow-hidden rounded-xl bg-sub">
-            <img src={preview} alt="Ticket" className="h-full w-full object-contain" />
-            {reading && (
-              <div className="absolute inset-0 grid place-items-center bg-white/50 backdrop-blur-[1px]">
-                <div className="absolute inset-x-6 top-0 h-0.5 animate-[scan_1.6s_ease-in-out_infinite] bg-vi-500 shadow-[0_0_12px_#8b5cf6]" />
-                <span className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-[12.5px] font-medium shadow-card"><ScanLine className="h-4 w-4 text-vi-700" />Bob lit le ticket…</span>
-              </div>
-            )}
-          </div>
-        )}
-        {read && <Badge tone="ok">Lu par Bob · vérifiez le montant (démo)</Badge>}
+        {(preview || (sample && !initial)) && <ReceiptScan preview={preview} sample={sample} reading={reading} read={read} date={x.date} />}
+        {read && <p className="animate-[fade-up_.4s_var(--ease)_.6s_both] text-[12.5px] text-ink-2">Bob a rempli la note. Vérifiez le montant, puis enregistrez.</p>}
         <Field label="Fournisseur"><Input value={x.supplier} disabled={reading} onChange={(e) => set({ supplier: e.target.value })} placeholder="Total, Leroy Merlin…" /></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Montant TTC"><Input type="number" inputMode="decimal" step="0.01" disabled={reading} value={x.amountTtc || ''} onChange={(e) => set({ amountTtc: Number(e.target.value) })} suffix="€" /></Field>
@@ -101,7 +93,6 @@ export function FraisSheet({ open, onClose, file, initial, photos, setPhoto }: {
           </Select>
         </Field>
       </div>
-      <style>{'@keyframes scan{0%,100%{top:8%}50%{top:90%}}'}</style>
     </Sheet>
   );
 }
