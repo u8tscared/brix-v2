@@ -1,38 +1,52 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { HardHat, Home, LayoutGrid, Mic, FileText } from 'lucide-react';
-import { Icon, Sheet, cn } from '@/components/ui';
+import { IconTile, Sheet, cn } from '@/components/ui';
 import { DEPARTMENTS, MODULES, TRADE_BY_KEY } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import { useUI } from '@/lib/ui';
 
-const Tab = ({ to, icon, label, end }: { to: string; icon: React.ReactNode; label: string; end?: boolean }) => (
-  <NavLink to={to} end={end} className={({ isActive }) => cn('flex flex-1 flex-col items-center justify-center gap-1 text-[10.5px] font-medium', isActive ? 'text-ink' : 'text-ink-3')}>
-    <span className="[&_svg]:h-[21px] [&_svg]:w-[21px]">{icon}</span>
-    {label}
-  </NavLink>
-);
+const TABS = [
+  { to: '/app', end: true, icon: Home, label: "Aujourd'hui" },
+  { to: '/app/chantiers', icon: HardHat, label: 'Chantiers' },
+  null,
+  { to: '/app/devis', icon: FileText, label: 'Devis' },
+] as const;
 
-/** Barre d'onglets du téléphone : 4 onglets et le micro de Bob au centre. */
+/** Barre d'onglets du téléphone : 4 onglets, une pastille qui glisse sous l'onglet actif, et le micro de Bob au centre. */
 export function MobileNav() {
   const ui = useUI();
+  const { pathname } = useLocation();
+  const active = ui.mobileMenu ? 4 : pathname === '/app' ? 0 : pathname.startsWith('/app/chantiers') ? 1 : pathname.startsWith('/app/devis') ? 3 : -1;
   return (
     <>
-      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/90 pb-[var(--safe-b)] backdrop-blur-xl md:hidden">
-        <div className="relative flex h-[62px] items-stretch">
-          <Tab to="/app" end icon={<Home />} label="Aujourd'hui" />
-          <Tab to="/app/chantiers" icon={<HardHat />} label="Chantiers" />
-          <div className="w-[76px] shrink-0" />
-          <Tab to="/app/devis" icon={<FileText />} label="Devis" />
-          <button onClick={() => ui.set({ mobileMenu: true })} className="flex flex-1 flex-col items-center justify-center gap-1 text-[10.5px] font-medium text-ink-3">
-            <LayoutGrid className="h-[21px] w-[21px]" />
-            Tout
+      <nav className="fixed inset-x-0 bottom-0 z-40 pb-[var(--safe-b)] md:hidden">
+        <div aria-hidden className="pointer-events-none absolute inset-0 border-t border-line/80 bg-white/85 backdrop-blur-2xl" />
+        <div className="relative flex h-[64px] items-stretch px-1">
+          {active >= 0 && (
+            <span aria-hidden className="absolute top-[7px] h-[34px] w-[56px] rounded-full bg-[#efedf5] transition-[left] duration-[420ms] ease-spring" style={{ left: `calc(${active * 20 + 10}% - 28px)` }} />
+          )}
+          {TABS.map((t, i) =>
+            t === null ? (
+              <div key="bob" className="w-[20%] shrink-0" />
+            ) : (
+              <NavLink key={t.to} to={t.to} end={'end' in t} className={cn('relative flex w-[20%] flex-col items-center justify-start gap-[3px] pt-[12px] text-[10.5px] font-medium transition-colors', active === i ? 'text-ink' : 'text-ink-3')}>
+                <t.icon className={cn('h-[21px] w-[21px] transition-transform duration-300 ease-spring', active === i && 'scale-110')} strokeWidth={active === i ? 2.1 : 1.75} />
+                <span className="mt-[5px]">{t.label}</span>
+              </NavLink>
+            ),
+          )}
+          <button onClick={() => ui.set({ mobileMenu: true })} className={cn('relative flex w-[20%] flex-col items-center justify-start gap-[3px] pt-[12px] text-[10.5px] font-medium', active === 4 ? 'text-ink' : 'text-ink-3')}>
+            <LayoutGrid className="h-[21px] w-[21px]" strokeWidth={1.75} />
+            <span className="mt-[5px]">Tout</span>
           </button>
           <button
             onClick={() => ui.askBob('', true)}
             aria-label="Parler à Bob"
-            className="absolute left-1/2 top-[-18px] grid h-[60px] w-[60px] -translate-x-1/2 place-items-center rounded-full bg-ink text-white shadow-[0_10px_24px_-8px_rgba(23,23,31,.6)] ring-[5px] ring-white transition active:scale-95"
+            className="group absolute left-1/2 top-[-20px] grid h-[62px] w-[62px] -translate-x-1/2 place-items-center rounded-full bg-night text-white shadow-[0_12px_28px_-10px_rgba(19,15,38,.7)] ring-[5px] ring-white transition active:scale-90"
           >
-            <Mic className="h-6 w-6" />
+            <span aria-hidden className="absolute inset-[-5px] rounded-full bg-dawn-diag opacity-0 blur-[2px] transition group-active:opacity-60" />
+            <span aria-hidden className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_20%,rgba(217,70,239,.45),transparent_60%)]" />
+            <Mic className="relative h-6 w-6" />
           </button>
         </div>
       </nav>
@@ -52,19 +66,17 @@ function MobileMenu() {
   const trade = TRADE_BY_KEY[s.company.trade];
   return (
     <Sheet open={ui.mobileMenu} onClose={() => ui.set({ mobileMenu: false })} title="Tout Brix" subtitle="Vos outils, rangés par département">
-      <div className="space-y-5">
+      <div className="stagger space-y-6">
         {DEPARTMENTS.map((d) => {
           const mods = MODULES.filter((m) => m.dept === d.key && s.enabled.includes(m.key));
           if (!mods.length) return null;
           return (
             <div key={d.key}>
-              <h6 className="mb-2 text-[11px] font-semibold uppercase tracking-[.05em] text-ink-3">{d.name}</h6>
+              <h6 className="eyebrow mb-2.5">{d.name}</h6>
               <div className="grid grid-cols-3 gap-2">
                 {mods.map((m) => (
-                  <button key={m.key} onClick={() => go(`/app/${m.path}`)} className="flex flex-col items-center gap-1.5 rounded-2xl border border-line bg-white px-1 py-3 text-center text-[11.5px] font-medium leading-tight active:scale-[.97]">
-                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-vi-50 text-vi-700">
-                      <Icon name={m.icon} className="h-[18px] w-[18px]" />
-                    </span>
+                  <button key={m.key} onClick={() => go(`/app/${m.path}`)} className="flex flex-col items-center gap-2 rounded-[18px] bg-sub px-1 pb-3 pt-3.5 text-center text-[11.5px] font-medium leading-tight transition active:scale-[.95]">
+                    <IconTile name={m.icon} dept={m.dept} size="md" />
                     {m.name}
                   </button>
                 ))}

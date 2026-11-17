@@ -35,18 +35,7 @@ export default function DevisList() {
   const [sort, setSort] = useState<Sort>('recent');
   const [busy, setBusy] = useState<string | null>(null);
 
-  useEffect(() => {
-    const k = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement;
-      if (e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(t.tagName) || t.isContentEditable) return;
-      if (e.key === 'n' || e.key === 'N') {
-        e.preventDefault();
-        navigate('/app/devis/nouveau');
-      }
-    };
-    window.addEventListener('keydown', k);
-    return () => window.removeEventListener('keydown', k);
-  }, [navigate]);
+  // Raccourci N : géré globalement par la barre du haut (TopBar).
 
   const rows = useMemo(
     () =>
