@@ -7,7 +7,7 @@ import { relative } from '@/lib/format';
 import { comparatif, eur } from '../data/helpers';
 import { useAchats } from '../data/store';
 import type { Demande } from '../data/types';
-import { BadgeDemande, Montant } from '../components/ui';
+import { BadgeDemande, FournisseurPastille, Montant } from '../components/ui';
 import { pluriel } from '../components/demandes/commun';
 import NouvelleDemande from '../components/NouvelleDemande';
 
@@ -19,7 +19,7 @@ function Reponses({ n, sur }: { n: number; sur: number }) {
     <span className="flex items-center gap-2">
       <span className="flex gap-[3px]" aria-hidden>
         {Array.from({ length: sur }, (_, i) => (
-          <i key={i} className={cn('h-1.5 w-3 rounded-full', i < n ? 'bg-ok' : 'bg-line2')} />
+          <i key={i} className={cn('h-1.5 w-3 rounded-full', i < n ? 'fx-pop bg-ok' : 'bg-line2')} style={{ animationDelay: `${0.2 + i * 0.08}s` }} />
         ))}
       </span>
       <span className="num text-[12.5px] text-ink-2">
@@ -50,7 +50,7 @@ export default function Demandes() {
   const visibles = lignes.filter((x) => (filtre === 'toutes' ? true : filtre === 'commandees' ? x.d.statut === 'commandee' : EN_COURS.includes(x.d.statut)));
 
   return (
-    <div className="space-y-5">
+    <div className="bx-stagger space-y-5">
       <PageHeader
         title="Demandes de prix"
         subtitle="Une liste, plusieurs fournisseurs, un comparatif clair. Vous commandez en un clic chez le moins cher."
@@ -88,7 +88,7 @@ export default function Demandes() {
           text={filtre === 'en_cours' ? 'Toutes vos demandes ont été commandées ou annulées. Lancez-en une nouvelle depuis un devis signé.' : 'Quand vous commandez depuis un comparatif, la demande se range ici avec ses bons de commande.'}
         />
       ) : (
-        <Card className="overflow-hidden">
+        <Card className="bx-stagger overflow-hidden">
           <div className="hidden grid-cols-[minmax(0,1fr)_170px_150px_190px_16px] gap-4 border-b border-line bg-[#fafafc] px-4 py-2.5 text-[11.5px] font-medium uppercase tracking-[0.04em] text-ink-3 lg:grid">
             <span>Demande</span>
             <span>Réponses</span>
@@ -100,13 +100,20 @@ export default function Demandes() {
             <button
               key={d.id}
               type="button"
-              onClick={() => nav(d.id)}
+              onClick={() => nav(`/app/fournisseurs/demandes/${d.id}`)}
               className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 border-b border-line px-4 py-3.5 text-left transition last:border-b-0 hover:bg-[#fafafc] lg:grid-cols-[minmax(0,1fr)_170px_150px_190px_16px]"
             >
-              <span className="min-w-0">
+              <span className="flex min-w-0 items-center gap-3">
+                <span className="hidden -space-x-2 sm:flex">
+                  {d.destinataires.slice(0, 3).map((x) => (
+                    <span key={x.id} className={cn('rounded-[11px] ring-2 ring-white', x.statut !== 'repondue' && 'opacity-45')}><FournisseurPastille f={fournisseurs.find((f) => f.id === x.fournisseurId)} size={30} /></span>
+                  ))}
+                </span>
+                <span className="min-w-0">
                 <span className="block truncate text-[14px] font-medium">{d.titre}</span>
                 <span className="block truncate text-[12.5px] text-ink-3">
                   {d.numero} · {pluriel(d.lignes.length, 'article')} · créée {relative(d.createdAt)}
+                </span>
                 </span>
               </span>
               <span className="row-start-2 lg:row-start-auto">

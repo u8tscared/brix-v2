@@ -1,0 +1,74 @@
+/* Boîte de démo : cadres d'aperçu et micro-animations. Préfixe boite- (propre à cette page). */
+
+.boite { --ease: cubic-bezier(.22,1,.36,1); }
+.boite-defile { scrollbar-width: thin; scrollbar-color: #d9d7e4 transparent; }
+.boite-defile-x { scrollbar-width: none; }
+.boite-defile-x::-webkit-scrollbar { display: none; }
+
+/* Onglets : curseur qui glisse */
+.boite-onglet-curseur { transition: transform .38s var(--ease); }
+
+/* Ligne de la liste : sélection avec filet d'encre à gauche */
+.boite-ligne { transition: background-color .2s ease, box-shadow .25s ease, transform .15s ease; }
+.boite-ligne:active { transform: scale(.992); }
+.boite-ligne::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: #130f26; transform: scaleY(0); opacity: 0; transition: transform .3s var(--ease), opacity .2s ease; }
+.boite-ligne-active { box-shadow: 0 1px 2px rgba(19,15,38,.05), 0 0 0 1px #ececf1, 0 10px 24px -18px rgba(45,20,90,.35); }
+.boite-ligne-active::before { transform: scaleY(1); opacity: 1; }
+
+/* Arrivée d'un nouvel e-mail : il glisse depuis le haut, la ligne se déplie, un halo passe */
+@keyframes boite-arrive { 0% { opacity: 0; transform: translateY(-14px) scale(.98); max-height: 0; } 45% { max-height: 160px; } 100% { opacity: 1; transform: none; max-height: 160px; } }
+@keyframes boite-halo { 0% { background-color: rgba(124,58,237,.10); } 100% { background-color: transparent; } }
+.boite-arrive { animation: boite-arrive .6s var(--ease) both; overflow: hidden; }
+.boite-arrive > .boite-ligne:not(.boite-ligne-active) { animation: boite-halo 2.2s ease-out .3s both; }
+@keyframes boite-point { 0% { transform: scale(0); } 55% { transform: scale(1.5); } 100% { transform: scale(1); } }
+@keyframes boite-onde { 0% { box-shadow: 0 0 0 0 rgba(124,58,237,.5); } 100% { box-shadow: 0 0 0 8px rgba(124,58,237,0); } }
+.boite-point { animation: boite-point .5s var(--ease) .25s both, boite-onde 1.2s ease-out .7s 2; }
+
+/* Lecture : scène sous l'en-tête, apparition douce */
+.boite-scene { animation: bx-rise .5s var(--ease) both; }
+.boite-cadre { transition: opacity .3s ease; }
+.boite-cadre[data-pret='non'] { opacity: 0; }
+@media (min-width: 768px) { .boite-fenetre { box-shadow: 0 1px 2px rgba(19,15,38,.05), 0 0 0 1px rgba(19,15,38,.05), 0 30px 60px -36px rgba(45,20,90,.35); } }
+
+/* Téléphone : liste → lecture qui glisse depuis la droite */
+@keyframes boite-glisse { from { transform: translateX(28%); opacity: 0; } to { transform: none; opacity: 1; } }
+.boite-glisse { animation: boite-glisse .38s var(--ease) both; }
+
+/* Cadre iPhone sobre */
+.boite-iphone { width: 398px; max-width: 100%; padding: 11px; border-radius: 60px; background: linear-gradient(145deg, #2a2733, #121019); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.08), 0 0 0 1px rgba(19,15,38,.2), 0 40px 80px -30px rgba(30,15,60,.45), 0 18px 36px -18px rgba(30,15,60,.3); }
+.boite-iphone-ecran { position: relative; height: 820px; max-height: calc(100dvh - 330px); min-height: 540px; border-radius: 49px; overflow: hidden; display: flex; flex-direction: column; }
+.boite-iphone-defile { flex: 1; overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain; }
+.boite-iphone-defile::-webkit-scrollbar { display: none; }
+
+/* Galerie : cartes qui se soulèvent, miniature qui défile un peu au survol */
+.boite-carte { transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
+.boite-carte:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px #ececf1, 0 24px 40px -24px rgba(45,20,90,.35); }
+.boite-carte-mini iframe { transition: margin-top 1.2s var(--ease); margin-top: 0; }
+.boite-carte:hover .boite-carte-mini iframe { margin-top: -40px; }
+
+/* Panneau d'aperçu d'un modèle */
+@keyframes boite-panneau { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.boite-panneau { animation: boite-panneau .45s var(--ease) both; }
+.boite-voile { animation: bx-fade .3s ease both; }
+
+/* Toast « Nouvel e-mail » */
+@keyframes boite-toast { from { transform: translate(-50%, 24px); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+@keyframes boite-toast-g { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.boite-toast { left: 50%; transform: translateX(-50%); animation: boite-toast .45s var(--ease) both; }
+@media (min-width: 768px) { .boite-toast { left: 16px; transform: none; animation-name: boite-toast-g; } }
+
+/* État vide : les cartes flottent doucement */
+@keyframes boite-flotte { 0%, 100% { transform: translateY(0) rotate(var(--r)); } 50% { transform: translateY(-6px) rotate(var(--r)); } }
+.boite-vide-carte-1 { --r: -6deg; animation: boite-flotte 5s ease-in-out infinite; }
+.boite-vide-carte-2 { --r: 5deg; animation: boite-flotte 5.6s ease-in-out .6s infinite; }
+@keyframes boite-enveloppe { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -3px); } }
+.boite-vide-enveloppe { animation: boite-enveloppe 3.2s ease-in-out infinite; }
+
+@media (max-width: 767px) {
+  .boite-iphone { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boite-arrive, .boite-arrive > .boite-ligne, .boite-point, .boite-scene, .boite-glisse, .boite-panneau, .boite-toast, .boite-vide-carte-1, .boite-vide-carte-2, .boite-vide-enveloppe { animation: none !important; }
+  .boite-onglet-curseur, .boite-carte, .boite-carte-mini iframe, .boite-ligne, .boite-ligne::before { transition: none !important; }
+}

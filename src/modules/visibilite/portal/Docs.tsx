@@ -4,6 +4,7 @@ import { Button, cn, Sheet, toast } from '@/components/ui';
 import { dateShort, money, totals } from '@/lib/format';
 import type { Devis, Facture } from '@/lib/types';
 import { payInvoice, usePortalLocal } from './data';
+import { lienPublic } from '@/parcours/liens';
 
 interface Inv { id: string; number: string; title: string; amount: number; dueDate: string }
 
@@ -37,6 +38,7 @@ export function Docs({ devis, factures, situation, payment, companyName }: { dev
       {right}
     </div>
   );
+  const ouvrir = (href: string) => <a href={href} className="grid h-10 place-items-center rounded-full px-3 text-[13px] font-medium text-brand hover:bg-sub">Ouvrir</a>;
   const pdf = (name: string) => <button onClick={() => toast(`${name} téléchargé (démo)`)} className="h-10 rounded-full px-3 text-[13px] font-medium text-brand hover:bg-sub">PDF</button>;
 
   return (
@@ -53,8 +55,8 @@ export function Docs({ devis, factures, situation, payment, companyName }: { dev
       )}
       <div>
         {sitPaid && row(<Receipt className="h-[18px] w-[18px]" />, `Facture ${situation.number}`, `${situation.title} · payée`, <span className="flex items-center gap-1 text-[12.5px] font-medium text-ok"><Check className="h-4 w-4" />Payée</span>, 'sit')}
-        {factures.map((f) => row(<Receipt className="h-[18px] w-[18px]" />, `Facture ${f.number}`, `${f.title} · ${money(totals(f.lines).ttc)}`, f.status === 'payee' ? <span className="flex items-center gap-1 text-[12.5px] font-medium text-ok"><Check className="h-4 w-4" />Payée</span> : pdf(f.number), f.id))}
-        {devis && row(<FileSignature className="h-[18px] w-[18px]" />, `Devis signé ${devis.number}`, `Signé le ${dateShort(devis.signedAt ?? devis.createdAt)} · ${money(totals(devis.lines).ttc)}`, pdf(devis.number), 'devis')}
+        {factures.map((f) => row(<Receipt className="h-[18px] w-[18px]" />, `Facture ${f.number}`, `${f.title} · ${money(totals(f.lines).ttc)}`, f.status === 'payee' ? <span className="flex items-center gap-1 text-[12.5px] font-medium text-ok"><Check className="h-4 w-4" />Payée</span> : ouvrir(lienPublic('facture', f.id)), f.id))}
+        {devis && row(<FileSignature className="h-[18px] w-[18px]" />, `Devis signé ${devis.number}`, `Signé le ${dateShort(devis.signedAt ?? devis.createdAt)} · ${money(totals(devis.lines).ttc)}`, ouvrir(lienPublic('devis', devis.id)), 'devis')}
         {row(<ShieldCheck className="h-[18px] w-[18px]" />, 'Attestation décennale', 'AXA · valable jusqu\'au 31/12', pdf('Attestation'), 'dec')}
         {row(<FileText className="h-[18px] w-[18px]" />, 'Plan électrique du logement', 'Ajouté par Karim', pdf('Plan'), 'plan')}
       </div>

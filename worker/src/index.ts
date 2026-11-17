@@ -5,12 +5,18 @@ import { handleFournisseursRoutes } from './modules/fournisseurs/routes';
 import { handleApiPubliqueRoutes } from './modules/api-publique/routes';
 import { handleMcpRoutes } from './modules/mcp/routes';
 import { relancerWebhooks } from './modules/api-publique/webhooks';
+import { handleDocumentsRoutes } from './modules/documents/routes';
+import { handleSignatureRoutes } from './modules/signature/routes';
+import { handlePaiementsRoutes } from './modules/paiements/routes';
+import { handleNotificationsRoutes } from './modules/notifications/routes';
+import { cronParcours } from './modules/notifications/cron';
+import { handleEmailsRoutes } from './modules/emails/routes';
 
 // Point d'entrée du worker Brix V2. Chaque module expose handleXRoutes(request, env, pathname)
 // qui renvoie null si la route ne le concerne pas (convention du CLAUDE.md).
 
 const cors = (origin: string | null, env: Env) => ({
-  'access-control-allow-origin': origin && (origin === env.APP_ORIGIN || origin.startsWith('http://localhost')) ? origin : env.APP_ORIGIN,
+  'access-control-allow-origin': origin && (origin === env.APP_ORIGIN || origin === env.PUBLIC_BASE_URL || origin.startsWith('http://localhost')) ? origin : env.APP_ORIGIN,
   'access-control-allow-headers': 'authorization, content-type',
   'access-control-allow-methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   vary: 'origin',
@@ -34,13 +40,16 @@ export default {
     if (request.method === 'OPTIONS' && !selfCors) return new Response(null, { status: 204, headers: h });
     try {
       if (url.pathname.startsWith('/api/')) {
-        const handlers = [handleCoreRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes];
+        const handlers = [handleCoreRoutes, handleDocumentsRoutes, handleSignatureRoutes, handlePaiementsRoutes, handleNotificationsRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes, handleEmailsRoutes];
         for (const handle of handlers) {
           const res = await handle(request, env, url.pathname);
           if (res) return withHeaders(res, h);
         }
         return withHeaders(json({ error: 'Route inconnue' }, 404), h);
       }
+      // Liens courts reçus par e-mail / SMS : /d/<jeton> → /#/d/<jeton> (l'app est en HashRouter)
+      const court = url.pathname.match(/^\/(d|f|p)\/([A-Za-z0-9_-]{43})$/);
+      if (court) return Response.redirect(`${url.origin}/#/${court[1]}/${court[2]}`, 302);
       if (env.ASSETS) return env.ASSETS.fetch(request);
       return new Response('Brix V2 API', { status: 200 });
     } catch (e) {
@@ -54,6 +63,6 @@ export default {
 
   // Cron (toutes les minutes, voir wrangler.toml) : renvoi des webhooks partenaires en échec.
   async scheduled(_event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
-    ctx.waitUntil(relancerWebhooks(env));
+    ctx.waitUntil(Promise.all([relancerWebhooks(env), cronParcours(env)]));
   },
 };

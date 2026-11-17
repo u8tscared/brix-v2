@@ -57,11 +57,11 @@ export const pluriel = (n: number, un: string, plusieurs = `${un}s`) => `${n} ${
 /** Petite paire « libellé / valeur » des en-têtes. */
 export function Info({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 items-start gap-2.5">
-      <span className="mt-0.5 text-ink-3 [&_svg]:h-4 [&_svg]:w-4">{icon}</span>
-      <div className="min-w-0">
-        <div className="text-[11.5px] font-medium uppercase tracking-[0.04em] text-ink-3">{label}</div>
-        <div className="text-[13.5px] text-ink first-letter:uppercase">{children}</div>
+    <div className="flex min-w-0 items-start gap-3">
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-page text-ink-2 [&_svg]:h-[17px] [&_svg]:w-[17px] [&_svg]:stroke-[1.75]">{icon}</span>
+      <div className="min-w-0 pt-px">
+        <div className="text-[12px] text-ink-3">{label}</div>
+        <div className="text-[13.5px] font-medium leading-snug text-ink first-letter:uppercase">{children}</div>
       </div>
     </div>
   );

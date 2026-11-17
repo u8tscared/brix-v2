@@ -15,10 +15,21 @@ type Filtre = 'encours' | 'livrees' | 'toutes';
 const COLS = 'md:grid md:grid-cols-[minmax(0,1.6fr)_minmax(0,1.3fr)_7.5rem_8.5rem_9.5rem_1rem] md:gap-4';
 
 function Livraison({ c }: { c: Commande }) {
-  if (!c.livraisonPrevue) return <span className="text-ink-3">—</span>;
+  if (!c.livraisonPrevue) return <span className="text-ink-3">–</span>;
   const retard = ENCOURS.includes(c.statut) && c.statut !== 'brouillon' && c.livraisonPrevue < todayISO();
   if (['livree', 'facturee', 'annulee'].includes(c.statut)) return <span className="text-ink-3">prévue {relative(c.livraisonPrevue)}</span>;
   return <span className={cn('inline-block first-letter:uppercase', retard ? 'font-medium text-bad' : 'text-ink')}>{retard ? `En retard (${relative(c.livraisonPrevue)})` : relative(c.livraisonPrevue)}</span>;
+}
+
+/** Mini piste de suivi : envoyée, confirmée, en route, reçue. */
+function Piste({ c }: { c: Commande }) {
+  const r = ['envoyee', 'confirmee', 'expediee', 'livree'].indexOf(c.statut === 'livree_partiel' ? 'expediee' : c.statut === 'facturee' ? 'livree' : c.statut);
+  if (r < 0) return null;
+  return (
+    <span className="mt-1.5 flex gap-[3px]" aria-hidden>
+      {[0, 1, 2, 3].map((i) => <i key={i} className={cn('h-1 w-4 rounded-full', i <= r ? (r === 3 ? 'bg-ok' : 'bg-ink') : 'bg-line2')} />)}
+    </span>
+  );
 }
 
 export default function Commandes() {
@@ -39,7 +50,7 @@ export default function Commandes() {
   const chantier = (id?: string) => chantiers.find((c) => c.id === id)?.name;
 
   return (
-    <div className="space-y-5">
+    <div className="bx-stagger space-y-5">
       <PageHeader
         title="Commandes"
         subtitle="Suivez chaque commande comme un colis, de l’envoi jusqu’à la facture."
@@ -67,7 +78,7 @@ export default function Commandes() {
           action={commandes.length === 0 && <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setOuvrir(true)}>Passer une commande</Button>}
         />
       ) : (
-        <Card className="overflow-hidden">
+        <Card className="bx-stagger overflow-hidden">
           <div className={cn('hidden border-b border-line bg-[#fbfbfd] px-4 py-2.5 text-[11.5px] font-medium text-ink-3', COLS)}>
             <span>Fournisseur</span>
             <span>Chantier</span>
@@ -80,7 +91,7 @@ export default function Commandes() {
             const f = frn(c.fournisseurId);
             const ch = chantier(c.chantierId);
             return (
-              <button key={c.id} onClick={() => nav(c.id)} className={cn('group flex w-full items-center gap-3 border-b border-line px-4 py-3 text-left transition last:border-b-0 hover:bg-[#fafafc] md:items-center', COLS)}>
+              <button key={c.id} onClick={() => nav(`/app/fournisseurs/commandes/${c.id}`)} className={cn('group flex w-full items-center gap-3 border-b border-line px-4 py-3 text-left transition last:border-b-0 hover:bg-[#fafafc] md:items-center', COLS)}>
                 {/* Colonne 1 : fournisseur et numéro (toujours visible) */}
                 <div className="flex min-w-0 flex-1 items-center gap-3">
                   <FournisseurPastille f={f} />
@@ -95,7 +106,10 @@ export default function Commandes() {
                 <div className="hidden min-w-0 truncate text-[13px] text-ink-2 md:block">{ch ?? <span className="text-ink-3">{MODES[c.mode].court}</span>}</div>
                 <Montant v={totalCommande(c)} className="hidden text-right text-[13.5px] md:block" />
                 <div className="hidden text-[13px] md:block"><Livraison c={c} /></div>
-                <div className="hidden md:block"><BadgeCommande s={c.statut} /></div>
+                <div className="hidden md:block">
+                  <BadgeCommande s={c.statut} />
+                  <Piste c={c} />
+                </div>
                 <ChevronRight className="hidden h-4 w-4 text-ink-3 transition group-hover:translate-x-0.5 md:block" />
                 {/* Téléphone : montant, statut et date empilés à droite */}
                 <div className="flex shrink-0 flex-col items-end gap-1 md:hidden">

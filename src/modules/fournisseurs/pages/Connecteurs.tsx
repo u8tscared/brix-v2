@@ -10,8 +10,8 @@ import { CAPACITES } from '../components/achats/commun';
 
 const ICONES: Record<string, ReactNode> = { email: <Mail />, api_brix: <Webhook />, fichier_tarif: <FileSpreadsheet />, edi: <FileText />, factures_pdp: <Receipt /> };
 const ACTIONS: Record<string, { label: string; to: string }> = {
-  email: { label: 'Voir mes fournisseurs', to: '../annuaire' },
-  fichier_tarif: { label: 'Importer un tarif', to: '../catalogue' },
+  email: { label: 'Voir mes fournisseurs', to: '/app/fournisseurs/annuaire' },
+  fichier_tarif: { label: 'Importer un tarif', to: '/app/fournisseurs/catalogue' },
 };
 
 // Textes affichés à l'artisan : le registre du serveur parle aux développeurs (EDI, GLN, webhook…), ici on parle simple.
@@ -65,7 +65,7 @@ export default function Connecteurs() {
   const bientot = CONNECTEURS.filter((c) => c.etat === 'bientot');
 
   return (
-    <div className="space-y-8">
+    <div className="bx-stagger space-y-8">
       <PageHeader title="Connexions" subtitle="Brix marche dès aujourd’hui avec tous vos fournisseurs, par e-mail et lien sécurisé. Les connexions directes arrivent enseigne par enseigne." />
 
       <Card className="p-5 md:p-6">

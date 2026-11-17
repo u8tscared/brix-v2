@@ -38,9 +38,9 @@ function Carte({ f, onModifier, onFavori }: { f: Fournisseur; onModifier: () => 
       )}
 
       <dl className="mx-4 mt-3 grid grid-cols-3 divide-x divide-line rounded-[10px] border border-line text-center">
-        <div className="px-2 py-2"><dt className="text-[11px] text-ink-3">Franco</dt><dd className="num text-[13px] font-medium">{f.franco != null ? money(f.franco, true) : '—'}</dd></div>
-        <div className="px-2 py-2"><dt className="text-[11px] text-ink-3">Délai</dt><dd className="num text-[13px] font-medium">{f.delaiJours != null ? `${f.delaiJours} j` : '—'}</dd></div>
-        <div className="min-w-0 px-2 py-2"><dt className="text-[11px] text-ink-3">N° client</dt><dd className="num truncate text-[13px] font-medium">{f.numeroCompte ?? '—'}</dd></div>
+        <div className="px-2 py-2"><dt className="text-[11px] text-ink-3">Franco</dt><dd className="num text-[13px] font-medium">{f.franco != null ? money(f.franco, true) : '–'}</dd></div>
+        <div className="px-2 py-2"><dt className="text-[11px] text-ink-3">Délai</dt><dd className="num text-[13px] font-medium">{f.delaiJours != null ? `${f.delaiJours} j` : '–'}</dd></div>
+        <div className="min-w-0 px-2 py-2"><dt className="text-[11px] text-ink-3">N° client</dt><dd className="num truncate text-[13px] font-medium">{f.numeroCompte ?? '–'}</dd></div>
       </dl>
 
       {metiers.length > 0 && <div className="mt-3 truncate px-4 text-[12px] text-ink-3">{metiers.join(' · ')}</div>}
@@ -61,7 +61,7 @@ export default function Annuaire() {
   const relies = fournisseurs.filter((f) => f.connecteur === 'api_brix').length;
 
   return (
-    <div className="space-y-5">
+    <div className="bx-stagger space-y-5">
       <PageHeader
         title="Mes fournisseurs"
         subtitle={fournisseurs.length ? `${fournisseurs.length} fournisseur${fournisseurs.length > 1 ? 's' : ''}${relies ? `, dont ${relies} relié${relies > 1 ? 's' : ''} par API` : ''}. Ils reçoivent vos demandes par e-mail, avec un lien pour répondre.` : 'Vos agences, comptoirs et commerciaux.'}
@@ -72,11 +72,11 @@ export default function Annuaire() {
         <EmptyState
           icon={<Store />}
           title="Ajoutez votre premier fournisseur"
-          text="Votre agence Rexel, Point.P ou Cedeo, ou le commercial qui passe vous voir : il suffit de son e-mail pour lui envoyer vos demandes de prix."
+          text="Le comptoir de votre agence habituelle ou le commercial qui passe vous voir : il suffit de son e-mail pour lui envoyer vos demandes de prix."
           action={<Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setFiche({ open: true })}>Ajouter un fournisseur</Button>}
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="bx-stagger grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {tries.map((f) => (
             <Carte key={f.id} f={f} onModifier={() => setFiche({ open: true, f })} onFavori={() => modifierFournisseur(f.id, { favori: !f.favori })} />
           ))}
