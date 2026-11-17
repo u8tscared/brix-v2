@@ -42,7 +42,7 @@ export default function AppShell() {
 
   return (
     <div className="flex min-h-dvh bg-page">
-      {isTablet && <Sidebar forceCollapsed={!isDesktop} />}
+      {isTablet && <Sidebar forceCollapsed={!isDesktop || fullBleed} />}
       <div className="flex min-w-0 flex-1 flex-col">
         {!isTablet && (
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line/70 bg-page/85 px-4 pt-safe backdrop-blur-xl">

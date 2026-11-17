@@ -15,6 +15,14 @@ async function hmac(secret: string, data: string) {
   return crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data));
 }
 
+/** Comparaison en temps constant (évite les attaques par mesure du temps). */
+export function timingSafeEqual(a: string, b: string) {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
 /** Signe un JWT HS256 (sessions de l'app). */
 export async function signJwt(payload: Record<string, unknown>, secret: string, ttlSeconds = 60 * 60 * 24 * 30) {
   const header = b64url(new TextEncoder().encode(JSON.stringify({ alg: 'HS256', typ: 'JWT' })));
@@ -27,7 +35,7 @@ export async function verifyJwt(token: string, secret: string): Promise<Record<s
   const [h, b, s] = token.split('.');
   if (!h || !b || !s) return null;
   const expected = b64url(await hmac(secret, `${h}.${b}`));
-  if (expected !== s) return null;
+  if (!timingSafeEqual(expected, s)) return null;
   const payload = JSON.parse(new TextDecoder().decode(fromB64url(b)));
   if (typeof payload.exp === 'number' && payload.exp < Date.now() / 1000) return null;
   return payload;
