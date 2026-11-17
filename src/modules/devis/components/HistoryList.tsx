@@ -7,8 +7,8 @@ import type { DevisMeta, JournalEvent } from '../store';
 /** Journal des événements du devis : dates du devis + événements enregistrés localement. */
 export function buildHistory(d: Devis, client: Client | undefined, meta: DevisMeta): JournalEvent[] {
   const who = client?.name ?? 'Le client';
-  const base: JournalEvent[] = [{ id: 'h-c', at: d.createdAt, text: 'Devis créé', tone: 'me' }];
   const logged = (re: RegExp) => meta.journal.some((e) => re.test(e.text));
+  const base: JournalEvent[] = logged(/^Devis créé/) ? [] : [{ id: 'h-c', at: d.createdAt, text: 'Devis créé', tone: 'me' }];
   if (d.sentAt && !logged(/^Envoyé/)) base.push({ id: 'h-s', at: d.sentAt, text: `Envoyé à ${who}`, tone: 'me' });
   if (d.viewedAt && !logged(/^Ouvert/)) base.push({ id: 'h-v', at: d.viewedAt, text: `Ouvert par ${who}${d.views ? ` · ${d.views} fois` : ''}`, tone: 'client' });
   if (d.signedAt && !logged(/^Signé/)) base.push({ id: 'h-g', at: d.signedAt, text: `Signé électroniquement par ${who}`, tone: 'client' });

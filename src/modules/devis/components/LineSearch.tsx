@@ -56,7 +56,7 @@ export const LineSearch = forwardRef<HTMLInputElement, { vatRate: number; onAdd:
               (e.target as HTMLInputElement).blur();
             }
           }}
-          placeholder={big ? 'Chercher un prix ou ajouter une ligne' : `Tape / pour chercher parmi ${LIBRARY.length} prix, ou parle à Bob`}
+          placeholder={big ? 'Chercher un prix ou ajouter une ligne' : `Chercher parmi vos ${LIBRARY.length} prix (touche /) ou dicter à Bob`}
           className="h-full min-w-0 flex-1 bg-transparent text-[13.5px] text-ink placeholder:text-ink-3 focus:outline-none"
           aria-label="Ajouter une ligne depuis la bibliothèque"
         />
