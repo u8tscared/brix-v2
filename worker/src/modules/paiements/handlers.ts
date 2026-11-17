@@ -189,8 +189,12 @@ export async function webhookStripe(env: EnvParcours, request: Request) {
   if (!env.STRIPE_WEBHOOK_SECRET) throw new ErreurParcours(503, 'non_configure', 'Webhook non configuré.');
   const corps = await request.text();
   if (corps.length > 1_000_000) throw new ErreurParcours(413, 'trop_gros', 'Requête trop volumineuse.');
-  if (!(await verifierSignatureStripe(corps, request.headers.get('stripe-signature'), env.STRIPE_WEBHOOK_SECRET)))
-    throw new ErreurParcours(400, 'signature_invalide', 'Signature invalide.');
+  const entete = request.headers.get('stripe-signature');
+  // Deux points de terminaison possibles chez Stripe (compte plateforme et comptes connectés), chacun son secret.
+  const valide =
+    (await verifierSignatureStripe(corps, entete, env.STRIPE_WEBHOOK_SECRET)) ||
+    (!!env.STRIPE_CONNECT_WEBHOOK_SECRET && (await verifierSignatureStripe(corps, entete, env.STRIPE_CONNECT_WEBHOOK_SECRET)));
+  if (!valide) throw new ErreurParcours(400, 'signature_invalide', 'Signature invalide.');
   const evt = JSON.parse(corps) as EvenementStripe;
   if (typeof evt.id !== 'string' || typeof evt.type !== 'string') throw new ErreurParcours(400, 'evenement_invalide', 'Événement invalide.');
 

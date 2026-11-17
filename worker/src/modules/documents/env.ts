@@ -29,7 +29,8 @@ export interface EnvParcours extends Env {
   TWILIO_FROM?: string;
 
   // Paiements
-  STRIPE_WEBHOOK_SECRET?: string;
+  STRIPE_WEBHOOK_SECRET?: string; // point de terminaison « Votre compte » (paiements)
+  STRIPE_CONNECT_WEBHOOK_SECRET?: string; // point de terminaison « Comptes connectés » (account.updated)
   STRIPE_PLATFORM_FEE_BPS?: string; // commission Brix en points de base (100 = 1 %)
   ALMA_API_KEY?: string;
   ALMA_BASE_URL?: string; // https://api.sandbox.getalma.eu ou https://api.getalma.eu

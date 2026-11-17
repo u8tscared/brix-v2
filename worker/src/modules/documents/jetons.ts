@@ -93,7 +93,8 @@ const INVALIDE = () => new ErreurParcours(404, 'lien_invalide', "Ce lien n'est p
 export async function verifierJeton(env: EnvParcours, type: TypeDocument, jeton: string): Promise<Lien> {
   if (typeof jeton !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(jeton)) throw INVALIDE();
   const brut = deB64url(jeton);
-  if (brut.length !== 32) throw INVALIDE();
+  // Forme canonique exigée (sinon plusieurs écritures du même jeton seraient acceptées).
+  if (brut.length !== 32 || b64url(brut) !== jeton) throw INVALIDE();
   const id = brut.slice(0, 16);
   const attendu = b64url(await signer(env, type, id));
   if (!egalTempsConstant(attendu, b64url(brut.slice(16)))) throw INVALIDE();
