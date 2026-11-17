@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { Badge, Button, Card, toast } from '@/components/ui';
+import { Button, Card, IconTile, cn, toast } from '@/components/ui';
+import { DrawCheck, LiveDot } from '@/components/motion';
 import { INTEGRATIONS, useIntegrations } from './integrationsStore';
 
 export default function IntegrationsTab() {
   const { connected, connect, disconnect } = useIntegrations();
   const [busy, setBusy] = useState<string | null>(null);
+  const [just, setJust] = useState<string | null>(null);
   const cats = [...new Set(INTEGRATIONS.map((i) => i.category))];
+  const count = Object.keys(connected).length;
 
   const onConnect = (k: string, name: string) => {
     setBusy(k);
@@ -15,51 +18,53 @@ export default function IntegrationsTab() {
     setTimeout(() => {
       connect(k);
       setBusy(null);
+      setJust(k);
+      setTimeout(() => setJust((j) => (j === k ? null : j)), 2200);
       toast(`${name} est connecté (simulé en démo).`);
     }, 1100);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      <p className="flex items-center gap-2 text-[13px] text-ink-2">
+        <LiveDot /> {count} service{count > 1 ? 's' : ''} relié{count > 1 ? 's' : ''} à Brix. Les données circulent toutes seules, chiffrées.
+      </p>
       {cats.map((cat) => (
         <section key={cat}>
-          <h3 className="mb-2 text-[14px] font-semibold">{cat}</h3>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <h3 className="eyebrow mb-2 px-1">{cat}</h3>
+          <Card className="overflow-hidden">
             {INTEGRATIONS.filter((i) => i.category === cat).map((i) => {
               const on = connected[i.key];
               return (
-                <Card key={i.key} className="flex flex-col p-4">
-                  <div className="flex items-start gap-3">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] text-[13px] font-bold text-white" style={{ background: i.color }}>{i.initials}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[14px] font-semibold">{i.name}</span>
-                        {on && <Badge tone="ok" dot>Connecté</Badge>}
-                      </div>
-                      <p className="mt-0.5 text-[12.5px] leading-snug text-ink-2">{i.what}</p>
-                      {on && <p className="mt-1 truncate text-[12px] text-ink-3">{on}</p>}
-                    </div>
+                <div key={i.key} className="flex items-center gap-3.5 border-b border-line px-4 py-3.5 last:border-b-0 md:px-5">
+                  <span className={cn('relative grid h-10 w-10 shrink-0 place-items-center rounded-[11px] text-[13px] font-bold text-white transition-[filter,opacity] duration-300', !on && 'opacity-90 saturate-[.7]')} style={{ background: i.color, boxShadow: `inset 0 1px 0 rgba(255,255,255,.25), 0 4px 10px -5px ${i.color}` }}>
+                    {i.initials}
+                    {on && <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 animate-pop rounded-full bg-[#22c55e] ring-2 ring-white" />}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[14px] font-semibold tracking-[-0.01em]">{i.name}</div>
+                    <p className="text-[12.5px] leading-snug text-ink-2">{i.what}</p>
+                    {on && <p className="mt-0.5 truncate text-[12px] font-medium text-ok">{just === i.key ? <span className="inline-flex items-center gap-1"><DrawCheck className="h-3.5 w-3.5" />Connecté à l’instant</span> : on}</p>}
                   </div>
-                  <div className="mt-3 flex justify-end">
-                    {on ? (
-                      <Button size="sm" variant="ghost" onClick={() => { disconnect(i.key); toast(`${i.name} est déconnecté.`, 'info'); }}>Déconnecter</Button>
-                    ) : (
-                      <Button size="sm" variant="secondary" loading={busy === i.key} onClick={() => onConnect(i.key, i.name)}>Connecter</Button>
-                    )}
-                  </div>
-                </Card>
+                  {on ? (
+                    <Button size="sm" variant="ghost" onClick={() => { disconnect(i.key); toast(`${i.name} est déconnecté.`, 'info'); }}>Déconnecter</Button>
+                  ) : (
+                    <Button size="sm" variant="secondary" loading={busy === i.key} onClick={() => onConnect(i.key, i.name)}>{busy === i.key ? 'Connexion' : 'Connecter'}</Button>
+                  )}
+                </div>
               );
             })}
-          </div>
+          </Card>
         </section>
       ))}
-      <Card className="flex items-center gap-3 p-4">
+      <Link to="/app/bob/mcp" className="lift group flex items-center gap-3.5 rounded-[16px] bg-white p-4 shadow-card md:px-5">
+        <IconTile name="Plug" dept="bob" size="md" />
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-semibold">Assistants IA (Claude, ChatGPT)</div>
-          <p className="text-[12.5px] text-ink-2">Connectez-les à Brix avec Brix AI MCP.</p>
+          <p className="text-[12.5px] text-ink-2">Pilotez Brix depuis votre assistant avec Brix AI MCP.</p>
         </div>
-        <Link to="/app/bob/mcp" className="inline-flex h-10 items-center gap-1.5 rounded-[10px] border border-line2 px-3 text-[13px] font-medium hover:bg-sub">Configurer <ArrowRight className="h-4 w-4" /></Link>
-      </Card>
+        <ArrowRight className="h-4 w-4 text-ink-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-ink" />
+      </Link>
     </div>
   );
 }

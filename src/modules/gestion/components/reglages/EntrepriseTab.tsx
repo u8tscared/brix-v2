@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Check } from 'lucide-react';
-import { Button, Card, Field, Input, Select, Switch, cn, toast } from '@/components/ui';
+import { ShieldCheck } from 'lucide-react';
+import { Field, Icon, Input, Select, Switch, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { SIZES, TRADES } from '@/lib/catalog';
 import type { Company, TradeKey } from '@/lib/types';
+import { SaveBar, SettingsSection } from './parts';
+
+const initials = (name: string) => name.split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
 
 export default function EntrepriseTab() {
   const company = useBrix((s) => s.company);
@@ -13,89 +16,124 @@ export default function EntrepriseTab() {
   const dirty = JSON.stringify(d) !== JSON.stringify(company);
   const set = <K extends keyof Company>(k: K, v: Company[K]) => setD((x) => ({ ...x, [k]: v }));
   const save = () => {
-    updateCompany({ ...d, logoInitials: d.logoInitials || d.name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase() });
-    toast('Informations enregistrées. Elles apparaissent sur vos prochains devis et factures.');
+    const prevTrade = company.trade;
+    updateCompany({ ...d, logoInitials: d.logoInitials || initials(d.name) });
+    if (prevTrade !== d.trade) toast(`Vos outils métier sont maintenant ceux d’un ${TRADES.find((t) => t.key === d.trade)?.name.toLowerCase()}.`, 'info');
   };
   const toggleSecondary = (k: TradeKey) => set('secondaryTrades', d.secondaryTrades.includes(k) ? d.secondaryTrades.filter((x) => x !== k) : [...d.secondaryTrades, k]);
+  const siretBad = d.siret && d.siret.replace(/\s/g, '').length !== 14;
 
   return (
-    <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.4fr_1fr]">
-      <div className="space-y-5">
-        <Card className="p-4 md:p-5">
-          <h3 className="text-[15px] font-semibold">Identité</h3>
-          <p className="text-[12.5px] text-ink-2">Ces informations figurent sur vos devis et factures (mentions obligatoires).</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Field label="Nom commercial"><Input value={d.name} onChange={(e) => set('name', e.target.value)} /></Field>
-            <Field label="Raison sociale"><Input value={d.legalName} onChange={(e) => set('legalName', e.target.value)} /></Field>
-            <Field label="SIRET" hint={d.siret && d.siret.replace(/\s/g, '').length !== 14 ? '14 chiffres attendus' : undefined}><Input value={d.siret} inputMode="numeric" onChange={(e) => set('siret', e.target.value)} /></Field>
-            <Field label="N° de TVA intracommunautaire"><Input value={d.vatNumber} onChange={(e) => set('vatNumber', e.target.value)} /></Field>
-            <Field label="Adresse" className="sm:col-span-2"><Input value={d.address} onChange={(e) => set('address', e.target.value)} /></Field>
-            <Field label="Code postal et ville"><Input value={d.city} onChange={(e) => set('city', e.target.value)} /></Field>
-            <Field label="Téléphone"><Input value={d.phone} inputMode="tel" onChange={(e) => set('phone', e.target.value)} /></Field>
-            <Field label="E-mail" className="sm:col-span-2"><Input value={d.email} type="email" onChange={(e) => set('email', e.target.value)} /></Field>
-          </div>
-        </Card>
+    <div className="space-y-4">
+      <HeaderPreview c={d} />
 
-        <Card className="p-4 md:p-5">
-          <h3 className="text-[15px] font-semibold">Assurance et banque</h3>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Field label="Assurance décennale" hint="Assureur, numéro de contrat, zone couverte" className="sm:col-span-2"><Input value={d.decennale} onChange={(e) => set('decennale', e.target.value)} /></Field>
-            <Field label="IBAN (affiché sur les factures)" className="sm:col-span-2"><Input value={d.iban} onChange={(e) => set('iban', e.target.value)} className="font-mono" /></Field>
-            <label className="flex min-h-[48px] items-center justify-between gap-3 rounded-[10px] border border-line px-3 sm:col-span-2">
-              <span><span className="block text-[13.5px] font-medium">Qualification RGE</span><span className="block text-[12px] text-ink-3">Débloque les mentions et les aides sur les devis de rénovation énergétique.</span></span>
-              <Switch checked={d.rge} onChange={(v) => set('rge', v)} label="RGE" />
-            </label>
-          </div>
-        </Card>
-      </div>
+      <SettingsSection title="Identité" text="Ces informations figurent sur vos devis et factures (mentions obligatoires).">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Nom commercial"><Input value={d.name} onChange={(e) => set('name', e.target.value)} /></Field>
+          <Field label="Raison sociale"><Input value={d.legalName} onChange={(e) => set('legalName', e.target.value)} /></Field>
+          <Field label="SIRET" hint={siretBad ? <span className="text-warn">14 chiffres attendus</span> : undefined}><Input value={d.siret} inputMode="numeric" className="font-mono" onChange={(e) => set('siret', e.target.value)} /></Field>
+          <Field label="N° de TVA intracommunautaire"><Input value={d.vatNumber} className="font-mono" onChange={(e) => set('vatNumber', e.target.value)} /></Field>
+          <Field label="Adresse" className="sm:col-span-2"><Input value={d.address} onChange={(e) => set('address', e.target.value)} /></Field>
+          <Field label="Code postal et ville"><Input value={d.city} onChange={(e) => set('city', e.target.value)} /></Field>
+          <Field label="Téléphone"><Input value={d.phone} inputMode="tel" onChange={(e) => set('phone', e.target.value)} /></Field>
+          <Field label="E-mail" className="sm:col-span-2"><Input value={d.email} type="email" onChange={(e) => set('email', e.target.value)} /></Field>
+        </div>
+      </SettingsSection>
 
-      <div className="space-y-5">
-        <Card className="p-4 md:p-5">
-          <h3 className="text-[15px] font-semibold">Métier et taille</h3>
-          <div className="mt-4 space-y-3">
-            <Field label="Métier principal">
-              <Select value={d.trade} onChange={(e) => set('trade', e.target.value as TradeKey)}>
-                {TRADES.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}
-              </Select>
-            </Field>
-            <div>
-              <div className="mb-1.5 text-[12.5px] font-medium text-ink-2">Autres métiers</div>
-              <div className="flex flex-wrap gap-1.5">
-                {TRADES.filter((t) => t.key !== d.trade && t.key !== 'autre').map((t) => (
-                  <button key={t.key} type="button" onClick={() => toggleSecondary(t.key)} className={cn('min-h-[36px] rounded-full border px-3 text-[12.5px] font-medium', d.secondaryTrades.includes(t.key) ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2')}>
-                    {t.name}
-                  </button>
-                ))}
-              </div>
+      <SettingsSection title="Métier et taille" text="Brix adapte vos outils de calcul, vos ouvrages et les modules conseillés.">
+        <div className="space-y-4">
+          <div>
+            <div className="mb-1.5 text-[12.5px] font-medium text-ink-2">Métier principal</div>
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+              {TRADES.map((t) => (
+                <button
+                  key={t.key}
+                  type="button"
+                  onClick={() => setD((x) => ({ ...x, trade: t.key, secondaryTrades: x.secondaryTrades.filter((k) => k !== t.key) }))}
+                  className={cn('press flex min-h-[44px] items-center gap-2 rounded-[11px] px-2.5 text-left text-[12.5px] font-medium transition-[box-shadow,background,color] duration-200', d.trade === t.key ? 'bg-white text-ink shadow-[0_0_0_1.5px_var(--ink)]' : 'bg-[#f7f6fb] text-ink-2 hover:text-ink')}
+                >
+                  <Icon name={t.icon} className={cn('h-4 w-4 shrink-0', d.trade === t.key ? 'text-[#4f46e5]' : 'text-ink-3')} />
+                  <span className="line-clamp-2 leading-tight">{t.name}</span>
+                </button>
+              ))}
             </div>
-            <Field label="Taille de l’entreprise">
-              <Select value={d.size} onChange={(e) => set('size', e.target.value as Company['size'])}>
-                {SIZES.map((s) => <option key={s.key} value={s.key}>{s.name} · {s.range}</option>)}
-              </Select>
-            </Field>
           </div>
-        </Card>
-        <Card className="p-4 md:p-5">
-          <h3 className="text-[15px] font-semibold">Vos prix par défaut</h3>
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <Field label="Taux horaire HT"><Input value={d.hourlyRate} inputMode="decimal" suffix="€/h" onChange={(e) => set('hourlyRate', Number(e.target.value.replace(',', '.')) || 0)} /></Field>
-            <Field label="TVA par défaut">
-              <Select value={d.defaultVat} onChange={(e) => set('defaultVat', Number(e.target.value))}>
-                {[20, 10, 5.5, 0].map((v) => <option key={v} value={v}>{String(v).replace('.', ',')} %</option>)}
-              </Select>
-            </Field>
+          <div>
+            <div className="mb-1.5 text-[12.5px] font-medium text-ink-2">Vous faites aussi</div>
+            <div className="flex flex-wrap gap-1.5">
+              {TRADES.filter((t) => t.key !== d.trade && t.key !== 'autre').map((t) => {
+                const on = d.secondaryTrades.includes(t.key);
+                return (
+                  <button key={t.key} type="button" onClick={() => toggleSecondary(t.key)} className={cn('press min-h-[36px] rounded-full px-3 text-[12.5px] font-medium transition-[background,color,box-shadow] duration-200', on ? 'bg-ink text-white' : 'bg-white text-ink-2 shadow-[0_0_0_1px_var(--line2)] hover:text-ink')}>
+                    {t.plural}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <p className="mt-2 text-[12px] text-ink-3">{TRADES.find((t) => t.key === d.trade)?.vatHint}. Bob utilise ce taux pour chiffrer la main d’œuvre.</p>
-        </Card>
-      </div>
+          <Field label="Taille de l’entreprise" className="sm:max-w-xs">
+            <Select value={d.size} onChange={(e) => set('size', e.target.value as Company['size'])}>
+              {SIZES.map((s) => <option key={s.key} value={s.key}>{s.name} · {s.range}</option>)}
+            </Select>
+          </Field>
+        </div>
+      </SettingsSection>
 
-      {dirty && (
-      <div className="sticky bottom-[calc(76px+var(--safe-b))] z-10 flex animate-fade-up items-center justify-end gap-2 rounded-[14px] border border-line bg-white/95 p-2.5 shadow-pop backdrop-blur md:bottom-4 xl:col-span-2">
-        <span className="mr-auto pl-2 text-[13px] text-ink-2">Modifications non enregistrées</span>
-        <Button variant="ghost" onClick={() => setD(company)}>Annuler</Button>
-        <Button variant="primary" icon={<Check className="h-4 w-4" />} onClick={save}>Enregistrer</Button>
+      <SettingsSection title="Vos prix par défaut" text="Bob s’en sert pour chiffrer la main d’œuvre et préremplir vos devis.">
+        <div className="grid grid-cols-2 gap-3 sm:max-w-md">
+          <Field label="Taux horaire HT"><Input value={d.hourlyRate} inputMode="decimal" suffix="€/h" className="num" onChange={(e) => set('hourlyRate', Number(e.target.value.replace(',', '.')) || 0)} /></Field>
+          <Field label="TVA par défaut">
+            <Select value={d.defaultVat} onChange={(e) => set('defaultVat', Number(e.target.value))}>
+              {[20, 10, 5.5, 0].map((v) => <option key={v} value={v}>{String(v).replace('.', ',')} %</option>)}
+            </Select>
+          </Field>
+        </div>
+        <p className="mt-2 text-[12px] text-ink-3">Pour un {TRADES.find((t) => t.key === d.trade)?.name.toLowerCase()} : {TRADES.find((t) => t.key === d.trade)?.vatHint}.</p>
+      </SettingsSection>
+
+      <SettingsSection title="Assurance et banque" text="L’IBAN s’affiche sur vos factures ; la décennale est obligatoire sur vos devis.">
+        <div className="space-y-3">
+          <Field label="Assurance décennale" hint="Assureur, numéro de contrat, zone couverte"><Input value={d.decennale} onChange={(e) => set('decennale', e.target.value)} /></Field>
+          <Field label="IBAN"><Input value={d.iban} onChange={(e) => set('iban', e.target.value)} className="font-mono" /></Field>
+          <div className="flex min-h-[56px] items-center justify-between gap-3 rounded-[12px] bg-[#f7f6fb] px-3.5 py-2.5">
+            <span className="flex min-w-0 items-start gap-2.5">
+              <ShieldCheck className={cn('mt-0.5 h-4 w-4 shrink-0 transition-colors', d.rge ? 'text-ok' : 'text-ink-3')} strokeWidth={1.75} />
+              <span>
+                <span className="block text-[13.5px] font-medium">Qualification RGE</span>
+                <span className="block text-[12px] text-ink-3">Débloque les mentions et les aides sur les devis de rénovation énergétique.</span>
+              </span>
+            </span>
+            <Switch checked={d.rge} onChange={(v) => set('rge', v)} label="RGE" />
+          </div>
+        </div>
+      </SettingsSection>
+
+      <SaveBar dirty={dirty} onSave={save} onReset={() => setD(company)} />
+    </div>
+  );
+}
+
+/** En-tête de devis tel que le client le verra : il se met à jour en direct. */
+function HeaderPreview({ c }: { c: Company }) {
+  return (
+    <div className="relative overflow-hidden rounded-[18px] bg-white shadow-card">
+      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2 md:px-6">
+        <span className="eyebrow">Aperçu de vos documents</span>
+        <span className="font-mono text-[11.5px] text-ink-3">D-2026-118</span>
       </div>
-      )}
+      <div className="flex flex-wrap items-start gap-4 px-4 py-4 md:px-6 md:py-5">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[13px] bg-night text-[15px] font-semibold tracking-[-0.02em] text-white">{c.logoInitials || initials(c.name) || '?'}</span>
+        <div className="min-w-0 flex-1">
+          <div key={c.name} className="animate-[fade-in_.25s_ease_both] truncate text-[17px] font-semibold tracking-[-0.025em]">{c.name || 'Nom de votre entreprise'}</div>
+          <div className="mt-0.5 truncate text-[12.5px] text-ink-2">{[c.address, c.city].filter(Boolean).join(', ') || 'Adresse'}</div>
+          <div className="truncate text-[12.5px] text-ink-2">{[c.phone, c.email].filter(Boolean).join(' · ')}</div>
+        </div>
+        <div className="text-right text-[11.5px] leading-relaxed text-ink-3 max-sm:w-full max-sm:text-left">
+          <div>SIRET <span className="font-mono text-ink-2">{c.siret || '—'}</span></div>
+          <div>TVA <span className="font-mono text-ink-2">{c.vatNumber || '—'}</span></div>
+          {c.rge && <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-ok-bg px-2 py-0.5 font-medium text-ok"><ShieldCheck className="h-3 w-3" />RGE</div>}
+        </div>
+      </div>
     </div>
   );
 }

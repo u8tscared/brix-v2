@@ -4,6 +4,7 @@ import { Badge, Button, Card, Segmented, Switch, cn, toast } from '@/components/
 import { useBrix } from '@/lib/store';
 import { OFFERS, PLAN_ORDER, type Plan } from '@/lib/catalog';
 import { money } from '@/lib/format';
+import { AnimatedNumber } from '@/components/motion';
 import { useBobLocal } from '@/modules/bob/store';
 
 export default function OffreTab() {
@@ -26,12 +27,12 @@ export default function OffreTab() {
         <Segmented value={period} onChange={setPeriod} options={[{ value: 'mois', label: 'Mensuel' }, { value: 'an', label: 'Annuel · 2 mois offerts' }]} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="stagger grid gap-4 [&>*]:min-w-0 sm:grid-cols-2 2xl:grid-cols-4">
         {OFFERS.map((o) => {
           const current = o.key === plan;
           const price = o.price === null ? null : period === 'an' ? o.price * 10 : o.price;
           return (
-            <Card key={o.key} className={cn('relative flex flex-col p-5', current && 'shadow-[0_0_0_2px_var(--ink)]', o.highlight && !current && 'border-vi-200')}>
+            <Card key={o.key} className={cn('relative flex flex-col p-5 transition-shadow duration-300', current ? 'shadow-[0_0_0_2px_var(--ink),0_12px_28px_-16px_rgba(19,15,38,.4)]' : 'hover:shadow-raise')}>
               <div className="flex items-center gap-2">
                 <h3 className="text-[17px] font-semibold">{o.name}</h3>
                 {current && <Badge tone="dark">Votre offre</Badge>}
@@ -40,12 +41,12 @@ export default function OffreTab() {
               <p className="text-[12.5px] text-ink-2">{o.pitch}</p>
               <div className="mt-4 min-h-[60px]">
                 {price === null ? (
-                  <div className="font-display text-[26px] font-semibold">Sur devis</div>
+                  <div className="text-[28px] font-semibold tracking-[-0.035em]">Sur devis</div>
                 ) : price === 0 ? (
-                  <div className="font-display text-[26px] font-semibold">Gratuit</div>
+                  <div className="text-[28px] font-semibold tracking-[-0.035em]">Gratuit</div>
                 ) : (
                   <>
-                    <div className="num font-display text-[26px] font-semibold leading-tight">{money(price, price % 1 === 0)}<span className="ml-1 text-[13px] font-normal text-ink-2">HT / {period === 'an' ? 'an' : 'mois'}</span></div>
+                    <div className="num text-[28px] font-semibold leading-tight tracking-[-0.035em]"><AnimatedNumber value={price} duration={600} format={(n) => money(n, price % 1 === 0)} /><span className="ml-1 text-[13px] font-normal text-ink-2">HT / {period === 'an' ? 'an' : 'mois'}</span></div>
                     <div className="text-[12px] text-ink-3">{period === 'an' ? `soit ${money(price / 12)} par mois` : o.unit}</div>
                   </>
                 )}
@@ -55,7 +56,7 @@ export default function OffreTab() {
                   <li key={i} className="flex gap-2 text-[13px]"><Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{i}</li>
                 ))}
               </ul>
-              <Button className="mt-5 w-full justify-center" variant={current ? 'secondary' : o.highlight ? 'dawn' : 'primary'} disabled={current} onClick={() => choose(o.key)}>
+              <Button className="mt-5 w-full justify-center" variant={current ? 'secondary' : o.key === 'entreprise' ? 'secondary' : PLAN_ORDER.indexOf(o.key) > PLAN_ORDER.indexOf(plan) ? (o.highlight || PLAN_ORDER.indexOf(o.key) === PLAN_ORDER.indexOf(plan) + 1 ? 'dawn' : 'primary') : 'ghost'} disabled={current} onClick={() => choose(o.key)}>
                 {current ? 'Offre actuelle' : o.key === 'entreprise' ? 'Nous contacter' : PLAN_ORDER.indexOf(o.key) > PLAN_ORDER.indexOf(plan) ? `Passer à ${o.name}` : `Revenir à ${o.name}`}
               </Button>
             </Card>
