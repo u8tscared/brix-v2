@@ -15,11 +15,15 @@ App de gestion pour artisans du bâtiment (devis, factures, facture électroniqu
 - `src/pages/` : écrans CORE (cockpit, onboarding, accueil, portail public).
 - `site/` : site vitrine (autre chantier). `src/modules/fournisseurs`, `worker/src/modules/{fournisseurs,api-publique,mcp}` : espace fournisseurs (autre chantier).
 
-## Direction artistique « Aube »
-- Fond lavande `--page #f4f3fa`, surfaces blanches, filets fins `--line #ececf1`, encre `#17171f`, texte secondaire `#5f5f70` / `#9898a8`, bleu marque `#1F389D`.
-- Dégradé d'aube `bg-dawn` (violet #6d28d9 → magenta #d946ef → pêche #fb923c) : **une seule fois par écran**, sur le chiffre qui compte ou l'action principale (`Button variant="dawn"`, `.dawn-text`).
-- Titres Poppins (`font-display`), texte Inter, chiffres en `num` (tabular). Icônes Lucide uniquement, trait 1,75. Rien qui « fasse IA » (pas d'étincelles partout, pas de violet fluo gratuit).
-- Logo officiel uniquement via `src/components/brand/Logo.tsx`, jamais redessiné.
+## Direction artistique « Aube » V3 (17/11/2026)
+Voir `docs/design-system.md` pour le détail. En bref :
+- Police **Geist** partout (titres, texte, chiffres), Geist Mono pour les références (D-2026-118). Titres serrés (-0,03 em).
+- Fond lavande `--page #f6f5fb`, surfaces blanches `shadow-card` (filet 1 px + ombre légère), encre violet nuit `--ink #15122a`, secondaires `#5d5a72` / `#9794aa`.
+- Dégradé d'aube `bg-dawn` : **une seule fois par écran**, sur le chiffre qui compte ou l'action principale.
+- Chaque département a sa couleur (`DEPT_TONE` dans `src/components/ui/IconTile.tsx`) : icônes de modules sur `IconTile`.
+- Motion : `src/components/motion` (AnimatedNumber, Reveal, Ring, GrowBar, DrawCheck, SuccessDot, LiveDot, usePresence). Sorties douces `ease-out-quint`, 150-600 ms.
+- Logo : `BrandTile` / `BrandLogo` / `BrandSymbol` dans `src/components/brand/Logo.tsx`, jamais redessiné.
+- Icônes Lucide, trait 1,75. Rien qui « fasse IA » : pas d'étincelles, pas de violet fluo gratuit.
 - Responsive obligatoire : téléphone (< 768 px, barre d'onglets en bas, cibles 44 px), tablette (768-1279 px, menu replié), ordinateur (≥ 1280 px).
 - Textes en français simple, tutoiement pour Bob, vouvoiement ailleurs. Public non technophile : une action principale par écran, jamais de jargon.
 
