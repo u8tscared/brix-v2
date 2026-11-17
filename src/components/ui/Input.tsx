@@ -1,7 +1,7 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
 import { cn } from './cn';
 
-const base = 'w-full rounded-[10px] border border-line2 bg-white px-3 text-[14px] text-ink placeholder:text-ink-3 transition focus:border-vi-300 focus:outline-none focus:ring-4 focus:ring-vi-100 disabled:bg-sub';
+const base = 'w-full rounded-[11px] border border-line2 bg-white px-3 text-[14px] text-ink shadow-xs placeholder:text-ink-3 transition-[border-color,box-shadow] duration-200 hover:border-[#cfcbdd] focus:border-vi-400 focus:outline-none focus:shadow-focus disabled:bg-sub';
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement> & { icon?: ReactNode; suffix?: ReactNode }>(function Input({ className, icon, suffix, ...p }, ref) {
   if (!icon && !suffix) return <input ref={ref} className={cn(base, 'h-11', className)} {...p} />;

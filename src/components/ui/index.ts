@@ -7,4 +7,5 @@ export * from './Sheet';
 export * from './misc';
 export * from './toast';
 export * from './Icon';
+export * from './IconTile';
 export * from './cn';
