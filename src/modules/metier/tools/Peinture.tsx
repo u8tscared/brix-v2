@@ -65,7 +65,7 @@ export default function Peinture() {
           </div>
         </>
       }
-      hero={{ label: 'Peinture de finition', value: `${n1(total)} L`, sub: `Murs ${n1(walls)} m² · plafonds ${n1(ceilings)} m² · ${coats} couche${coats > 1 ? 's' : ''}` }}
+      hero={{ label: 'Peinture de finition', value: total, decimals: 1, unit: 'litres', sub: `Murs ${n1(walls)} m² · plafonds ${n1(ceilings)} m² · ${coats} couche${coats > 1 ? 's' : ''}` }}
       formulas={[
         'Murs : périmètre × hauteur − portes (1,7 m²) − fenêtres (1,5 m²).',
         'Litres = surface × couches / rendement. Plafond : rendement réduit de 1 m²/L (on charge plus le rouleau).',

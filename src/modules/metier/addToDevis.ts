@@ -64,3 +64,6 @@ export function addLinesToDevis(lines: QuoteLine[], opts: { mode: 'new' | 'last'
   s.upsertDevis(d);
   return d.id;
 }
+
+/** Prix unitaire effectif : la main d'œuvre sans prix prend le taux horaire de l'entreprise. */
+export const priceOf = (l: QuoteLine, rate = useBrix.getState().company.hourlyRate || 55) => (l.unit === 'h' && !l.unitPriceHt ? rate : l.unitPriceHt);

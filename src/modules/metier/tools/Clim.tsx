@@ -57,7 +57,7 @@ export default function Clim() {
           <Button size="sm" variant="ghost" icon={<Plus className="h-4 w-4" />} onClick={() => setRooms((rs) => [...rs, { id: uid('c'), name: `Pièce ${rs.length + 1}`, surface: 12, height: 2.5, insul: 35, sun: 1, people: 2 }])}>Ajouter une pièce</Button>
         </>
       }
-      hero={{ label: 'Puissance froid totale', value: `${n1(total / 1000)} kW`, sub: multi ? `Multisplit : unité extérieure d’environ ${n1(outdoor)} kW` : `Monosplit ${res[0] ? String(res[0].unit).replace('.', ',') : '–'} kW` }}
+      hero={{ label: 'Puissance froid totale', value: total / 1000, decimals: 1, unit: 'kW', sub: multi ? `Multisplit : unité extérieure d’environ ${n1(outdoor)} kW` : `Monosplit ${res[0] ? String(res[0].unit).replace('.', ',') : '–'} kW` }}
       formulas={[
         'Puissance froid = volume × coefficient (30 W/m³ bien isolé, 35 moyen, 42 peu isolé) × exposition (+15 % plein sud) + 100 W par personne au-delà de 2.',
         'On prend l’unité intérieure standard juste au-dessus. En multisplit, l’unité extérieure couvre environ 80 % de la somme (toutes les pièces ne tournent pas à fond en même temps).',

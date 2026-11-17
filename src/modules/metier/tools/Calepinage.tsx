@@ -51,7 +51,8 @@ export default function Calepinage() {
           </div>
         </>
       }
-      hero={{ label: 'Carreaux à commander', value: `${tiles} carreaux`, sub: `${boxes} cartons · ${n1(area)} m² + ${Math.round(waste * 100)} % de chutes` }}
+      hero={{ label: 'Carreaux à commander', value: tiles, unit: 'carreaux', sub: `${boxes} cartons · ${n1(area)} m² + ${Math.round(waste * 100)} % de chutes` }}
+      visual={<TilePreview L={L} W={W} tl={tl} tw={tw} edge={edgeCentered} />}
       formulas={[
         'Carreaux = surface × (1 + chutes) / surface d’un carreau. Chutes : 7 % en pose droite, 10 % décalée, 15 % en diagonale.',
         'Colle : 4 à 5 kg/m² en simple encollage ; double encollage au-delà de 30 × 30 cm (6 à 7 kg/m²).',
@@ -71,27 +72,62 @@ export default function Calepinage() {
       <ResultRow label="Joint" value={`${n1(jointKg)} kg`} sub={`${n2(jointKgM2)} kg/m²`} />
       {plinthes && <ResultRow label="Plinthes" value={`${n1(perim - 0.9)} m`} sub="périmètre moins une porte" />}
       <ResultRow label="Coupe en bordure (longueur)" value={`${n1(edgeCentered)} cm`} sub="de chaque côté, pose centrée" />
-      <TilePreview L={L} W={W} tl={tl} tw={tw} />
       {edge < tl / 3 && <div className="mt-2"><Note>Pose décalée d’un demi-carreau pour éviter des coupes de {n1(edge)} cm.</Note></div>}
     </ToolLayout>
   );
 }
 
-function TilePreview({ L, W, tl, tw }: { L: number; W: number; tl: number; tw: number }) {
-  const scale = 100;
-  const cols = Math.ceil((L * 100) / tl) + 1;
-  const rows = Math.ceil((W * 100) / tw) + 1;
-  if (cols * rows > 900) return null;
-  const offX = (((L * 100) % tl) / 2 - tl) / scale;
-  const offY = (((W * 100) % tw) / 2 - tw) / scale;
+function TilePreview({ L, W, tl, tw, edge }: { L: number; W: number; tl: number; tw: number; edge: number }) {
+  const Lc = L * 100;
+  const Wc = W * 100;
+  const cols = Math.ceil(Lc / tl) + 2;
+  const rows = Math.ceil(Wc / tw) + 2;
+  if (L <= 0 || W <= 0 || cols * rows > 1200) return null;
+  // Pose centrée : la première coupe vaut `edge` cm sur la longueur ; idem sur la largeur.
+  const fullY = Math.floor(Wc / tw);
+  let edgeY = (Wc - fullY * tw) / 2;
+  if (edgeY < tw / 3) edgeY = (Wc - (fullY - 1) * tw) / 2;
+  const x0 = edge - tl;
+  const y0 = edgeY - tw;
+  const pad = Math.max(Lc, Wc) * 0.04;
+  const tiles: { x: number; y: number; cut: boolean }[] = [];
+  for (let r = 0; r < rows; r++)
+    for (let c = 0; c < cols; c++) {
+      const x = x0 + c * tl;
+      const y = y0 + r * tw;
+      if (x >= Lc || y >= Wc || x + tl <= 0 || y + tw <= 0) continue;
+      tiles.push({ x, y, cut: x < 0 || y < 0 || x + tl > Lc + 0.01 || y + tw > Wc + 0.01 });
+    }
+  const cuts = tiles.filter((t) => t.cut).length;
   return (
-    <svg viewBox={`0 0 ${L} ${W}`} className="mt-3 w-full rounded-[10px] border border-line bg-white" style={{ maxHeight: 180 }}>
-      {Array.from({ length: rows + 1 }, (_, r) =>
-        Array.from({ length: cols + 1 }, (_, c) => (
-          <rect key={`${r}-${c}`} x={offX + (c * tl) / scale} y={offY + (r * tw) / scale} width={tl / scale} height={tw / scale} fill="#f5f0ff" stroke="#b9a2f5" strokeWidth={0.012} />
-        )),
-      )}
-      <rect x={0} y={0} width={L} height={W} fill="none" stroke="#17171f" strokeWidth={0.03} />
-    </svg>
+    <div>
+      <svg viewBox={`${-pad} ${-pad} ${Lc + pad * 2} ${Wc + pad * 2}`} className="w-full" style={{ maxHeight: 220 }} aria-label="Plan de calepinage">
+        <defs>
+          <clipPath id="room"><rect x={0} y={0} width={Lc} height={Wc} /></clipPath>
+        </defs>
+        <g clipPath="url(#room)">
+          {tiles.map((t, i) => (
+            <rect
+              key={`${Math.round(t.x)}-${Math.round(t.y)}`}
+              x={t.x}
+              y={t.y}
+              width={tl}
+              height={tw}
+              fill={t.cut ? '#fdecc8' : '#fff'}
+              stroke="#c9b98f"
+              strokeWidth={Math.max(Lc, Wc) / 500}
+              className="animate-[fade-in_.4s_ease_both]"
+              style={{ animationDelay: `${Math.min(i, 60) * 8}ms` }}
+            />
+          ))}
+        </g>
+        <rect x={0} y={0} width={Lc} height={Wc} fill="none" stroke="#15122a" strokeWidth={Math.max(Lc, Wc) / 160} />
+      </svg>
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px] text-ink-2">
+        <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] border border-[#c9b98f] bg-white" />Carreaux entiers</span>
+        <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px] border border-[#c9b98f] bg-[#fdecc8]" />{cuts} carreaux coupés</span>
+        <span className="ml-auto text-ink-3">Pose centrée, coupes égales</span>
+      </div>
+    </div>
   );
 }

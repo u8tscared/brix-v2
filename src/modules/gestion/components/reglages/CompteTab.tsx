@@ -25,7 +25,7 @@ export default function CompteTab() {
     <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1fr_1fr]">
       <Card className="p-4 md:p-5">
         <div className="flex items-center gap-3">
-          <Avatar initials={`${s.user.firstName[0] ?? ''}${s.user.lastName[0] ?? ''}`} color="#1F389D" size={48} />
+          <Avatar initials={`${s.user.firstName[0] ?? ''}${s.user.lastName[0] ?? ''}`} color="#130f26" size={48} />
           <div className="min-w-0">
             <div className="text-[16px] font-semibold">{s.user.firstName} {s.user.lastName}</div>
             <div className="truncate text-[13px] text-ink-2">{s.user.email}</div>

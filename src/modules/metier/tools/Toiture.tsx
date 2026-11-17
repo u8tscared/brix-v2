@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Choice, Note, NumField, ResultRow, n1 } from '../components/fields';
+import { RoofProfile } from '../components/diagrams';
 import { ToolLayout } from '../components/ToolLayout';
 
 // Valeurs moyennes du marché ; pente mini indicative en zone 1, rampant < 6,5 m (DTU série 40).
@@ -45,7 +46,8 @@ export default function Toiture() {
           <Choice label="Couverture" value={cover} onChange={setCover} options={COVERS.map((x) => ({ value: x.key, label: x.label }))} />
         </>
       }
-      hero={{ label: 'Surface de couverture', value: `${n1(area)} m²`, sub: `${tiles} ${cover === 'ardoise' ? 'ardoises' : 'tuiles'} avec 5 % de casse · rampant ${n1(rampant)} m` }}
+      hero={{ label: 'Surface de couverture', value: area, decimals: 1, unit: 'm²', sub: `${tiles} ${cover === 'ardoise' ? 'ardoises' : 'tuiles'} avec 5 % de casse · rampant ${n1(rampant)} m` }}
+      visual={<RoofProfile slopePct={slopePct} width={W} pans={shape} rampant={rampant} />}
       formulas={[
         'Surface rampante = surface au sol (débords compris) / cos(pente). La forme change le faîtage, pas la surface.',
         `Coefficient ici : 1 / cos(${n1((angle * 180) / Math.PI)}°) = ${factor.toFixed(3).replace('.', ',')}.`,
