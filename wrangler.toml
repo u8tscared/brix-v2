@@ -1,0 +1,25 @@
+# Worker Brix V2 : API + fichiers statiques de l'app.
+# Rien n'est déployé tant que Marceau n'a pas fourni son compte Cloudflare.
+name = "brix-v2"
+main = "worker/src/index.ts"
+compatibility_date = "2024-11-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[vars]
+APP_ORIGIN = "https://app.brix-app.fr"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "brix-v2-db"
+database_id = "A_REMPLIR_APRES_wrangler_d1_create"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "brix-v2-files"
+
+[triggers]
+crons = ["* * * * *"]
