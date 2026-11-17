@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tarifs · Brix</title>
+<meta name="description" content="Start gratuit pour toujours, Pro à 29,99 € par mois, Équipe à 69 € par mois pour 5 personnes. Prix HT, sans engagement, import et mise en route offerts. Comparez les offres fonction par fonction.">
+<meta name="theme-color" content="#6d28d9">
+<link rel="icon" href="logos/brix-icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="./src/styles/base.css">
+<link rel="stylesheet" href="./src/styles/layout.css">
+<link rel="stylesheet" href="./src/styles/home-1.css">
+<link rel="stylesheet" href="./src/styles/home-2.css">
+<link rel="stylesheet" href="./src/styles/home-3.css">
+<link rel="stylesheet" href="./src/styles/page.css">
+<link rel="stylesheet" href="./src/styles/tarifs.css">
+</head>
+<body data-nav="solid">
+<!--@icons-->
+<!--@include nav-->
+<main id="main">
+  <section class="ph pricing tf-top" aria-labelledby="pr-t">
+    <div class="wrap ph-in">
+      <div class="ptop">
+        <div>
+          <span class="eyebrow rv"><svg class="i" aria-hidden="true"><use href="#i-calculator"/></svg>Tarifs</span>
+          <h1 class="ph-t rv" id="pr-t">Quatre offres. <span class="grad">Pas de surprise.</span></h1>
+          <p class="sub rv">Prix hors taxes, sans engagement, sans frais d’installation. Commencez gratuitement, passez à l’offre du dessus le jour où vous en avez besoin.</p>
+        </div>
+        <div class="toggle rv" role="group" aria-label="Période de facturation"><span class="pill" data-pill></span><button type="button" data-bill="m" aria-pressed="true">Mensuel</button><button type="button" data-bill="a" aria-pressed="false">Annuel <em>2 mois offerts</em></button></div>
+      </div>
+      <h2 class="sr">Les quatre offres</h2>
+      <div class="plans" data-plans></div>
+
+      <div class="sim rv" aria-labelledby="sim-t">
+        <div class="sim-l">
+          <h2 class="h3" id="sim-t">Combien êtes-vous ?</h2>
+          <label class="sim-r"><span class="sr">Nombre d’utilisateurs</span><input type="range" min="1" max="60" value="1" data-sim></label>
+          <div class="sim-scale mono" aria-hidden="true"><span>1</span><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>60+</span></div>
+        </div>
+        <div class="sim-o">
+          <div><small>Utilisateurs</small><b class="num" data-sim-n>1</b></div>
+          <div><small>Offre conseillée</small><b data-sim-plan>Pro</b></div>
+          <div><small>Total par mois</small><b class="num" data-sim-total>29,99 €</b><span data-sim-per>soit 29,99 € par personne</span></div>
+        </div>
+      </div>
+
+      <h2 class="tf-sub rv" id="opt-t">Options et services</h2>
+      <div class="opts rv" aria-labelledby="opt-t">
+        <div class="opt"><svg class="i" aria-hidden="true"><use href="#i-plug-zap"/></svg><div><b>Brix AI MCP</b><span>Brix dans Claude, ChatGPT et les autres. 9 € par mois sur Pro, inclus dans Équipe.</span></div></div>
+        <div class="opt"><svg class="i" aria-hidden="true"><use href="#i-user-plus"/></svg><div><b>Utilisateur en plus</b><span>9 € par mois au-delà des 5 utilisateurs inclus dans Équipe.</span></div></div>
+        <div class="opt"><svg class="i" aria-hidden="true"><use href="#i-arrow-right-left"/></svg><div><b>Import et mise en route</b><span>Offerts. On reprend vos données et on règle Brix avec vous en visio.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap sec tf-cmp" id="detail" aria-labelledby="det-t">
+    <div class="sec-h">
+      <div><span class="eyebrow rv"><svg class="i" aria-hidden="true"><use href="#i-list-checks"/></svg>Le détail</span><h2 class="h2 rv" id="det-t">Fonction par fonction.</h2></div>
+      <p class="sub rv">Chaque offre reprend tout ce que contient celle d’avant. Une coche, c’est inclus, sans supplément.</p>
+    </div>
+    <div class="tf-legend rv" aria-hidden="true">
+      <span><i class="tf-y"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></i>Inclus</span>
+      <span><i class="tf-o">9 €</i>En option</span>
+      <span><i class="tf-s"><svg class="i" aria-hidden="true"><use href="#i-clock"/></svg></i>Bientôt</span>
+    </div>
+    <div class="tf-wrap rv"><table class="tf-t" data-tf></table></div>
+    <p class="fine tf-fine">Prix hors taxes. « Bientôt » signale une fonction en préparation : elle sera incluse dans l’offre indiquée dès sa sortie.</p>
+  </section>
+
+  <section class="tf-faq-sec" aria-labelledby="faq-t">
+    <div class="wrap sec faq">
+      <div><span class="eyebrow rv"><svg class="i" aria-hidden="true"><use href="#i-message-circle-question"/></svg>Facturation</span><h2 class="h2 rv" id="faq-t">Les questions d’argent.</h2><p class="sub rv">Une autre question ? Écrivez-nous à <a class="link" href="mailto:contact@brix-app.fr">contact@brix-app.fr</a>.</p></div>
+      <div class="qas" data-faq>
+        <div class="qa open"><h3><button aria-expanded="true">Start est vraiment gratuit ?<svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button></h3><div class="ans"><div><p>Oui, pour toujours et sans carte bancaire. Vous faites jusqu’à 5 devis et 5 factures par mois, avec la facture électronique conforme et la signature électronique. Pas de période d’essai qui se termine.</p></div></div></div>
+        <div class="qa"><h3><button aria-expanded="false">Comment marche l’abonnement annuel ?<svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button></h3><div class="ans"><div><p>Vous payez l’année en une fois et vous ne payez que 10 mois sur 12. Deux mois sont offerts. Le prix affiché dans le sélecteur « Annuel » est le coût ramené au mois.</p></div></div></div>
+        <div class="qa"><h3><button aria-expanded="false">Je peux arrêter quand je veux ?<svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button></h3><div class="ans"><div><p>Oui. Les offres sont sans engagement. Vous arrêtez depuis vos réglages, sans appeler personne. Vous pouvez aussi revenir sur Start gratuit pour garder l’accès à vos documents.</p></div></div></div>
+        <div class="qa"><h3><button aria-expanded="false">Je peux changer d’offre en cours de route ?<svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button></h3><div class="ans"><div><p>Oui, dans les deux sens et à tout moment. Vous embauchez, vous passez à Équipe. Vous revenez seul, vous repassez à Pro. Vos données restent en place.</p></div></div></div>
+        <div class="qa"><h3><button aria-expanded="false">Les prix sont HT ou TTC ?<svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button></h3><div class="ans"><div><p>Tous les prix sont hors taxes. La TVA s’ajoute sur la facture, et vous la récupérez comme pour vos autres achats professionnels.</p></div></div></div>
+        <div class="qa"><h3><button aria-expanded="false">Comment sont comptés les utilisateurs ?<svg class="i" aria-hidden="true"><use href="#i-plus"/></svg></button></h3><div class="ans"><div><p>Pro est prévu pour une personne. Équipe inclut 5 utilisateurs, puis chaque personne en plus coûte 9 € par mois. À partir de 50 personnes, l’offre Entreprise se fait sur devis.</p></div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final short">
+    <canvas class="mesh" aria-hidden="true"></canvas><div class="grain" aria-hidden="true"></div>
+    <div class="wrap">
+      <h2 class="h2" data-split>Commencez gratuitement. Payez quand ça vous sert.</h2>
+      <p class="sub rv">Start ne coûte rien et ne demande pas de carte. Passez à Pro ou Équipe le jour où vous en avez besoin.</p>
+      <div class="ctas rv"><a class="btn white lg mag" href="demarrer.html">Créer mon Brix gratuitement <svg class="i go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a><a class="btn glass lg mag" href="mailto:contact@brix-app.fr?subject=Brix%20Entreprise">Parler à un conseiller</a></div>
+    </div>
+  </section>
+</main>
+<!--@include footer-->
+<script type="module" src="./src/js/pages/tarifs.js"></script>
+</body>
+</html>

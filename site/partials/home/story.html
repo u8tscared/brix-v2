@@ -1,0 +1,64 @@
+<section id="parcours" aria-labelledby="story-t">
+  <div class="wrap sec">
+    <div class="head">
+      <div><span class="eyebrow rv"><svg class="i" aria-hidden="true"><use href="#i-route"/></svg>Du devis au paiement</span><h2 class="h2 rv" id="story-t">Une journée de bureau, <span class="grad">en cinq gestes.</span></h2></div>
+      <p class="sub rv">Ce qui vous prenait vos soirées se fait depuis le chantier, en quelques minutes. Faites défiler pour suivre un vrai devis jusqu’au compte en banque.</p>
+    </div>
+    <div class="story">
+      <div class="steps">
+        <div class="step on" data-step="0"><div class="n"><i></i>01 · Dictez</div><h3>Vous parlez, le devis s’écrit.</h3><p>Décrivez les travaux comme à votre client. Bob trouve les bonnes lignes dans 50 000 ouvrages et applique vos propres prix.</p></div>
+        <div class="step" data-step="1"><div class="n"><i></i>02 · Faites signer</div><h3>Signé avant de remonter dans le camion.</h3><p>Le client signe sur votre téléphone ou reçoit le devis par e-mail et SMS. L’acompte est demandé dans la foulée.</p></div>
+        <div class="step" data-step="2"><div class="n"><i></i>03 · Commandez</div><h3>Le matériel, au meilleur prix.</h3><p>La liste de matériel part chez vos fournisseurs habituels. Brix compare les réponses ligne par ligne et vous montre la meilleure offre.</p></div>
+        <div class="step" data-step="3"><div class="n"><i></i>04 · Facturez</div><h3>Le devis devient facture. Conforme.</h3><p>Un geste, et le devis signé devient une facture électronique au bon format, transmise et archivée.</p></div>
+        <div class="step" data-step="4"><div class="n"><i></i>05 · Encaissez</div><h3>Bob relance. Vous encaissez.</h3><p>Relances automatiques, paiement en ligne ou Tap to Pay, rapprochement bancaire. Les impayés oubliés, c’est fini.</p></div>
+      </div>
+      <div class="stagewrap"><div class="stage" id="stage" data-s="0">
+        <div class="scene on" data-scene="0"><div class="panel">
+          <div class="ph"><b>Nouveau devis</b><span class="mono">dictée en cours</span></div>
+          <div class="microw"><span class="micb"><svg class="i" aria-hidden="true"><use href="#i-mic"/></svg></span><div class="wave" id="wave"></div></div>
+          <p class="said"><span id="said"></span><span class="caret"></span></p>
+          <div class="ql"><span>Dépose ancienne baignoire</span><b>280,00 €</b></div>
+          <div class="ql"><span>Receveur extra-plat 90×140</span><b>640,00 €</b></div>
+          <div class="ql"><span>Paroi vitrée fixe 120 cm</span><b>520,00 €</b></div>
+          <div class="ql"><span>Main d’œuvre plomberie · 6 h</span><b>330,00 €</b></div>
+        </div></div>
+        <div class="scene" data-scene="1"><div class="panel">
+          <div class="ph"><b>Devis D-2026-143</b><span class="badge v">Envoyé</span></div>
+          <div class="doc"><div class="r"><span>Client</span><b>M. et Mme Petit</b></div><div class="r"><span>Chantier</span><b>Salle de bain · Nantes</b></div><div class="r"><span>Total TTC</span><b>1 947,00 €</b></div></div>
+          <div class="sign"><span class="stamp">Bon pour accord</span><svg viewBox="0 0 240 90" aria-hidden="true"><path d="M10 64c14-30 30-46 36-34s-14 40-4 36 22-46 32-40-4 32 6 30 16-24 24-20-2 18 8 16 12-14 22-12 6 10 16 8 22-8 34-6 24 0 40-4"/></svg></div>
+          <div class="sendrow"><span><svg class="i" aria-hidden="true"><use href="#i-send"/></svg>E-mail et SMS</span><span><svg class="i" aria-hidden="true"><use href="#i-wallet"/></svg>Acompte 30 % demandé</span></div>
+        </div></div>
+        <div class="scene" data-scene="2"><div class="panel">
+          <div class="ph"><b>Demande de prix</b><span class="badge v">3 réponses</span></div>
+          <p class="rfq-l">Receveur 90×140, paroi 120 cm, kit d’évacuation</p>
+          <div class="rfq">
+            <div class="rq"><span class="sup">Fournisseur A</span><span class="dl">J+2</span><b class="num" data-p="1184">1 184,00 €</b></div>
+            <div class="rq best"><span class="sup">Fournisseur B</span><span class="dl">J+1</span><b class="num" data-p="1062">1 062,00 €</b><span class="badge ok">Meilleure offre</span></div>
+            <div class="rq"><span class="sup">Fournisseur C</span><span class="dl">J+4</span><b class="num" data-p="1139">1 139,00 €</b></div>
+          </div>
+          <div class="sendrow"><span><svg class="i" aria-hidden="true"><use href="#i-truck"/></svg>Livraison sur chantier mercredi</span><span><svg class="i" aria-hidden="true"><use href="#i-piggy-bank"/></svg>122 € économisés</span></div>
+        </div></div>
+        <div class="scene" data-scene="3"><div class="panel">
+          <div class="ph"><b>Facture</b><span class="badge ok">Conforme</span></div>
+          <div class="flip"><s>D-2026-143</s><svg class="i" aria-hidden="true"><use href="#i-arrow-right"/></svg><b>F-2026-0319</b></div>
+          <div class="fx"><div><small>HT</small><b>1 770,00 €</b></div><div><small>TVA 10 %</small><b>177,00 €</b></div><div><small>TTC</small><b>1 947,00 €</b></div></div>
+          <div class="chk">
+            <div><span class="c"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Format Factur-X généré</div>
+            <div><span class="c"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Transmise via plateforme agréée</div>
+            <div><span class="c"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Archivée 10 ans</div>
+            <div><span class="c"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Envoyée à votre comptable</div>
+          </div>
+        </div></div>
+        <div class="scene" data-scene="4"><div class="panel">
+          <div class="ph"><b>Paiement</b><span class="badge ok">Payée</span></div>
+          <div class="big num"><span id="paid">1 947,00</span> €</div>
+          <div class="tl">
+            <div class="done"><span class="d"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg></span><div>Facture envoyée<br><span>M. et Mme Petit</span></div><em>02/11</em></div>
+            <div class="done"><span class="d"><svg class="i" aria-hidden="true"><use href="#i-bell-ring"/></svg></span><div>Relance automatique<br><span>Aucune action de votre part</span></div><em>09/11</em></div>
+            <div class="done"><span class="d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span><div>Paiement reçu<br><span>Rapproché avec votre banque</span></div><em>11/11</em></div>
+          </div>
+        </div></div>
+      </div></div>
+    </div>
+  </div>
+</section>

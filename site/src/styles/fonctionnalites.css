@@ -1,0 +1,65 @@
+/* ===== Page Fonctionnalités : recherche, filtres, barre des départements, sections ===== */
+
+/* ---------- Recherche + filtres ---------- */
+.fx-tools { padding-bottom: 8px }
+.fx-bar { display: flex; flex-direction: column; gap: 16px; padding: 14px; border-radius: 26px; background: #fff; box-shadow: 0 0 0 1px var(--line), 0 30px 60px -40px rgba(40, 10, 90, .35) }
+.fx-search { position: relative; display: flex; align-items: center }
+.fx-search > .i { position: absolute; left: 20px; width: 22px; height: 22px; color: var(--v); pointer-events: none }
+.fx-search input { width: 100%; height: 62px; border: 0; border-radius: 18px; background: var(--paper-2); padding: 0 60px 0 56px; font: inherit; font-size: 17px; color: var(--ink); outline: none; box-shadow: inset 0 0 0 1.5px transparent; transition: box-shadow .25s, background .25s; -webkit-appearance: none; appearance: none }
+.fx-search input::placeholder { color: var(--faint) }
+.fx-search input::-webkit-search-cancel-button { display: none }
+.fx-search input:focus { background: #fff; box-shadow: inset 0 0 0 1.5px var(--v2), 0 0 0 5px rgba(139, 92, 246, .14) }
+.fx-clear { position: absolute; right: 12px; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--mute); transition: background .2s }
+.fx-clear:hover { background: var(--paper-3); color: var(--ink) }
+.fx-clear[hidden] { display: none }
+.fx-chips { display: flex; flex-wrap: wrap; gap: 8px; padding-inline: 2px }
+.fx-chips .chip { height: 40px; padding: 0 16px; font-weight: 600 }
+.fx-chips .chip:nth-child(4) { margin-left: 10px; position: relative }
+.fx-chips .chip:nth-child(4)::before { content: ""; position: absolute; left: -10px; top: 9px; bottom: 9px; width: 1px; background: var(--line) }
+.fx-status { min-height: 24px; margin-top: 14px; font-size: 14px; color: var(--mute); font-weight: 500 }
+
+/* ---------- Barre des départements (collante) ---------- */
+.fx-body { position: relative }
+.fx-nav-wrap { position: sticky; top: calc(var(--nav-h) + 10px); z-index: 6; margin-top: 18px }
+.fx-nav .dtab { text-decoration: none }
+.fx-nav .dtab[aria-current="true"] { color: #fff }
+.fx-nav .dtab[hidden] { display: none }
+.fx-nav .dtab-pill { transition: transform .5s var(--ease), width .5s var(--ease), background .5s, opacity .3s }
+
+/* ---------- Sections de département ---------- */
+.fx-sec { padding-block: clamp(70px, 8vw, 110px) 0 }
+.fx-sec[hidden] { display: none }
+.fx-sec + .fx-sec { border-top: 1px solid var(--line); margin-top: clamp(70px, 8vw, 110px) }
+.fx-sec .dpanel { margin-top: 0; min-height: 0 }
+.fx-sec .dp-head { top: calc(var(--nav-h) + 110px) }
+.fx-sec .dp-head h2 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 3.6vw, 52px); line-height: 1; letter-spacing: -.045em; margin-top: 26px; text-wrap: balance }
+.fx-sec .dp-head h2 em { font-style: normal; color: var(--c) }
+.fx-sec .ft h3 { font-size: 16.5px; font-weight: 650; letter-spacing: -.01em; line-height: 1.3; margin-top: 4px }
+.fx-sec .ft[hidden] { display: none }
+.fx-sec mark { background: color-mix(in srgb, var(--c) 22%, #fff); color: inherit; border-radius: 4px; padding: 0 2px; margin: 0 -2px }
+
+/* ---------- État vide ---------- */
+.fx-empty { text-align: center; padding-block: 90px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px }
+.fx-empty[hidden] { display: none }
+.fx-empty-ic { width: 72px; height: 72px; border-radius: 24px; display: grid; place-items: center; background: var(--paper-3); color: var(--v) }
+.fx-empty-ic .i { width: 32px; height: 32px }
+.fx-empty p { color: var(--mute); line-height: 1.6; max-width: 52ch }
+.fx-empty .btn { margin-top: 8px }
+
+@media (max-width: 860px) {
+  .fx-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -14px; padding-inline: 14px; padding-bottom: 2px }
+  .fx-chips::-webkit-scrollbar { display: none }
+  .fx-chips .chip { flex: none }
+}
+@media (max-width: 560px) {
+  .fx-bar { padding: 10px; border-radius: 22px }
+  .fx-search input { height: 56px; font-size: 16px; padding-left: 50px }
+  .fx-search > .i { left: 17px }
+  .fx-chips { margin-inline: -10px; padding-inline: 10px }
+  .fx-nav-wrap { top: calc(var(--nav-h) + 4px) }
+  .fx-nav-wrap > .wrap { padding: 0 }
+  .fx-nav { border-radius: 0; padding-inline: 14px; box-shadow: 0 1px 0 var(--line) }
+  .fx-nav .dtab-pill { display: none }
+  .fx-nav .dtab[aria-current="true"] { background: var(--ink) }
+  .fx-sec { padding-top: 56px }
+}

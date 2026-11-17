@@ -1,0 +1,88 @@
+/* ===== Page Tarifs : en-tête offres, options, tableau fonction par fonction, FAQ ===== */
+.tf-top { background: linear-gradient(180deg, #fff, var(--paper-2) 420px) }
+.tf-top .ph-in { padding-bottom: clamp(70px, 9vw, 120px) }
+.tf-top .ptop .sub { max-width: 52ch }
+.tf-top .opts { margin-bottom: 0 }
+.tf-sub { font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: -.03em; margin-top: 56px }
+
+/* ---------- Tableau ---------- */
+.tf-cmp { padding-bottom: clamp(60px, 7vw, 100px) }
+.tf-legend { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 44px; font-size: 14px; color: var(--mute) }
+.tf-legend span { display: inline-flex; align-items: center; gap: 8px }
+.tf-wrap { margin-top: 18px; border-radius: var(--r-lg); box-shadow: 0 0 0 1px var(--line), 0 40px 80px -50px rgba(40, 10, 90, .35); background: #fff; overflow: clip }
+.tf-t { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-size: 15px }
+.tf-t col, .tf-t thead th:not(.tf-fc) { width: 15% }
+.tf-t th, .tf-t td { padding: 16px 14px; border-bottom: 1px solid var(--line); text-align: center; vertical-align: middle }
+.tf-t tbody tr:last-child > * { border-bottom: 0 }
+
+/* en-tête collant sous la navigation */
+.tf-t thead th { position: sticky; top: var(--nav-h); z-index: 3; background: rgba(255, 255, 255, .94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); padding-block: 18px; box-shadow: 0 1px 0 var(--line); border-bottom: 0 }
+.tf-t thead th b { display: block; font-family: var(--display); font-size: 21px; letter-spacing: -.03em; font-weight: 700 }
+.tf-t thead th.hi { background: rgba(245, 243, 255, .96) }
+.tf-t thead th.hi b { color: var(--v) }
+.tf-pr { display: block; margin-top: 2px; font-size: 13.5px; color: var(--mute); font-weight: 500; font-variant-numeric: tabular-nums }
+.tf-pr small { font-size: 12px; color: var(--faint) }
+.tf-sh { display: none }
+
+/* colonne Équipe mise en avant */
+.tf-t td.hi { background: linear-gradient(90deg, rgba(139, 92, 246, .045), rgba(217, 70, 239, .045)) }
+
+/* lignes de fonction */
+.tf-t tbody th { text-align: left; font-weight: 400 }
+.tf-t tbody th b { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-weight: 600; font-size: 15.5px; line-height: 1.35 }
+.tf-t tbody th > span { display: block; margin-top: 4px; color: var(--mute); font-size: 13.5px; line-height: 1.5; max-width: 62ch }
+.tf-t tbody tr:not(.tf-g):hover > * { background-color: var(--paper-2) }
+.tf-t tbody tr:not(.tf-g):hover > td.hi { background: linear-gradient(90deg, rgba(139, 92, 246, .08), rgba(217, 70, 239, .08)) }
+
+/* ligne de département */
+.tf-t .tf-g th { text-align: left; background: var(--paper-2); padding-block: 22px 14px; font-family: var(--display); font-size: 20px; font-weight: 700; letter-spacing: -.025em }
+.tf-t th > .tf-gi { display: inline-grid; max-width: none; margin-top: 0; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: #fff; vertical-align: -9px; margin-right: 12px }
+.tf-gi .i { width: 17px; height: 17px }
+.tf-g small { font-family: var(--body); font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--faint); margin-left: 12px }
+
+/* marques */
+.tf-y, .tf-s, .tf-n, .tf-o { display: inline-grid; place-items: center; vertical-align: middle }
+.tf-y { width: 28px; height: 28px; border-radius: 50%; background: var(--ok-bg); color: var(--ok) }
+.tf-y .i { width: 15px; height: 15px; stroke-width: 2.8 }
+.tf-s { width: 28px; height: 28px; border-radius: 50%; background: #f1f5f9; color: #64748b }
+.tf-s .i { width: 15px; height: 15px; stroke-width: 2.2 }
+.tf-n { width: 14px; height: 2px; border-radius: 2px; background: #dcd7ea }
+.tf-o { height: 26px; padding: 0 9px; border-radius: 999px; background: var(--warn-bg); color: var(--warn); font-size: 12px; font-weight: 700; white-space: nowrap; font-style: normal }
+.tf-txt { font-weight: 600; font-size: 14.5px; font-variant-numeric: tabular-nums }
+.tf-t td small { display: block; margin-top: 3px; font-size: 12px; color: var(--mute); line-height: 1.35 }
+.tf-legend i { font-style: normal }
+.tf-fine { margin-top: 16px }
+
+/* ---------- FAQ ---------- */
+.tf-faq-sec { background: var(--paper-2); border-radius: var(--r-xl); margin: 0 max(10px, env(safe-area-inset-left, 0px)) 10px }
+
+@media (max-width: 860px) {
+  .tf-t { font-size: 14px }
+  .tf-t th, .tf-t td { padding: 14px 8px }
+  .tf-t tbody th { padding-left: 16px }
+  .tf-t col, .tf-t thead th:not(.tf-fc) { width: 13% }
+  .tf-t thead th b { font-size: 17px }
+  .tf-pr small { display: none }
+}
+@media (max-width: 560px) {
+  .tf-wrap { border-radius: 20px; margin-inline: -8px }
+  .tf-t thead th:not(.tf-fc) { width: 54px }
+  .tf-t th, .tf-t td { padding: 13px 4px }
+  .tf-t tbody th, .tf-t thead th.tf-fc { padding-left: 14px; padding-right: 8px }
+  .tf-t thead th { padding-block: 14px }
+  .tf-t thead th b { font-size: 14px; letter-spacing: -.02em }
+  .tf-pr { font-size: 11px }
+  .tf-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+  .tf-sh { display: inline }
+  .tf-t tbody th b { font-size: 14px; gap: 4px 6px }
+  .tf-t tbody th > span { display: none }
+  .tf-t .badge { font-size: 10.5px; padding: 2px 7px }
+  .tf-y, .tf-s { width: 24px; height: 24px }
+  .tf-y .i, .tf-s .i { width: 13px; height: 13px }
+  .tf-o { font-size: 11px; padding: 0 6px; height: 22px }
+  .tf-txt { font-size: 11.5px; letter-spacing: -.01em }
+  .tf-t td small { font-size: 10.5px }
+  .tf-t .tf-g th { font-size: 17px; padding: 18px 14px 12px }
+  .tf-g small { display: block; margin: 4px 0 0 44px }
+  .tf-t th > .tf-gi { display: inline-grid; width: 30px; height: 30px; margin-right: 10px }
+}
