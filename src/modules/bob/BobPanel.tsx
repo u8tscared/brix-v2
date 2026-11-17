@@ -2,16 +2,24 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowUp, Keyboard, Mic, RotateCcw, Settings2, X } from 'lucide-react';
-import { Badge, cn, toast } from '@/components/ui';
+import { Badge, IconTile, cn, toast } from '@/components/ui';
+import type { DepartmentKey } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import { useUI } from '@/lib/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { useChat } from './chat';
 import { contextualSuggestions, type BobCardAction } from './engine';
 import { useBobLocal } from './store';
+import { devisExample } from './tradeExamples';
 import { speak, stopSpeaking, useSpeech } from './useSpeech';
 import { ChatThread, Suggestions } from './components/ChatThread';
 import { BobMark, VoiceOrb } from './components/VoiceOrb';
+
+const QUICK: { label: string; icon: string; dept: DepartmentKey; ask: (s: string[]) => string }[] = [
+  { label: 'Faire un devis', icon: 'FileText', dept: 'vendre', ask: () => devisExample(useBrix.getState().company.trade) },
+  { label: 'Relancer les retards', icon: 'BellRing', dept: 'facturer', ask: () => 'Qui est en retard de paiement ?' },
+  { label: 'Mon planning', icon: 'CalendarRange', dept: 'equipe', ask: () => 'Qu’est-ce que j’ai demain ?' },
+];
 
 /** Panneau de conversation avec Bob : feuille à droite sur ordinateur, plein écran sur téléphone. */
 export default function BobPanel() {
@@ -97,7 +105,7 @@ export default function BobPanel() {
         className="absolute inset-0 flex animate-[fade-up_.28s_cubic-bezier(.2,.8,.2,1)_both] flex-col bg-page md:inset-y-2 md:left-auto md:right-2 md:w-[460px] md:rounded-[18px] md:bg-[#f8f7fc] md:shadow-pop"
       >
         <header className="flex items-center gap-2.5 border-b border-line px-4 pb-3 pt-[calc(12px+var(--safe-t))] md:pt-3">
-          <BobMark size={34} />
+          <BobMark size={34} active={speech.listening || chat.thinking} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-display text-[16px] font-semibold">Bob</span>
@@ -120,17 +128,26 @@ export default function BobPanel() {
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
           {empty && !voice && (
-            <div className="pt-4">
-              <BobMark size={44} />
-              <h2 className="mt-4 text-[22px] font-semibold leading-tight">Salut {firstName || 'toi'}, je fais quoi pour toi ?</h2>
-              <p className="mt-1.5 text-[13.5px] text-ink-2">Parle-moi comme à un collègue. Je fais les devis, je relance, je regarde le planning et je réponds à tes questions de métier.</p>
+            <div className="animate-fade-in pt-3">
+              <BobMark size={48} />
+              <h2 className="mt-4 text-[22px] font-semibold leading-tight tracking-[-0.03em]">Salut {firstName || 'toi'}, je fais quoi pour toi ?</h2>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-2">Parle-moi comme à un collègue. Je prépare, tu valides : rien ne part sans ton accord.</p>
+              <div className="stagger-fast mt-5 grid grid-cols-3 gap-2">
+                {QUICK.map((q) => (
+                  <button key={q.label} onClick={() => send(q.ask(suggestions))} className="lift flex min-h-[84px] flex-col items-start justify-between rounded-[14px] bg-white p-3 text-left shadow-card">
+                    <IconTile name={q.icon} dept={q.dept} size="sm" />
+                    <span className="text-[12.5px] font-semibold leading-tight">{q.label}</span>
+                  </button>
+                ))}
+              </div>
               <div className="mt-5 text-[11.5px] font-medium uppercase tracking-wide text-ink-3">Essaie</div>
               <Suggestions items={suggestions} onPick={send} className="mt-2" />
             </div>
           )}
           {empty && voice && (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <h2 className="text-[22px] font-semibold">{speech.listening ? 'Je t’écoute' : `Dis-moi, ${firstName || 'chef'}`}</h2>
+              <BobMark size={44} active={speech.listening} />
+              <h2 className="mt-4 text-[22px] font-semibold tracking-[-0.03em]">{speech.listening ? 'Je t’écoute' : `Dis-moi, ${firstName || 'chef'}`}</h2>
               <p className="mt-1 max-w-xs text-[13.5px] text-ink-2">Par exemple : « {suggestions[0]} »</p>
             </div>
           )}

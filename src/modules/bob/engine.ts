@@ -9,6 +9,7 @@ import { addToLastDraft, createClient, createDevis } from './nlu/create';
 import { cash, cashIn, late, margin, pendingQuotes, remind } from './nlu/money';
 import { agenda, assign, chantierStatus } from './nlu/planning';
 import { norm } from './nlu/text';
+import { devisExample, normExample } from './tradeExamples';
 import type { BobReply, EngineContext } from './nlu/types';
 
 export type { BobReply, BobCard, BobCardAction, BobCardRow, EngineContext } from './nlu/types';
@@ -25,8 +26,11 @@ const NAV: [RegExp, string, string][] = [
   [/brief/, '/app/bob/brief', 'le brief du matin'],
 ];
 
-export const CAPABILITIES = [
-  { icon: 'FileText', title: 'Faire un devis', example: 'Fais un devis pour Mme Martin, 3 prises et un radiateur' },
+const trade = () => useBrix.getState().company.trade;
+
+/** Ce que Bob sait faire, avec des exemples dans les mots du métier. */
+export const capabilities = () => [
+  { icon: 'FileText', title: 'Faire un devis', example: devisExample(trade()) },
   { icon: 'Wallet', title: 'Suivre l’argent', example: 'Combien j’ai encaissé ce mois ?' },
   { icon: 'BellRing', title: 'Relancer les retards', example: 'Qui est en retard de paiement ?' },
   { icon: 'CalendarRange', title: 'Lire ton planning', example: 'Qu’est-ce que j’ai demain ?' },
@@ -35,27 +39,29 @@ export const CAPABILITIES = [
   { icon: 'Contact', title: 'Créer un client', example: 'Crée un client Sarah Kaci, 06 51 23 98 70' },
   { icon: 'Calculator', title: 'Calculer ta marge', example: 'Quelle est ma marge sur les devis signés ?' },
   { icon: 'Landmark', title: 'Voir ta trésorerie', example: 'Combien j’ai en banque ?' },
-  { icon: 'ShieldCheck', title: 'Expliquer les normes', example: 'Explique-moi la NF C 15-100 pour une cuisine' },
+  { icon: 'ShieldCheck', title: 'Expliquer les règles', example: normExample(trade()) },
 ];
 
 /** Suggestions selon la page ouverte. */
 export function contextualSuggestions(pathname: string): string[] {
   const p = pathname.replace(/^\/app\/?/, '');
-  if (p.startsWith('devis')) return ['Fais un devis pour Mme Martin, 3 prises et un radiateur', 'Quels devis attendent une signature ?', 'Quelle est ma marge sur les devis signés ?'];
+  const dv = devisExample(trade());
+  const nm = normExample(trade());
+  if (p.startsWith('devis')) return [dv, 'Quels devis attendent une signature ?', 'Quelle est ma marge sur les devis signés ?'];
   if (p.startsWith('factures') || p.startsWith('relances') || p.startsWith('paiements')) return ['Qui est en retard de paiement ?', 'Combien j’ai encaissé ce mois ?', 'Explique-moi la facture électronique'];
   if (p.startsWith('tresorerie') || p.startsWith('compta')) return ['Combien j’ai en banque ?', 'Combien j’ai encaissé ce mois ?', 'Qui est en retard de paiement ?'];
   if (p.startsWith('chantiers')) return ['Où en est le chantier Lefèvre ?', 'Quelle marge sur les chantiers en cours ?', 'Ajoute Yanis sur le chantier Dupuis jeudi'];
   if (p.startsWith('planning') || p.startsWith('equipe') || p.startsWith('pointage')) return ['Qu’est-ce que j’ai demain ?', 'Qui fait quoi aujourd’hui ?', 'Ajoute Yanis sur le chantier Dupuis jeudi'];
-  if (p.startsWith('clients') || p.startsWith('demandes')) return ['Crée un client', 'Fais un devis pour Sarah Kaci, 4 prises et un radiateur', 'Qui est en retard de paiement ?'];
-  if (p.startsWith('outils')) return ['Explique-moi la NF C 15-100 pour une cuisine', 'Quelles règles pour une borne IRVE ?', 'Quel taux de TVA pour une rénovation ?'];
-  return ['Qu’est-ce que j’ai demain ?', 'Combien j’ai encaissé ce mois ?', 'Fais un devis pour Mme Martin, 3 prises et un radiateur'];
+  if (p.startsWith('clients') || p.startsWith('demandes')) return ['Crée un client', dv.replace('Mme Martin', 'Sarah Kaci'), 'Qui est en retard de paiement ?'];
+  if (p.startsWith('outils')) return trade() === 'electricien' || !trade() ? [nm, 'Quelles règles pour une borne IRVE ?', 'Quel taux de TVA pour une rénovation ?'] : [nm, 'Explique-moi la facture électronique', 'Combien j’ai en banque ?'];
+  return ['Qu’est-ce que j’ai demain ?', 'Combien j’ai encaissé ce mois ?', dv];
 }
 
 function help(): BobReply {
   return {
     text: 'Je peux faire tout ça pour toi. Parle normalement, comme à un collègue.',
-    cards: [{ kind: 'info', icon: 'AudioLines', title: 'Ce que je sais faire', rows: CAPABILITIES.map((c) => ({ label: c.title, sub: `« ${c.example} »` })) }],
-    suggestions: CAPABILITIES.slice(0, 3).map((c) => c.example),
+    cards: [{ kind: 'info', icon: 'AudioLines', title: 'Ce que je sais faire', rows: capabilities().map((c) => ({ label: c.title, sub: `« ${c.example} »` })) }],
+    suggestions: capabilities().slice(0, 3).map((c) => c.example),
   };
 }
 

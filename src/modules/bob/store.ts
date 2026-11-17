@@ -4,6 +4,8 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { useBrix } from '@/lib/store';
+import { voiceFor } from '@/lib/demoTrades';
 
 export type MemoryKind = 'prix' | 'formulation' | 'habitude';
 export interface BobMemory {
@@ -49,6 +51,8 @@ export interface BobLocalState {
   secretary: SecretarySettings;
   callsDone: Record<string, boolean>;
   mcp: { token: string | null; createdAt: string | null; perms: Record<string, McpPerm>; mcpAddon: boolean };
+  /** Entreprise et métier pour lesquels mémoire et accueil ont été préparés. */
+  seededFor?: string;
 
   addMemory: (m: Omit<BobMemory, 'id'>) => void;
   updateMemory: (id: string, patch: Partial<BobMemory>) => void;
@@ -65,6 +69,25 @@ export interface BobLocalState {
 }
 
 const rid = () => Math.random().toString(36).slice(2, 9);
+
+const fr = (n: number) => n.toLocaleString('fr-FR', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+
+/** Mémoire de départ dans les mots du métier de l'entreprise. */
+export function memoryFor(trade: string | undefined, company: { name: string; hourlyRate?: number }, firstName: string): BobMemory[] {
+  const v = voiceFor(trade);
+  const items: BobMemory[] = v.memory.map(([kind, label, value], i) => ({ id: `m${i + 1}`, kind, label, value, learnedFrom: kind === 'prix' ? `${[18, 6, 9][i] ?? 5} devis` : `${[9, 14, 7][i] ?? 6} devis` }));
+  const n = items.length;
+  items.splice(Math.min(2, n), 0, { id: 'm_taux', kind: 'prix', label: 'Ton taux horaire', value: `${fr(company.hourlyRate || 55)} € HT de l’heure`, learnedFrom: 'tes réglages' });
+  items.push(
+    { id: 'm_acompte', kind: 'habitude', label: 'Acompte', value: '30 % à la signature, 40 % pour les pros', learnedFrom: '24 devis' },
+    { id: 'm_relance', kind: 'formulation', label: 'Relance polie', value: '« Petit rappel amical : la facture … reste à régler. Si c’est déjà fait, merci et ignorez ce message. »', learnedFrom: '12 relances' },
+    { id: 'm_fin', kind: 'formulation', label: 'Fin de mail', value: `« Bien à vous, ${firstName || 'l’équipe'}, ${company.name} »`, learnedFrom: 'tes mails' },
+  );
+  return items;
+}
+
+export const greetingFor = (companyName: string, firstName: string) =>
+  `Bonjour, vous êtes bien chez ${companyName}. ${firstName || 'Le patron'} est sur un chantier, je suis Bob, son assistant. Dites-moi ce dont vous avez besoin, je lui transmets tout de suite.`;
 
 export const DEFAULT_MEMORY: BobMemory[] = [
   { id: 'm1', kind: 'prix', label: 'Prise 2P+T posée', value: '24,50 € HT la prise + 0,5 h de pose', learnedFrom: '18 devis' },
@@ -150,3 +173,21 @@ export const useBobLocal = create<BobLocalState>()(
     },
   ),
 );
+
+/** Quand l'entreprise ou le métier change (démo, inscription), Bob repart avec une mémoire et un accueil à jour. */
+function syncWithCompany() {
+  const { company, user } = useBrix.getState();
+  const key = `${company.trade}|${company.name}|${user.firstName}`;
+  if (useBobLocal.getState().seededFor === key) return;
+  useBobLocal.setState((s) => ({
+    seededFor: key,
+    memory: memoryFor(company.trade, company, user.firstName),
+    secretary: { ...s.secretary, greeting: greetingFor(company.name, user.firstName) },
+    callsDone: {},
+    nightDecisions: {},
+  }));
+}
+syncWithCompany();
+useBrix.subscribe((s, prev) => {
+  if (s.company.trade !== prev.company.trade || s.company.name !== prev.company.name || s.user.firstName !== prev.user.firstName) syncWithCompany();
+});
