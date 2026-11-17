@@ -1,3 +1,5 @@
+import { ExternalLink } from 'lucide-react';
+import { lienPublic } from '@/parcours/liens';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BadgeCheck, Eye, FileText, PenLine } from 'lucide-react';
@@ -54,6 +56,9 @@ export function DemoStrip({ d, onOpen, onSign, onConvert, className }: { d: Devi
         </Button>
         <Button size="sm" variant="primary" className="max-md:h-10" loading={busy === 'sign'} icon={<PenLine className="h-3.5 w-3.5" />} onClick={() => run('sign', onSign)}>
           Simuler la signature
+        </Button>
+        <Button size="sm" className="col-span-2 max-md:h-10" icon={<ExternalLink className="h-3.5 w-3.5" />} onClick={() => window.open(lienPublic('devis', d.id), '_blank')}>
+          Signer comme le client
         </Button>
       </div>
     </div>

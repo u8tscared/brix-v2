@@ -5,6 +5,7 @@
 
 import { useBrix } from '@/lib/store';
 import type { Devis } from '@/lib/types';
+import { envoyerDevis } from '@/parcours/signature';
 import { sendForSignature, type SendOptions } from './service';
 import { useDevisMeta, type Channel } from './store';
 
@@ -32,6 +33,9 @@ export async function sendDevis(devisId: string, input: SendDevisInput): Promise
 
   // ── À rebrancher : `await envoyerDevis({ devis: d, to: input.to, subject, message, pdf })` ──
   const res = await sendForSignature(d, { channel: input.channel, to: input.to, message: input.message, variants, payment });
+  // Parcours client réel : e-mail dans la boîte de démo (#/boite) et lien public de signature (#/d/<id>).
+  const envoi = envoyerDevis(devisId, { a: input.to, message: input.message, canal: input.channel });
+  if (envoi?.lien) res.link = envoi.lien;
 
   const cur = useBrix.getState().devis.find((x) => x.id === devisId) ?? d;
   const status: Devis['status'] = cur.status === 'brouillon' || cur.status === 'refuse' || cur.status === 'expire' ? 'envoye' : cur.status;

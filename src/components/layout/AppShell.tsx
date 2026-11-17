@@ -12,6 +12,7 @@ import { Sidebar } from './Sidebar';
 import { useMediaQuery } from './useMediaQuery';
 import { GuidedTour } from './GuidedTour';
 import { TopBar } from './TopBar';
+import { NotificationBell } from '@/modules/notifications';
 
 export function PageLoader() {
   return (
@@ -65,10 +66,7 @@ export default function AppShell() {
             <button onClick={() => ui.set({ palette: true })} className="grid h-10 w-10 place-items-center rounded-full bg-white text-ink-2 shadow-card active:scale-95" aria-label="Rechercher">
               <Search className="h-[18px] w-[18px]" />
             </button>
-            <button onClick={() => navigate('/app/bob/brief')} className="relative grid h-10 w-10 place-items-center rounded-full bg-white text-ink-2 shadow-card active:scale-95" aria-label="Notifications">
-              <Bell className="h-[18px] w-[18px]" />
-              <i className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-mag ring-2 ring-white" />
-            </button>
+            <NotificationBell variant="mobile" />
             <button onClick={() => navigate('/app/reglages')} aria-label="Mon compte" className="active:scale-95">
               <Avatar initials={`${s.user.firstName[0] ?? ''}${s.user.lastName[0] ?? ''}`} color="#e9e4fb" fg="#4c1d95" size={38} />
             </button>

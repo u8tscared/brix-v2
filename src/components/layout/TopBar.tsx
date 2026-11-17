@@ -5,6 +5,7 @@ import { DEPT_TONE, IconTile, Kbd, cn } from '@/components/ui';
 import { DEPARTMENTS, MODULES } from '@/lib/catalog';
 import { useUI } from '@/lib/ui';
 import { usePresence } from '@/components/motion';
+import { NotificationBell } from '@/modules/notifications';
 
 /** Fil d'Ariane déduit de l'adresse : Département › Module › fiche. */
 export function useCrumbs() {
@@ -134,12 +135,7 @@ export function TopBar({ notifications }: { notifications?: React.ReactNode }) {
           <Kbd>⌘K</Kbd>
         </span>
       </button>
-      {notifications ?? (
-        <button onClick={() => navigate('/app/bob/brief')} className="group relative grid h-9 w-9 place-items-center rounded-[10px] bg-white text-ink-2 shadow-card transition hover:text-ink hover:shadow-raise" aria-label="Notifications">
-          <Bell className="h-4 w-4 group-hover:animate-wiggle" />
-          <i className="absolute right-2 top-2 h-2 w-2 rounded-full bg-mag ring-2 ring-white" />
-        </button>
-      )}
+      {notifications ?? <NotificationBell />}
       <QuickCreate />
     </header>
   );

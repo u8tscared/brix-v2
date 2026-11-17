@@ -1,3 +1,4 @@
+import { relancerDevis } from '@/parcours/signature';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, FileText, Phone, Plus, Search } from 'lucide-react';
@@ -76,6 +77,7 @@ export default function DevisList() {
     setBusy(d.id);
     await remindClient(d, client, meta.channel);
     patch(d.id, { reminders: meta.reminders + 1, lastReminderAt: new Date().toISOString() });
+    relancerDevis(d.id, meta.reminders + 1);
     log(d.id, `Relance envoyée par ${meta.channel === 'email' ? 'e-mail' : meta.channel === 'sms' ? 'SMS' : 'WhatsApp'}`, 'me');
     setBusy(null);
     toast(`Relance envoyée à ${client?.name ?? 'votre client'}`);
