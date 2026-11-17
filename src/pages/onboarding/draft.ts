@@ -41,10 +41,12 @@ export const PRET = STEPS.length; // index de l'écran final
 /** Offre conseillée : la plus haute exigée par les outils cochés, Entreprise à partir de 50 personnes. */
 export function recommendedPlan(d: Draft): Plan {
   if (d.size === 'grande') return 'entreprise';
-  return d.enabled.reduce<Plan>((acc, k) => {
-    const need = MODULE_BY_KEY[k]?.plan ?? 'start';
-    return PLAN_ORDER.indexOf(need) > PLAN_ORDER.indexOf(acc) ? need : acc;
+  const need = d.enabled.reduce<Plan>((acc, k) => {
+    const p = MODULE_BY_KEY[k]?.plan ?? 'start';
+    return PLAN_ORDER.indexOf(p) > PLAN_ORDER.indexOf(acc) ? p : acc;
   }, 'start');
+  // Seul, on ne conseille jamais plus que Pro : les outils Équipe restent proposés en option.
+  return d.size === 'solo' && need === 'equipe' ? 'pro' : need;
 }
 
 export const emailOk = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e.trim());

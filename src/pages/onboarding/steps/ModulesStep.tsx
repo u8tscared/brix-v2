@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Lock, RotateCcw } from 'lucide-react';
-import { DEPARTMENTS, MODULES, OFFERS, sizeAtLeast, type ModuleKey } from '@/lib/catalog';
+import { DEPARTMENTS, MODULES, OFFERS, planIncludes, sizeAtLeast, type ModuleKey } from '@/lib/catalog';
 import { recommendedPlan } from '@/pages/onboarding/draft';
 import { DEPT_ICON, Tile, TONE } from '@/pages/onboarding/icons';
 import { CountUp, StepHeader, Toggle } from '@/pages/onboarding/ui';
@@ -63,6 +63,7 @@ export function ModulesStep({ d, set, touched, onReset }: StepProps & { touched:
                         <span className="flex flex-wrap items-center gap-1.5 text-[14px] font-semibold tracking-[-0.01em]">
                           {m.name}
                           {m.isNew && <span className="rounded-md bg-[#f4f3fa] px-1.5 py-0.5 text-[10.5px] font-medium text-[#5f5f70]">Nouveau</span>}
+                          {!planIncludes(plan, m.plan) && <span className="rounded-md bg-[#fff1e7] px-1.5 py-0.5 text-[10.5px] font-medium text-[#c2410c]">Offre {OFFERS.find((o) => o.key === m.plan)!.name}</span>}
                         </span>
                         <span className="mt-0.5 block text-[12.5px] leading-snug text-[#9898a8]">{fits ? m.short : 'Utile à partir de 2 personnes.'}</span>
                       </span>
