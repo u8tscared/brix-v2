@@ -11,3 +11,12 @@ export const KIND_STYLE: Record<PlanningEvent['kind'], { label: string; block: s
 };
 
 export const KINDS = Object.keys(KIND_STYLE) as PlanningEvent['kind'][];
+
+/** Teinte d'une personne : on reconnaît qui fait quoi d'un coup d'œil. Absence = hachures neutres. */
+export function personTone(color: string, kind: PlanningEvent['kind']) {
+  if (kind === 'absence') {
+    return { background: 'repeating-linear-gradient(135deg,#f4f3f8 0 6px,#ecebf2 6px 12px)', borderLeft: '3px solid #cfcbdd', color: '#5d5a72' };
+  }
+  const c = /^#1[0-9a-f]{5}$/i.test(color) ? '#3d3758' : color;
+  return { background: `${c}14`, borderLeft: `3px solid ${c}`, color: '#15122a', boxShadow: `inset 0 0 0 1px ${c}22` };
+}

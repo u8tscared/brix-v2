@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { AlertTriangle, ChevronLeft, ChevronRight, CloudRain, Plus, Route, X } from 'lucide-react';
-import { Button, Card, PageHeader, cn, toast } from '@/components/ui';
+import { Button, Card, IconTile, PageHeader, toast } from '@/components/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { useBrix } from '@/lib/store';
 import { dateShort, todayISO } from '@/lib/format';
@@ -67,8 +67,9 @@ export default function Planning() {
   return (
     <div className="space-y-4">
       <PageHeader
+        icon={<IconTile name="CalendarRange" dept="chantiers" size="lg" />}
         title="Planning"
-        subtitle={solo ? 'Votre semaine, avec la météo.' : `${people.length} personnes · ${weekEvents.length} créneaux cette semaine`}
+        subtitle={solo ? 'Votre semaine, avec la météo.' : `${people.length} personnes, ${weekEvents.length} créneaux cette semaine`}
         actions={
           <>
             {!solo && (
@@ -84,7 +85,7 @@ export default function Planning() {
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center rounded-[10px] border border-line bg-white">
+        <div className="flex items-center rounded-[12px] bg-white shadow-card">
           <button onClick={() => goWeek(week - 1)} className="grid h-10 w-10 place-items-center text-ink-2 hover:text-ink" aria-label="Semaine précédente"><ChevronLeft className="h-4 w-4" /></button>
           <span className="num min-w-[150px] text-center text-[13.5px] font-medium">Du {range}</span>
           <button onClick={() => goWeek(week + 1)} className="grid h-10 w-10 place-items-center text-ink-2 hover:text-ink" aria-label="Semaine suivante"><ChevronRight className="h-4 w-4" /></button>
@@ -97,8 +98,12 @@ export default function Planning() {
         )}
         <div className="flex-1" />
         <div className="hidden flex-wrap items-center gap-3 text-xs text-ink-2 lg:flex">
-          {KINDS.map((k) => (
-            <span key={k} className="flex items-center gap-1.5"><i className={cn('h-2 w-2 rounded-full', KIND_STYLE[k].bar)} />{KIND_STYLE[k].label}</span>
+          {people.map((p) => (
+            <span key={p.id} className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px]" style={{ background: p.color === '#17171f' ? '#3d3758' : p.color }} />{p.firstName}</span>
+          ))}
+          <i className="mx-1 h-4 w-px bg-line2" />
+          {KINDS.filter((k) => k !== 'chantier' && k !== 'absence').map((k) => (
+            <span key={k} className="flex items-center gap-1.5"><i className="h-1.5 w-1.5 rounded-full" style={{ background: KIND_STYLE[k].dot }} />{KIND_STYLE[k].label}</span>
           ))}
         </div>
       </div>
