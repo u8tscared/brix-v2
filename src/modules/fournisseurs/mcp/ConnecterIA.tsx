@@ -86,25 +86,28 @@ function CreerAcces({ open, onClose }: { open: boolean; onClose: () => void }) {
               <div className="mt-0.5 text-[12.5px]">Elle sert de clé : gardez-la pour vous. Si vous la perdez, créez simplement un nouvel accès.</div>
             </div>
           </div>
-          <button className="text-[12.5px] font-medium text-ink-2 underline-offset-2 hover:underline" onClick={() => setCopie(true)}>Je l’ai copiée autrement</button>
+          <button className="min-h-10 text-[12.5px] font-medium text-ink-2 underline-offset-2 hover:underline" onClick={() => setCopie(true)}>Je l’ai copiée autrement</button>
         </div>
       )}
     </Sheet>
   );
 }
 
-export default function ConnecterIA() {
+/** `embedded` : affiché dans un onglet d'une page qui a déjà son titre (Bob › Brix AI MCP). */
+export default function ConnecterIA({ embedded = false }: { embedded?: boolean }) {
   const { jetons, revoquerJeton } = useAchats();
   const [ouvrir, setOuvrir] = useState(false);
   const [aRevoquer, setARevoquer] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
-      <PageHeader
+      {embedded ? (
+        <div className="flex justify-end"><Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setOuvrir(true)}>Créer un accès</Button></div>
+      ) : <PageHeader
         title="Connecter une IA à Brix"
         subtitle="Posez vos questions à Claude, ChatGPT ou un autre assistant : il lit vos chiffres dans Brix et vous répond avec vos vraies données."
         actions={<Button variant="dawn" icon={<Plus className="h-4 w-4" />} onClick={() => setOuvrir(true)}>Créer un accès</Button>}
-      />
+      />}
 
       <Card className="p-5 md:p-6">
         <ol className="grid gap-5 md:grid-cols-3 md:gap-6">
@@ -124,7 +127,7 @@ export default function ConnecterIA() {
         </ol>
       </Card>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
           <CardHeader title="Vos accès" meta={jetons.length ? `${jetons.length}` : undefined} icon={<KeyRound className="h-4 w-4 text-ink-3" />} />
           {jetons.length === 0 ? (
@@ -145,11 +148,11 @@ export default function ConnecterIA() {
                 </div>
                 {aRevoquer === j.id ? (
                   <div className="flex shrink-0 gap-1">
-                    <Button size="sm" variant="ghost" onClick={() => setARevoquer(null)}>Garder</Button>
-                    <Button size="sm" variant="danger" onClick={() => { revoquerJeton(j.id); setARevoquer(null); toast('Accès coupé : l’assistant ne peut plus rien lire', 'info'); }}>Couper</Button>
+                    <Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => setARevoquer(null)}>Garder</Button>
+                    <Button size="sm" variant="danger" className="max-md:h-10" onClick={() => { revoquerJeton(j.id); setARevoquer(null); toast('Accès coupé : l’assistant ne peut plus rien lire', 'info'); }}>Couper</Button>
                   </div>
                 ) : (
-                  <Button size="sm" variant="ghost" onClick={() => setARevoquer(j.id)}>Révoquer</Button>
+                  <Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => setARevoquer(j.id)}>Révoquer</Button>
                 )}
               </div>
             ))
@@ -169,8 +172,8 @@ export default function ConnecterIA() {
           <div className="mt-5 text-[12.5px] font-medium text-ink-2">Essayez par exemple</div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {QUESTIONS.map((q) => (
-              <button key={q} onClick={() => void copier(q, 'Question copiée')} className="min-h-9 rounded-full border border-line2 bg-white px-3 py-1.5 text-left text-[12.5px] text-ink transition hover:bg-sub" title="Copier la question">
-                « {q} »
+              <button key={q} onClick={() => void copier(q, 'Question copiée')} className="min-h-10 rounded-full border border-line2 bg-white px-3 py-1.5 text-left text-[12.5px] text-ink transition hover:bg-sub" title="Copier la question">
+                {`«\u00a0${q.replace(' ?', '\u00a0?')}\u00a0»`}
               </button>
             ))}
           </div>

@@ -10,7 +10,7 @@ import { extraireBesoins } from './besoins';
 import { prixConnu } from './catalogue';
 import { canalEffectif } from './connecteurs/registre';
 import { genererOrders } from './connecteurs/edifact';
-import { comparatifDemande, jeton, majStatutDemande, urlPortail, type Ctx, type LigneSaisie } from './demandes';
+import { comparatifDemande, entierOuNull, jeton, majStatutDemande, urlPortail, type Ctx, type LigneSaisie } from './demandes';
 import {
   all,
   commandeOuErreur,
@@ -46,8 +46,16 @@ export interface CreerCommandeInput {
 
 export async function creerCommande(env: Env, ctx: Ctx, input: CreerCommandeInput): Promise<Commande> {
   const f = await fournisseurOuErreur(env, ctx.organizationId, input.fournisseur_id);
-  const lignes = (input.lignes ?? []).filter((l) => l.designation?.trim() && Number(l.quantite) > 0);
+  const lignes = (Array.isArray(input.lignes) ? input.lignes : []).filter((l) => typeof l?.designation === 'string' && l.designation.trim() && Number(l.quantite) > 0 && Number(l.quantite) <= 1_000_000);
   if (lignes.length === 0) throw new HttpError(400, 'lignes_requises', 'Ajoutez au moins un article');
+  if (lignes.length > 300) throw new HttpError(400, 'trop_de_lignes', '300 lignes maximum');
+  for (const l of lignes) entierOuNull(l.prix_unitaire_cents, 0, 100_000_000, 'prix_unitaire_cents');
+  const port = entierOuNull(input.frais_port_cents, 0, 10_000_000, 'frais_port_cents') ?? 0;
+  const mode: ModeLivraison = input.mode_livraison && ['livraison_chantier', 'retrait_agence', 'livraison_depot'].includes(input.mode_livraison) ? input.mode_livraison : 'livraison_chantier';
+  for (const [k, table] of [['devis_id', 'devis'], ['chantier_id', 'chantiers'], ['demande_id', 'fournisseurs_demandes']] as const) {
+    const v = input[k];
+    if (v && !(await first(env, `SELECT id FROM ${table} WHERE id = ? AND organization_id = ?`, v, ctx.organizationId))) throw new HttpError(400, 'reference_invalide', `${k} inconnu`);
+  }
   let adresse = input.adresse_livraison ?? null;
   if (!adresse && input.chantier_id) adresse = (await lireChantier(env, ctx.organizationId, input.chantier_id))?.address ?? null;
 
@@ -65,10 +73,10 @@ export async function creerCommande(env: Env, ctx: Ctx, input: CreerCommandeInpu
     canal: canalEffectif(f.connecteur),
     token_hash: null,
     total_ht_cents: total,
-    frais_port_cents: input.frais_port_cents ?? 0,
+    frais_port_cents: port,
     livraison_prevue: input.livraison_prevue ?? null,
     adresse_livraison: adresse,
-    mode_livraison: input.mode_livraison ?? 'livraison_chantier',
+    mode_livraison: mode,
     reference_fournisseur: null,
     suivi_transporteur: null,
     facture_fournisseur_id: null,
@@ -125,13 +133,14 @@ export async function commandeDepuisDevis(env: Env, ctx: Ctx, devisId: string, f
 export async function commandesDepuisDemande(env: Env, ctx: Ctx, demandeId: string, choix: { destinataire_id?: string; repartition?: 'recommandation' | 'optimise' | 'unique' } = {}) {
   const d = await demandeOuErreur(env, ctx.organizationId, demandeId);
   if (d.statut === 'commandee') throw new HttpError(409, 'deja_commandee', 'Cette demande a déjà été commandée');
+  if (d.statut === 'annulee') throw new HttpError(409, 'demande_annulee', 'Cette demande a été annulée');
   const [lignes, reps, comp] = await Promise.all([lignesDemande(env, demandeId), reponsesDemande(env, demandeId), comparatifDemande(env, demandeId)]);
   const dests = await all<{ id: string; fournisseur_id: string; frais_port_cents: number | null; delai_livraison_jours: number | null }>(
     env,
     `SELECT id, fournisseur_id, frais_port_cents, delai_livraison_jours FROM fournisseurs_demandes_destinataires WHERE demande_id = ? AND statut = 'repondue'`,
     demandeId,
   );
-  let repartition: { destinataire_id: string; ligne_ids: string[] }[];
+  let repartition: { destinataire_id: string; ligne_ids: string[]; total_cents?: number }[];
   if (choix.destinataire_id) {
     if (!dests.some((x) => x.id === choix.destinataire_id)) throw new HttpError(400, 'offre_inconnue', "Ce fournisseur n'a pas répondu");
     repartition = [{ destinataire_id: choix.destinataire_id, ligne_ids: lignes.map((l) => l.id) }];
@@ -145,6 +154,11 @@ export async function commandesDepuisDemande(env: Env, ctx: Ctx, demandeId: stri
     if (!reco) throw new HttpError(409, 'pas_de_recommandation', 'Pas assez de réponses pour commander automatiquement');
     repartition = reco.repartition;
   }
+  // Réservation atomique : deux clics simultanés ne créent pas deux jeux de commandes
+  const res = await env.DB.prepare(`UPDATE fournisseurs_demandes SET statut = 'commandee', updated_at = ? WHERE id = ? AND statut NOT IN ('commandee','annulee')`)
+    .bind(Date.now(), d.id)
+    .run();
+  if (res.meta && typeof res.meta.changes === 'number' && res.meta.changes === 0) throw new HttpError(409, 'deja_commandee', 'Cette demande a déjà été commandée');
   const commandes: Commande[] = [];
   for (const r of repartition) {
     const dest = dests.find((x) => x.id === r.destinataire_id)!;
@@ -173,12 +187,17 @@ export async function commandesDepuisDemande(env: Env, ctx: Ctx, demandeId: stri
         chantier_id: d.chantier_id,
         adresse_livraison: d.adresse_livraison,
         livraison_prevue: d.livraison_souhaitee ?? (dest.delai_livraison_jours != null ? Date.now() + dest.delai_livraison_jours * DAY_MS : null),
-        frais_port_cents: comp.totaux.find((t) => t.destinataire_id === dest.id)?.port_cents ?? dest.frais_port_cents ?? 0,
+        // Port du sous-panier réellement commandé (franco apprécié sur ce sous-total), pas de l'offre complète
+        frais_port_cents:
+          r.total_cents != null
+            ? Math.max(0, r.total_cents - lignesCmd.reduce((s, l) => s + Math.round((l.prix_unitaire_cents ?? 0) * l.quantite), 0))
+            : comp.totaux.find((t) => t.destinataire_id === dest.id)?.port_cents ?? dest.frais_port_cents ?? 0,
       }),
     );
   }
-  if (commandes.length > 0) {
-    await majStatutDemande(env, d.id, 'commandee');
+  if (commandes.length === 0) {
+    await majStatutDemande(env, d.id, d.statut);
+  } else {
     await journal(env, ctx.organizationId, 'demande', d.id, 'commandee', 'artisan', { commandes: commandes.map((c) => c.numero) });
   }
   return commandes;
@@ -212,10 +231,8 @@ export async function envoyerCommande(env: Env, ctx: Ctx, id: string) {
   let canal = 'email';
   let simule = false;
   const partenaire = await partenaireDuFournisseur(env, ctx.organizationId, f.id);
-  if (partenaire) {
-    await emettre(env, partenaire, 'commande.creee', { commande_id: c.id, numero: c.numero });
-    canal = 'api';
-  }
+  const premierEnvoi = c.statut === 'brouillon';
+  if (partenaire) canal = 'api';
   if (f.email) {
     const { html, text } = gabaritEmail({
       titre: `Commande ${c.numero} de ${entreprise.nom}`,
@@ -247,6 +264,8 @@ export async function envoyerCommande(env: Env, ctx: Ctx, id: string) {
     throw new HttpError(400, 'email_manquant', "Ajoutez l'adresse e-mail du fournisseur sur sa fiche");
   }
   await run(env, `UPDATE fournisseurs_commandes SET statut = 'envoyee', token_hash = ?, updated_at = ? WHERE id = ?`, hash, Date.now(), id);
+  // Le webhook ne part qu'une fois l'e-mail parti, et seulement au premier envoi (pas de doublon dans l'ERP)
+  if (partenaire && premierEnvoi) await emettre(env, partenaire, 'commande.creee', { commande_id: c.id, numero: c.numero });
   await journal(env, ctx.organizationId, 'commande', id, 'envoyee', 'systeme', { canal, fournisseur: f.nom });
   return { envoyee: true, canal, simule, lien_portail: simule ? lien : undefined, edi };
 }
@@ -278,7 +297,7 @@ export async function majStatutCommande(env: Env, orgId: string, id: string, inp
     Date.now(),
     id,
   );
-  if (input.statut === 'livree') {
+  if (input.statut === 'livree' && acteur === 'artisan') {
     await run(env, `UPDATE fournisseurs_commandes_lignes SET quantite_livree = quantite WHERE commande_id = ? AND quantite_livree < quantite`, id);
   }
   await journal(env, orgId, 'commande', id, input.statut, acteur, {
@@ -299,10 +318,26 @@ export async function enregistrerLivraison(env: Env, orgId: string, id: string, 
   const c = await commandeOuErreur(env, orgId, id);
   if (['brouillon', 'annulee', 'facturee'].includes(c.statut)) throw new HttpError(409, 'statut_incompatible', 'Cette commande ne peut pas recevoir de livraison');
   const lignes = await lignesCommande(env, id);
-  for (const r of recu) {
-    const l = lignes.find((x) => x.id === r.ligne_id);
-    if (!l || !(Number(r.quantite_recue) >= 0)) continue;
-    l.quantite_livree = Math.min(l.quantite * 2, Number(r.quantite_recue));
+  const parLigne = new Map<string, number>();
+  for (const r of Array.isArray(recu) ? recu : []) {
+    const q = Number(r?.quantite_recue);
+    if (lignes.some((x) => x.id === r?.ligne_id) && Number.isFinite(q) && q >= 0) parLigne.set(r.ligne_id, q);
+  }
+  if (acteur !== 'artisan') {
+    // Bon de livraison déclaré par le fournisseur : on le note, mais seules les quantités pointées par l'artisan font foi
+    const declare = lignes.map((l) => ({ designation: l.designation, declare: parLigne.get(l.id) ?? 0, commande: l.quantite }));
+    const toutes = declare.every((x) => x.declare >= x.commande);
+    const cible = toutes ? 'livree' : 'livree_partiel';
+    if (c.statut !== cible && transitionAutorisee(c.statut, cible, acteur)) {
+      await run(env, `UPDATE fournisseurs_commandes SET statut = ?, updated_at = ? WHERE id = ?`, cible, Date.now(), id);
+    }
+    await journal(env, orgId, 'commande', id, 'bon_livraison', acteur, { lignes: declare });
+    const apres = await commandeOuErreur(env, orgId, id);
+    return { statut: apres.statut, manquants: declare.filter((x) => x.declare < x.commande).map((x) => ({ designation: x.designation, manque: x.commande - x.declare })) };
+  }
+  for (const l of lignes) {
+    if (!parLigne.has(l.id)) continue;
+    l.quantite_livree = Math.min(l.quantite * 2, parLigne.get(l.id)!);
     await run(env, `UPDATE fournisseurs_commandes_lignes SET quantite_livree = ? WHERE id = ?`, l.quantite_livree, l.id);
   }
   const statut = statutDepuisLivraisons(lignes);
@@ -319,7 +354,9 @@ export async function lierFacture(env: Env, ctx: Ctx, id: string, facture: { fac
   const c = await commandeOuErreur(env, ctx.organizationId, id);
   if (c.statut === 'annulee') throw new HttpError(409, 'annulee', 'Commande annulée');
   const attendu = c.total_ht_cents + c.frais_port_cents;
-  const ecart = facture.montant_ht_cents != null ? facture.montant_ht_cents - attendu : null;
+  const montant = entierOuNull(facture.montant_ht_cents, 0, 1_000_000_000, 'montant_ht_cents');
+  if (typeof facture.facture_id !== 'string' || !facture.facture_id) throw new HttpError(400, 'facture_requise', 'facture_id requis');
+  const ecart = montant != null ? montant - attendu : null;
   await run(env, `UPDATE fournisseurs_commandes SET facture_fournisseur_id = ?, statut = CASE WHEN statut = 'livree' THEN 'facturee' ELSE statut END, updated_at = ? WHERE id = ?`, facture.facture_id, Date.now(), id);
   await journal(env, ctx.organizationId, 'commande', id, 'facture_liee', 'artisan', { facture_id: facture.facture_id, ecart_cents: ecart });
   return { attendu_ht_cents: attendu, ecart_cents: ecart, alerte: ecart != null && Math.abs(ecart) > Math.max(100, attendu * 0.01) };

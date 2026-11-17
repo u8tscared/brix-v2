@@ -12,7 +12,7 @@ import { lireEntreprise } from '../fournisseurs/sources';
 import type { Commande } from '../fournisseurs/types';
 import { HttpError, newId, parseJsonArray, randomToken } from '../fournisseurs/util';
 import { creerCle, genererCodePartenaire, TOUS_SCOPES, type PartenaireCtx, type Scope } from './auth';
-import { emettre, EVENEMENTS_WEBHOOK, type EvenementWebhook } from './webhooks';
+import { emettre, urlWebhookAutorisee, EVENEMENTS_WEBHOOK, type EvenementWebhook } from './webhooks';
 
 /** Inscription libre d'un fournisseur : crée le compte partenaire et une première clé. */
 export async function inscrirePartenaire(env: Env, input: { nom?: string; email_technique?: string; siret?: string }) {
@@ -112,6 +112,7 @@ export class ApiFournisseursService {
       this.ctx.partenaireId,
     );
     if (!r) throw new HttpError(404, 'demande_introuvable', 'Demande introuvable');
+    if (r.statut === 'a_envoyer') throw new HttpError(404, 'demande_introuvable', 'Demande introuvable');
     return r;
   }
 
@@ -125,23 +126,24 @@ export class ApiFournisseursService {
     const ent = await lireEntreprise(this.env, r.organization_id);
     const lignes = await lignesDemande(this.env, r.demande_id);
     return {
+      ...d,
+      demande_statut: d?.statut,
       id: r.id,
       statut: r.statut,
-      ...d,
       client: { entreprise: ent.nom },
       lignes: lignes.map((l) => ({ ligne_id: l.id, position: l.position, designation: l.designation, reference: l.reference, quantite: l.quantite, unite: l.unite })),
     };
   }
 
   async repondre(id: string, input: ReponseInput) {
-    await this.destinataire(id);
-    await enregistrerReponse(this.env, id, input, 'api');
+    const r = await this.destinataire(id);
+    await enregistrerReponse(this.env, r.organization_id, id, input, 'api');
     return { ok: true };
   }
 
   async decliner(id: string, motif: string | null) {
-    await this.destinataire(id);
-    await declinerDemande(this.env, id, motif, 'api');
+    const r = await this.destinataire(id);
+    await declinerDemande(this.env, r.organization_id, id, motif, 'api');
     return { ok: true };
   }
 
@@ -240,7 +242,7 @@ export class ApiFournisseursService {
       throw new HttpError(400, 'url_invalide', 'URL invalide');
     }
     if (u.protocol !== 'https:') throw new HttpError(400, 'https_requis', 'Les webhooks doivent être en HTTPS');
-    if (/^(localhost|127\.|10\.|192\.168\.|169\.254\.|\[?::1)/.test(u.hostname)) throw new HttpError(400, 'url_interdite', 'Adresse privée interdite');
+    if (!urlWebhookAutorisee(u)) throw new HttpError(400, 'url_interdite', 'Adresse interdite : utilisez un nom de domaine public en HTTPS (port 443 ou 8443)');
     const evts = (input.evenements ?? EVENEMENTS_WEBHOOK).filter((e): e is EvenementWebhook => EVENEMENTS_WEBHOOK.includes(e as EvenementWebhook));
     if (evts.length === 0) throw new HttpError(400, 'evenements_requis', `Événements possibles : ${EVENEMENTS_WEBHOOK.join(', ')}`);
     const n = await first<{ n: number }>(this.env, `SELECT COUNT(*) AS n FROM api_webhooks WHERE partenaire_id = ?`, this.ctx.partenaireId);
@@ -257,7 +259,12 @@ export class ApiFournisseursService {
   }
 
   creerCle(input: { nom?: string; scopes?: Scope[]; mode?: 'live' | 'test' }) {
-    return creerCle(this.env, this.ctx.partenaireId, input.nom ?? 'Clé', input.scopes ?? TOUS_SCOPES, input.mode === 'test' ? 'test' : 'live');
+    // Une clé ne peut jamais créer une clé plus puissante qu'elle-même.
+    const demandes = input.scopes ?? this.ctx.scopes;
+    const autorises = demandes.filter((s) => this.ctx.scopes.includes(s));
+    if (autorises.length !== demandes.length) throw new HttpError(403, 'scope_refuse', 'Une clé ne peut pas accorder des droits qu’elle n’a pas');
+    const mode = this.ctx.mode === 'test' ? 'test' : input.mode === 'test' ? 'test' : 'live';
+    return creerCle(this.env, this.ctx.partenaireId, String(input.nom ?? 'Clé').slice(0, 80), autorises, mode);
   }
 
   async revoquerCle(id: string) {

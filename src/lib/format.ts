@@ -7,14 +7,16 @@ export const money = (n: number, round = false) => (round ? eur0 : eur).format(n
 export const pct = (n: number, digits = 0) => `${(n || 0).toFixed(digits).replace('.', ',')} %`;
 export const num = (n: number, digits = 2) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: digits }).format(n).replace(/ /g, ' ');
 
-export const todayISO = () => new Date().toISOString().slice(0, 10);
+/** Jour local (et non UTC : entre minuit et 2 h en France, l'UTC donne la veille). */
+export const localISO = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+export const todayISO = () => localISO(new Date());
 
 /** Date relative à aujourd'hui (jours), au format ISO YYYY-MM-DD. */
 export const dayOffset = (offset: number, base = new Date()) => {
   const d = new Date(base);
   d.setHours(12, 0, 0, 0);
   d.setDate(d.getDate() + offset);
-  return d.toISOString().slice(0, 10);
+  return localISO(d);
 };
 
 export const dateLong = (iso: string) => new Date(iso + (iso.length === 10 ? 'T12:00:00' : '')).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });

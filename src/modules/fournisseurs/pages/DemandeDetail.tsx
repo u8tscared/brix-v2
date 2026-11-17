@@ -64,7 +64,7 @@ export default function DemandeDetail() {
 
   return (
     <div className="space-y-5">
-      <Link to="/app/fournisseurs/demandes" className="-ml-1 inline-flex h-9 items-center gap-1.5 rounded-lg px-1 text-[13px] font-medium text-ink-2 hover:text-ink">
+      <Link to="/app/fournisseurs/demandes" className="-ml-1 inline-flex h-10 items-center gap-1.5 rounded-lg px-1 md:h-9 text-[13px] font-medium text-ink-2 hover:text-ink">
         <ArrowLeft className="h-4 w-4" /> Demandes de prix
       </Link>
 

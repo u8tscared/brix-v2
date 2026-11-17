@@ -11,6 +11,8 @@ const at = (days: number, h = 9) => {
   const d = new Date();
   d.setDate(d.getDate() + days);
   d.setHours(h, 12, 0, 0);
+  // Jamais dans le futur : avant 9 h, un événement « d'aujourd'hui à 9 h » n'a pas encore eu lieu.
+  if (d.getTime() > Date.now()) d.setTime(Date.now() - (24 - h) * 5 * 60000);
   return d.toISOString();
 };
 
@@ -18,7 +20,7 @@ export const DEMO_FOURNISSEURS: Fournisseur[] = [
   { id: 'frn_rexel', nom: 'Rexel Villeurbanne', enseigne: 'rexel', agence: 'Villeurbanne – Croix-Luizet', contact: 'Julie Reynaud', email: 'comptoir.villeurbanne@exemple.fr', telephone: '04 72 00 00 01', numeroCompte: 'RX-448120', metiers: ['electricite'], franco: 150, delaiJours: 1, connecteur: 'rexel', favori: true },
   { id: 'frn_sonepar', nom: 'Sonepar Lyon Est', enseigne: 'sonepar', agence: 'Vaulx-en-Velin', contact: 'Hugo Martel', email: 'lyon-est@exemple.fr', telephone: '04 72 00 00 02', numeroCompte: 'SNP-20931', metiers: ['electricite'], franco: 200, delaiJours: 2, connecteur: 'sonepar', favori: true },
   { id: 'frn_yesss', nom: 'Yesss Électrique Lyon', enseigne: 'yesss', agence: 'Lyon 7', contact: 'Nadia Ferhat', email: 'lyon7@exemple.fr', telephone: '04 72 00 00 03', metiers: ['electricite'], franco: 250, delaiJours: 2, connecteur: 'yesss' },
-  { id: 'frn_cedeo', nom: 'Cédéo Villeurbanne', enseigne: 'cedeo', agence: 'Villeurbanne', contact: 'Sophie Marchand', email: 'cedeo.villeurbanne@exemple.fr', telephone: '04 72 00 00 04', metiers: ['plomberie', 'electricite'], franco: 250, delaiJours: 1, connecteur: 'cedeo' },
+  { id: 'frn_cedeo', nom: 'Cédéo Villeurbanne', enseigne: 'cedeo', agence: 'Villeurbanne', contact: 'Sophie Marchand', email: 'cedeo.villeurbanne@exemple.fr', telephone: '04 72 00 00 04', metiers: ['plomberie', 'electricite'], franco: 200, delaiJours: 1, connecteur: 'cedeo' },
   { id: 'frn_wurth', nom: 'Würth (Marc, commercial)', enseigne: 'wurth', contact: 'Marc Dubreuil', email: 'marc.dubreuil@exemple.fr', telephone: '06 00 00 00 05', metiers: [], franco: 100, delaiJours: 3, connecteur: 'email' },
 ];
 
@@ -129,7 +131,7 @@ export function demoState(devis: Devis[]) {
     journal: [
       { at: at(-1, 15), texte: 'Expédiée : camion Cédéo, créneau 7 h 30 – 9 h', acteur: 'fournisseur' },
       { at: at(-2, 18), texte: 'Confirmée par Cédéo Villeurbanne (réf. ARC-558120)', acteur: 'fournisseur' },
-      { at: at(-2, 17), texte: 'Envoyée à Cédéo Villeurbanne (e-mail + bon EDI joint)', acteur: 'systeme' },
+      { at: at(-2, 17), texte: 'Envoyée à Cédéo Villeurbanne (e-mail + bon de commande joint)', acteur: 'systeme' },
       { at: at(-2, 17), texte: 'Bon de commande créé', acteur: 'artisan' },
     ],
   });

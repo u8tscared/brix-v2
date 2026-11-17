@@ -152,7 +152,7 @@ export default function FicheFournisseur({ open, onClose, fournisseur }: { open:
             {METIERS.map((m) => {
               const on = form.metiers.includes(m.cle);
               return (
-                <button key={m.cle} onClick={() => set({ metiers: on ? form.metiers.filter((x) => x !== m.cle) : [...form.metiers, m.cle] })} aria-pressed={on} className={cn('h-9 rounded-full border px-3 text-[12.5px] font-medium transition', on ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')}>
+                <button key={m.cle} onClick={() => set({ metiers: on ? form.metiers.filter((x) => x !== m.cle) : [...form.metiers, m.cle] })} aria-pressed={on} className={cn('h-10 rounded-full border px-3 text-[12.5px] font-medium transition sm:h-9', on ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')}>
                   {m.label}
                 </button>
               );
@@ -161,11 +161,11 @@ export default function FicheFournisseur({ open, onClose, fournisseur }: { open:
         </div>
 
         <div className="rounded-[14px] border border-line bg-[#fbfbfd] p-4">
-          <div className="flex items-center gap-2 text-[13.5px] font-semibold"><Plug className="h-4 w-4 text-ink-3" />Relier par API</div>
+          <div className="flex items-center gap-2 text-[13.5px] font-semibold"><Plug className="h-4 w-4 text-ink-3" />Relier à son logiciel</div>
           {live?.connecteur === 'api_brix' ? (
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[13px]">
               <span className="text-ok">Relié avec le code <span className="num font-medium">{live.partenaire}</span></span>
-              <Button size="sm" variant="ghost" onClick={() => { modifierFournisseur(live.id, { connecteur: live.enseigne || 'email', partenaire: undefined }); setRetour(null); }}>Délier</Button>
+              <Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => { modifierFournisseur(live.id, { connecteur: live.enseigne || 'email', partenaire: undefined }); setRetour(null); }}>Délier</Button>
             </div>
           ) : (
             <>

@@ -63,7 +63,7 @@ export class FournisseursService {
   }
   /** Saisie par l'artisan d'un devis reçu par téléphone ou en PDF. */
   saisirReponse(destinataireId: string, input: demandes.ReponseInput) {
-    return demandes.enregistrerReponse(this.env, destinataireId, input, 'artisan');
+    return demandes.enregistrerReponse(this.env, this.ctx.organizationId, destinataireId, input, 'artisan');
   }
   commanderDemande(id: string, choix: Parameters<typeof commandes.commandesDepuisDemande>[3]) {
     return commandes.commandesDepuisDemande(this.env, this.ctx, id, choix);

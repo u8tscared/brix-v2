@@ -41,9 +41,9 @@ export default function EtapeSource({ onDevis, onLibre }: { onDevis: (d: Devis) 
                 <FileText className="h-[18px] w-[18px]" strokeWidth={1.75} />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-[14px] font-medium">{d.title}</span>
+                <span className="line-clamp-2 block text-[14px] font-medium leading-snug">{d.title}</span>
                 <span className="block truncate text-[12.5px] text-ink-3">
-                  {client ?? 'Client'} · {d.number}
+                  <span className="num">{d.number}</span> · {client ?? 'Client'}
                 </span>
               </span>
               <span className="flex shrink-0 flex-col items-end gap-1">

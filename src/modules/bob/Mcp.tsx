@@ -51,7 +51,7 @@ export default function Mcp() {
       <div className={cn('space-y-6', !included && 'pointer-events-none opacity-50')}>
         <Segmented value={tab} onChange={(v: Tab) => setTab(v)} options={[{ value: 'connecter', label: 'Connecter une IA' }, { value: 'outils', label: 'Outils et journal' }]} />
 
-        {tab === 'connecter' ? <ConnecterIA /> : (
+        {tab === 'connecter' ? <ConnecterIA embedded /> : (
           <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.2fr_1fr]">
             <Card>
               <CardHeader title="Ce que l’assistant peut faire" meta={`${active} outils actifs`} />

@@ -67,7 +67,7 @@ export default function Accueil() {
       />
 
       <Card className="grid grid-cols-2 divide-line md:grid-cols-4 md:divide-x [&>*:nth-child(-n+2)]:border-b [&>*:nth-child(-n+2)]:border-line md:[&>*:nth-child(-n+2)]:border-b-0">
-        <Stat hero label="Économisé grâce aux comparatifs" value={money(stats.economie, true)} sub="par rapport à l'offre la plus chère" />
+        <Stat label="Économisé grâce aux comparatifs" value={money(stats.economie, true)} sub="par rapport à l'offre la plus chère" />
         <Stat label="Commandes en cours" value={stats.enCours.length} sub={money(stats.enCours.reduce((s, c) => s + totalCommande(c), 0), true) + ' HT'} />
         <Stat label="Livraisons cette semaine" value={stats.livraisons.length} sub={stats.livraisons[0]?.livraisonPrevue ? `prochaine ${relative(stats.livraisons[0].livraisonPrevue)}` : 'aucune prévue'} />
         <Stat label="Achats sur 30 jours" value={money(stats.depenses, true)} sub="HT, port compris" />
@@ -87,9 +87,9 @@ export default function Accueil() {
         </Card>
       )}
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
-          <CardHeader title="Livraisons à venir" icon={<Truck className="h-4 w-4 text-ink-3" />} action={<Button size="sm" variant="ghost" onClick={() => nav('commandes')}>Tout voir</Button>} />
+          <CardHeader title="Livraisons à venir" icon={<Truck className="h-4 w-4 text-ink-3" />} action={<Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => nav('commandes')}>Tout voir</Button>} />
           {stats.livraisons.length === 0 ? (
             <div className="p-4"><EmptyState icon={<CalendarClock />} title="Rien à recevoir cette semaine" text="Les commandes confirmées par vos fournisseurs apparaîtront ici avec leur date de livraison." /></div>
           ) : (
@@ -110,7 +110,7 @@ export default function Accueil() {
         </Card>
 
         <Card>
-          <CardHeader title="Demandes de prix en cours" icon={<Scale className="h-4 w-4 text-ink-3" />} action={<Button size="sm" variant="ghost" onClick={() => nav('demandes')}>Tout voir</Button>} />
+          <CardHeader title="Demandes de prix en cours" icon={<Scale className="h-4 w-4 text-ink-3" />} action={<Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => nav('demandes')}>Tout voir</Button>} />
           {ouvertes.length === 0 ? (
             <div className="p-4">
               <EmptyState icon={<Scale />} title="Aucune demande en cours" text="Depuis un devis signé, Brix prépare la liste du matériel et l'envoie à vos fournisseurs." action={<Button variant="primary" onClick={() => setOuvrir(true)}>Demander des prix</Button>} />

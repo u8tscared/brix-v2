@@ -82,11 +82,25 @@ export async function emettre(
   return hooks.length;
 }
 
+/** Anti-SSRF : nom de domaine public uniquement (pas d'IP littérale, pas de localhost), HTTPS, port standard. */
+export function urlWebhookAutorisee(u: URL): boolean {
+  if (u.protocol !== 'https:') return false;
+  if (u.username || u.password) return false;
+  if (u.port && u.port !== '443' && u.port !== '8443') return false;
+  const h = u.hostname.toLowerCase().replace(/\.$/, '');
+  if (!h.includes('.') || h.startsWith('[') || h.includes(':')) return false;
+  if (/^[\d.]+$/.test(h) || /^0x/i.test(h)) return false;
+  if (h === 'localhost' || h.endsWith('.localhost') || h.endsWith('.local') || h.endsWith('.internal') || h.endsWith('.lan')) return false;
+  return true;
+}
+
 async function livrer(env: Env, h: WebhookRow, envoiId: string, payload: string, tentatives: number): Promise<boolean> {
   let status = 0;
   try {
+    if (!urlWebhookAutorisee(new URL(h.url))) throw new Error('url_interdite');
     const res = await fetch(h.url, {
       method: 'POST',
+      redirect: 'manual',
       headers: {
         'content-type': 'application/json',
         'user-agent': 'Brix-Webhooks/1.0',

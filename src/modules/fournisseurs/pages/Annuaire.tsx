@@ -48,7 +48,7 @@ function Carte({ f, onModifier, onFavori }: { f: Fournisseur; onModifier: () => 
       <div className="min-h-3 flex-1" />
       <div className="flex items-center justify-between gap-2 border-t border-line px-4 py-2.5">
         {api ? <Badge tone="ok" icon={<Plug />}>Relié par API</Badge> : <Badge icon={<Mail />}>Par e-mail + lien</Badge>}
-        <Button size="sm" variant="ghost" icon={<Pencil className="h-3.5 w-3.5" />} onClick={onModifier}>Modifier</Button>
+        <Button size="sm" variant="ghost" className="max-md:h-10" icon={<Pencil className="h-3.5 w-3.5" />} onClick={onModifier}>Modifier</Button>
       </div>
     </Card>
   );

@@ -19,7 +19,13 @@ type Cible =
 async function resoudre(env: Env, token: string): Promise<Cible> {
   if (!/^[A-Za-z0-9_-]{30,64}$/.test(token)) throw new HttpError(404, 'lien_invalide', 'Ce lien est invalide');
   const hash = await sha256Hex(token);
-  const dest = await first<Destinataire>(env, `SELECT * FROM fournisseurs_demandes_destinataires WHERE token_hash = ?`, hash);
+  const dest =
+    (await first<Destinataire>(env, `SELECT * FROM fournisseurs_demandes_destinataires WHERE token_hash = ?`, hash)) ??
+    (await first<Destinataire>(
+      env,
+      `SELECT dd.* FROM fournisseurs_jetons_anciens j JOIN fournisseurs_demandes_destinataires dd ON dd.id = j.destinataire_id WHERE j.token_hash = ?`,
+      hash,
+    ));
   if (dest) {
     if (dest.expire_le < Date.now()) throw new HttpError(410, 'lien_expire', 'Ce lien a expiré. Demandez à votre client de vous renvoyer la demande.');
     const demande = await first<Demande>(env, `SELECT * FROM fournisseurs_demandes WHERE id = ?`, dest.demande_id);
@@ -95,14 +101,14 @@ export async function lirePortail(env: Env, token: string) {
 export async function repondrePortail(env: Env, token: string, input: ReponseInput) {
   const cible = await resoudre(env, token);
   if (cible.type !== 'demande') throw new HttpError(400, 'mauvais_lien', "Ce lien concerne une commande, pas une demande de prix");
-  await enregistrerReponse(env, cible.dest.id, input, 'fournisseur');
+  await enregistrerReponse(env, cible.demande.organization_id, cible.dest.id, input, 'fournisseur');
   return { ok: true, message: 'Merci, votre réponse a bien été transmise.' };
 }
 
 export async function declinerPortail(env: Env, token: string, motif: string | null) {
   const cible = await resoudre(env, token);
   if (cible.type !== 'demande') throw new HttpError(400, 'mauvais_lien', 'Ce lien concerne une commande');
-  await declinerDemande(env, cible.dest.id, motif, 'fournisseur');
+  await declinerDemande(env, cible.demande.organization_id, cible.dest.id, motif, 'fournisseur');
   return { ok: true };
 }
 

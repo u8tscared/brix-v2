@@ -68,8 +68,11 @@ export function parseEurosToCents(raw: unknown): number | null {
     // « 1.234,56 » (FR) ou « 1,234.56 » (EN) : le dernier séparateur est la décimale
     if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
     else s = s.replace(/,/g, '');
-  } else {
+  } else if (s.includes(',')) {
     s = s.replace(',', '.');
+  } else if (/^\d{1,3}(\.\d{3})+$/.test(s)) {
+    // « 1.250 » : séparateur de milliers à la française, pas une décimale
+    s = s.replace(/\./g, '');
   }
   const n = Number(s);
   return Number.isFinite(n) ? Math.round(n * 100) : null;

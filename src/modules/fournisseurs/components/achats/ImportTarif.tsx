@@ -120,8 +120,8 @@ export default function ImportTarif({ open, onClose, fournisseurInitial }: { ope
           </Field>
         )}
         <div className="-mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px]">
-          <button className="font-medium text-vi-700 hover:underline" onClick={() => setColler((v) => !v)}>{coller ? 'Déposer un fichier' : 'Coller le contenu à la place'}</button>
-          <button className="font-medium text-ink-2 hover:underline" onClick={() => { setColler(true); setTexte(EXEMPLE); setNomFichier(null); }}>Essayer avec un exemple</button>
+          <button className="min-h-10 font-medium sm:min-h-0 text-vi-700 hover:underline" onClick={() => setColler((v) => !v)}>{coller ? 'Déposer un fichier' : 'Coller le contenu à la place'}</button>
+          <button className="min-h-10 font-medium sm:min-h-0 text-ink-2 hover:underline" onClick={() => { setColler(true); setTexte(EXEMPLE); setNomFichier(null); }}>Essayer avec un exemple</button>
         </div>
 
         {erreur && <div className="flex gap-2 rounded-[12px] border border-[#fde3b5] bg-warn-bg px-3.5 py-3 text-[13px] text-[#92400e]"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{erreur}</div>}
