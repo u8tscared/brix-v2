@@ -57,6 +57,8 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Si la page publique est ouverte sans données (preview vierge), charge la démo. */
 export function assurerDonnees() {
   if (!S().devis.length) S().loadDemo();
+  // Démo : le devis de Thomas Garnier est proposé en trois formules.
+  if (S().devis.some((d) => d.id === 'q_118') && !useDevisMeta.getState().meta.q_118) useDevisMeta.getState().patch('q_118', { variants: { essentiel: true, confort: true, premium: true } });
 }
 
 export function emetteur(): Emetteur {

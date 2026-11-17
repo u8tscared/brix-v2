@@ -14,6 +14,7 @@ const ClientPortal = lazy(() => import('@/pages/public/ClientPortal'));
 const DevisPublic = lazy(() => import('@/pages/public/devis/DevisPublic'));
 const FacturePublique = lazy(() => import('@/pages/public/facture/FacturePublique'));
 const BoiteDemo = lazy(() => import('@/pages/public/boite/BoiteDemo'));
+const Parcours = lazy(() => import('@/pages/public/Parcours'));
 // Portail fournisseur (espace fournisseurs, autre chantier) : chargé s'il est présent.
 const portailFournisseur = import.meta.glob<{ default: React.ComponentType }>('./modules/fournisseurs/PortailFournisseurPage.tsx');
 const PortailFournisseur = lazy(portailFournisseur['./modules/fournisseurs/PortailFournisseurPage.tsx'] ?? (() => import('@/components/layout/Placeholder')));
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/p/:token" element={<ClientPortal />} />
           <Route path="/d/:token" element={<DevisPublic />} />
           <Route path="/f/:token" element={<FacturePublique />} />
+          <Route path="/parcours" element={<Parcours />} />
           <Route path="/boite" element={<BoiteDemo />} />
           <Route path="/boite/:id" element={<BoiteDemo />} />
           <Route path="/portail-fournisseur/:token" element={<PortailFournisseur />} />
