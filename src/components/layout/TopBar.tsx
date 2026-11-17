@@ -91,6 +91,7 @@ export function TopBar({ notifications }: { notifications?: React.ReactNode }) {
   const ui = useUI();
   const navigate = useNavigate();
   const { dept, mod, leaf } = useCrumbs();
+  const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const f = () => setScrolled(window.scrollY > 4);
@@ -101,7 +102,7 @@ export function TopBar({ notifications }: { notifications?: React.ReactNode }) {
     <header className={cn('sticky top-0 z-30 flex h-14 items-center gap-3 px-7 transition-[background,box-shadow] duration-300', scrolled ? 'bg-page/80 shadow-[0_1px_0_var(--line)] backdrop-blur-xl' : 'bg-transparent')}>
       <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]" aria-label="Fil d'Ariane">
         {!mod ? (
-          <span className="font-medium text-ink">Aujourd'hui</span>
+          <span className="font-medium text-ink">{pathname.startsWith('/app/reglages') ? 'Réglages' : "Aujourd'hui"}</span>
         ) : (
           <>
             {dept && dept.name !== mod.name && (
