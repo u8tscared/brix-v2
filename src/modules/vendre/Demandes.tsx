@@ -109,10 +109,10 @@ export default function Demandes() {
                 <div key={st} className="flex min-w-0 flex-col rounded-[16px] bg-[#efedf6] p-2">
                   <div className="flex items-center gap-2 px-1.5 pb-2.5 pt-1">
                     <i className="h-2 w-2 rounded-full" style={{ background: STAGE_DOT[st] }} />
-                    <span className="text-[13px] font-semibold">{LEAD_STATUS[st].label}</span>
+                    <span className="truncate text-[13px] font-semibold">{LEAD_STATUS[st].label}</span>
                     <span className="text-[12px] text-ink-3">{items.length}</span>
                     <div className="flex-1" />
-                    {sum > 0 && <span className="num text-[11.5px] text-ink-3">{money(sum, true)}</span>}
+                    {sum > 0 && <span className="num hidden text-[11.5px] text-ink-3 xl:inline">{money(sum, true)}</span>}
                   </div>
                   <div className="stagger-fast flex flex-col gap-2">
                     {items.map((l) => <LeadCard key={l.id} lead={l} compact highlight={moved === l.id} onOpen={() => setOpenId(l.id)} onDevis={() => prepareDevis(l)} onAdvance={nextOf(l) ? () => advance(l) : undefined} nextLabel={nextOf(l) ? LEAD_STATUS[nextOf(l)].label : undefined} />)}

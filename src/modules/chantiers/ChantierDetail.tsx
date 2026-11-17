@@ -120,7 +120,7 @@ export default function ChantierDetail() {
         {tab === 'achats' && <AchatsTab v={v} />}
       </div>
 
-      {!done && (
+      {!done && ch.status !== 'a_planifier' && (
         <Button variant="primary" size="lg" className="sticky bottom-[calc(96px+var(--safe-b))] z-10 w-full shadow-lift md:hidden" icon={<ClipboardCheck className="h-5 w-5" />} onClick={() => navigate(`/app/pv-reception?chantier=${ch.id}`)}>
           Terminer le chantier et signer le PV
         </Button>

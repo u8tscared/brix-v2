@@ -39,7 +39,7 @@ export function ChantierMap({ rows }: { rows: ChantierView[] }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
       <Card className="relative overflow-hidden">
-        <svg viewBox="0 0 400 300" className="block h-auto w-full" role="img" aria-label="Plan des chantiers">
+        <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" className="block h-[340px] w-full md:h-[460px]" role="img" aria-label="Plan des chantiers">
           <defs>
             <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
               <path d="M20 0H0V20" fill="none" stroke="#efeef5" strokeWidth=".6" />
@@ -58,12 +58,12 @@ export function ChantierMap({ rows }: { rows: ChantierView[] }) {
           {/* Saône */}
           <path d="M150 0 C 170 40, 196 70, 184 110 S 156 160, 176 196 S 186 228, 186 232" fill="none" stroke="#cfe0fb" strokeWidth="8" strokeLinecap="round" />
           {LABELS.map(([t, x, y]) => (
-            <text key={t} x={x} y={y} textAnchor="middle" fontSize="8.5" fill="#b4b3c3" fontFamily="Inter" letterSpacing=".04em">
+            <text key={t} x={x} y={y} textAnchor="middle" fontSize="6" fill="#b4b3c3" fontFamily="Geist" letterSpacing=".04em">
               {t.toUpperCase()}
             </text>
           ))}
           {/* dépôt */}
-          <g transform={`translate(${depot[0]} ${depot[1]})`}>
+          <g transform={`translate(${depot[0]} ${depot[1]}) scale(.72)`}>
             <rect x="-7" y="-7" width="14" height="14" rx="3.5" fill="#17171f" />
             <path d="M-3 2 V-1 L0 -3.5 L3 -1 V2 Z" fill="#fff" />
           </g>
@@ -71,13 +71,13 @@ export function ChantierMap({ rows }: { rows: ChantierView[] }) {
             const [x, y] = placeOf(v.ch.city, v.ch.id);
             const active = v.ch.id === sel;
             return (
-              <g key={v.ch.id} transform={`translate(${x} ${y})`} className="cursor-pointer" onClick={() => setSel(v.ch.id)}>
+              <g key={v.ch.id} transform={`translate(${x} ${y}) scale(.72)`} className="cursor-pointer" onClick={() => setSel(v.ch.id)}>
                 {v.ch.status === 'en_cours' && <circle r="11" fill={DOT[v.ch.status]} opacity=".12" />}
                 <circle r={active ? 8 : 6} fill={DOT[v.ch.status]} stroke="#fff" strokeWidth="2.2" className="transition-all" />
                 {active && (
                   <g>
                     <rect x="11" y="-10" width={Math.min(150, v.ch.name.length * 4.6 + 14)} height="20" rx="6" fill="#17171f" />
-                    <text x="18" y="3.5" fontSize="9" fill="#fff" fontFamily="Inter" fontWeight="500">
+                    <text x="18" y="3.5" fontSize="9" fill="#fff" fontFamily="Geist" fontWeight="500">
                       {v.ch.name.length > 30 ? v.ch.name.slice(0, 29) + '…' : v.ch.name}
                     </text>
                   </g>
