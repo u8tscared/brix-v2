@@ -14,7 +14,7 @@ export function renderPlans(root) {
       <div class="price">${p.monthly === null ? '<b class="txt">Sur devis</b><span>selon vos agences et effectifs</span>' : `<b data-m="${p.monthly}">${p.monthly === 0 ? '0 €' : euro(p.monthly)}</b><span data-per>${p.monthly === 0 ? 'pour toujours' : 'par mois HT'}</span>`}</div>
       <ul><li class="lead">${p.lead}</li>${p.items.map((i) => `<li>${ic('check')}${i}</li>`).join('')}</ul>
       ${p.note ? `<p class="fine">${p.note}</p>` : ''}
-      <a class="btn ${p.hi ? 'white' : 'dark'} mag" href="${p.ctaHref}">${p.cta} ${ic('arrow-right', 'go')}</a>
+      <a class="btn ${p.hi ? 'dawn' : 'dark'}" href="${p.ctaHref}">${p.cta} ${ic('arrow-right', 'go')}</a>
     </article>`).join('');
 }
 
@@ -54,7 +54,9 @@ export function initSimulator(root) {
     $('[data-sim-per]', root).textContent = r.total === null ? 'interlocuteur dédié' : `soit ${euro(r.total / n)} par personne`;
     input.setAttribute('aria-valuetext', `${n >= 60 ? '60 utilisateurs ou plus' : n > 1 ? `${n} utilisateurs` : '1 utilisateur'}, offre ${r.plan}, ${r.total === null ? 'sur devis' : `${euro(r.total)} par mois`}`);
   };
-  input.addEventListener('input', () => out(+input.value));
+  const fill = () => input.style.setProperty('--fill', `${((input.value - input.min) / (input.max - input.min)) * 100}%`);
+  input.addEventListener('input', () => { out(+input.value); fill(); });
+  fill();
   out(+input.value);
 }
 

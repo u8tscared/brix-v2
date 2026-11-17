@@ -29,7 +29,7 @@ export function initNight() {
   ScrollTrigger.create({
     trigger: sec,
     start: desktop ? 'top top' : 'top 70%',
-    end: desktop ? '+=220%' : 'bottom 60%',
+    end: desktop ? '+=150%' : 'bottom 60%',
     pin: desktop ? $('.night-pin', sec) : false,
     scrub: 0.6,
     animation: tl,

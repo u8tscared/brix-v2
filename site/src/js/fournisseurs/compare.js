@@ -22,7 +22,7 @@ const delay = (d) => (d === 1 ? 'Livré demain' : `Livré sous ${d} jours`);
 export function initCompare() {
   const root = $('[data-cmpd]');
   if (!root) return;
-  const list = $('[data-cd-list]', root), table = $('[data-cd-t]', root), seg = $('[data-sort]', root), pill = $('.seg2-p', seg);
+  const list = $('[data-cd-list]', root), table = $('[data-cd-t]', root), seg = $('[data-sort]', root), pill = $('.seg-p', seg);
   const max = Math.max(...SUPPLIERS.map((s) => s.total)), min = Math.min(...SUPPLIERS.map((s) => s.total));
   const mix = LINES.reduce((a, l, i) => a + Math.min(...SUPPLIERS.map((s) => s.p[i])) * l.q, 0);
 
@@ -47,7 +47,7 @@ export function initCompare() {
   const movePill = () => {
     const b = $('[aria-checked="true"]', seg);
     pill.style.width = `${b.offsetWidth}px`;
-    pill.style.transform = `translateX(${b.offsetLeft - 4}px)`;
+    pill.style.transform = `translateX(${b.offsetLeft}px)`;
   };
 
   function sort(key, animate = true) {

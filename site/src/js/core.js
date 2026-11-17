@@ -21,7 +21,7 @@ export const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '
 function initNav() {
   const nav = $('#nav');
   if (!nav) return;
-  const grad = (d) => `background:linear-gradient(135deg, ${d.color}, ${d.color}cc)`;
+  const grad = () => '';
   const mega = $('[data-mega]');
   if (mega) mega.innerHTML = DEPARTMENTS.map((d) => `<a href="fonctionnalites.html#${d.id}"><span class="ic" style="${grad(d)}">${ic(d.icon)}</span><span><b>${d.name}</b><small>${d.features.length} fonctions · ${esc(d.features.slice(0, 3).map((f) => f.name).join(', '))}</small></span></a>`).join('');
   const drawerGrid = $('[data-drawer]');
@@ -123,7 +123,7 @@ export function mesh(canvas, palette) {
 /* ---------- Apparitions ---------- */
 function initReveals() {
   if (reduce) return;
-  if ($('.rv')) gsap.set('.rv', { opacity: 0, y: 36 });
+  if ($('.rv')) gsap.set('.rv', { opacity: 0, y: 20 });
   ScrollTrigger.batch('.rv', {
     start: 'top 90%',
     once: true,

@@ -1,10 +1,10 @@
 import { boot } from '../core.js';
-import { heroIn, faq } from '../subpage.js';
-import { heroRfq, flow, order, catalog, portal, codeTabs, more } from '../fournisseurs/sections.js';
+import { faq } from '../subpage.js';
+import { heroIntro, heroRfq, flow, order, catalog, portal, codeTabs, more } from '../fournisseurs/sections.js';
 import { initCompare } from '../fournisseurs/compare.js';
 
 boot(() => {
-  heroRfq(heroIn());
+  heroRfq(heroIntro());
   flow();
   initCompare();
   order();

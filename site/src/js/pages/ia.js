@@ -1,17 +1,19 @@
 import { boot } from '../core.js';
-import { heroIn, faq } from '../subpage.js';
-import { heroBob, bobGrid, nightSky, bobSwitch } from '../ia/bob.js';
+import { faq } from '../subpage.js';
+import { heroIntro, heroBob, toc, bobGrid, nightRun, bobSwitch, copyDemo } from '../ia/bob.js';
 import { initDictation } from '../ia/dictation.js';
 import { initCall } from '../ia/call.js';
 import { initMcp } from '../ia/mcp.js';
 
 boot(() => {
-  heroBob(heroIn());
+  heroBob(heroIntro());
+  toc();
   bobGrid();
   initDictation();
-  nightSky();
+  nightRun();
   initCall();
   initMcp();
+  copyDemo();
   bobSwitch();
   faq(document.querySelector('[data-faq]'));
 });

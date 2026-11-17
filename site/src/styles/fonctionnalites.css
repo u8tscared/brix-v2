@@ -1,65 +1,114 @@
-/* ===== Page Fonctionnalités : recherche, filtres, barre des départements, sections ===== */
+/* ===== Page Fonctionnalités : recherche, filtres, index collant, sections par département ===== */
 
 /* ---------- Recherche + filtres ---------- */
-.fx-tools { padding-bottom: 8px }
-.fx-bar { display: flex; flex-direction: column; gap: 16px; padding: 14px; border-radius: 26px; background: #fff; box-shadow: 0 0 0 1px var(--line), 0 30px 60px -40px rgba(40, 10, 90, .35) }
-.fx-search { position: relative; display: flex; align-items: center }
-.fx-search > .i { position: absolute; left: 20px; width: 22px; height: 22px; color: var(--v); pointer-events: none }
-.fx-search input { width: 100%; height: 62px; border: 0; border-radius: 18px; background: var(--paper-2); padding: 0 60px 0 56px; font: inherit; font-size: 17px; color: var(--ink); outline: none; box-shadow: inset 0 0 0 1.5px transparent; transition: box-shadow .25s, background .25s; -webkit-appearance: none; appearance: none }
+.fx-tools { padding-bottom: 4px }
+.fx-bar { display: flex; align-items: center; gap: 14px 18px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--line) }
+.fx-search { position: relative; display: flex; align-items: center; flex: 1 1 320px; max-width: 420px }
+.fx-search > .i { position: absolute; left: 14px; width: 17px; height: 17px; color: var(--faint); pointer-events: none; transition: color .2s }
+.fx-search:focus-within > .i { color: var(--ink) }
+.fx-search input { width: 100%; height: 42px; border: 0; border-radius: 10px; background: #fff; padding: 0 44px 0 40px; font: inherit; font-size: 15px; color: var(--ink); outline: none; box-shadow: 0 0 0 1px var(--line-2), var(--sh-1); transition: box-shadow .2s; -webkit-appearance: none; appearance: none; letter-spacing: -.01em }
 .fx-search input::placeholder { color: var(--faint) }
 .fx-search input::-webkit-search-cancel-button { display: none }
-.fx-search input:focus { background: #fff; box-shadow: inset 0 0 0 1.5px var(--v2), 0 0 0 5px rgba(139, 92, 246, .14) }
-.fx-clear { position: absolute; right: 12px; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; color: var(--mute); transition: background .2s }
+.fx-search input:hover { box-shadow: 0 0 0 1px #cfcbe0, var(--sh-1) }
+.fx-search input:focus { box-shadow: 0 0 0 1px var(--ink), 0 0 0 4px rgba(109, 40, 217, .1) }
+.fx-kbd { position: absolute; right: 12px; min-width: 20px; height: 20px; display: grid; place-items: center; border-radius: 5px; font-size: 11px; color: var(--faint); background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--line-2); pointer-events: none }
+.fx-clear { position: absolute; right: 6px; width: 30px; height: 30px; border-radius: 7px; display: grid; place-items: center; color: var(--mute); transition: background .2s, color .2s }
+.fx-clear .i { width: 15px; height: 15px }
 .fx-clear:hover { background: var(--paper-3); color: var(--ink) }
-.fx-clear[hidden] { display: none }
-.fx-chips { display: flex; flex-wrap: wrap; gap: 8px; padding-inline: 2px }
-.fx-chips .chip { height: 40px; padding: 0 16px; font-weight: 600 }
-.fx-chips .chip:nth-child(4) { margin-left: 10px; position: relative }
-.fx-chips .chip:nth-child(4)::before { content: ""; position: absolute; left: -10px; top: 9px; bottom: 9px; width: 1px; background: var(--line) }
-.fx-status { min-height: 24px; margin-top: 14px; font-size: 14px; color: var(--mute); font-weight: 500 }
+.fx-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center }
+.fx-chips .chip { height: 34px; padding: 0 12px }
+.fx-chips .chip:nth-child(4) { margin-left: 13px; position: relative }
+.fx-chips .chip:nth-child(4)::before { content: ""; position: absolute; left: -10px; top: 8px; bottom: 8px; width: 1px; background: var(--line-2) }
+.fx-status { min-height: 20px; margin-top: 12px; font-size: 12.5px; color: var(--mute) }
 
-/* ---------- Barre des départements (collante) ---------- */
-.fx-body { position: relative }
-.fx-nav-wrap { position: sticky; top: calc(var(--nav-h) + 10px); z-index: 6; margin-top: 18px }
-.fx-nav .dtab { text-decoration: none }
-.fx-nav .dtab[aria-current="true"] { color: #fff }
-.fx-nav .dtab[hidden] { display: none }
-.fx-nav .dtab-pill { transition: transform .5s var(--ease), width .5s var(--ease), background .5s, opacity .3s }
+/* ---------- Corps : index collant à gauche, départements à droite ---------- */
+.fx-body { display: grid; grid-template-columns: 228px minmax(0, 1fr); gap: clamp(40px, 5vw, 72px); align-items: start; padding-top: 18px }
+.fx-side { position: sticky; top: calc(var(--nav-h) + 28px); display: flex; flex-direction: column; gap: 22px }
+.fx-nav { position: relative; display: flex; flex-direction: column; gap: 1px; padding-left: 14px }
+.fx-rail { position: absolute; left: 0; top: 0; bottom: 0; width: 2px; border-radius: 2px; background: var(--line) }
+.fx-ind { position: absolute; left: 0; top: 0; width: 2px; border-radius: 2px; background: #cdc6e2; overflow: hidden; transition: transform .5s var(--ease), height .5s var(--ease), opacity .3s }
+.fx-ind i { position: absolute; inset: 0; background: var(--dawn); transform-origin: top; transform: scaleY(0); transition: transform .12s linear }
+.fx-l { display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; font-size: 14px; font-weight: 450; color: var(--mute); letter-spacing: -.01em; transition: color .2s, background .2s }
+.fx-l .i { width: 16px; height: 16px; color: var(--faint); transition: color .2s }
+.fx-l-c { font-size: 11.5px; color: var(--soft); transition: color .2s }
+.fx-l:hover { color: var(--ink); background: var(--paper-2) }
+.fx-l:hover .i { color: var(--ink-2) }
+.fx-l[aria-current="true"] { color: var(--ink); font-weight: 550 }
+.fx-l[aria-current="true"] .i { color: var(--v) }
+.fx-l[aria-current="true"] .fx-l-c { color: var(--mute) }
+.fx-bar-p { display: none }
+.fx-side-cta { display: flex; flex-direction: column; gap: 4px; padding: 16px; border-radius: 12px; background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow .25s, transform .3s var(--ease) }
+.fx-side-cta:hover { box-shadow: inset 0 0 0 1px var(--line-2), var(--sh-2); transform: translateY(-1px) }
+.fx-side-k { font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em }
+.fx-side-cta b { font-size: 14.5px; font-weight: 600; letter-spacing: -.015em; line-height: 1.3 }
+.fx-side-cta > span:last-child { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--mute); margin-top: 2px }
+.fx-side-cta .i { width: 14px; height: 14px; transition: transform .3s var(--ease) }
+.fx-side-cta:hover .i { transform: translateX(3px); color: var(--ink) }
 
 /* ---------- Sections de département ---------- */
-.fx-sec { padding-block: clamp(70px, 8vw, 110px) 0 }
-.fx-sec[hidden] { display: none }
-.fx-sec + .fx-sec { border-top: 1px solid var(--line); margin-top: clamp(70px, 8vw, 110px) }
-.fx-sec .dpanel { margin-top: 0; min-height: 0 }
-.fx-sec .dp-head { top: calc(var(--nav-h) + 110px) }
-.fx-sec .dp-head h2 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 3.6vw, 52px); line-height: 1; letter-spacing: -.045em; margin-top: 26px; text-wrap: balance }
-.fx-sec .dp-head h2 em { font-style: normal; color: var(--c) }
-.fx-sec .ft h3 { font-size: 16.5px; font-weight: 650; letter-spacing: -.01em; line-height: 1.3; margin-top: 4px }
-.fx-sec .ft[hidden] { display: none }
-.fx-sec mark { background: color-mix(in srgb, var(--c) 22%, #fff); color: inherit; border-radius: 4px; padding: 0 2px; margin: 0 -2px }
+.fx-main { min-width: 0 }
+.fx-sec { padding-block: 8px clamp(64px, 7vw, 96px) }
+.fx-sec + .fx-sec { padding-top: clamp(56px, 6vw, 84px); border-top: 1px solid var(--line) }
+.fx-sh { max-width: 640px }
+.fx-k { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; color: var(--ink-2) }
+.fx-k .mono { font-size: 12px; color: var(--faint) }
+.fx-ic { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; background: var(--tile); color: var(--ink-2); box-shadow: inset 0 0 0 1px rgba(20, 17, 43, .05) }
+.fx-ic .i { width: 17px; height: 17px }
+.fx-sh h2 { font-family: var(--display); font-weight: 600; font-size: clamp(28px, 3vw, 40px); line-height: 1.08; letter-spacing: -.04em; margin-top: 18px; text-wrap: balance }
+.fx-sh p { color: var(--mute); font-size: 16px; line-height: 1.6; margin-top: 14px; max-width: 56ch; text-wrap: pretty }
+.fx-mt { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 18px }
+
+/* grille à filets : une seule bordure fine entre les fonctions, comme un tableau */
+.fx-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 32px; border-radius: 14px; box-shadow: 0 0 0 1px var(--line); overflow: hidden; background: #fff }
+.fc { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 22px 22px 18px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); margin: 0 -1px -1px 0; background: #fff; transition: background .25s }
+.fc:hover { background: #fcfbfe }
+.fc-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 6px }
+.fc-ic { width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center; background: var(--tile); color: var(--ink-2); box-shadow: inset 0 0 0 1px rgba(20, 17, 43, .05); transition: color .25s, background .25s, transform .4s var(--spring) }
+.fc-ic .i { width: 17px; height: 17px }
+.fc:hover .fc-ic { color: var(--v); background: #f1ecfd; transform: translateY(-1px) }
+.fc h3 { font-size: 15.5px; font-weight: 600; letter-spacing: -.015em; line-height: 1.3 }
+.fc p { color: var(--mute); font-size: 14px; line-height: 1.55; text-wrap: pretty }
+.fc-plan { display: flex; align-items: center; gap: 8px; margin-top: auto; padding-top: 8px; font-size: 11.5px; color: var(--faint) }
+.fc-meter { display: inline-flex; gap: 2px }
+.fc-meter i { width: 9px; height: 4px; border-radius: 2px; background: var(--line-2) }
+.fc-meter i.on { background: var(--ink-2) }
+.fc:hover .fc-meter i.on { background: var(--v) }
+.fx-sec mark { background: #efe7fe; color: var(--ink); border-radius: 3px; padding: 0 2px; margin: 0 -2px; box-shadow: inset 0 -1px 0 var(--v3) }
 
 /* ---------- État vide ---------- */
-.fx-empty { text-align: center; padding-block: 90px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px }
-.fx-empty[hidden] { display: none }
-.fx-empty-ic { width: 72px; height: 72px; border-radius: 24px; display: grid; place-items: center; background: var(--paper-3); color: var(--v) }
-.fx-empty-ic .i { width: 32px; height: 32px }
+.fx-empty { text-align: center; padding-block: 72px 40px; display: flex; flex-direction: column; align-items: center; gap: 14px }
+.fx-empty-ic { width: 52px; height: 52px; border-radius: 13px; display: grid; place-items: center; background: var(--tile); color: var(--ink-2); box-shadow: inset 0 0 0 1px rgba(20, 17, 43, .05) }
+.fx-empty-ic .i { width: 24px; height: 24px }
 .fx-empty p { color: var(--mute); line-height: 1.6; max-width: 52ch }
-.fx-empty .btn { margin-top: 8px }
+.fx-empty .btn { margin-top: 6px }
 
+@media (max-width: 1060px) {
+  .fx-body { grid-template-columns: minmax(0, 1fr); gap: 0; padding-top: 0 }
+  .fx-side { position: sticky; top: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); z-index: 6; margin-inline: calc(-1 * max(20px, env(safe-area-inset-left, 0px))); background: rgba(255, 255, 255, .86); backdrop-filter: blur(16px) saturate(1.8); -webkit-backdrop-filter: blur(16px) saturate(1.8); box-shadow: 0 1px 0 var(--line) }
+  .fx-side-cta { display: none }
+  .fx-nav { position: static; flex-direction: row; gap: 2px; overflow-x: auto; scrollbar-width: none; padding: 8px max(20px, env(safe-area-inset-left, 0px)) 10px }
+  .fx-nav::-webkit-scrollbar { display: none }
+  .fx-rail, .fx-ind { display: none }
+  .fx-l { flex: none; grid-template-columns: 16px auto auto; gap: 7px; padding: 7px 11px; white-space: nowrap; font-size: 13.5px }
+  .fx-l .i { width: 15px; height: 15px }
+  .fx-l[aria-current="true"] { background: var(--ink); color: #fff }
+  .fx-l[aria-current="true"] .i { color: #d8ccfd }
+  .fx-l[aria-current="true"] .fx-l-c { color: rgba(255, 255, 255, .55) }
+  .fx-bar-p { display: block; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: transparent }
+  .fx-bar-p i { position: absolute; inset: 0; background: var(--dawn); transform-origin: left; transform: scaleX(0) }
+  .fx-sec { padding-top: 48px }
+  .fx-sec + .fx-sec { padding-top: 48px }
+}
 @media (max-width: 860px) {
-  .fx-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -14px; padding-inline: 14px; padding-bottom: 2px }
+  .fx-bar { flex-direction: column; flex-wrap: nowrap; align-items: stretch }
+  .fx-search { max-width: none; flex: none }
+  .fx-chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -20px; padding: 2px 20px }
   .fx-chips::-webkit-scrollbar { display: none }
   .fx-chips .chip { flex: none }
+  .fx-kbd { display: none }
 }
-@media (max-width: 560px) {
-  .fx-bar { padding: 10px; border-radius: 22px }
-  .fx-search input { height: 56px; font-size: 16px; padding-left: 50px }
-  .fx-search > .i { left: 17px }
-  .fx-chips { margin-inline: -10px; padding-inline: 10px }
-  .fx-nav-wrap { top: calc(var(--nav-h) + 4px) }
-  .fx-nav-wrap > .wrap { padding: 0 }
-  .fx-nav { border-radius: 0; padding-inline: 14px; box-shadow: 0 1px 0 var(--line) }
-  .fx-nav .dtab-pill { display: none }
-  .fx-nav .dtab[aria-current="true"] { background: var(--ink) }
-  .fx-sec { padding-top: 56px }
+@media (max-width: 640px) {
+  .fx-grid { grid-template-columns: minmax(0, 1fr) }
+  .fc { padding: 18px 18px 16px }
+  .fx-sh p { font-size: 15px }
 }

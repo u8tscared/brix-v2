@@ -50,7 +50,7 @@ export function initConfig() {
   sizesEl.innerHTML = SIZES.map((s) => `<button type="button" role="radio" aria-checked="${s.id === state.size}" tabindex="${s.id === state.size ? 0 : -1}" data-s="${s.id}">${s.name}<small>${s.id === 'solo' ? '1 personne' : 'personnes'}</small></button>`).join('');
 
   const side = $('[data-cfg-side]', root), grid = $('[data-cfg-widgets]', root);
-  side.innerHTML = DEPARTMENTS.map((d, i) => `<li data-d="${d.id}" class="${i === 0 ? 'cur' : ''}"><span class="d" style="background:${d.color}">${ic(d.icon)}</span><span>${d.name}</span><em></em></li>`).join('');
+  side.innerHTML = DEPARTMENTS.map((d, i) => `<li data-d="${d.id}" class="${i === 0 ? 'cur' : ''}"><span class="d">${ic(d.icon)}</span><span>${d.name}</span><em></em></li>`).join('');
 
   const date = new Date(Date.now() + 864e5).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   $('[data-cfg-date]', root).textContent = date.charAt(0).toUpperCase() + date.slice(1);

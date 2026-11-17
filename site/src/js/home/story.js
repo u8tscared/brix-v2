@@ -6,7 +6,7 @@ export function initStory() {
   if (!stage) return;
   const scenes = $$('.scene', stage), steps = $$('.step');
   const wave = $('#wave');
-  for (let i = 0; i < 34; i++) {
+  for (let i = 0; i < 28; i++) {
     const s = document.createElement('i');
     s.style.animationDelay = `${(-Math.random()).toFixed(2)}s`;
     s.style.animationDuration = `${(0.6 + Math.random() * 0.7).toFixed(2)}s`;
@@ -20,6 +20,7 @@ export function initStory() {
     stage.dataset.s = n;
     scenes.forEach((s, i) => s.classList.toggle('on', i === n));
     steps.forEach((s, i) => s.classList.toggle('on', i === n));
+    $$('.stage-dots i', stage).forEach((d, i) => d.classList.toggle('on', i === n));
     if (n === 0) {
       const el = $('#said'), ls = $$('.ql');
       ls.forEach((l) => l.classList.remove('on'));
