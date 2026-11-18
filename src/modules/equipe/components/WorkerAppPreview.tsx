@@ -41,7 +41,7 @@ export function WorkerAppPreview() {
       </div>
 
       {/* Téléphone */}
-      <div className="mx-auto w-full max-w-[360px] rounded-[46px] lg:order-2 border-[10px] border-[#17171f] bg-page shadow-pop">
+      <div className="mx-auto w-full max-w-[360px] rounded-[46px] lg:order-2 border-[10px] border-[#17171f] bg-dawn-mist shadow-pop">
         <div className="mx-auto mt-2 h-6 w-28 rounded-full bg-[#17171f]" />
         <div className="space-y-3 px-4 pb-6 pt-3">
           <div>
@@ -64,45 +64,45 @@ export function WorkerAppPreview() {
             </span>
           </button>
 
-          <div className="rounded-[18px] bg-white p-1 shadow-card">
+          <div className="rounded-card bg-white p-1 shadow-halo">
             <div className="px-3 pb-1 pt-2 text-[12px] font-semibold text-ink-2">Mes chantiers du jour</div>
             {today.length === 0 && <div className="px-3 pb-3 text-[13px] text-ink-3">Rien de prévu aujourd’hui.</div>}
             {today.map((e) => {
               const ch = chantiers.find((c) => c.id === e.chantierId);
               const cl = clients.find((c) => c.id === ch?.clientId);
               return (
-                <div key={e.id} className="flex items-center gap-3 border-t border-line px-3 py-2.5 first-of-type:border-0">
+                <div key={e.id} className="flex items-center gap-3 border-t border-halo-line px-3 py-2.5 first-of-type:border-0">
                   <div className="num w-10 shrink-0 whitespace-nowrap text-[12.5px] font-semibold text-ink-2">{e.start}</div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13.5px] font-medium">{e.title}</div>
                     <div className="flex items-center gap-1 truncate text-[11.5px] text-ink-3"><MapPin className="h-3 w-3 shrink-0" />{ch ? `${ch.address}, ${ch.city}` : 'Dépôt'}</div>
                   </div>
-                  {cl && <a href={`tel:${cl.phone.replace(/\s/g, '')}`} aria-label="Appeler le client" className="grid h-11 w-11 place-items-center rounded-full bg-sub text-ink-2"><Phone className="h-4 w-4" /></a>}
-                  {ch && <a href={`https://maps.google.com/?q=${encodeURIComponent(ch.address + ' ' + ch.city)}`} target="_blank" rel="noreferrer" aria-label="Itinéraire" className="grid h-11 w-11 place-items-center rounded-full bg-vi-50 text-vi-700"><Navigation className="h-4 w-4" /></a>}
+                  {cl && <a href={`tel:${cl.phone.replace(/\s/g, '')}`} aria-label="Appeler le client" className="grid h-11 w-11 place-items-center rounded-full bg-halo-track text-ink-2"><Phone className="h-4 w-4" /></a>}
+                  {ch && <a href={`https://maps.google.com/?q=${encodeURIComponent(ch.address + ' ' + ch.city)}`} target="_blank" rel="noreferrer" aria-label="Itinéraire" className="grid h-11 w-11 place-items-center rounded-full bg-pale-v text-deep-v"><Navigation className="h-4 w-4" /></a>}
                 </div>
               );
             })}
           </div>
 
-          <div className="grid grid-cols-[1fr_auto] gap-2 rounded-[18px] bg-white p-3 shadow-card">
+          <div className="grid grid-cols-[1fr_auto] gap-2 rounded-card bg-white p-3 shadow-halo">
             <div>
               <div className="text-[12px] font-semibold text-ink-2">Photos du chantier</div>
               <div className="mt-2 flex gap-1.5">
                 {Array.from({ length: Math.min(photos, 3) }).map((_, i) => (
                   <div key={i} className="h-11 w-11 rounded-lg" style={{ background: ['#e6e1d6', '#d9dde3', '#e9e4ef', '#dfe6dc'][i % 4] }} />
                 ))}
-                {photos > 3 && <div className="grid h-11 w-11 place-items-center rounded-lg bg-sub text-[12px] font-medium text-ink-2">+{photos - 3}</div>}
+                {photos > 3 && <div className="grid h-11 w-11 place-items-center rounded-lg bg-halo-track text-[12px] font-medium text-ink-2">+{photos - 3}</div>}
               </div>
             </div>
             <button onClick={() => { setPhotos((p) => p + 1); toast('Photo ajoutée au chantier (démo).'); }} className="grid h-14 w-14 place-items-center self-end rounded-2xl bg-ink text-white" aria-label="Prendre une photo"><Camera className="h-6 w-6" /></button>
           </div>
 
-          <div className="rounded-[18px] bg-white p-3 shadow-card">
+          <div className="rounded-card bg-white p-3 shadow-halo">
             <div className="mb-2 flex items-center gap-1.5 text-[12px] font-semibold text-ink-2"><NotebookPen className="h-3.5 w-3.5" />Notes</div>
-            <ul className="space-y-1.5 text-[13px]">{notes.map((n, i) => <li key={i} className="rounded-lg bg-sub px-2.5 py-1.5">{n}</li>)}</ul>
+            <ul className="space-y-1.5 text-[13px]">{notes.map((n, i) => <li key={i} className="rounded-lg bg-halo-track px-2.5 py-1.5">{n}</li>)}</ul>
             <form onSubmit={(e) => { e.preventDefault(); if (draft.trim()) { setNotes([...notes, draft.trim()]); setDraft(''); } }} className="mt-2 flex gap-2">
-              <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Ajouter une note…" className="h-11 min-w-0 flex-1 rounded-xl border border-line2 px-3 text-[13px] focus:outline-none focus:ring-4 focus:ring-vi-100" />
-              <button className="h-11 rounded-xl bg-sub px-3 text-[13px] font-medium">Ajouter</button>
+              <input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Ajouter une note…" className="h-11 min-w-0 flex-1 rounded-card-sm border border-line2 px-3 text-[13px] focus:outline-none focus:ring-4 focus:ring-vi-100" />
+              <button className="h-11 rounded-card-sm bg-halo-track px-3 text-[13px] font-medium">Ajouter</button>
             </form>
           </div>
         </div>

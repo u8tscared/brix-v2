@@ -37,7 +37,7 @@ export default function Photos() {
               <option value="tous">Tous les chantiers</option>
               {chantiers.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </Select>
-            <Button variant="primary" icon={<Camera className="h-4 w-4" />} onClick={() => capture.open()} disabled={!active.length && sel === 'tous'}>
+            <Button variant="dawn" icon={<Camera className="h-4 w-4" />} onClick={() => capture.open()} disabled={!active.length && sel === 'tous'}>
               Prendre une photo
             </Button>
           </>
@@ -45,28 +45,26 @@ export default function Photos() {
       />
 
       {sel === 'tous' && missing.length > 0 && (
-        <section className="rounded-[18px] bg-[#fffaf0] p-4 shadow-[inset_0_0_0_1px_#fde3b0] md:p-5">
-          <div className="flex items-center gap-2.5">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-warn-bg text-warn shadow-[inset_0_0_0_1px_#fde3b0]">
-              <AlertTriangle className="h-4 w-4" />
-            </span>
+        <section className="rounded-card bg-[linear-gradient(135deg,#fffaf0,#fff5ee)] p-4 shadow-halo md:p-5">
+          <div className="flex items-center gap-3">
+            <IconTile tone="amber" icon={<AlertTriangle />} />
             <div className="min-w-0 flex-1">
-              <div className="text-[14px] font-semibold tracking-[-0.015em]">Contrôle qualité : {missing.length} photo{missing.length > 1 ? 's' : ''} à prendre</div>
+              <div className="text-[15px] font-semibold tracking-[-0.02em]">Contrôle qualité : {missing.length} photo{missing.length > 1 ? 's' : ''} à prendre</div>
               <div className="text-[12.5px] text-ink-2">Elles vous protègent en cas de litige et nourrissent le rapport client.</div>
             </div>
           </div>
           <div className="stagger-fast mt-4 grid gap-2.5 md:grid-cols-2 xl:grid-cols-3">
             {groups.map(({ c, list }) => (
-              <button key={c.id} onClick={() => navigate(`/app/chantiers/${c.id}?onglet=photos`)} className="group lift press flex flex-col rounded-[14px] bg-white p-3.5 text-left shadow-card">
+              <button key={c.id} onClick={() => navigate(`/app/chantiers/${c.id}?onglet=photos`)} className="group lift press flex flex-col rounded-card-sm bg-white p-4 text-left shadow-halo">
                 <span className="flex items-center gap-2">
                   <span className="min-w-0 flex-1 truncate text-[13.5px] font-semibold">{c.name}</span>
-                  <span className="num grid h-5 min-w-5 place-items-center rounded-full bg-warn-bg px-1.5 text-[11px] font-semibold text-warn">{list.length}</span>
+                  <span className="num tone-amber grid h-[22px] min-w-[22px] place-items-center rounded-full px-1.5 text-[11px] font-semibold">{list.length}</span>
                   <ArrowRight className="h-4 w-4 shrink-0 text-ink-3 transition group-hover:translate-x-0.5" />
                 </span>
                 <span className="mt-2 space-y-1">
                   {list.map((q) => (
                     <span key={q.tag} className="flex items-center gap-2 text-[12.5px] text-ink-2">
-                      <Camera className="h-3.5 w-3.5 shrink-0 text-ink-3" />
+                      <Camera className="h-3.5 w-3.5 shrink-0 text-deep-p" />
                       <span className="truncate">{q.message.replace(/^Il manque (la|une) photo (du |des |de la |de l'|d')?/, (m) => capitalize(m.replace(/^Il manque (la|une) photo /, '')))}</span>
                     </span>
                   ))}

@@ -7,7 +7,7 @@ import type { ChantierView } from '../../lib/useChantier';
 import { hoursOf } from '../../lib/metrics';
 import { weatherFor, isRainy } from '../../lib/weather';
 import { WeatherIcon } from '../common/bits';
-import { KIND_STYLE } from '../planning/kinds';
+import { personTone } from '../planning/kinds';
 
 export function PlanningTab({ v }: { v: ChantierView }) {
   const navigate = useNavigate();
@@ -23,17 +23,17 @@ export function PlanningTab({ v }: { v: ChantierView }) {
 
   return (
     <div className="space-y-4">
-      <Card className="p-4">
+      <Card className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-2 text-[13px]">
-          <span className="font-semibold">Calendrier du chantier</span>
-          <span className="text-ink-2">{list.length} créneaux · {total} h prévues</span>
+          <span className="text-[15px] font-semibold tracking-[-0.02em]">Calendrier du chantier</span>
+          <span className="num text-ink-2">{list.length} créneaux · {total} h prévues</span>
         </div>
-        <div className="relative mt-4 h-9 rounded-lg bg-sub">
-          <div className="absolute inset-y-0 left-0 rounded-lg bg-ink/10" style={{ width: `${ch.progress}%` }} />
+        <div className="relative mt-4 h-10 rounded-full bg-halo-track">
+          <div className="absolute inset-y-0 left-0 origin-left animate-grow rounded-full bg-dawn-soft shadow-[inset_0_0_0_1px_#efe3fb]" style={{ width: `${ch.progress}%` }} />
           {days.map((d) => (
-            <span key={d} className={cn('absolute top-2 h-5 w-1.5 -translate-x-1/2 rounded-full', d < today ? 'bg-ink-3' : 'bg-vi-700')} style={{ left: `${pos(d)}%` }} title={dateLong(d)} />
+            <span key={d} className={cn('absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white', d < today ? 'bg-[#c9c3dc]' : 'bg-deep-v')} style={{ left: `${pos(d)}%` }} title={dateLong(d)} />
           ))}
-          <span className="absolute -top-1 bottom-[-4px] w-0.5 bg-bad" style={{ left: `${pos(today)}%` }} />
+          <span className="absolute -top-1.5 bottom-[-6px] w-[3px] -translate-x-1/2 rounded-full bg-[#d946ef] ring-2 ring-white" style={{ left: `${pos(today)}%` }} />
         </div>
         <div className="mt-1.5 flex justify-between text-xs text-ink-3">
           <span>{dateLong(ch.startDate)}</span>
@@ -42,14 +42,14 @@ export function PlanningTab({ v }: { v: ChantierView }) {
       </Card>
 
       {list.length === 0 ? (
-        <EmptyState icon={<CalendarRange />} title="Aucun créneau prévu" text="Placez l'équipe sur ce chantier depuis le planning." action={<Button variant="primary" icon={<CalendarPlus className="h-4 w-4" />} onClick={() => navigate('/app/planning')}>Ouvrir le planning</Button>} />
+        <EmptyState icon={<CalendarRange />} title="Aucun créneau prévu" text="Placez l'équipe sur ce chantier depuis le planning." action={<Button variant="dawn" icon={<CalendarPlus className="h-4 w-4" />} onClick={() => navigate('/app/planning')}>Ouvrir le planning</Button>} />
       ) : (
-        <Card>
+        <div className="space-y-4">
           {days.map((d) => {
             const w = weatherFor(d, ch.city);
             return (
-              <div key={d} className={cn('border-b border-line last:border-b-0', d < today && 'opacity-60')}>
-                <div className="flex items-center gap-2 bg-[#fbfbfd] px-4 py-2 text-xs font-medium text-ink-2">
+              <div key={d} className={cn('space-y-1.5', d < today && 'opacity-60')}>
+                <div className="flex items-center gap-2 px-1 text-[12.5px] font-medium text-ink-2">
                   <span className="flex-1">{capitalize(dateLong(d))}</span>
                   <WeatherIcon sky={w.sky} className="h-3.5 w-3.5" />
                   <span className={cn('num', isRainy(w) && 'text-[#3b82f6]')}>{w.tMax}°</span>
@@ -57,9 +57,8 @@ export function PlanningTab({ v }: { v: ChantierView }) {
                 {list.filter((e) => e.date === d).map((e) => {
                   const emp = employees.find((x) => x.id === e.employeeId);
                   return (
-                    <div key={e.id} className="flex min-h-[52px] items-center gap-3 px-4 py-2">
+                    <div key={e.id} style={personTone(emp?.color ?? '#7c3aed', e.kind)} className="flex min-h-[52px] items-center gap-3 rounded-card-sm px-4 py-2">
                       <span className="num w-[86px] shrink-0 text-[12.5px] text-ink-2">{e.start} – {e.end}</span>
-                      <span className={cn('h-6 w-1 shrink-0 rounded-full', KIND_STYLE[e.kind].bar)} />
                       <span className="min-w-0 flex-1 truncate text-[13.5px]">{e.title}</span>
                       {emp && <Avatar initials={emp.initials} color={emp.color} size={26} />}
                     </div>
@@ -68,7 +67,7 @@ export function PlanningTab({ v }: { v: ChantierView }) {
               </div>
             );
           })}
-        </Card>
+        </div>
       )}
       <div className="flex justify-end">
         <Button icon={<CalendarRange className="h-4 w-4" />} onClick={() => navigate('/app/planning')}>Modifier dans le planning</Button>

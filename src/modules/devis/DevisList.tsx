@@ -2,8 +2,8 @@ import { relancerDevis } from '@/parcours/signature';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, FileText, Phone, Plus, Search } from 'lucide-react';
-import { Button, EmptyState, IconTile, Input, PageHeader, Segmented, Select, toast } from '@/components/ui';
-import { LiveDot } from '@/components/motion';
+import { BrandTile } from '@/components/brand/Logo';
+import { Button, Card, EmptyState, IconTile, Input, PageHeader, Segmented, Select, toast } from '@/components/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
@@ -19,11 +19,11 @@ type Filter = StageKey | 'tous' | 'relancer';
 type Sort = 'recent' | 'montant' | 'proba';
 
 const STAGES: { key: StageKey; label: string; color: string; match: (d: Devis) => boolean }[] = [
-  { key: 'brouillon', label: 'Brouillons', color: '#cfcbdd', match: (d) => d.status === 'brouillon' },
-  { key: 'envoye', label: 'Envoyés', color: '#6366f1', match: (d) => d.status === 'envoye' },
-  { key: 'vu', label: 'Vus', color: '#c026d3', match: (d) => d.status === 'vu' },
-  { key: 'signe', label: 'Signés', color: '#16a34a', match: (d) => d.status === 'signe' },
-  { key: 'refuse', label: 'Refusés', color: '#f87171', match: (d) => d.status === 'refuse' || d.status === 'expire' },
+  { key: 'brouillon', label: 'Brouillons', color: '#ddd8ea', match: (d) => d.status === 'brouillon' },
+  { key: 'envoye', label: 'Envoyés', color: '#a78bfa', match: (d) => d.status === 'envoye' },
+  { key: 'vu', label: 'Vus', color: '#e879f9', match: (d) => d.status === 'vu' },
+  { key: 'signe', label: 'Signés', color: '#34d399', match: (d) => d.status === 'signe' },
+  { key: 'refuse', label: 'Refusés', color: '#fda4af', match: (d) => d.status === 'refuse' || d.status === 'expire' },
 ];
 
 export default function DevisList() {
@@ -99,11 +99,11 @@ export default function DevisList() {
   return (
     <div className="space-y-5">
       <PageHeader
-        icon={<IconTile name="FileText" dept="vendre" size="lg" />}
+        icon={<IconTile name="FileText" dept="vendre" size="xl" />}
         title="Devis"
-        subtitle={toRemind.length ? `${toRemind.length} devis attendent une réponse de vos clients.` : 'Tous vos devis ont reçu une réponse.'}
+        titleMuted={toRemind.length ? `${toRemind.length} attendent une réponse.` : 'tous ont reçu une réponse.'}
         actions={
-          <Button variant="primary" size={phone ? 'lg' : 'md'} icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/devis/nouveau')} className="max-sm:w-full max-sm:justify-center">
+          <Button variant="dawn" size={phone ? 'lg' : 'md'} icon={<Plus className="h-4 w-4" />} kbd="N" onClick={() => navigate('/app/devis/nouveau')} className="max-sm:w-full max-sm:justify-center">
             Nouveau devis
           </Button>
         }
@@ -114,22 +114,22 @@ export default function DevisList() {
       </div>
 
       {hot?.client && (
-        <div className="flex animate-[fade-up_.5s_var(--ease)_.12s_both] flex-col gap-3 rounded-[16px] bg-night px-4 py-3.5 text-white shadow-ink sm:flex-row sm:items-center md:px-5">
+        <Card tone="mist" className="flex animate-[fade-up_.5s_var(--ease)_.12s_both] flex-col gap-3 p-4 sm:flex-row sm:items-center md:px-5">
           <div className="flex min-w-0 flex-1 items-start gap-3">
-            <LiveDot tone="peach" className="mt-1.5" />
-            <p className="text-[13.5px] leading-snug text-white/85">
-              <b className="font-semibold text-white">{hot.client.name}</b> a ouvert son devis {hot.d.views} fois, la dernière {activityAgo(hot.d.viewedAt)}. C’est le bon moment pour l’appeler : <b className="font-semibold text-white">{hot.score.value} %</b> de chances de signer.
+            <BrandTile size={30} className="mt-0.5" />
+            <p className="text-[14px] leading-snug text-ink-2">
+              <b className="font-semibold text-ink">{hot.client.name}</b> a ouvert son devis {hot.d.views} fois, la dernière {activityAgo(hot.d.viewedAt)}. C’est le bon moment pour l’appeler : <b className="font-semibold text-ink">{hot.score.value} %</b> de chances de signer.
             </p>
           </div>
-          <div className="flex shrink-0 gap-2 pl-5 sm:pl-0">
-            <a href={`tel:${hot.client.phone.replace(/\s/g, '')}`} className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-white px-4 text-[13.5px] font-semibold text-ink transition hover:bg-white/90 sm:h-9 sm:px-3.5">
-              <Phone className="h-3.5 w-3.5" /> Appeler
+          <div className="flex shrink-0 gap-2 pl-[42px] sm:pl-0">
+            <a href={`tel:${hot.client.phone.replace(/\s/g, '')}`} className="inline-flex h-11 items-center gap-2 rounded-full bg-white px-4 text-[13.5px] font-medium text-ink shadow-[0_1px_2px_rgba(60,30,120,.08),0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:-translate-y-px sm:h-9">
+              <Phone className="h-4 w-4" /> Appeler
             </a>
-            <button onClick={() => navigate(`/app/devis/${hot.d.id}`)} className="inline-flex h-11 items-center gap-1.5 rounded-[10px] px-3 text-[13.5px] font-medium text-white/85 transition hover:bg-white/10 hover:text-white sm:h-9">
-              Voir le devis <ArrowRight className="h-3.5 w-3.5" />
-            </button>
+            <Button variant="ghost" size="sm" iconRight={<ArrowRight className="h-3.5 w-3.5" />} onClick={() => navigate(`/app/devis/${hot.d.id}`)} className="max-sm:h-11">
+              Voir le devis
+            </Button>
           </div>
-        </div>
+        </Card>
       )}
 
       <div className="space-y-3">
@@ -167,15 +167,15 @@ export default function DevisList() {
             ))}
           </div>
         ) : (
-          <div className="overflow-hidden rounded-[18px] bg-white shadow-card">
-            <div className={`grid gap-4 border-b border-line px-5 py-2.5 text-[11.5px] font-medium text-ink-3 ${ROW_GRID}`}>
+          <div>
+            <div className={`grid gap-4 px-5 pb-2 text-[12px] font-medium text-ink-3 ${ROW_GRID}`}>
               <span title="Probabilité de signature">Chances</span>
               <span>Client et devis</span>
               <span>Où en est-il</span>
               <span className="text-right">Montant TTC</span>
               <span />
             </div>
-            <div key={filter + sort} className="stagger-fast">
+            <div key={filter + sort} className="stagger-fast space-y-2">
               {list.map((r) => (
                 <DevisRow key={r.d.id} {...itemProps(r)} />
               ))}

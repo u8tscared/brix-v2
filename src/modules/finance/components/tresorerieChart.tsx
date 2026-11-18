@@ -56,11 +56,20 @@ export function ForecastChart({ points, threshold, height = 260 }: { points: For
       {w > 0 && (
         <svg width={w} height={H} className="block touch-pan-y" onPointerMove={(e) => pick(e.clientX, e.currentTarget)} onPointerDown={(e) => pick(e.clientX, e.currentTarget)} onPointerLeave={() => setHover(null)} role="img" aria-label="Solde prévu sur 90 jours">
           <defs>
-            <linearGradient id={`f${uid}`} x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stopColor="#8b5cf6" stopOpacity=".22" />
-              <stop offset=".7" stopColor="#d946ef" stopOpacity=".04" />
-              <stop offset="1" stopColor="#d946ef" stopOpacity="0" />
+            {/* Zone : dégradé Aube doux (violet → magenta → pêche en largeur, qui s'efface vers le bas). */}
+            <linearGradient id={`fh${uid}`} x1="0" x2="1">
+              <stop offset="0" stopColor="#8b5cf6" />
+              <stop offset=".6" stopColor="#d946ef" />
+              <stop offset="1" stopColor="#fb923c" />
             </linearGradient>
+            <linearGradient id={`fv${uid}`} x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0" stopColor="#fff" stopOpacity=".24" />
+              <stop offset=".75" stopColor="#fff" stopOpacity=".03" />
+              <stop offset="1" stopColor="#fff" stopOpacity="0" />
+            </linearGradient>
+            <mask id={`m${uid}`}>
+              <rect x="0" y="0" width={w} height={H} fill={`url(#fv${uid})`} />
+            </mask>
             <linearGradient id={`s${uid}`} x1="0" x2="1">
               <stop offset="0" stopColor="#6d28d9" />
               <stop offset=".65" stopColor="#c026d3" />
@@ -69,14 +78,14 @@ export function ForecastChart({ points, threshold, height = 260 }: { points: For
           </defs>
           {ticks.map((t) => (
             <g key={t}>
-              <line x1={PAD.l} x2={w - PAD.r} y1={y(t)} y2={y(t)} stroke={t === 0 ? '#e7a3a3' : 'var(--line)'} strokeDasharray={t === 0 ? '3 4' : undefined} />
-              <text x={PAD.l + 2} y={y(t) - 5} className="fill-ink-3 text-[10.5px]">{t === 0 ? '0 €' : `${Math.round(t / 1000)} k€`}</text>
+              <line x1={PAD.l} x2={w - PAD.r} y1={y(t)} y2={y(t)} stroke={t === 0 ? '#f3b4c4' : '#f0eef5'} strokeDasharray={t === 0 ? '3 4' : undefined} />
+              <text x={PAD.l + 2} y={y(t) - 5} className="fill-ink-3 font-mono text-[10px]">{t === 0 ? '0 €' : `${Math.round(t / 1000)} k€`}</text>
             </g>
           ))}
           {months.map(({ p, i }) => (
             <g key={p.date}>
-              <line x1={x(i)} x2={x(i)} y1={PAD.t} y2={H - PAD.b} stroke="var(--line)" strokeDasharray="2 4" />
-              <text x={x(i) + 5} y={H - 9} className="fill-ink-3 text-[11px]">{capitalize(new Date(p.date + 'T12:00').toLocaleDateString('fr-FR', { month: 'long' }))}</text>
+              <line x1={x(i)} x2={x(i)} y1={PAD.t} y2={H - PAD.b} stroke="#ece8f6" strokeDasharray="2 4" />
+              {x(i) > 84 && <text x={x(i) + 5} y={H - 9} className="fill-ink-3 text-[11px]">{capitalize(new Date(p.date + 'T12:00').toLocaleDateString('fr-FR', { month: 'long' }))}</text>}
             </g>
           ))}
           <text x={PAD.l + 2} y={H - 9} className="fill-ink-2 text-[11px] font-medium">Aujourd'hui</text>
@@ -84,15 +93,15 @@ export function ForecastChart({ points, threshold, height = 260 }: { points: For
           {threshold !== undefined && (
             <g className="animate-[fade-in_.6s_ease_.9s_both]">
               <line x1={PAD.l} x2={w - PAD.r} y1={y(threshold)} y2={y(threshold)} stroke="#f59e0b" strokeWidth={1.25} strokeDasharray="5 5" />
-              <rect x={PAD.l + 74} y={y(threshold) - 20} width={150} height={16} rx={8} fill="#fff8eb" />
-              <text x={PAD.l + 149} y={y(threshold) - 9} textAnchor="middle" className="fill-warn text-[10.5px] font-medium">Seuil : 1 mois de salaires</text>
+              <rect x={PAD.l + 74} y={y(threshold) - 21} width={154} height={18} rx={9} fill="#fdf3dc" />
+              <text x={PAD.l + 151} y={y(threshold) - 8.5} textAnchor="middle" className="fill-deep-a text-[10.5px] font-medium">Seuil : 1 mois de salaires</text>
             </g>
           )}
 
-          <path d={area} fill={`url(#f${uid})`} className="animate-[fade-in_1s_ease_.6s_both]" />
+          <path d={area} fill={`url(#fh${uid})`} mask={`url(#m${uid})`} className="animate-[fade-in_1.2s_ease_.5s_both]" />
           <path d={path} fill="none" stroke={`url(#s${uid})`} strokeWidth={2.25} strokeLinejoin="round" strokeLinecap="round" pathLength={1} style={{ strokeDasharray: 1, ['--len' as string]: 1, animation: 'draw 1.6s var(--ease) .1s both' }} />
           {big.map((b, k) => (
-            <circle key={b.i} cx={x(b.i)} cy={y(points[b.i].balance)} r={3} fill="#fff" stroke={b.sum > 0 ? '#16a34a' : '#8b5cf6'} strokeWidth={1.6} className="animate-[pop_.4s_var(--ease)_both]" style={{ animationDelay: `${0.9 + k * 0.04}s`, transformBox: 'fill-box', transformOrigin: 'center' }} />
+            <circle key={b.i} cx={x(b.i)} cy={y(points[b.i].balance)} r={3} fill="#fff" stroke={b.sum > 0 ? '#10b981' : '#a78bfa'} strokeWidth={1.6} className="animate-[pop_.4s_var(--ease)_both]" style={{ animationDelay: `${0.9 + k * 0.04}s`, transformBox: 'fill-box', transformOrigin: 'center' }} />
           ))}
           <circle cx={x(0)} cy={y(vals[0])} r={4.5} fill="#6d28d9" stroke="#fff" strokeWidth={2} />
           <g className="animate-[fade-in_.4s_ease_1.1s_both]">
@@ -113,14 +122,14 @@ export function ForecastChart({ points, threshold, height = 260 }: { points: For
         </svg>
       )}
       {hp && hover !== null && (
-        <div className="pointer-events-none absolute top-0 z-10 rounded-[12px] bg-night/95 p-3 text-[12px] text-white shadow-pop backdrop-blur" style={{ width: tipW, left: Math.min(Math.max(x(hover) - tipW / 2, 0), w - tipW) }}>
-          <div className="text-white/60">{capitalize(dateLong(hp.date))}</div>
-          <div className="num mt-0.5 text-[17px] font-semibold tracking-[-0.02em]">{money(hp.balance, true)}</div>
-          {hp.events.length === 0 && <div className="mt-1 text-white/50">Aucun mouvement ce jour</div>}
+        <div className="glass-strong pointer-events-none absolute top-0 z-10 animate-[scale-in_.2s_var(--ease)_both] rounded-card-sm p-3 text-[12px] text-ink shadow-halo-lg" style={{ width: tipW, left: Math.min(Math.max(x(hover) - tipW / 2, 0), w - tipW) }}>
+          <div className="text-ink-3">{capitalize(dateLong(hp.date))}</div>
+          <div className="num-halo mt-0.5 text-[20px]">{money(hp.balance, true)}</div>
+          {hp.events.length === 0 && <div className="mt-1 text-ink-3">Aucun mouvement ce jour</div>}
           {hp.events.slice(0, 4).map((e, i) => (
             <div key={i} className="mt-1 flex justify-between gap-2">
-              <span className="truncate text-white/75">{e.label}</span>
-              <span className={cn('num shrink-0 font-medium', e.amount > 0 ? 'text-[#4ade80]' : 'text-white')}>{e.amount > 0 ? '+' : ''}{money(e.amount, true)}</span>
+              <span className="truncate text-ink-2">{e.label}</span>
+              <span className={cn('num shrink-0 font-medium', e.amount > 0 ? 'text-deep-g' : 'text-ink')}>{e.amount > 0 ? '+' : ''}{money(e.amount, true)}</span>
             </div>
           ))}
         </div>

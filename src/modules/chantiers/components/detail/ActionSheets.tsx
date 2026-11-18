@@ -51,7 +51,7 @@ export function VoiceNoteSheet({ v, open, onClose }: { v: ChantierView; open: bo
         <button
           onClick={d.listening ? stop : () => d.start()}
           disabled={d.busy}
-          className={cn('relative grid h-24 w-24 place-items-center rounded-full text-white transition active:scale-95', d.listening ? 'bg-bad' : 'bg-ink')}
+          className={cn('relative grid h-24 w-24 place-items-center rounded-full text-white transition active:scale-95', d.listening ? 'bg-[linear-gradient(160deg,#f43f5e,#c81e4a)] shadow-[0_12px_30px_-10px_rgba(244,63,94,.6)]' : 'bg-[image:var(--dawn-d)] shadow-dawn-lg')}
           aria-label={d.listening ? 'Arrêter' : 'Parler'}
         >
           {d.listening && <span className="absolute inset-0 animate-ping rounded-full bg-bad/30" />}
@@ -72,7 +72,7 @@ export function VoiceNoteSheet({ v, open, onClose }: { v: ChantierView; open: bo
       {intents.length > 0 && !d.listening && (
         <div className="mt-3 flex flex-wrap gap-2">
           {intents.map((i) => (
-            <button key={i.label} onClick={() => toast(`${i.label} : noté pour Bob (démo)`, 'info')} className="flex h-10 items-center gap-1.5 rounded-full bg-vi-50 px-3.5 text-[13px] font-medium text-vi-700 hover:bg-vi-100">
+            <button key={i.label} onClick={() => toast(`${i.label} : noté pour Bob (démo)`, 'info')} className="flex h-10 items-center gap-1.5 rounded-full bg-pale-v px-3.5 text-[13px] font-medium text-deep-v hover:bg-vi-100">
               {i.icon} {i.label}
             </button>
           ))}
@@ -209,7 +209,7 @@ export function AvenantSheet({ v, open, onClose }: { v: ChantierView; open: bool
         <Field label="Motif, lu par le client">
           <Textarea value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Ex. : prise supplémentaire derrière le canapé, demandée le 12/11." />
         </Field>
-        <div className="flex items-center justify-between rounded-xl bg-sub px-4 py-3">
+        <div className="flex items-center justify-between rounded-card-sm bg-halo-track px-4 py-3">
           <span className="text-[13px] text-ink-2">Total de l’avenant</span>
           <span className="num text-[18px] font-semibold">{money(total)} HT</span>
         </div>

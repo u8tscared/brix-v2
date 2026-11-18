@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, UserPlus, Users } from 'lucide-react';
-import { Avatar, Badge, Button, Card, CardHeader, EmptyState, Icon, IconTile, PageHeader, UnderlineTabs, cn } from '@/components/ui';
+import { Avatar, Badge, Button, Card, CardHeader, EmptyState, IconTile, PageHeader, UnderlineTabs, cn, type HaloTone } from '@/components/ui';
 import { LiveDot } from '@/components/motion';
 import { DaysRing } from '@/modules/finance/components/kit';
 import { NowBoard } from './components/NowBoard';
@@ -46,10 +46,10 @@ export default function Equipe() {
       />
 
       <div className="stagger-fast grid grid-cols-2 gap-3 md:grid-cols-4">
-        <QuickTile to="/app/pointage" icon="Timer" label="Pointage" value={`${onSite} / ${employees.length}`} sub={missing.length ? `${missing.length} pas encore pointé` : 'tout le monde a pointé'} tone={missing.length ? 'warn' : undefined} />
-        <QuickTile to="/app/conges" icon="Palmtree" label="Congés à valider" value={String(pendingLeaves)} sub={pendingLeaves ? 'en un geste' : 'rien en attente'} tone={pendingLeaves ? 'warn' : undefined} />
-        <QuickTile to="/app/habilitations" icon="BadgeCheck" label="Habilitations" value={String(habAlerts.length)} sub="à renouveler sous 60 j" tone={habAlerts.some((h) => habState(h.expires).level === 'expired') ? 'bad' : habAlerts.length ? 'warn' : undefined} />
-        <QuickTile to="/app/paie" icon="FileSpreadsheet" label="Masse salariale" value={money(payroll, true)} sub="brut par mois" />
+        <QuickTile to="/app/pointage" icon="Timer" color="green" label="Pointage" value={`${onSite} / ${employees.length}`} sub={missing.length ? `${missing.length} pas encore pointé` : 'tout le monde a pointé'} tone={missing.length ? 'warn' : undefined} />
+        <QuickTile to="/app/conges" icon="Palmtree" color="peach" label="Congés à valider" value={String(pendingLeaves)} sub={pendingLeaves ? 'en un geste' : 'rien en attente'} tone={pendingLeaves ? 'warn' : undefined} />
+        <QuickTile to="/app/habilitations" icon="BadgeCheck" color="amber" label="Habilitations" value={String(habAlerts.length)} sub="à renouveler sous 60 j" tone={habAlerts.some((h) => habState(h.expires).level === 'expired') ? 'bad' : habAlerts.length ? 'warn' : undefined} />
+        <QuickTile to="/app/paie" icon="FileSpreadsheet" color="blue" label="Masse salariale" value={money(payroll, true)} sub="brut par mois" />
       </div>
 
       <UnderlineTabs<Tab> value={tab} onChange={setTab} options={[
@@ -60,7 +60,7 @@ export default function Equipe() {
       ]} />
 
       {employees.length === 0 && tab !== 'roles' && (
-        <EmptyState icon={<Users />} title="Votre équipe arrive ici" text="Invitez vos compagnons : ils pointent depuis leur téléphone et vous voyez qui est où." action={<Button variant="primary" onClick={() => setInvite(true)}>Inviter une personne</Button>} />
+        <EmptyState icon={<Users />} title="Votre équipe arrive ici" text="Invitez vos compagnons : ils pointent depuis leur téléphone et vous voyez qui est où." action={<Button variant="soft" onClick={() => setInvite(true)}>Inviter une personne</Button>} />
       )}
 
       {tab === 'now' && employees.length > 0 && (
@@ -70,7 +70,7 @@ export default function Equipe() {
             {habAlerts.length > 0 && (
               <Card className="p-4">
                 <div className="flex items-center justify-between">
-                  <div className="text-[13.5px] font-semibold">À surveiller</div>
+                  <div className="flex items-center gap-2.5 text-[14.5px] font-semibold tracking-[-0.015em]"><IconTile size="sm" tone="amber" name="BadgeCheck" />À surveiller</div>
                   <Link to="/app/habilitations" className="text-[12.5px] font-medium text-ink-2 hover:text-ink">Tout voir</Link>
                 </div>
                 <ul className="mt-2 space-y-1">
@@ -80,7 +80,7 @@ export default function Equipe() {
                     const t = habType(h.type);
                     return (
                       <li key={h.id}>
-                        <Link to="/app/habilitations" className="-mx-2 flex min-h-[52px] items-center gap-3 rounded-[12px] px-2 transition hover:bg-sub">
+                        <Link to="/app/habilitations" className="-mx-2 flex min-h-[52px] items-center gap-3 rounded-[14px] px-2 transition hover:bg-halo-hover">
                           <DaysRing days={st.days} horizon={60} size={38} />
                           <span className="min-w-0 flex-1">
                             <span className="block truncate text-[13px] font-medium">{e.firstName} · {t?.short ?? 'Formation'}</span>
@@ -93,7 +93,7 @@ export default function Equipe() {
                 </ul>
               </Card>
             )}
-            <Link to="/app/planning" className="lift flex items-center gap-3 rounded-[16px] bg-white p-4 shadow-card">
+            <Link to="/app/planning" className="lift flex items-center gap-3 rounded-card bg-white p-4 shadow-halo">
               <IconTile name="CalendarRange" dept="chantiers" size="sm" />
               <span className="min-w-0 flex-1">
                 <span className="block text-[13.5px] font-medium">Planning de la semaine</span>
@@ -107,15 +107,15 @@ export default function Equipe() {
 
       {tab === 'fiches' && employees.length > 0 && (
         <div className="space-y-4">
-          <Card className="overflow-hidden">
-            <div className="hidden grid-cols-[minmax(0,1.6fr)_1fr_.8fr_.8fr_1fr_.7fr_20px] gap-3 border-b border-line bg-[#fafafc] px-4 py-2.5 text-[11.5px] font-medium text-ink-2 lg:grid">
+          <div className="stagger-fast space-y-2">
+            <div className="hidden grid-cols-[minmax(0,1.6fr)_1fr_.8fr_.8fr_1fr_.7fr_20px] gap-3 px-4 pb-1 text-[12.5px] font-medium text-ink-2 lg:grid">
               <span>Personne</span><span>Contrat</span><span className="text-right">Coût horaire</span><span className="text-right">Congés</span><span>Habilitations</span><span>Téléphone</span><span />
             </div>
             {employees.map((e) => {
               const mine = habs.filter((h) => h.employeeId === e.id);
               const worst = mine.map((h) => habState(h.expires)).sort((a, b) => a.days - b.days)[0];
               return (
-                <button key={e.id} onClick={() => setOpen(e)} className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-line px-4 py-3 text-left transition last:border-0 hover:bg-[#fafafc] lg:grid-cols-[minmax(0,1.6fr)_1fr_.8fr_.8fr_1fr_.7fr_20px]">
+                <button key={e.id} onClick={() => setOpen(e)} className="row-card grid w-full grid-cols-[auto_minmax(0,1fr)_auto] gap-3 text-left lg:grid-cols-[minmax(0,1.6fr)_1fr_.8fr_.8fr_1fr_.7fr_20px]">
                   <span className="flex min-w-0 items-center gap-3 max-lg:contents">
                     <Avatar initials={e.initials} color={e.color} size={36} />
                     <span className="min-w-0">
@@ -132,13 +132,13 @@ export default function Equipe() {
                 </button>
               );
             })}
-          </Card>
+          </div>
 
           {invitations.length > 0 && (
             <Card>
               <CardHeader title="Invitations envoyées" meta={`${invitations.length}`} />
               {invitations.map((i) => (
-                <div key={i.id} className="flex min-h-[52px] items-center gap-3 border-b border-line px-4 py-2 last:border-0">
+                <div key={i.id} className="flex min-h-[52px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-0">
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13.5px] font-medium">{i.name}</div>
                     <div className="text-[12px] text-ink-3">{roleName(i.role)} · par {i.via === 'qr' ? 'QR code' : i.via === 'sms' ? 'SMS' : 'lien'}</div>
@@ -160,14 +160,12 @@ export default function Equipe() {
   );
 }
 
-function QuickTile({ to, icon, label, value, sub, tone }: { to: string; icon: string; label: string; value: string; sub: string; tone?: 'warn' | 'bad' }) {
+function QuickTile({ to, icon, label, value, sub, tone, color }: { to: string; icon: string; label: string; value: string; sub: string; tone?: 'warn' | 'bad'; color: HaloTone }) {
   return (
-    <Link to={to} className="lift group relative flex min-w-0 flex-col rounded-[16px] bg-white p-4 shadow-card">
-      <span className="flex items-center justify-between gap-2">
-        <span className="truncate text-[12.5px] font-medium text-ink-2">{label}</span>
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[9px] bg-[#e8f7fa] text-[#0e7490] transition group-hover:scale-105"><Icon name={icon} className="h-3.5 w-3.5" strokeWidth={1.9} /></span>
-      </span>
-      <span className="num mt-2 text-[24px] font-semibold leading-none tracking-[-0.035em]">{value}</span>
+    <Link to={to} className="lift group relative flex min-w-0 flex-col rounded-card bg-white p-4 shadow-halo md:p-5">
+      <IconTile name={icon} tone={color} size="sm" className="transition-transform duration-300 ease-spring group-hover:scale-110" />
+      <span className="mt-3 truncate text-[13px] font-medium text-ink-2">{label}</span>
+      <span className="num-halo mt-1.5 text-[26px] leading-none md:text-[30px]">{value}</span>
       <span className={cn('mt-1.5 flex items-center gap-1.5 truncate text-[12px] text-ink-3', tone === 'warn' && 'text-warn', tone === 'bad' && 'text-bad')}>
         {tone && <i className={cn('h-1.5 w-1.5 shrink-0 rounded-full', tone === 'bad' ? 'bg-bad' : 'bg-[#f59e0b]')} />}
         {sub}

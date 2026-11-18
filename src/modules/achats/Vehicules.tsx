@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CalendarCheck, CheckCircle2, HardHat, Wrench } from 'lucide-react';
-import { Button, Field, IconTile, Input, PageHeader, Select, Sheet, UnderlineTabs, cn, toast } from '@/components/ui';
+import { Button, Card, Field, IconTile, Input, PageHeader, Select, Sheet, UnderlineTabs, cn, toast } from '@/components/ui';
 import { SuccessDot } from '@/components/motion';
 import { useBrix } from '@/lib/store';
 import { num, todayISO } from '@/lib/format';
@@ -50,7 +50,7 @@ export default function Vehicules() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Truck" dept="achats" size="lg" />} title="Véhicules et outillage" subtitle="Échéances, kilométrage, qui a quel outil. Brix prévient avant que ça coince." />
+      <PageHeader icon={<IconTile name="Truck" dept="achats" size="lg" />} title="Véhicules et outillage" titleMuted="rien ne coince." subtitle="Échéances, kilométrage, qui a quel outil. Brix prévient avant que ça coince." />
 
       {due.length > 0 && (
         <section>
@@ -59,20 +59,19 @@ export default function Vehicules() {
             {due.map((d) => {
               const ok = done[d.id];
               return (
-                <div key={d.id} className={cn('relative flex items-center gap-3.5 overflow-hidden rounded-[16px] bg-white p-4 shadow-card transition-opacity duration-500', ok && 'opacity-80')}>
-                  {!ok && <span aria-hidden className={cn('absolute inset-y-0 left-0 w-[3px]', d.days < 0 ? 'bg-bad' : 'bg-[#f59e0b]')} />}
+                <Card key={d.id} className={cn('relative flex items-center gap-3.5 overflow-hidden p-4 transition-opacity duration-500', ok && 'opacity-80')}>
                   <DaysRing days={d.days} horizon={30} size={52} />
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-ink-3">{d.kind === 'tool' ? <HardHat className="h-3.5 w-3.5" /> : <Wrench className="h-3.5 w-3.5" />}{d.kind === 'ct' ? 'Contrôle technique' : d.kind === 'service' ? 'Entretien' : 'Vérification'}</div>
-                    <div className="mt-0.5 line-clamp-2 text-[13.5px] font-semibold leading-snug">{d.title}</div>
+                    <div className={cn('inline-flex h-[22px] items-center gap-1 rounded-full px-2 text-[11.5px] font-medium', d.days < 0 ? 'bg-pale-r text-deep-r' : 'bg-pale-a text-deep-a')}>{d.kind === 'tool' ? <HardHat className="h-3 w-3" /> : <Wrench className="h-3 w-3" />}{d.kind === 'ct' ? 'Contrôle technique' : d.kind === 'service' ? 'Entretien' : 'Vérification'}</div>
+                    <div className="mt-1.5 line-clamp-2 text-[14px] font-semibold leading-snug tracking-[-0.01em]">{d.title}</div>
                     <div className="truncate text-[12px] text-ink-3">{d.sub}</div>
                   </div>
                   {ok ? (
-                    <span className="flex shrink-0 items-center gap-1.5 text-[12.5px] font-medium text-ok"><SuccessDot size={18} />{d.tool ? 'Fait' : 'Demandé'}</span>
+                    <span className="flex shrink-0 items-center gap-1.5 text-[12.5px] font-medium text-deep-g"><SuccessDot size={18} />{d.tool ? 'Fait' : 'Demandé'}</span>
                   ) : (
                     <Button size="sm" variant="secondary" icon={d.tool ? <CheckCircle2 /> : <CalendarCheck />} onClick={() => act(d)} className="shrink-0">{d.tool ? 'Vérifié' : 'Réserver'}</Button>
                   )}
-                </div>
+                </Card>
               );
             })}
           </div>

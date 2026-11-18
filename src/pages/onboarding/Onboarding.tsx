@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { HaloBackdrop } from '@/components/layout/HaloBackdrop';
 import { TRADE_BY_KEY, recommendModules } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import type { TradeKey } from '@/lib/types';
@@ -105,8 +106,8 @@ export default function Onboarding() {
 
   if (step === PRET) {
     return (
-      <div className="bx-root ob relative min-h-dvh overflow-x-hidden">
-        <div className="bx-sky" aria-hidden />
+      <div className="bx-root ob relative isolate min-h-dvh overflow-x-hidden">
+        <HaloBackdrop />
         <header className="relative z-10 mx-auto flex h-16 max-w-[1040px] items-center px-4 pt-[env(safe-area-inset-top)] md:px-8">
           <BrandLogo size={24} />
         </header>
@@ -118,14 +119,15 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="bx-root ob min-h-dvh lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,46%)]">
+    <div className="bx-root ob relative isolate min-h-dvh lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,46%)]">
+      <HaloBackdrop />
       <div className="flex min-w-0 flex-col">
-        <header className="sticky top-0 z-20 bg-[#f4f3fa]/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
-          <div className="mx-auto flex h-16 w-full max-w-[640px] items-center gap-5 px-4 md:px-8">
+        <header className="sticky top-0 z-20 px-3 pt-[calc(10px+env(safe-area-inset-top))] md:px-6">
+          <div className="glass mx-auto flex h-[60px] w-full max-w-[640px] items-center gap-4 rounded-[22px] px-4 md:gap-5 md:px-5">
             <span className="shrink-0 sm:hidden"><BrandLogo size={22} className="[&>span:last-child]:hidden" /></span>
             <span className="hidden shrink-0 sm:block"><BrandLogo size={24} /></span>
             <Progress step={step} done={!block} />
-            <span className="num shrink-0 text-[12.5px] font-medium text-[#9898a8]">{step + 1}/{STEPS.length}</span>
+            <span className="num shrink-0 text-[12.5px] font-medium text-ink-3">{step + 1}/{STEPS.length}</span>
           </div>
         </header>
 
@@ -142,12 +144,13 @@ export default function Onboarding() {
           {step === 4 && <AccesStep d={d} set={set} />}
         </main>
 
-        <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-[#ececf1] bg-[#f4f3fa]/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:right-[46%]">
-          <div className="mx-auto flex h-[76px] w-full max-w-[640px] items-center gap-3 px-4 md:px-8">
+        <footer className="fixed inset-x-0 bottom-0 z-20 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] md:px-6 lg:right-[46%]">
+          {block && <p className="glass mx-auto mb-2 w-fit max-w-full rounded-full px-3.5 py-1.5 text-center text-[12px] font-medium text-ink-2 sm:hidden">{block}</p>}
+          <div className="glass-strong mx-auto flex h-[68px] w-full max-w-[640px] items-center gap-3 rounded-[24px] px-2.5 md:px-3">
             <button type="button" onClick={back} className="ob-btn ob-btn-ghost h-12 w-12 shrink-0 px-0 sm:w-auto sm:px-4" aria-label={step === 0 ? 'Retour à l\'accueil' : 'Étape précédente'}>
               <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.75} /> <span className="hidden sm:inline">Retour</span>
             </button>
-            <span className="hidden min-w-0 flex-1 truncate text-[13px] text-[#9898a8] sm:block" aria-live="polite">{block}</span>
+            <span className="hidden min-w-0 flex-1 truncate text-[13px] text-ink-3 sm:block" aria-live="polite">{block}</span>
             <span className="flex-1 sm:hidden" />
             {step < PRET - 1 ? (
               <button type="button" onClick={next} disabled={!!block} className="ob-btn ob-btn-ink h-12 min-w-0 flex-1 sm:min-w-[176px] sm:flex-none" title={block ?? undefined}>
@@ -160,11 +163,10 @@ export default function Onboarding() {
               </button>
             )}
           </div>
-          {block && <p className="-mt-2 pb-2 text-center text-[12px] text-[#9898a8] sm:hidden">{block}</p>}
         </footer>
       </div>
 
-      <aside className="sticky top-0 hidden h-dvh p-4 pl-0 lg:block">
+      <aside className="sticky top-0 hidden h-dvh p-4 pl-2 lg:block">
         <ApercuDesktop d={d} step={step} />
       </aside>
     </div>
@@ -173,13 +175,24 @@ export default function Onboarding() {
 
 function Progress({ step, done }: { step: number; done: boolean }) {
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-1.5" role="progressbar" aria-label="Progression de l'inscription" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-valuetext={`Étape ${step + 1} sur ${STEPS.length}, ${STEPS[step].label}`}>
-      {STEPS.map((s, i) => (
-        <div key={s.key} className="min-w-0 flex-1">
-          <div className="ob-seg"><i style={{ transform: `scaleX(${i < step ? 1 : i === step ? (done ? 1 : 0.4) : 0})` }} /></div>
-          <div className={`mt-1.5 hidden truncate text-[11.5px] font-medium transition-colors md:block ${i <= step ? 'text-[#130f26]' : 'text-[#9898a8]'}`}>{s.label}</div>
-        </div>
-      ))}
-    </div>
+    <ol className="ob-steps" aria-label="Progression de l'inscription">
+      {STEPS.map((s, i) => {
+        const state = i < step ? 'done' : i === step ? 'on' : undefined;
+        return (
+          <Fragment key={s.key}>
+            {i > 0 && (
+              <span className="ob-link" aria-hidden>
+                <i style={{ transform: `scaleX(${i < step ? 1 : i === step ? 0.5 : 0})` }} />
+              </span>
+            )}
+            <li className="ob-pill" data-state={state} aria-current={i === step ? 'step' : undefined} title={s.label}>
+              <b>{state === 'done' ? <Check className="h-3 w-3" strokeWidth={3} aria-hidden /> : i + 1}</b>
+              <span>{s.label}</span>
+              {i === step && <span className="sr-only">{done ? ' (complète)' : ''}</span>}
+            </li>
+          </Fragment>
+        );
+      })}
+    </ol>
   );
 }

@@ -1,17 +1,19 @@
 // Enregistrer un paiement et créer un lien de paiement (Stripe simulé).
 
 import { useEffect, useState } from 'react';
-import { Apple, Check, Copy, CreditCard, Landmark, Link2, MessageSquareText, Mail, Split, Zap } from 'lucide-react';
-import { Button, Field, Input, Sheet, Switch, cn, toast } from '@/components/ui';
+import { Apple, Banknote, Check, Copy, CreditCard, Landmark, ReceiptText, Repeat, Link2, MessageSquareText, Mail, Split, Zap } from 'lucide-react';
+import { Button, Field, IconTile, Input, Sheet, Switch, cn, toast, type HaloTone } from '@/components/ui';
 import { money, todayISO } from '@/lib/format';
 import type { Facture } from '@/lib/types';
 import { recordPayment } from '../lib/actions';
 import { amounts, METHOD_LABEL, type PaymentMethod } from '../lib/model';
 import { createPaymentLink, feeFor, METHOD_FEES } from '../service';
 import { useFactures } from '../store';
-import { SendSuccess } from '@/modules/devis/components/send/SendParts';
+import { PaidSuccess } from './PaidSuccess';
 
 const QUICK: PaymentMethod[] = ['virement', 'carte', 'cheque', 'especes', 'instantane', 'prelevement'];
+const QUICK_ICON: Partial<Record<PaymentMethod, React.ReactNode>> = { virement: <Landmark />, carte: <CreditCard />, cheque: <ReceiptText />, especes: <Banknote />, instantane: <Zap />, prelevement: <Repeat /> };
+const QUICK_TONE: Partial<Record<PaymentMethod, HaloTone>> = { virement: 'green', carte: 'violet', cheque: 'peach', especes: 'amber', instantane: 'cyan', prelevement: 'blue' };
 
 export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boolean; onClose: () => void }) {
   const a = amounts(f);
@@ -49,7 +51,7 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
             <Button variant="ghost" onClick={onClose}>
               Annuler
             </Button>
-            <Button variant="primary" icon={<Check className="h-4 w-4" />} onClick={save}>
+            <Button variant="dawn" icon={<Check className="h-4 w-4" />} onClick={save}>
               {partial ? 'Enregistrer le paiement partiel' : 'Marquer comme payée'}
             </Button>
           </>
@@ -57,8 +59,9 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
       }
     >
       {done ? (
-        <SendSuccess
+        <PaidSuccess
           title={done.left > 0 ? 'Paiement enregistré' : 'Facture réglée'}
+          amount={done.amount}
           text={
             done.left > 0 ? (
               <>
@@ -82,11 +85,20 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
           <Chip on={Math.abs(amount - a.remaining / 2) < 0.01} onClick={() => setAmount(Math.round(a.remaining * 50) / 100)}>La moitié</Chip>
         </div>
         <div>
-          <div className="mb-1.5 text-[12.5px] font-medium text-ink-2">Moyen de paiement</div>
+          <div className="mb-2 text-[13px] font-medium text-ink-2">Moyen de paiement</div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {QUICK.map((m) => (
-              <button key={m} onClick={() => setMethod(m)} className={cn('h-11 rounded-[10px] border px-3 text-[13.5px] font-medium transition', method === m ? 'border-ink bg-ink text-white' : 'border-line2 bg-white hover:bg-sub')}>
-                {METHOD_LABEL[m]}
+              <button
+                key={m}
+                onClick={() => setMethod(m)}
+                aria-pressed={method === m}
+                className={cn(
+                  'flex h-12 items-center gap-2.5 rounded-card-sm bg-white pl-2 pr-3 text-left text-[13.5px] font-medium transition duration-300 ease-spring',
+                  method === m ? 'shadow-[0_0_0_1.5px_#c9b2fb,0_8px_22px_-10px_rgba(109,40,217,.35)]' : 'shadow-halo-sm hover:-translate-y-px',
+                )}
+              >
+                <IconTile icon={QUICK_ICON[m]} tone={method === m ? QUICK_TONE[m] : 'neutral'} size="sm" />
+                <span className="min-w-0 truncate">{METHOD_LABEL[m]}</span>
               </button>
             ))}
           </div>
@@ -94,7 +106,7 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
         <Field label="Date de réception">
           <Input type="date" value={date} max={todayISO()} onChange={(e) => setDate(e.target.value)} />
         </Field>
-        {partial && <p className="rounded-lg bg-sub px-3 py-2 text-[12.5px] text-ink-2">Il restera {money(a.remaining - amount)} à encaisser. Bob continuera de suivre l’échéance.</p>}
+        {partial && <p className="rounded-field bg-pale-a px-3.5 py-2.5 text-[12.5px] text-deep-a">Il restera {money(a.remaining - amount)} à encaisser. Bob continuera de suivre l’échéance.</p>}
       </div>
       )}
     </Sheet>
@@ -103,18 +115,18 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
 
 function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button onClick={onClick} className={cn('h-9 rounded-full border px-3 text-[13px] font-medium transition', on ? 'border-vi-200 bg-vi-50 text-vi-700' : 'border-line2 bg-white text-ink-2 hover:bg-sub')}>
+    <button onClick={onClick} aria-pressed={on} className={cn('h-9 rounded-full px-3.5 text-[13px] font-medium transition duration-300 ease-spring active:scale-95', on ? 'bg-pale-v text-deep-v' : 'bg-white text-ink-2 shadow-[0_0_0_1px_#ece8f6] hover:-translate-y-px')}>
       {children}
     </button>
   );
 }
 
-const LINK_METHODS: { key: PaymentMethod; icon: React.ReactNode; hint: string }[] = [
-  { key: 'carte', icon: <CreditCard className="h-4 w-4" />, hint: 'Visa, Mastercard, CB' },
-  { key: 'apple_pay', icon: <Apple className="h-4 w-4" />, hint: 'Et Google Pay, en un geste' },
-  { key: 'instantane', icon: <Zap className="h-4 w-4" />, hint: 'Argent reçu en 10 secondes' },
-  { key: 'x3', icon: <Split className="h-4 w-4" />, hint: 'Vous êtes payé en une fois' },
-  { key: 'x4', icon: <Split className="h-4 w-4" />, hint: 'Vous êtes payé en une fois' },
+const LINK_METHODS: { key: PaymentMethod; icon: React.ReactNode; hint: string; tone: HaloTone }[] = [
+  { key: 'carte', icon: <CreditCard />, hint: 'Visa, Mastercard, CB', tone: 'violet' },
+  { key: 'apple_pay', icon: <Apple />, hint: 'Et Google Pay, en un geste', tone: 'neutral' },
+  { key: 'instantane', icon: <Zap />, hint: 'Argent reçu en 10 secondes', tone: 'cyan' },
+  { key: 'x3', icon: <Split />, hint: 'Vous êtes payé en une fois', tone: 'peach' },
+  { key: 'x4', icon: <Split />, hint: 'Vous êtes payé en une fois', tone: 'mag' },
 ];
 
 export function PaymentLinkSheet({ f, open, onClose, clientEmail, clientPhone }: { f: Facture; open: boolean; onClose: () => void; clientEmail?: string; clientPhone?: string }) {
@@ -141,12 +153,12 @@ export function PaymentLinkSheet({ f, open, onClose, clientEmail, clientPhone }:
   return (
     <Sheet open={open} onClose={onClose} title="Lien de paiement" subtitle={`Votre client paie ${money(a.remaining)} en ligne, l’argent arrive sur votre compte.`} width={520}>
       <div className="space-y-4">
-        <div className="divide-y divide-line rounded-xl border border-line">
+        <div className="space-y-2">
           {LINK_METHODS.map((m) => {
             const fee = feeFor(m.key, a.remaining);
             return (
-              <label key={m.key} className="flex min-h-[56px] items-center gap-3 px-3.5 py-2">
-                <span className="grid h-8 w-8 place-items-center rounded-lg bg-sub text-ink-2">{m.icon}</span>
+              <label key={m.key} className="row-card min-h-[60px] cursor-pointer gap-3 py-2.5">
+                <IconTile icon={m.icon} tone={m.tone} size="row" />
                 <div className="min-w-0 flex-1">
                   <div className="text-[13.5px] font-medium">{METHOD_LABEL[m.key]}</div>
                   <div className="text-[12px] text-ink-3">{m.hint}</div>
@@ -163,17 +175,17 @@ export function PaymentLinkSheet({ f, open, onClose, clientEmail, clientPhone }:
         <p className="text-[12px] text-ink-3">Frais prélevés sur le paiement, rien d’autre : pas d’abonnement, pas de frais cachés. En démo, aucun paiement réel n’est créé.</p>
 
         {link ? (
-          <div className="space-y-3 rounded-xl bg-sub p-3.5">
+          <div className="space-y-3 rounded-card bg-dawn-pale p-4 shadow-halo-sm">
             <div className="flex items-center gap-2">
               <Link2 className="h-4 w-4 shrink-0 text-ink-2" />
               <span className="min-w-0 flex-1 truncate font-mono text-[13px]">{link.url}</span>
               <Button size="sm" variant="secondary" icon={<Copy className="h-3.5 w-3.5" />} onClick={copy}>Copier</Button>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <a href={`mailto:${clientEmail ?? ''}?subject=${encodeURIComponent(`Facture ${f.number}`)}&body=${encodeURIComponent(`Bonjour, vous pouvez régler la facture ${f.number} ici : ${link.url}`)}`} className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-line2 bg-white text-[13.5px] font-medium">
+              <a href={`mailto:${clientEmail ?? ''}?subject=${encodeURIComponent(`Facture ${f.number}`)}&body=${encodeURIComponent(`Bonjour, vous pouvez régler la facture ${f.number} ici : ${link.url}`)}`} className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white text-[13.5px] font-medium shadow-[0_0_0_1px_#ece8f6] transition hover:-translate-y-px">
                 <Mail className="h-4 w-4" /> Par mail
               </a>
-              <a href={`sms:${(clientPhone ?? '').replace(/\s/g, '')}?&body=${encodeURIComponent(`Facture ${f.number} : ${link.url}`)}`} className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-line2 bg-white text-[13.5px] font-medium">
+              <a href={`sms:${(clientPhone ?? '').replace(/\s/g, '')}?&body=${encodeURIComponent(`Facture ${f.number} : ${link.url}`)}`} className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-white text-[13.5px] font-medium shadow-[0_0_0_1px_#ece8f6] transition hover:-translate-y-px">
                 <MessageSquareText className="h-4 w-4" /> Par SMS
               </a>
             </div>
@@ -181,7 +193,7 @@ export function PaymentLinkSheet({ f, open, onClose, clientEmail, clientPhone }:
             <Button variant="ghost" size="sm" onClick={create} loading={busy}>Mettre à jour les moyens de paiement</Button>
           </div>
         ) : (
-          <Button variant="primary" size="lg" className="w-full justify-center" loading={busy} disabled={!methods.length} icon={<Landmark className="h-4 w-4" />} onClick={create}>
+          <Button variant="dawn" size="lg" className="w-full justify-center" loading={busy} disabled={!methods.length} icon={<Landmark className="h-4 w-4" />} onClick={create}>
             Créer le lien de paiement
           </Button>
         )}

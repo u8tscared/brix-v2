@@ -51,50 +51,47 @@ export default function AgentNuit() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="MoonStar" dept="bob" size="lg" solid />} kicker="Bob" title="Agent de nuit" subtitle="Pendant que tu dors, Bob relance, prépare et range. Tu valides le matin en un geste." />
+      <PageHeader icon={<IconTile name="MoonStar" tone="indigo" size="lg" />} kicker="Bob" title="Agent de nuit" subtitle="Pendant que tu dors, Bob relance, prépare et range. Tu valides le matin en un geste." />
       <BobNav />
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.45fr_1fr]">
-        <section className="relative self-start overflow-hidden rounded-[20px] bg-night text-white shadow-pop" aria-label="La nuit dernière">
+        <section className="relative self-start overflow-hidden rounded-card bg-white shadow-halo" aria-label="La nuit dernière">
           <div className="pointer-events-none absolute inset-0" aria-hidden>
-            <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#6d28d9] opacity-40 blur-[70px]" />
-            <div className="absolute -bottom-24 left-10 h-48 w-72 rounded-full bg-[#d946ef] opacity-[.14] blur-[80px]" />
-            {[[12, 10], [78, 8], [64, 22], [90, 40], [30, 5], [46, 16], [8, 60], [94, 74]].map(([x, y], i) => (
-              <i key={i} className="absolute h-[2px] w-[2px] rounded-full bg-white/50" style={{ left: `${x}%`, top: `${y}%` }} />
-            ))}
+            <div className="absolute -right-16 -top-24 h-56 w-56 rounded-full bg-[#d6c6fd] opacity-60 blur-[70px]" />
+            <div className="absolute -top-28 right-40 h-40 w-56 rounded-full bg-[#e9b8f5] opacity-40 blur-[80px]" />
           </div>
           <header className="relative flex flex-wrap items-center gap-x-3 gap-y-3 px-5 pb-3 pt-5">
-            <span className="grid h-10 w-10 place-items-center rounded-[12px] bg-white/10 ring-1 ring-white/10"><MoonStar className="h-5 w-5" strokeWidth={1.75} /></span>
+            <IconTile tone="indigo" icon={<MoonStar strokeWidth={1.9} />} />
             <div className="min-w-0 flex-1">
               <h2 className="text-[16px] font-semibold tracking-[-0.02em]">La nuit dernière</h2>
-              <div className="text-[12.5px] text-white/55">
+              <div className="text-[12.5px] text-ink-2">
                 <AnimatedNumber value={log.length} /> actions · environ <AnimatedNumber value={Math.max(1, log.length) * 20} /> min gagnées
               </div>
             </div>
             {pending.length > 0 ? (
-              <button onClick={validateAll} className="flex h-11 items-center justify-center gap-1.5 max-sm:w-full rounded-full bg-white px-4 text-[13px] font-semibold text-ink transition hover:bg-white/90 active:scale-95">
+              <button onClick={validateAll} className="flex h-11 items-center justify-center gap-1.5 max-sm:w-full rounded-full bg-ink px-4 text-[13px] font-semibold text-white shadow-ink transition duration-300 ease-spring hover:-translate-y-px active:scale-95">
                 <Check className="h-4 w-4" strokeWidth={2.4} /> Tout valider ({pending.length})
               </button>
             ) : (
-              <span className="flex items-center gap-1.5 text-[13px] font-medium text-[#86efac]"><SuccessDot size={20} /> Tout est traité</span>
+              <span className="flex items-center gap-1.5 text-[13px] font-medium text-deep-g"><SuccessDot size={20} /> Tout est traité</span>
             )}
           </header>
-          {log.length === 0 && <p className="relative px-5 pb-8 pt-4 text-[13px] text-white/60">Bob n’a rien eu à faire cette nuit.</p>}
+          {log.length === 0 && <p className="relative px-5 pb-8 pt-4 text-[13px] text-ink-2">Bob n’a rien eu à faire cette nuit.</p>}
           <ol className="stagger-fast relative px-3 pb-3">
-            <span className="absolute bottom-8 left-[87.5px] top-6 w-px bg-white/10 max-sm:left-[35.5px]" aria-hidden />
+            <span className="absolute bottom-8 left-[87.5px] top-6 w-px bg-halo-line max-sm:left-[35.5px]" aria-hidden />
             {log.map((b) => {
               const d = local.nightDecisions[b.id] ?? (b.done ? 'validee' : undefined);
               return (
-                <li key={b.id} className={cn('relative flex flex-col gap-3 rounded-[14px] px-2 py-3 transition-colors hover:bg-white/[.04] sm:flex-row sm:items-center', d === 'annulee' && 'opacity-50')}>
+                <li key={b.id} className={cn('relative flex flex-col gap-3 rounded-[14px] px-2 py-3 transition-colors hover:bg-halo-hover sm:flex-row sm:items-center', d === 'annulee' && 'opacity-50')}>
                   <div className="flex min-w-0 flex-1 items-start gap-3">
-                    <span className="num w-10 shrink-0 pt-2 text-right text-[11.5px] text-white/40 max-sm:hidden">{b.at.replace(':', ' h ')}</span>
-                    <span className={cn('relative z-[1] grid h-8 w-8 shrink-0 place-items-center rounded-full ring-4 ring-[#15122a] transition-colors', d === 'validee' ? 'bg-[#22c55e]/15 text-[#86efac]' : 'bg-[#2a2545] text-white/85')}>
+                    <span className="num w-10 shrink-0 pt-2 text-right text-[11.5px] text-ink-3 max-sm:hidden">{b.at.replace(':', ' h ')}</span>
+                    <span className={cn('relative z-[1] grid h-8 w-8 shrink-0 place-items-center rounded-full ring-4 ring-white transition-colors', d === 'validee' ? 'bg-pale-g text-deep-g' : 'bg-pale-i text-deep-i')}>
                       {d === 'validee' ? <SuccessDot size={18} /> : <Icon name={b.icon} className="h-4 w-4" />}
                     </span>
                     <div className="min-w-0 pt-0.5">
                       <div className={cn('text-[13.5px] font-medium leading-snug', d === 'annulee' && 'line-through')}>{b.text}</div>
-                      {b.detail && <div className="text-[12.5px] text-white/55">{b.detail}</div>}
-                      {d && <div className={cn('mt-1 text-[11.5px] font-medium', d === 'validee' ? 'text-[#86efac]' : 'text-white/45')}>{d === 'validee' ? (b.done && !local.nightDecisions[b.id] ? 'Fait seul (petite chose)' : 'Validé') : 'Annulé, rien n’est parti'}</div>}
+                      {b.detail && <div className="text-[12.5px] text-ink-2">{b.detail}</div>}
+                      {d && <div className={cn('mt-1 text-[11.5px] font-medium', d === 'validee' ? 'text-deep-g' : 'text-ink-3')}>{d === 'validee' ? (b.done && !local.nightDecisions[b.id] ? 'Fait seul (petite chose)' : 'Validé') : 'Annulé, rien n’est parti'}</div>}
                     </div>
                   </div>
                   <div className="flex shrink-0 flex-wrap gap-2 pl-11 sm:pl-0">
@@ -119,9 +116,9 @@ export default function AgentNuit() {
             <div className="text-[14px] font-semibold">Ce que Bob peut faire seul</div>
             <div className="mt-3 space-y-2">
               {LEVELS.map((l) => (
-                <button key={l.key} onClick={() => { local.setNightLevel(l.key); toast(`Autonomie : ${l.title.toLowerCase()}.`); }} className={cn('flex w-full items-start gap-3 rounded-[12px] border p-3 text-left transition duration-200 active:scale-[.99]', local.nightLevel === l.key ? 'border-ink bg-white shadow-[0_0_0_1px_var(--ink)]' : 'border-line2 bg-white hover:border-ink-3')}>
-                  <span className={cn('mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2', local.nightLevel === l.key ? 'border-ink' : 'border-line2')}>
-                    {local.nightLevel === l.key && <i className="h-2.5 w-2.5 animate-[scale-in_.25s_var(--ease)_both] rounded-full bg-ink" />}
+                <button key={l.key} onClick={() => { local.setNightLevel(l.key); toast(`Autonomie : ${l.title.toLowerCase()}.`); }} className={cn('flex w-full items-start gap-3 rounded-card-sm border p-3 text-left transition duration-300 ease-spring active:scale-[.99]', local.nightLevel === l.key ? 'border-transparent bg-dawn-pale shadow-[0_0_0_1.5px_#e9b8f5,0_10px_30px_-12px_rgba(217,70,239,.3)]' : 'border-transparent bg-white shadow-halo-sm hover:-translate-y-px')}>
+                  <span className={cn('mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full', local.nightLevel === l.key ? 'bg-dawn-diag' : 'shadow-[inset_0_0_0_2px_#dcd6ea]')}>
+                    {local.nightLevel === l.key && <i className="h-2 w-2 animate-[scale-in_.25s_var(--ease)_both] rounded-full bg-white" />}
                   </span>
                   <span className="min-w-0">
                     <span className="block text-[13.5px] font-semibold">{l.title}</span>
@@ -163,7 +160,7 @@ function NightBtn({ children, onClick, icon, solid, ghost }: { children: React.R
       onClick={onClick}
       className={cn(
         'flex h-9 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium transition active:scale-95',
-        solid ? 'bg-white font-semibold text-ink hover:bg-white/90' : ghost ? 'text-white/70 hover:bg-white/10 hover:text-white' : 'bg-white/10 text-white ring-1 ring-white/10 hover:bg-white/15',
+        solid ? 'bg-ink font-semibold text-white shadow-ink hover:bg-[#241f3f]' : ghost ? 'text-ink-2 hover:bg-halo-hover hover:text-ink' : 'bg-white text-ink shadow-[0_0_0_1px_#ece8f6] hover:-translate-y-px',
       )}
     >
       {icon}

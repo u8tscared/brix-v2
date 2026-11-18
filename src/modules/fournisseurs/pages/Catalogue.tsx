@@ -1,7 +1,7 @@
 // « Prix » : tous les prix nets de vos fournisseurs au même endroit. Même EAN = même produit.
 import { useMemo, useState } from 'react';
 import { Search, SearchX, Tags, TrendingUp, Upload, X } from 'lucide-react';
-import { Button, Card, CardHeader, EmptyState, PageHeader, Row, cn } from '@/components/ui';
+import { Button, Card, CardHeader, EmptyState, IconTile, PageHeader, Row, cn } from '@/components/ui';
 import { money, relative } from '@/lib/format';
 import { useAchats } from '../data/store';
 import type { Article, Fournisseur } from '../data/types';
@@ -43,7 +43,7 @@ function Hausses({ catalogue, frn }: { catalogue: Article[]; frn: (id: string) =
           </div>
         </Row>
       ))}
-      <p className="border-t border-line px-4 py-2.5 text-[11.5px] text-ink-3">Pensez à mettre à jour vos devis en cours qui utilisent ces articles.</p>
+      <p className="border-t border-halo-line px-4 py-2.5 text-[11.5px] text-ink-3">Pensez à mettre à jour vos devis en cours qui utilisent ces articles.</p>
     </Card>
   );
 }
@@ -52,7 +52,7 @@ function CarteProduit({ p, frn }: { p: Produit; frn: (id: string) => Fournisseur
   const meilleur = p.offres[0].prixNet;
   return (
     <Card className="overflow-hidden">
-      <div className="border-b border-line px-4 py-3">
+      <div className="border-b border-halo-line px-4 py-3">
         <div className="text-[14px] font-medium leading-snug">{p.designation}</div>
         <div className="mt-0.5 flex flex-wrap gap-x-2 text-[11.5px] text-ink-3">
           {p.marque && <span>{p.marque}</span>}
@@ -64,7 +64,7 @@ function CarteProduit({ p, frn }: { p: Produit; frn: (id: string) => Fournisseur
         const ecart = meilleur ? ((a.prixNet - meilleur) / meilleur) * 100 : 0;
         const best = i === 0 && p.offres.length > 1;
         return (
-          <div key={a.id} className={cn('flex items-center gap-3 px-4 py-2.5', i > 0 && 'border-t border-line', best && 'bg-ok-bg/60')}>
+          <div key={a.id} className={cn('flex items-center gap-3 px-4 py-2.5', i > 0 && 'border-t border-halo-line', best && 'bg-ok-bg/60')}>
             <FournisseurPastille f={frn(a.fournisseurId)} size={30} />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13px] font-medium">{frn(a.fournisseurId)?.nom ?? 'Fournisseur'}</div>
@@ -72,7 +72,7 @@ function CarteProduit({ p, frn }: { p: Produit; frn: (id: string) => Fournisseur
             </div>
             <div className="shrink-0 text-right">
               <div className={cn('num text-[14px]', best ? 'font-semibold text-ok' : 'font-medium')}>{money(a.prixNet)}</div>
-              <div className="ml-auto mt-1 h-1 w-16 overflow-hidden rounded-full bg-line"><div className={cn('fx-grow h-full rounded-full', best ? 'bg-ok' : 'bg-ink-3/50')} style={{ width: `${Math.min(100, (meilleur / a.prixNet) * 100)}%` }} /></div>
+              <div className="ml-auto mt-1 h-1 w-16 overflow-hidden rounded-full bg-halo-line"><div className={cn('fx-grow h-full rounded-full', best ? 'bg-ok' : 'bg-ink-3/50')} style={{ width: `${Math.min(100, (meilleur / a.prixNet) * 100)}%` }} /></div>
               {best ? <span className="text-[11px] font-medium text-ok">Le moins cher</span> : i > 0 && <span className="num text-[11px] text-ink-3">{pourcent(ecart)}</span>}
             </div>
           </div>
@@ -114,7 +114,9 @@ export default function Catalogue() {
   return (
     <div className="bx-stagger space-y-5">
       <PageHeader
+        icon={<IconTile icon={<Tags />} dept="achats" size="xl" />}
         title="Prix"
+        titleMuted="tous vos tarifs, côte à côte."
         subtitle="Les prix nets de tous vos fournisseurs au même endroit. Le moins cher saute aux yeux."
         actions={<Button variant="dawn" icon={<Upload className="h-4 w-4" />} onClick={() => setImporter(true)}>Importer un tarif</Button>}
       />
@@ -138,10 +140,10 @@ export default function Catalogue() {
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Article, référence ou code EAN"
                   aria-label="Rechercher un prix"
-                  className="h-14 w-full rounded-[14px] border border-line2 bg-white pl-12 pr-12 text-[16px] shadow-card transition placeholder:text-ink-3 focus:border-vi-300 focus:outline-none focus:ring-4 focus:ring-vi-100 [&::-webkit-search-cancel-button]:hidden"
+                  className="h-14 w-full rounded-field border border-[#e3ddf0] bg-white pl-12 pr-12 text-[16px] shadow-card transition placeholder:text-ink-3 focus:border-vi-300 focus:outline-none focus:ring-4 focus:ring-vi-100 [&::-webkit-search-cancel-button]:hidden"
                 />
                 {q && (
-                  <button onClick={() => setQ('')} aria-label="Effacer" className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-lg text-ink-3 hover:bg-sub hover:text-ink">
+                  <button onClick={() => setQ('')} aria-label="Effacer" className="absolute right-2 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-ink-3 hover:bg-halo-hover hover:text-ink">
                     <X className="h-4 w-4" />
                   </button>
                 )}

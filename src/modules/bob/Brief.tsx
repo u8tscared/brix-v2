@@ -55,13 +55,13 @@ export default function Brief() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Sunrise" dept="bob" size="lg" solid />} kicker="Bob" title="Brief du matin" subtitle="Ce qui compte aujourd’hui, en une minute. À écouter dans le camion." />
+      <PageHeader icon={<IconTile name="Sunrise" tone="peach" size="lg" />} kicker="Bob" title="Brief du matin" subtitle="Ce qui compte aujourd’hui, en une minute. À écouter dans le camion." />
       <BobNav />
 
-      <section className="relative overflow-hidden rounded-[20px] bg-night text-white shadow-pop">
+      <section className="relative overflow-hidden rounded-card bg-dawn-mist shadow-halo">
         <div className="pointer-events-none absolute inset-0" aria-hidden>
-          <div className="absolute -left-10 -top-24 h-64 w-64 rounded-full bg-[#fb923c] opacity-25 blur-[80px]" />
-          <div className="absolute -right-16 -bottom-24 h-64 w-80 rounded-full bg-[#8b5cf6] opacity-35 blur-[90px]" />
+          <div className="absolute -left-10 -top-24 h-64 w-64 rounded-full bg-[#ffd3b0] opacity-50 blur-[80px]" />
+          <div className="absolute -right-16 -bottom-24 h-64 w-80 rounded-full bg-[#e9d5ff] opacity-60 blur-[90px]" />
         </div>
         <div className="relative flex flex-col gap-5 p-5 md:flex-row md:items-center md:p-6">
           <button onClick={play} aria-label={playing ? 'Arrêter la lecture' : 'Écouter le brief'} className="relative grid h-[72px] w-[72px] shrink-0 place-items-center rounded-full bg-dawn-diag text-white shadow-dawn transition duration-300 ease-spring hover:scale-[1.04] active:scale-95">
@@ -70,16 +70,16 @@ export default function Brief() {
             {playing ? <Pause className="relative h-7 w-7" /> : <Play className="relative ml-1 h-7 w-7 fill-current" />}
           </button>
           <div className="min-w-0 flex-1">
-            <div className="text-[12.5px] font-medium text-white/55">{capitalize(dateLong(todayISO()))}</div>
+            <div className="label-halo">{capitalize(dateLong(todayISO()))}</div>
             <div className="text-[22px] font-semibold leading-tight tracking-[-0.03em]">Bonjour {s.user.firstName}, voici ta journée</div>
             <div className="mt-3 flex items-center gap-3">
               <Waveform progress={progress} playing={playing} />
-              <span className="num shrink-0 text-[12.5px] text-white/60">{fmtDuration(b.seconds)}</span>
+              <span className="num shrink-0 text-[12.5px] text-ink-3">{fmtDuration(b.seconds)}</span>
             </div>
           </div>
         </div>
-        <details className="group relative border-t border-white/10 px-5 py-3 text-[13px] text-white/70 md:px-6">
-          <summary className="flex min-h-[28px] cursor-pointer select-none items-center gap-1.5 font-medium text-white marker:hidden [&::-webkit-details-marker]:hidden">
+        <details className="group relative border-t border-halo-line px-5 py-3 text-[13px] text-ink-2 md:px-6">
+          <summary className="flex min-h-[28px] cursor-pointer select-none items-center gap-1.5 font-medium text-ink marker:hidden [&::-webkit-details-marker]:hidden">
             <ChevronRight className="h-4 w-4 transition group-open:rotate-90" /> Lire le texte
           </summary>
           <p className="mt-2 max-w-3xl leading-relaxed">{b.script}</p>
@@ -221,7 +221,7 @@ function Waveform({ progress, playing }: { progress: number; playing: boolean })
         return (
           <i
             key={i}
-            className={cn('block min-w-[2px] max-w-[4px] flex-1 rounded-full transition-colors duration-300', on ? 'bg-white' : 'bg-white/25', playing && on && 'animate-wave')}
+            className={cn('block min-w-[2px] max-w-[4px] flex-1 rounded-full transition-colors duration-300', on ? 'bg-dawn-diag' : 'bg-[#e6e1f1]', playing && on && 'animate-wave')}
             style={{ height: `${Math.round(h * 100)}%`, animationDelay: `${(i % 7) * 0.09}s` }}
           />
         );

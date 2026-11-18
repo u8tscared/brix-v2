@@ -34,7 +34,7 @@ export function AccesStep({ d, set }: StepProps) {
           Apple
         </button>
       </div>
-      <div className="my-6 flex items-center gap-3 text-[12.5px] text-[#9898a8]"><span className="h-px flex-1 bg-[#e4e2ee]" />ou avec votre e-mail<span className="h-px flex-1 bg-[#e4e2ee]" /></div>
+      <div className="my-6 flex items-center gap-3 text-[12.5px] text-ink-3"><span className="h-px flex-1 bg-[#e4e2ee]" />ou avec votre e-mail<span className="h-px flex-1 bg-[#e4e2ee]" /></div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
@@ -60,7 +60,7 @@ export function AccesStep({ d, set }: StepProps) {
             aria-describedby="ob-em-h"
             style={badMail ? { boxShadow: '0 0 0 1.5px #dc2626' } : undefined}
           />
-          <p id="ob-em-h" className={`mt-1.5 text-[12.5px] ${badMail ? 'text-[#dc2626]' : 'text-[#9898a8]'}`}>
+          <p id="ob-em-h" className={`mt-1.5 text-[12.5px] ${badMail ? 'text-[#dc2626]' : 'text-ink-3'}`}>
             {badMail ? 'Cette adresse semble incomplète.' : 'Vos devis signés et paiements y arrivent.'}
           </p>
         </div>
@@ -68,23 +68,23 @@ export function AccesStep({ d, set }: StepProps) {
           <label htmlFor="ob-pw" className="ob-label">Mot de passe</label>
           <div className="relative">
             <input id="ob-pw" type={show ? 'text' : 'password'} className="ob-input pr-12" value={d.password} onChange={(e) => set({ password: e.target.value })} autoComplete="new-password" aria-describedby="ob-pw-h" />
-            <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1 grid h-11 w-11 place-items-center rounded-xl text-[#9898a8] hover:text-[#130f26]" aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
+            <button type="button" onClick={() => setShow(!show)} className="absolute right-1 top-1 grid h-11 w-11 place-items-center rounded-xl text-ink-3 hover:text-ink" aria-label={show ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
               {show ? <EyeOff className="h-[18px] w-[18px]" strokeWidth={1.75} /> : <Eye className="h-[18px] w-[18px]" strokeWidth={1.75} />}
             </button>
           </div>
           <div className="mt-2.5 flex items-center gap-3" id="ob-pw-h">
             <div className="flex flex-1 gap-1" aria-hidden>
               {[1, 2, 3, 4].map((k) => (
-                <span key={k} className="h-1 flex-1 rounded-full transition-colors duration-300" style={{ background: s >= k ? (s >= 3 ? '#16a34a' : '#130f26') : '#e4e2ee' }} />
+                <span key={k} className="h-1 flex-1 rounded-full transition-colors duration-300" style={{ background: s >= k ? (s >= 3 ? '#10b981' : '#d946ef') : '#ece8f6' }} />
               ))}
             </div>
-            <span className="w-[120px] text-right text-[12.5px] text-[#9898a8]">{d.password.length < 8 ? `${Math.max(0, 8 - d.password.length)} caractères encore` : LABEL[s]}</span>
+            <span className="w-[120px] text-right text-[12.5px] text-ink-3">{d.password.length < 8 ? `${Math.max(0, 8 - d.password.length)} caractères encore` : LABEL[s]}</span>
           </div>
         </div>
       </div>
 
-      <p className="mt-7 flex items-start gap-2.5 text-[12.5px] leading-relaxed text-[#9898a8]">
-        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#5f5f70]" strokeWidth={1.75} aria-hidden />
+      <p className="mt-7 flex items-start gap-2.5 text-[12.5px] leading-relaxed text-ink-3">
+        <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ink-2" strokeWidth={1.75} aria-hidden />
         Données hébergées en France. En créant votre compte, vous acceptez les conditions d'utilisation et la politique de confidentialité de Brix.
       </p>
     </>

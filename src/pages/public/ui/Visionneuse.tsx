@@ -32,12 +32,12 @@ export function ApercuPapier({ children, onOuvrir, hauteurMax, legende }: { chil
   const visible = hauteurMax ? Math.min(h * k, hauteurMax) : h * k;
   return (
     <div ref={ref} className="group relative w-full">
-      <button onClick={onOuvrir} className="bx-paper relative block w-full overflow-hidden rounded-[10px] bg-white text-left transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_30px_60px_-28px_rgba(45,20,90,.4)]" style={{ height: visible }} aria-label="Ouvrir le document en grand">
+      <button onClick={onOuvrir} className="bx-paper relative block w-full overflow-hidden rounded-card-sm bg-white text-left shadow-halo transition duration-[450ms] ease-out-quint hover:-translate-y-[3px] hover:shadow-halo-lg" style={{ height: visible }} aria-label="Ouvrir le document en grand">
         <div ref={inner} style={{ width: LARGEUR, transform: `scale(${k})`, transformOrigin: 'top left' }} className="pointer-events-none">
           {children}
         </div>
         {hauteurMax && h * k > hauteurMax && <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-white/85 to-transparent" />}
-        <span className="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#130f26]/90 px-4 py-2.5 text-[13px] font-medium text-white opacity-95 shadow-lg backdrop-blur transition group-hover:scale-[1.03] group-hover:opacity-100">
+        <span className="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full bg-ink px-4 py-2.5 text-[13px] font-medium text-white shadow-ink transition duration-300 ease-spring group-hover:scale-[1.04]">
           <Expand className="h-4 w-4" strokeWidth={1.75} />
           {legende ?? 'Lire le document en grand'}
         </span>
@@ -79,13 +79,13 @@ export function PleinEcran({ open, onClose, titre, children, onImprimer }: { ope
   const dist = (t: React.TouchList) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
 
   return createPortal(
-    <div className="bx-root bx-fade fixed inset-0 z-[75] flex flex-col bg-[#ebe9f3]" role="dialog" aria-modal="true" aria-label={titre}>
-      <div className="flex h-16 shrink-0 items-center gap-2 border-b border-[#e0deea] bg-white/90 px-3 pt-safe backdrop-blur-xl sm:px-5">
-        <button onClick={onClose} className="grid h-11 w-11 place-items-center rounded-full transition hover:bg-[#f4f3fa]" aria-label="Fermer">
+    <div className="bx-root bx-fade fixed inset-0 z-[75] flex flex-col bg-[#efecf7]" role="dialog" aria-modal="true" aria-label={titre}>
+      <div className="glass-strong mx-2 mt-[calc(8px+var(--safe-t))] flex h-14 shrink-0 items-center gap-2 rounded-[20px] px-2 sm:mx-4 sm:px-3">
+        <button onClick={onClose} className="grid h-11 w-11 place-items-center rounded-full transition hover:bg-halo-hover" aria-label="Fermer">
           <X className="h-5 w-5" strokeWidth={1.75} />
         </button>
         <div className="min-w-0 flex-1 truncate text-[15px] font-semibold">{titre}</div>
-        <div className="flex items-center rounded-full bg-[#f4f3fa] p-1">
+        <div className="flex items-center rounded-full bg-halo-track p-1">
           <button onClick={() => changer(-0.15)} className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white" aria-label="Dézoomer">
             <Minus className="h-4 w-4" strokeWidth={2} />
           </button>
@@ -96,11 +96,11 @@ export function PleinEcran({ open, onClose, titre, children, onImprimer }: { ope
             <Plus className="h-4 w-4" strokeWidth={2} />
           </button>
         </div>
-        <button onClick={() => setZoom(null)} className="hidden h-11 items-center gap-2 rounded-full px-3 text-[13.5px] font-medium transition hover:bg-[#f4f3fa] sm:inline-flex">
+        <button onClick={() => setZoom(null)} className="hidden h-11 items-center gap-2 rounded-full px-3 text-[13.5px] font-medium transition hover:bg-halo-hover sm:inline-flex">
           <ScanLine className="h-4 w-4" strokeWidth={1.75} /> Ajuster
         </button>
         {onImprimer && (
-          <button onClick={onImprimer} className="inline-flex h-11 min-w-[44px] items-center justify-center gap-2 rounded-full transition hover:bg-[#f4f3fa] sm:px-3 sm:text-[13.5px] sm:font-medium" aria-label="Télécharger en PDF">
+          <button onClick={onImprimer} className="inline-flex h-11 min-w-[44px] items-center justify-center gap-2 rounded-full transition hover:bg-halo-hover sm:px-3 sm:text-[13.5px] sm:font-medium" aria-label="Télécharger en PDF">
             <Download className="h-[18px] w-[18px]" strokeWidth={1.75} />
             <span className="hidden sm:inline">PDF</span>
           </button>
@@ -141,7 +141,7 @@ function Mesure({ k, children }: { k: number; children: ReactNode }) {
     if (ref.current && ref.current.offsetHeight !== h) setH(ref.current.offsetHeight);
   });
   return (
-    <div className={cn('bx-paper bx-pop overflow-hidden rounded-[6px] bg-white')} style={{ width: LARGEUR * k, height: h * k }}>
+    <div className={cn('bx-paper bx-pop overflow-hidden rounded-[8px] bg-white')} style={{ width: LARGEUR * k, height: h * k }}>
       <div ref={ref} style={{ width: LARGEUR, transform: `scale(${k})`, transformOrigin: 'top left' }}>
         {children}
       </div>

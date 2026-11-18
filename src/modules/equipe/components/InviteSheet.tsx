@@ -64,11 +64,11 @@ export function InviteSheet({ open, onClose, defaultRole = 'compagnon' }: { open
           </Field>
         </div>
 
-        <div className="rounded-xl border border-line bg-sub/60 p-3 text-[12.5px] text-ink-2">
+        <div className="rounded-card-sm border border-halo-line bg-halo-track/60 p-3 text-[12.5px] text-ink-2">
           <span className="font-medium text-ink">{roleDef.name} :</span> {roleDef.short}
           <div className="mt-2 flex flex-wrap gap-1.5">
             {can.slice(0, 6).map((p) => (
-              <span key={p.key} className="rounded-full border border-line bg-white px-2 py-0.5 text-[11.5px]">{p.label}{p.rights[role] !== 'oui' && <span className="text-ink-3"> · {RIGHT_LABEL[p.rights[role]].toLowerCase()}</span>}</span>
+              <span key={p.key} className="rounded-full border border-halo-line bg-white px-2 py-0.5 text-[11.5px]">{p.label}{p.rights[role] !== 'oui' && <span className="text-ink-3"> · {RIGHT_LABEL[p.rights[role]].toLowerCase()}</span>}</span>
             ))}
           </div>
         </div>
@@ -80,8 +80,8 @@ export function InviteSheet({ open, onClose, defaultRole = 'compagnon' }: { open
         ]} />
 
         {via === 'qr' && (
-          <div className="flex flex-col items-center rounded-2xl border border-line p-5 text-center">
-            <div className="rounded-xl border border-line p-2"><QrCode value={link} size={196} /></div>
+          <div className="flex flex-col items-center rounded-2xl border border-halo-line p-5 text-center">
+            <div className="rounded-card-sm border border-halo-line p-2"><QrCode value={link} size={196} /></div>
             <p className="mt-3 text-[13.5px] font-medium">Faites scanner ce code avec l’appareil photo de son téléphone</p>
             <p className="mt-1 text-xs text-ink-3">Code d’invitation <span className="num font-medium text-ink-2">{code}</span> · valable 7 jours</p>
           </div>
@@ -89,13 +89,13 @@ export function InviteSheet({ open, onClose, defaultRole = 'compagnon' }: { open
         {via === 'sms' && (
           <div className="space-y-3">
             <Field label="Numéro de portable"><Input inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" /></Field>
-            <div className="rounded-xl bg-sub p-3 text-[13px] leading-relaxed text-ink-2">
+            <div className="rounded-card-sm bg-halo-track p-3 text-[13px] leading-relaxed text-ink-2">
               « Bonjour {name.split(' ')[0] || '…'}, Benali Électricité vous invite sur Brix pour vos chantiers et vos heures. Touchez ce lien pour commencer : <span className="break-all text-brand">{link}</span> »
             </div>
           </div>
         )}
         {via === 'lien' && (
-          <div className="rounded-xl border border-line p-3">
+          <div className="rounded-card-sm border border-halo-line p-3">
             <div className="break-all font-mono text-[12.5px] text-ink-2">{link}</div>
             <p className="mt-2 text-xs text-ink-3">À envoyer par WhatsApp, e-mail ou SMS. Le lien ne marche qu’une fois.</p>
           </div>

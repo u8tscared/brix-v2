@@ -60,14 +60,13 @@ export default function Habilitations() {
                   const t = habType(h.type)!;
                   const planned = trainings.find((x) => x.employeeId === h.employeeId && x.type === h.type && x.status === 'inscrit');
                   return (
-                    <Card key={h.id} className="relative flex flex-col overflow-hidden p-4">
-                      <span aria-hidden className={cn('absolute inset-y-0 left-0 w-[3px]', st.level === 'expired' ? 'bg-bad' : 'bg-[#f59e0b]')} />
+                    <Card key={h.id} className={cn('relative flex flex-col overflow-hidden p-5', st.level === 'expired' ? 'bg-[linear-gradient(160deg,#ffffff_55%,#fff1f4)]' : 'bg-[linear-gradient(160deg,#ffffff_55%,#fff8ea)]')}>
                       <div className="flex items-start gap-3.5">
                         <DaysRing days={st.days} horizon={ALERT_DAYS} size={58} stroke={5} />
                         <div className="min-w-0 flex-1 pt-0.5">
                           <div className="flex items-center gap-2">
                             <Avatar initials={e.initials} color={e.color} size={20} />
-                            <span className="truncate text-[14px] font-semibold">{e.firstName} · {t.short}</span>
+                            <span className="truncate text-[15px] font-semibold tracking-[-0.015em]">{e.firstName} · {t.short}</span>
                           </div>
                           <div className="mt-0.5 truncate text-[12.5px] text-ink-2">{t.label}</div>
                           <div className={cn('mt-1 text-[12.5px] font-medium', st.level === 'expired' ? 'text-bad' : 'text-warn')}>{st.level === 'expired' ? `Expirée depuis ${-st.days} jours` : `Expire le ${dateShort(h.expires)}`}</div>
@@ -92,7 +91,7 @@ export default function Habilitations() {
               </div>
             </section>
           ) : (
-            <Card className="flex items-center gap-3 p-5 text-[13.5px]"><SuccessDot size={24} />Tout le monde est à jour. Brix vous prévient {ALERT_DAYS} jours avant la prochaine échéance.</Card>
+            <Card tone="mist" className="flex items-center gap-3 p-5 text-[13.5px]"><SuccessDot size={24} />Tout le monde est à jour. Brix vous prévient {ALERT_DAYS} jours avant la prochaine échéance.</Card>
           )}
 
           {/* Tableau complet (ordinateur) */}
@@ -101,15 +100,15 @@ export default function Habilitations() {
             <table className="w-full table-fixed text-[12.5px]">
               <colgroup><col className="w-[180px]" />{COLS.map((c) => <col key={c} />)}</colgroup>
               <thead>
-                <tr className="border-b border-line bg-[#fafafc] text-[11.5px] text-ink-2">
-                  <th className="px-4 py-2.5 text-left font-medium">Salarié</th>
-                  {COLS.map((c) => <th key={c} className="px-1 py-2.5 text-center font-medium" title={habType(c)?.label}>{habType(c)?.short}</th>)}
+                <tr className="border-b border-halo-line text-[12px] text-ink-2">
+                  <th className="px-4 py-3 text-left font-medium">Salarié</th>
+                  {COLS.map((c) => <th key={c} className="px-1 py-3 text-center font-medium" title={habType(c)?.label}>{habType(c)?.short}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {employees.map((e) => (
-                  <tr key={e.id} className="border-b border-line last:border-0">
-                    <td className="px-4 py-2"><span className="flex items-center gap-2"><Avatar initials={e.initials} color={e.color} size={24} /><span className="truncate font-medium">{e.firstName} {e.lastName[0]}.</span></span></td>
+                  <tr key={e.id} className="border-b border-halo-line last:border-0">
+                    <td className="px-4 py-2"><span className="flex items-center gap-2"><Avatar initials={e.initials} color={e.color} size={28} /><span className="truncate font-medium">{e.firstName} {e.lastName[0]}.</span></span></td>
                     {COLS.map((c) => {
                       // BR couvre B1V/B2V ; on affiche la plus haute détenue dans sa colonne.
                       const h = habs.find((x) => x.employeeId === e.id && (x.type === c || (c === 'elec_br' && x.type === 'elec_b2v')));
@@ -117,8 +116,8 @@ export default function Habilitations() {
                       return (
                         <td key={c} className="px-1 py-2 text-center">
                           {h && st ? (
-                            <span title={st.label} className={cn('num inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[11.5px] font-medium', st.level === 'expired' ? 'bg-bad-bg text-bad' : st.level === 'soon' ? 'bg-warn-bg text-warn' : 'text-ink-2')}>{st.level === 'ok' && <i className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />}{dateFull(h.expires).slice(0, 6) + dateFull(h.expires).slice(8)}</span>
-                          ) : <span className="text-line2">·</span>}
+                            <span title={st.label} className={cn('num inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11.5px] font-medium', st.level === 'expired' ? 'tone-rose' : st.level === 'soon' ? 'tone-amber' : 'tone-green')}>{st.level === 'ok' && <i className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />}{dateFull(h.expires).slice(0, 6) + dateFull(h.expires).slice(8)}</span>
+                          ) : <span className="text-[#dcd6ec]">·</span>}
                         </td>
                       );
                     })}
@@ -134,7 +133,7 @@ export default function Habilitations() {
               const mine = habs.filter((h) => h.employeeId === e.id).sort((a, b) => a.expires.localeCompare(b.expires));
               return (
                 <Card key={e.id}>
-                  <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
+                  <div className="flex items-center gap-2.5 border-b border-halo-line px-4 py-3">
                     <Avatar initials={e.initials} color={e.color} size={30} />
                     <span className="text-[14px] font-semibold">{e.firstName} {e.lastName}</span>
                   </div>
@@ -142,7 +141,7 @@ export default function Habilitations() {
                   {mine.map((h) => {
                     const st = habState(h.expires);
                     return (
-                      <div key={h.id} className="flex min-h-[52px] items-center gap-3 border-b border-line px-4 py-2 last:border-0">
+                      <div key={h.id} className="flex min-h-[52px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-0">
                         <div className="min-w-0 flex-1">
                           <div className="truncate text-[13.5px] font-medium">{habType(h.type)?.label}</div>
                           <div className="text-[11.5px] text-ink-3">jusqu’au {dateFull(h.expires)} · {h.organisme}</div>
@@ -162,7 +161,7 @@ export default function Habilitations() {
             {trainings.map((t) => {
               const e = empOf(t.employeeId);
               return (
-                <div key={t.id} className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3 last:border-0">
+                <div key={t.id} className="flex flex-wrap items-center gap-3 border-b border-halo-line px-4 py-3 last:border-0">
                   <Avatar initials={e.initials} color={e.color} size={30} />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13.5px] font-medium">{e.firstName} · {habType(t.type)?.label}</div>
@@ -176,7 +175,7 @@ export default function Habilitations() {
                 </div>
               );
             })}
-            <p className="border-t border-line px-4 py-3 text-[11.5px] text-ink-3">Validités conseillées : électriques 3 ans, CACES nacelle 5 ans, CACES engins 10 ans, travail en hauteur 3 ans, SST 2 ans, amiante 3 ans.</p>
+            <p className="border-t border-halo-line px-4 py-3 text-[11.5px] text-ink-3">Validités conseillées : électriques 3 ans, CACES nacelle 5 ans, CACES engins 10 ans, travail en hauteur 3 ans, SST 2 ans, amiante 3 ans.</p>
           </Card>
         </>
       )}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ArrowRight, Check, Download, FileArchive, FileSpreadsheet, FileText, Lock, Mail, RefreshCw, Trash2, UserPlus } from 'lucide-react';
+import { ArrowRight, Check, Download, FileArchive, FileSpreadsheet, FileText, Lock, Mail, Percent, RefreshCw, Trash2, UserPlus } from 'lucide-react';
 import { Badge, Button, Card, CardHeader, cn, IconTile, Input, PageHeader, Segmented, Sheet, toast } from '@/components/ui';
-import { LiveDot, SuccessDot } from '@/components/motion';
+import { DrawCheck, LiveDot, SuccessDot } from '@/components/motion';
 import { capitalize, money, monthName, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { BigMoney, Label, SectionHead } from './components/kit';
@@ -89,16 +89,16 @@ export default function Compta() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Calculator" dept="gestion" size="lg" />} title="Comptabilité" subtitle="Votre comptable reçoit tout, sans que vous ayez rien à envoyer." />
+      <PageHeader icon={<IconTile name="Calculator" dept="gestion" size="lg" />} kicker="Gestion" title="Comptabilité" titleMuted={soft ? 'tout part tout seul.' : 'reliez, et c’est fini.'} subtitle="Votre comptable reçoit tout, sans que vous ayez rien à envoyer." />
 
-      <Card className="overflow-hidden">
-        <div className="flex flex-col gap-5 p-5 md:flex-row md:items-center md:p-6">
+      <Card className="halo-bg halo-clip overflow-hidden">
+        <div className="flex flex-col gap-5 p-5 md:flex-row md:items-center md:p-7">
           <div className="flex min-w-0 flex-1 items-start gap-4">
-            <span className={cn('relative grid h-12 w-12 shrink-0 place-items-center rounded-[14px]', soft ? 'bg-ok-bg text-ok' : 'bg-sub text-ink-3')}>
+            <span className={cn('relative grid h-12 w-12 shrink-0 place-items-center rounded-[15px]', soft ? 'bg-pale-g text-deep-g' : 'bg-pale-i text-deep-i')}>
               {soft ? <SuccessDot size={26} /> : <RefreshCw className="h-5 w-5" />}
             </span>
             <div className="min-w-0">
-              <div className="text-[18px] font-semibold leading-tight tracking-[-0.025em]">{soft ? `Votre comptable est à jour` : 'Reliez votre logiciel, et c’est fini'}</div>
+              <div className="text-[22px] font-semibold leading-tight tracking-[-0.035em]">{soft ? `Votre comptable est à jour` : 'Reliez votre logiciel, et c’est fini'}</div>
               <div className="mt-1 flex flex-wrap items-center gap-x-2 text-[13px] text-ink-2">
                 {soft ? (
                   <>
@@ -115,10 +115,10 @@ export default function Compta() {
             {soft ? 'Envoyer maintenant' : 'Relier mon logiciel'}
           </Button>
         </div>
-        <div className="stagger-fast grid grid-cols-1 border-t border-line sm:grid-cols-3">
+        <div className="stagger-fast grid grid-cols-1 border-t border-halo-line sm:grid-cols-3">
           {counts.map((x, i) => (
-            <div key={x.label} className={cn('flex items-center gap-3 px-5 py-4 md:px-6', i > 0 && 'border-line max-sm:border-t sm:border-l')}>
-              <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-full', soft ? 'bg-ok text-white' : 'bg-sub text-ink-3')}><Check className="h-3.5 w-3.5" strokeWidth={2.6} /></span>
+            <div key={x.label} className={cn('flex items-center gap-3 px-5 py-4 md:px-6', i > 0 && 'border-halo-line max-sm:border-t sm:border-l')}>
+              <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-full', soft ? 'bg-[#10b981] text-white' : 'bg-pale-n text-ink-3')}>{soft ? <DrawCheck className="h-3.5 w-3.5" strokeWidth={2.8} delay={200 + i * 120} /> : <Check className="h-3.5 w-3.5" strokeWidth={2.6} />}</span>
               <div className="min-w-0">
                 <div className="text-[13.5px] font-medium"><span className="num">{x.n}</span> {x.label.toLowerCase()}</div>
                 <div className="truncate text-[12px] text-ink-3">{soft ? 'transmis' : 'prêts'} · {x.sub}</div>
@@ -129,14 +129,15 @@ export default function Compta() {
       </Card>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-        <Card className="p-5 md:p-6">
-          <Label>TVA de {monthName(now)}</Label>
-          <BigMoney value={Math.max(0, vat.due)} cents dawn className="mt-3 block text-[40px]" />
+        <Card className="p-5 md:p-7">
+          <IconTile icon={<Percent />} tone="indigo" />
+          <Label className="mt-4">TVA de {monthName(now)}</Label>
+          <BigMoney value={Math.max(0, vat.due)} cents dawn className="mt-1.5 block text-[40px] md:text-[48px]" />
           <div className="mt-2 text-[12.5px] text-ink-2">à déclarer avant le {dueDay} · Bob a tout calculé</div>
           <div className="mt-5 space-y-2.5 text-[13px]">
             <div className="flex justify-between gap-3"><span className="text-ink-2">Encaissée sur vos factures</span><span className="num font-medium">{money(vat.collected)}</span></div>
-            <div className="flex justify-between gap-3"><span className="text-ink-2">Récupérable sur vos achats et frais</span><span className="num font-medium text-ok">− {money(vat.deductible)}</span></div>
-            <div className="flex justify-between gap-3 border-t border-line pt-2.5"><span className="font-medium">À payer</span><span className="num font-semibold">{money(Math.max(0, vat.due))}</span></div>
+            <div className="flex justify-between gap-3"><span className="text-ink-2">Récupérable sur vos achats et frais</span><span className="num font-medium text-deep-g">− {money(vat.deductible)}</span></div>
+            <div className="flex justify-between gap-3 border-t border-halo-line pt-2.5"><span className="font-medium">À payer</span><span className="num font-semibold">{money(Math.max(0, vat.due))}</span></div>
           </div>
           <p className="mt-4 text-[12.5px] leading-relaxed text-ink-3">Dans le bâtiment, la TVA se paie quand le client vous règle, pas quand vous facturez. Les taux 5,5 %, 10 % et 20 % sont comptés ligne par ligne.</p>
           <Button className="mt-5 w-full" variant="secondary" onClick={() => toast('Déclaration pré-remplie, envoyée à votre comptable pour validation')}>Préparer la déclaration</Button>
@@ -149,13 +150,13 @@ export default function Compta() {
             <div className="text-[12.5px] text-ink-3">Période : {p.label}</div>
             <div className="stagger-fast space-y-2">
               {exports.map((x) => (
-                <button key={x.k} onClick={x.go} disabled={!!busy} className="lift group flex min-h-[64px] w-full items-center gap-3 rounded-[13px] bg-white px-3.5 text-left shadow-[0_0_0_1px_var(--line)] disabled:opacity-60">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] bg-[#eef0fd] text-[#3730a3]"><x.icon className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
+                <button key={x.k} onClick={x.go} disabled={!!busy} className="row-card group min-h-[64px] w-full gap-3 px-3.5 text-left disabled:opacity-60">
+                  <IconTile icon={<x.icon />} tone={x.k === 'fec' ? 'indigo' : x.k === 'csv' ? 'green' : 'peach'} />
                   <span className="min-w-0 flex-1">
                     <span className="flex items-center gap-2 text-[13.5px] font-medium">{x.t}<Badge>{x.tag}</Badge></span>
                     <span className="block truncate text-[12px] text-ink-3">{x.d}</span>
                   </span>
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-3 transition group-hover:bg-sub group-hover:text-ink">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-3 transition group-hover:bg-halo-hover group-hover:text-ink">
                     {busy === x.k ? <RefreshCw className="h-4 w-4 animate-spin" /> : done[x.k] ? <SuccessDot size={20} /> : <Download className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />}
                   </span>
                 </button>
@@ -183,17 +184,17 @@ export default function Compta() {
           </div>
           <div className="mt-3 space-y-2">
             {c.guests.map((g) => (
-              <div key={g.email} className="flex min-h-[60px] animate-[fade-up_.4s_var(--ease)_both] items-center gap-3 rounded-[13px] bg-sub/60 px-3.5 py-2">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-[12px] font-semibold text-[#3730a3] shadow-card">{g.name.slice(0, 1).toUpperCase()}</span>
+              <div key={g.email} className="row-card min-h-[60px] animate-[fade-up_.4s_var(--ease)_both] gap-3 px-3.5 py-2">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-pale-i text-[12px] font-semibold text-deep-i">{g.name.slice(0, 1).toUpperCase()}</span>
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13.5px] font-medium">{capitalize(g.name)}</div>
                   <div className="truncate text-[12px] text-ink-3">{g.email}</div>
                 </div>
                 <Badge tone="info" icon={<Lock />} className="max-sm:hidden">Lecture seule</Badge>
-                <button onClick={() => { c.removeGuest(g.email); toast('Accès retiré', 'info'); }} className="grid h-10 w-10 place-items-center rounded-lg text-ink-3 transition hover:bg-white hover:text-bad" aria-label="Retirer l'accès"><Trash2 className="h-4 w-4" /></button>
+                <button onClick={() => { c.removeGuest(g.email); toast('Accès retiré', 'info'); }} className="grid h-10 w-10 place-items-center rounded-full text-ink-3 transition hover:bg-pale-r hover:text-deep-r" aria-label="Retirer l'accès"><Trash2 className="h-4 w-4" /></button>
               </div>
             ))}
-            {!c.guests.length && <div className="rounded-[13px] bg-sub/60 px-4 py-6 text-center text-[13px] text-ink-3">Aucun accès pour l’instant.</div>}
+            {!c.guests.length && <div className="rounded-card-sm bg-pale-n/70 px-4 py-6 text-center text-[13px] text-ink-3">Aucun accès pour l’instant.</div>}
           </div>
           <p className="mt-3 text-[12px] text-ink-3">Gratuit et sans limite pour votre cabinet. Il voit et télécharge, il ne peut ni modifier ni supprimer.</p>
         </div>
@@ -212,8 +213,8 @@ export default function Compta() {
 
 function SoftTile({ x, on, busy, disabled, onClick }: { x: (typeof CONNECTORS)[number]; on: boolean; busy: boolean; disabled: boolean; onClick: () => void }) {
   return (
-    <button onClick={onClick} disabled={disabled} className={cn('lift group flex min-h-[64px] items-center gap-3 rounded-[14px] bg-white p-3 text-left shadow-card transition disabled:pointer-events-none disabled:opacity-45', on && 'shadow-[0_0_0_1.5px_#86efac,0_1px_2px_rgba(19,15,38,.04)]')}>
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] text-[15px] font-semibold text-white" style={{ background: x.color }}>{x.name[0]}</span>
+    <button onClick={onClick} disabled={disabled} className={cn('lift group flex min-h-[64px] items-center gap-3 rounded-card-sm bg-white p-3 text-left shadow-halo transition disabled:pointer-events-none disabled:opacity-45', on && 'shadow-[0_0_0_1.5px_#b7ebd3,0_10px_28px_-12px_rgba(16,185,129,.35)]')}>
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-tile text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,.25)]" style={{ background: x.color }}>{x.name[0]}</span>
       <span className="min-w-0 flex-1">
         <span className="block text-[13.5px] font-semibold">{x.name}</span>
         <span className="block truncate text-[12px] text-ink-3">{on ? 'Relié · touchez pour couper' : busy ? 'Connexion sécurisée…' : x.sub}</span>

@@ -57,3 +57,14 @@
   .fx-grow, .fx-pop, .fx-halo, .fx-lit, .fx-flash, .fx-trace, .fx-trace-v { animation-duration: .01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
   .fx-ping, .fx-roule { animation: none !important; }
 }
+
+/* Halo : la meilleure offre est mise en avant par un bord Aube (dégradé) et une lueur rose. */
+.fx-best { position: relative; isolation: isolate; }
+.fx-best::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none; z-index: 1;
+  background: linear-gradient(120deg, #6d28d9, #d946ef 58%, #fb923c);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.fx-best-glow { box-shadow: 0 0 0 1px rgba(217,70,239,.06), 0 18px 44px -18px rgba(217,70,239,.45), 0 8px 22px -14px rgba(109,40,217,.3) !important; }
+/* Colonne gagnante du comparatif (tableau) : fond Aube très pâle */
+.fx-best-col { background: linear-gradient(180deg, rgba(250,245,255,.9), rgba(255,245,238,.6)); }

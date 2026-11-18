@@ -84,9 +84,10 @@ export default function ChantiersList() {
       <PageHeader
         icon={<IconTile name="HardHat" dept="chantiers" size="lg" />}
         title="Chantiers"
-        subtitle={views.length ? `${active.length} en cours, ${count('a_planifier')} à planifier` : 'Suivez avancement, marge et photos de chaque chantier.'}
+        titleMuted={views.length ? `${active.length} en cours, ${count('a_planifier')} à planifier.` : undefined}
+        subtitle={views.length ? undefined : 'Suivez avancement, marge et photos de chaque chantier.'}
         actions={
-          <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)} className="max-sm:w-full">
+          <Button variant="dawn" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)} className="max-sm:w-full">
             Nouveau chantier
           </Button>
         }
@@ -130,7 +131,7 @@ export default function ChantiersList() {
           icon={<HardHat />}
           title="Aucun chantier pour l'instant"
           text="Un chantier naît d'un devis signé. Créez-le en 20 secondes : client, adresse, dates et équipe."
-          action={<Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>Créer mon premier chantier</Button>}
+          action={<Button variant="dawn" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>Créer mon premier chantier</Button>}
         />
       ) : rows.length === 0 ? (
         <EmptyState icon={<Search />} title="Aucun chantier ne correspond" text="Changez le filtre ou la recherche." action={<Button onClick={() => { setFilter('tous'); setQ(''); }}>Tout afficher</Button>} />

@@ -200,21 +200,21 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
       <div className={cn('mt-2 space-y-2 border-t border-[#e6e1f1]/80 pt-3', collapsed && 'flex w-full flex-col items-center')}>
         {collapsed ? (
           <Tip label="Parler à Bob (⌘J)" side="right">
-            <button onClick={() => ui.askBob()} className="grid h-10 w-10 place-items-center rounded-full bg-night text-white shadow-ink transition hover:scale-105" aria-label="Parler à Bob">
+            <button onClick={() => ui.askBob()} className="grid h-10 w-10 place-items-center rounded-full bg-dawn text-white shadow-dawn transition hover:scale-105" aria-label="Parler à Bob">
               <BobWave />
             </button>
           </Tip>
         ) : (
-          <button onClick={() => ui.askBob()} className="group relative flex w-full items-center gap-2.5 overflow-hidden rounded-[18px] bg-night p-2.5 text-left text-white shadow-[0_12px_28px_-14px_rgba(19,15,38,.9)] transition duration-300 hover:-translate-y-px">
-            <span aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-mag/30 blur-2xl transition-opacity group-hover:opacity-100" />
-            <span className="relative grid h-8 w-8 place-items-center rounded-full bg-white/10">
+          <button onClick={() => ui.askBob()} className="group relative flex w-full items-center gap-2.5 overflow-hidden rounded-[18px] bg-white/80 p-2.5 text-left text-ink shadow-halo-sm ring-1 ring-white transition duration-300 hover:-translate-y-px hover:shadow-halo">
+            <span aria-hidden className="pointer-events-none absolute -right-8 -top-10 h-24 w-24 rounded-full bg-mag/15 blur-2xl opacity-70 transition-opacity group-hover:opacity-100" />
+            <span className="relative grid h-8 w-8 place-items-center rounded-full bg-dawn text-white shadow-dawn">
               <BobWave active={pendingBob > 0} />
             </span>
             <span className="relative min-w-0 flex-1">
               <b className="block text-[13px] font-semibold">Bob</b>
-              <span className="block truncate text-[11.5px] text-white/60">{pendingBob ? `${pendingBob} action${pendingBob > 1 ? 's' : ''} à valider` : 'Dites-lui ce que vous voulez'}</span>
+              <span className="block truncate text-[11.5px] text-ink-3">{pendingBob ? `${pendingBob} action${pendingBob > 1 ? 's' : ''} à valider` : 'Dites-lui ce que vous voulez'}</span>
             </span>
-            <kbd className="relative rounded-full bg-white/10 px-2 font-sans text-[11px] text-white/70">⌘J</kbd>
+            <kbd className="relative rounded-full bg-pale-v px-2 font-sans text-[11px] text-deep-v">⌘J</kbd>
           </button>
         )}
         <div className={cn('flex items-center gap-2.5', collapsed ? 'flex-col' : 'px-1 pt-0.5')}>

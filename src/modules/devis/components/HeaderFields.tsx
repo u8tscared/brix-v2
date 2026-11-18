@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Check, ChevronDown, MapPin, PenLine, Plus, Search, UserPlus, UserRound } from 'lucide-react';
-import { Avatar, Button, Field, Input, Segmented, Sheet, cn, toast } from '@/components/ui';
+import { Avatar, Button, Field, IconTile, Input, Segmented, Sheet, cn, toast } from '@/components/ui';
 import { initials, todayISO, uid } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Client, Devis } from '@/lib/types';
@@ -31,34 +31,34 @@ export function HeaderFields({ d, client, update, phone }: { d: Devis; client?: 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focus.nonce]);
 
-  const label = 'text-[11.5px] font-medium text-ink-3';
+  const label = 'text-[12px] font-medium text-ink-3';
   const value = 'truncate text-[14px] font-medium text-ink';
   const addr = client ? [client.address, client.city].filter(Boolean).join(', ') : '';
   return (
-    <div className="space-y-3">
-      <input
+    <div className="space-y-3.5">
+      <textarea
+        rows={1}
         value={d.title}
-        onChange={(e) => update({ title: e.target.value })}
+        onChange={(e) => update({ title: e.target.value.replace(/\n/g, ' ') })}
         placeholder="Titre du devis"
-        className="-ml-1.5 w-[calc(100%+12px)] rounded-[10px] border border-transparent bg-transparent px-1.5 py-1 text-[24px] font-semibold tracking-[-0.035em] text-ink transition placeholder:text-ink-3 hover:bg-white/60 focus:border-vi-300 focus:bg-white focus:outline-none md:text-[28px]"
+        style={{ fieldSizing: 'content' } as React.CSSProperties}
+        className="-ml-2.5 block w-[calc(100%+20px)] resize-none overflow-hidden rounded-[16px] border border-transparent bg-transparent px-2.5 py-1 text-[26px] font-semibold leading-[1.1] tracking-[-0.04em] text-ink transition placeholder:text-ink-3 hover:bg-white/60 focus:border-vi-300 focus:bg-white focus:outline-none md:text-[34px] md:tracking-[-0.045em]"
         aria-label="Titre du devis"
       />
       <div className={cn('grid gap-2', phone ? 'grid-cols-1' : 'grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]')}>
         {/* Client */}
-        <button data-field="client" onClick={() => setPicker('list')} className="group flex min-h-[64px] items-center gap-3 rounded-[14px] bg-white px-3.5 py-2.5 text-left shadow-card transition hover:shadow-raise">
-          {client ? <Avatar initials={initials(client.name)} size={38} color="#f3edff" fg="#6d28d9" /> : <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-full border border-dashed border-vi-300 text-vi-700"><UserPlus className="h-4 w-4" /></span>}
+        <button data-field="client" onClick={() => setPicker('list')} className="group flex min-h-[68px] items-center gap-3 rounded-card-sm bg-white px-3.5 py-2.5 text-left shadow-halo-sm transition duration-300 ease-out-quint hover:-translate-y-px hover:shadow-[0_0_0_1px_#e3dcf3,0_10px_24px_-12px_rgba(60,30,120,.18)]">
+          {client ? <Avatar initials={initials(client.name)} size={42} /> : <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-full border-[1.5px] border-dashed border-vi-300 text-deep-v"><UserPlus className="h-4 w-4" /></span>}
           <span className="min-w-0 flex-1">
             <span className={label}>Client</span>
-            <span className={cn(value, 'block', !client && 'text-vi-700')}>{client ? client.name : 'Choisir ou créer un client'}</span>
-            {client && <span className={cn('block truncate text-[12px]', incomplete(client) ? 'text-warn' : 'text-ink-3')}>{incomplete(client) ? 'Fiche à compléter' : [client.phone, client.email].filter(Boolean).join(' · ')}</span>}
+            <span className={cn(value, 'block', !client && 'text-deep-v')}>{client ? client.name : 'Choisir ou créer un client'}</span>
+            {client && <span className={cn('block truncate text-[12px]', incomplete(client) ? 'text-deep-a' : 'text-ink-3')}>{incomplete(client) ? 'Fiche à compléter' : [client.phone, client.email].filter(Boolean).join(' · ')}</span>}
           </span>
           <ChevronDown className="h-4 w-4 shrink-0 text-ink-3 transition group-hover:text-ink" />
         </button>
         {/* Chantier */}
-        <label data-field="chantier" className="relative flex min-h-[64px] cursor-pointer items-center gap-3 rounded-[14px] bg-white px-3.5 py-2.5 shadow-card transition hover:shadow-raise">
-          <span className="grid h-[38px] w-[38px] shrink-0 place-items-center rounded-full bg-[#fff1e7] text-[#c2410c]">
-            <MapPin className="h-4 w-4" />
-          </span>
+        <label data-field="chantier" className="group relative flex min-h-[68px] cursor-pointer items-center gap-3 rounded-card-sm bg-white px-3.5 py-2.5 shadow-halo-sm transition duration-300 ease-out-quint hover:-translate-y-px hover:shadow-[0_0_0_1px_#e3dcf3,0_10px_24px_-12px_rgba(60,30,120,.18)]">
+          <IconTile icon={<MapPin />} tone="peach" />
           <span className="min-w-0 flex-1">
             <span className={cn(label, 'block')}>Chantier</span>
             <select value={d.chantierId ?? ''} onChange={(e) => update({ chantierId: e.target.value || undefined })} className={cn(value, 'block w-full cursor-pointer appearance-none bg-transparent pr-5 focus:outline-none', !addr && !d.chantierId && 'text-ink-3')} aria-label="Chantier">
@@ -70,7 +70,7 @@ export function HeaderFields({ d, client, update, phone }: { d: Devis; client?: 
               ))}
             </select>
             {client && !addr && (
-              <button type="button" onClick={(e) => (e.preventDefault(), setPicker('edit'))} className="text-[12px] font-medium text-vi-700">
+              <button type="button" onClick={(e) => (e.preventDefault(), setPicker('edit'))} className="text-[12px] font-medium text-deep-v">
                 Ajouter l’adresse
               </button>
             )}
@@ -114,7 +114,7 @@ export function HeaderFields({ d, client, update, phone }: { d: Devis; client?: 
 
 function Chip({ field, label, children }: { field: string; label: string; children: React.ReactNode }) {
   return (
-    <label data-field={field} className="relative inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-white pl-3 pr-2.5 text-[13px] shadow-card transition hover:shadow-raise max-md:h-11">
+    <label data-field={field} className="relative inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-white/80 pl-3.5 pr-2.5 text-[13px] shadow-[0_1px_2px_rgba(60,30,120,.06),0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:-translate-y-px hover:bg-white max-md:h-11">
       <span className="text-ink-3">{label}</span>
       {children}
       <ChevronDown className="pointer-events-none absolute right-2.5 h-3.5 w-3.5 text-ink-3" />
@@ -164,7 +164,7 @@ function ClientPicker({ open, mode, onClose, current, onPick }: { open: boolean;
     <Sheet
       open={open}
       onClose={onClose}
-      icon={<span className="grid h-10 w-10 place-items-center rounded-[12px] bg-[#f3edff] text-[#6d28d9]">{view === 'list' ? <UserRound className="h-[18px] w-[18px]" /> : <PenLine className="h-[18px] w-[18px]" />}</span>}
+      icon={<IconTile icon={view === 'list' ? <UserRound /> : <PenLine />} tone="violet" />}
       title={view === 'new' ? 'Nouveau client' : view === 'edit' ? 'Compléter la fiche client' : 'Choisir le client'}
       subtitle={view === 'new' ? 'Seul le nom est obligatoire, le reste peut attendre.' : view === 'edit' ? 'Ces informations apparaissent sur le devis.' : `${clients.length} clients`}
       footer={
@@ -209,7 +209,7 @@ function ClientPicker({ open, mode, onClose, current, onPick }: { open: boolean;
               Nouveau
             </Button>
           </div>
-          <div className="stagger-fast overflow-hidden rounded-[14px] bg-white shadow-card">
+          <div className="stagger-fast space-y-1.5">
             {list.map((c) => (
               <button
                 key={c.id}
@@ -217,20 +217,20 @@ function ClientPicker({ open, mode, onClose, current, onPick }: { open: boolean;
                   onPick(c.id);
                   onClose();
                 }}
-                className="flex min-h-[56px] w-full items-center gap-3 border-b border-line px-3 py-2 text-left transition last:border-b-0 hover:bg-[#faf9fd]"
+                className="row-card min-h-[60px] w-full !py-2.5 text-left"
               >
-                <Avatar initials={initials(c.name)} size={34} color="#f3edff" fg="#6d28d9" />
+                <Avatar initials={initials(c.name)} size={36} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] font-medium">{c.name}</div>
                   <div className="truncate text-[12px] text-ink-3">
                     {c.kind === 'pro' ? 'Professionnel' : 'Particulier'} · {c.city || 'ville à préciser'}
                   </div>
                 </div>
-                {c.id === current?.id && <Check className="h-4 w-4 text-vi-700" />}
+                {c.id === current?.id && <span className="grid h-6 w-6 place-items-center rounded-full bg-pale-g text-deep-g"><Check className="h-3.5 w-3.5" strokeWidth={2.6} /></span>}
               </button>
             ))}
             {!list.length && (
-              <button onClick={startNew} className="flex min-h-[52px] w-full items-center gap-2 px-3 py-4 text-[13.5px] font-medium text-vi-700">
+              <button onClick={startNew} className="row-card min-h-[56px] w-full text-[13.5px] font-medium text-deep-v">
                 <Plus className="h-4 w-4" /> {q.trim() ? <>Créer « {q.trim()} »</> : 'Nouveau client'}
               </button>
             )}

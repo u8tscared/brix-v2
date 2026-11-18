@@ -2,6 +2,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { Globe, Handshake, LayoutGrid, MessageCircle, PhoneCall, Search, Users } from 'lucide-react';
 import type { Tone } from '@/components/ui/Badge';
+import type { HaloTone } from '@/components/ui/IconTile';
 import { totals } from '@/lib/format';
 import type { BrixState } from '@/lib/store';
 import type { Client, Lead } from '@/lib/types';
@@ -14,6 +15,9 @@ export const LEAD_SOURCE: Record<Lead['source'], { label: string; icon: LucideIc
   google: { label: 'Google', icon: Search },
   parrainage: { label: 'Parrainage', icon: Handshake },
 };
+
+/** Ton Halo de chaque canal (pastille de la source). */
+export const LEAD_SOURCE_TONE: Record<Lead['source'], HaloTone> = { site: 'violet', telephone: 'blue', whatsapp: 'green', plateforme: 'peach', google: 'amber', parrainage: 'mag' };
 
 export const CLIENT_SOURCE: Record<NonNullable<Client['source']>, string> = {
   site: 'Site internet',
@@ -82,5 +86,9 @@ export const waHref = (phone: string, text = '') => {
   return `https://wa.me/${p}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 };
 
-const AVATAR = ['#ebe2fe', '#fde7d9', '#dff3e7', '#e3e9fb', '#fbe1f3', '#f1efe2'];
-export const clientColor = (id: string) => AVATAR[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % AVATAR.length];
+// Avatars Halo : fond pâle + encre franche du même ton (violet, pêche, vert, bleu, magenta, ambre).
+const AVATAR = ['#f1eafe', '#fff0e4', '#e5f6ef', '#e8f0fe', '#fce8fd', '#fdf3dc'];
+const AVATAR_INK = ['#6d28d9', '#d4661b', '#0f8a5f', '#2f5fd0', '#b02bc4', '#a86206'];
+const avatarIndex = (id: string) => [...id].reduce((a, c) => a + c.charCodeAt(0), 0) % AVATAR.length;
+export const clientColor = (id: string) => AVATAR[avatarIndex(id)];
+export const clientInk = (id: string) => AVATAR_INK[avatarIndex(id)];

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowDownLeft, ArrowUpRight, Check, Link2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Badge, Button, Card, CardHeader, cn, Segmented, Sheet, toast } from '@/components/ui';
+import { Badge, Button, Card, CardHeader, cn, IconTile, Segmented, Sheet, toast } from '@/components/ui';
 import { SuccessDot } from '@/components/motion';
 import { dateShort, money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
@@ -42,20 +42,18 @@ export function TransactionsCard() {
         const f = t.matchedFactureId ? s.factures.find((x) => x.id === t.matchedFactureId) : undefined;
         const In = t.amount > 0;
         return (
-          <div key={t.id} className="flex min-h-[60px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0">
-            <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-full', In ? 'bg-ok-bg text-ok' : 'bg-sub text-ink-2')}>
-              {In ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
-            </span>
+          <div key={t.id} className="flex min-h-[60px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-b-0">
+            <IconTile icon={In ? <ArrowDownLeft /> : <ArrowUpRight />} tone={In ? 'green' : 'neutral'} size="row" />
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13px] font-medium">{t.label}</div>
               <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[12px] text-ink-3">
                 <span>{dateShort(t.date)}</span>
                 {f ? (
-                  <Link to={`/app/factures/${f.id}`} className="inline-flex items-center gap-1 text-ok hover:underline"><Check className="h-3 w-3" />{f.number}</Link>
+                  <Link to={`/app/factures/${f.id}`} className="inline-flex items-center gap-1 font-medium text-deep-g hover:underline"><Check className="h-3 w-3" />{f.number}</Link>
                 ) : In ? (
                   <Badge tone="warn">Sans facture</Badge>
                 ) : (
-                  <select value={t.category ?? ''} onChange={(e) => classify(t, e.target.value)} className={cn('h-7 max-w-[150px] rounded-full border-0 px-2.5 text-[12px] font-medium shadow-[inset_0_0_0_1px_var(--line2)] transition focus:outline-none focus:ring-4 focus:ring-vi-100', t.category ? 'bg-sub text-ink-2' : 'bg-warn-bg text-warn shadow-[inset_0_0_0_1px_#fde3b0]')}>
+                  <select value={t.category ?? ''} onChange={(e) => classify(t, e.target.value)} className={cn('h-7 max-w-[150px] rounded-full border-0 px-2.5 text-[12px] font-medium transition focus:shadow-focus focus:outline-none', t.category ? 'bg-pale-n text-ink-2' : 'bg-pale-a text-deep-a')}>
                     <option value="" disabled>Classer…</option>
                     {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
                   </select>
@@ -63,9 +61,9 @@ export function TransactionsCard() {
                 {done === t.id && <SuccessDot size={16} />}
               </div>
             </div>
-            <div className={cn('num shrink-0 text-right text-[13.5px] font-semibold', In && 'text-ok')}>{In ? '+' : ''}{money(t.amount)}</div>
+            <div className={cn('num shrink-0 text-right text-[13.5px] font-semibold', In && 'text-deep-g')}>{In ? '+' : ''}{money(t.amount)}</div>
             {In && !f && <Button size="sm" variant="soft" icon={<Link2 className="h-3.5 w-3.5" />} onClick={() => setMatching(t)} className="hidden sm:inline-flex">Associer</Button>}
-            {In && !f && <button onClick={() => setMatching(t)} className="grid h-11 w-11 place-items-center rounded-full bg-vi-50 text-vi-700 sm:hidden" aria-label="Associer"><Link2 className="h-4 w-4" /></button>}
+            {In && !f && <button onClick={() => setMatching(t)} className="grid h-11 w-11 place-items-center rounded-full bg-pale-v text-deep-v sm:hidden" aria-label="Associer"><Link2 className="h-4 w-4" /></button>}
           </div>
         );
       })}
@@ -83,7 +81,7 @@ export function TransactionsCard() {
           {suggestions.map((f, i) => {
             const cl = s.clients.find((c) => c.id === f.clientId);
             return (
-              <button key={f.id} onClick={() => matching && match(matching, f.id)} className="flex min-h-[60px] w-full items-center gap-3 rounded-xl border border-line px-3.5 text-left hover:border-vi-200 hover:bg-vi-50">
+              <button key={f.id} onClick={() => matching && match(matching, f.id)} className="row-card min-h-[60px] w-full gap-3 py-2.5 text-left">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13.5px] font-medium">{cl?.name} · {f.number}</div>
                   <div className="truncate text-[12px] text-ink-3">{f.title}</div>

@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Expand, MoreHorizontal, Send } from 'lucide-react';
+import { ChevronLeft, Cloud, Expand, MoreHorizontal, Send } from 'lucide-react';
 import { Badge, Button, cn } from '@/components/ui';
 import { DrawCheck } from '@/components/motion';
 import { DEVIS_STATUS } from '@/lib/status';
 import type { Devis } from '@/lib/types';
 import { Menu, type MenuItem } from './bits';
+import { Steps, type Step, type StepKey } from './Steps';
 
 interface Props {
   d: Devis;
@@ -17,6 +17,8 @@ interface Props {
   phone: boolean;
   onBack: () => void;
   checks?: { ok: number; total: number };
+  steps?: Step[];
+  onStep?: (k: StepKey) => void;
 }
 
 /** Indicateur discret de sauvegarde automatique. */
@@ -31,7 +33,7 @@ export function SavedPill({ saving }: { saving: boolean }) {
   );
 }
 
-export function TopBar({ d, saving, menu, onPreview, onMain, mainLabel, mainIcon, phone, onBack, checks }: Props) {
+export function TopBar({ d, saving, menu, onPreview, onMain, mainLabel, mainIcon, phone, onBack, checks, steps, onStep }: Props) {
   const st = DEVIS_STATUS[d.status];
   const more = (
     <Menu
@@ -45,47 +47,59 @@ export function TopBar({ d, saving, menu, onPreview, onMain, mainLabel, mainIcon
   );
   if (phone)
     return (
-      <div className="sticky top-14 z-20 flex h-14 items-center gap-1.5 border-b border-line/70 bg-page/90 px-2 backdrop-blur-xl">
-        <button onClick={onBack} className="grid h-11 w-11 place-items-center rounded-full text-ink" aria-label="Retour aux devis">
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-        <div className="min-w-0 flex-1 leading-tight">
-          <div className="flex items-center gap-1.5">
-            <span className="truncate font-mono text-[13.5px] font-semibold">{d.number}</span>
-            <Badge tone={st.tone}>{d.status === 'vu' ? 'Vu' : st.label}</Badge>
+      <div className="sticky top-14 z-20 px-3 pt-1">
+        <div className="glass flex h-14 items-center gap-1.5 rounded-full pl-1 pr-1.5">
+          <button onClick={onBack} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink transition active:scale-95" aria-label="Retour aux devis">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <div className="min-w-0 flex-1 leading-tight">
+            <div className="flex items-center gap-1.5">
+              <span className="truncate font-mono text-[13px] font-semibold">{d.number}</span>
+              <Badge tone={st.tone}>{d.status === 'vu' ? 'Vu' : st.label}</Badge>
+            </div>
+            <SavedPill saving={saving} />
           </div>
-          <SavedPill saving={saving} />
+          <Button variant="secondary" size="sm" onClick={onPreview} icon={<Expand />} className="!h-11 px-3.5" aria-label="Aperçu plein écran">
+            Aperçu
+          </Button>
+          {more}
         </div>
-        <Button variant="secondary" size="lg" onClick={onPreview} icon={<Expand className="h-4 w-4" />} className="h-11 px-3.5" aria-label="Aperçu plein écran">
-          Aperçu
-        </Button>
-        {more}
       </div>
     );
   return (
-    <div className="flex h-14 shrink-0 items-center gap-3 border-b border-line bg-white px-5 lg:h-[60px] lg:px-6">
-      <nav className="flex min-w-0 items-center gap-1.5 text-[13.5px]" aria-label="Fil d’Ariane">
-        <Link to="/app/devis" className="text-ink-2 transition hover:text-ink">
-          Devis
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-ink-3" />
-        <span className="truncate font-mono text-[13px] font-medium">{d.number}</span>
-      </nav>
-      <Badge tone={st.tone} dot pulse={d.status === 'vu'}>
-        {st.label}
-      </Badge>
-      <span className="hidden sm:inline-flex">
-        <SavedPill saving={saving} />
-      </span>
-      <div className="flex-1" />
-      <Button variant="secondary" size="sm" icon={<Expand className="h-4 w-4" />} onClick={onPreview} kbd="P">
-        Aperçu
-        {checks && checks.ok < checks.total && <span className="num ml-0.5 rounded-full bg-warn-bg px-1.5 text-[11px] font-semibold text-warn">{checks.total - checks.ok}</span>}
-      </Button>
-      {more}
-      <Button variant="dawn" size="sm" icon={mainIcon ?? <Send className="h-3.5 w-3.5" />} onClick={onMain} kbd="⌘↵" className="h-9 px-3.5">
-        {mainLabel}
-      </Button>
+    <div className="relative z-20 shrink-0 px-3 pt-3 lg:px-4">
+      <div className="glass flex h-[60px] items-center gap-3 rounded-[22px] pl-2 pr-2.5">
+        <button onClick={onBack} className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink-2 transition hover:bg-white hover:text-ink hover:shadow-pill" aria-label="Retour aux devis">
+          <ChevronLeft className="h-[18px] w-[18px]" />
+        </button>
+        <div className="min-w-0 shrink-0 leading-tight">
+          <div className="font-mono text-[13px] font-semibold text-ink">{d.number}</div>
+          <Badge tone={st.tone} dot pulse={d.status === 'vu'} className="mt-0.5 !h-[20px]">
+            {st.label}
+          </Badge>
+        </div>
+        {steps && onStep && (
+          <>
+            <span className="mx-1 hidden h-7 w-px bg-[#ece8f6] xl:block" />
+            <Steps steps={steps} onGo={onStep} className="hidden xl:flex" />
+          </>
+        )}
+        <div className="flex-1" />
+        <span className="hidden h-[30px] shrink-0 items-center rounded-full bg-white/80 pl-2 pr-3 shadow-[0_0_0_1px_#ece8f6] 2xl:inline-flex">
+          <SavedPill saving={saving} />
+        </span>
+        <span className="2xl:hidden" title={saving ? 'Enregistrement' : 'Enregistré'}>
+          <Cloud className={cn('h-4 w-4 transition-colors', saving ? 'text-vi-500' : 'text-ink-3')} aria-label={saving ? 'Enregistrement' : 'Enregistré'} />
+        </span>
+        <Button variant="secondary" size="sm" icon={<Expand />} onClick={onPreview} kbd="P">
+          Aperçu
+          {checks && checks.ok < checks.total && <span className="num ml-0.5 rounded-full bg-pale-a px-1.5 text-[11px] font-semibold text-deep-a">{checks.total - checks.ok}</span>}
+        </Button>
+        {more}
+        <Button variant="dawn" size="sm" icon={mainIcon ?? <Send />} onClick={onMain} kbd="⌘↵">
+          {mainLabel}
+        </Button>
+      </div>
     </div>
   );
 }

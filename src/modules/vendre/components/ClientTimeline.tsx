@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Eye, FileSignature, FileText, Mail, MapPin, MessageCircle, MessageSquare, PenLine, Phone, Receipt, Send } from 'lucide-react';
-import { Button, Card, CardHeader, cn, Input } from '@/components/ui';
+import { Eye, FileSignature, FileText, Mail, MapPin, MessageCircle, MessageSquare, MessagesSquare, PenLine, Phone, Receipt, Send } from 'lucide-react';
+import { Button, Card, CardHeader, cn, IconTile, Input } from '@/components/ui';
 import { dateShort, money, totals } from '@/lib/format';
 import type { Devis, Facture } from '@/lib/types';
 import { useVendre, type Exchange } from '../store';
@@ -46,13 +46,13 @@ export function ClientTimeline({ clientId, devis, factures }: { clientId: string
 
   return (
     <Card>
-      <CardHeader title="Échanges" meta={`${items.length}`} />
-      <div className="border-b border-line p-3">
+      <CardHeader icon={<IconTile icon={<MessagesSquare />} tone="blue" size="sm" />} title="Échanges" meta={`${items.length}`} />
+      <div className="border-b border-halo-line p-3 md:p-4">
         <div className="mb-2 flex gap-1 overflow-x-auto scrollbar-none">
           {(['note', 'appel', 'visite', 'mail'] as Exchange['kind'][]).map((k) => {
             const I = KIND[k].icon;
             return (
-              <button key={k} onClick={() => setKind(k)} className={cn('flex h-8 shrink-0 items-center gap-1 rounded-lg px-2.5 text-[12px] font-medium', kind === k ? 'bg-ink text-white' : 'text-ink-2 hover:bg-sub')}>
+              <button key={k} onClick={() => setKind(k)} aria-pressed={kind === k} className={cn('flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-[background,color,box-shadow] duration-300 ease-spring', kind === k ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:bg-halo-hover hover:text-ink')}>
                 <I className="h-3.5 w-3.5" strokeWidth={1.75} /> {KIND[k].label}
               </button>
             );
@@ -66,9 +66,9 @@ export function ClientTimeline({ clientId, devis, factures }: { clientId: string
       <ol className="px-4 py-2">
         {shown.map((it, i) => (
           <li key={i} className="relative flex gap-3 py-2.5">
-            {i < shown.length - 1 && <span className="absolute bottom-0 left-[13px] top-9 w-px bg-line" />}
-            <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full', it.tone === 'ok' ? 'bg-ok-bg text-ok' : it.tone === 'violet' ? 'bg-vi-50 text-vi-700' : 'bg-sub text-ink-2')}>
-              <it.icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+            {i < shown.length - 1 && <span className="absolute bottom-0 left-[15px] top-10 w-px bg-halo-line" />}
+            <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-full', it.tone === 'ok' ? 'bg-pale-g text-deep-g' : it.tone === 'violet' ? 'bg-pale-v text-deep-v' : 'bg-pale-n text-ink-2')}>
+              <it.icon className="h-3.5 w-3.5" strokeWidth={1.9} />
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-[13px] leading-snug">{it.text}</div>
@@ -79,7 +79,7 @@ export function ClientTimeline({ clientId, devis, factures }: { clientId: string
         {!items.length && <li className="py-6 text-center text-[13px] text-ink-3">Aucun échange pour l'instant.</li>}
       </ol>
       {items.length > 7 && (
-        <button onClick={() => setMore((v) => !v)} className="h-11 w-full border-t border-line text-[12.5px] font-medium text-ink-2 hover:text-ink">
+        <button onClick={() => setMore((v) => !v)} className="h-11 w-full border-t border-halo-line text-[12.5px] transition-colors hover:bg-halo-hover font-medium text-ink-2 hover:text-ink">
           {more ? 'Voir moins' : items.length - 7 === 1 ? 'Voir le plus ancien' : `Voir les ${items.length - 7} plus anciens`}
         </button>
       )}

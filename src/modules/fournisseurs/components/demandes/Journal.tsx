@@ -5,9 +5,9 @@ import { quand } from './commun';
 
 const PASTILLE: Record<Evenement['acteur'], string> = {
   artisan: 'bg-ink',
-  fournisseur: 'bg-ok',
-  systeme: 'bg-line2',
-  api: 'bg-brand',
+  fournisseur: 'bg-[#10b981]',
+  systeme: 'bg-[#d6cfe8]',
+  api: 'bg-dawn',
 };
 
 export default function Journal({ evenements, max = 8 }: { evenements: Evenement[]; max?: number }) {
@@ -15,11 +15,11 @@ export default function Journal({ evenements, max = 8 }: { evenements: Evenement
   return (
     <Card>
       <CardHeader title="Historique" meta={evenements.length > max ? `${max} derniers` : undefined} />
-      <ol className="px-4 py-3">
+      <ol className="px-5 py-4">
         {liste.map((e, i) => (
           <li key={i} className="relative flex gap-3 pb-3.5 last:pb-0">
-            {i < liste.length - 1 && <span className="absolute left-[3.5px] top-3 h-full w-px bg-line" aria-hidden />}
-            <span className={cn('relative mt-[6px] h-2 w-2 shrink-0 rounded-full ring-4 ring-white', PASTILLE[e.acteur])} />
+            {i < liste.length - 1 && <span className="absolute left-[4.5px] top-3 h-full w-px bg-halo-line" aria-hidden />}
+            <span className={cn('relative mt-[5px] h-2.5 w-2.5 shrink-0 rounded-full ring-4 ring-white', PASTILLE[e.acteur])} />
             <div className="min-w-0 flex-1">
               <div className="text-[13px] leading-snug">{e.texte}</div>
               <div className="num text-[11.5px] text-ink-3 first-letter:uppercase">{quand(e.at)}</div>

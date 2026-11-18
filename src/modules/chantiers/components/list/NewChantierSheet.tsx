@@ -124,7 +124,7 @@ export function NewChantierSheet({ open, onClose }: { open: boolean; onClose: ()
                 </button>
               );
             })}
-            {!freeDevis.length && <p className="rounded-[12px] bg-sub px-3 py-2.5 text-[12.5px] text-ink-2">Aucun devis libre pour ce client : le chantier sera créé sans devis.</p>}
+            {!freeDevis.length && <p className="rounded-[12px] bg-halo-track px-3 py-2.5 text-[12.5px] text-ink-2">Aucun devis libre pour ce client : le chantier sera créé sans devis.</p>}
           </div>
           <span className="mt-1.5 block text-xs text-ink-3">Facultatif : un chantier peut exister sans devis.</span>
         </div>
@@ -165,7 +165,7 @@ export function NewChantierSheet({ open, onClose }: { open: boolean; onClose: ()
                   key={e.id}
                   type="button"
                   onClick={() => setTeam((t) => (on ? t.filter((x) => x !== e.id) : [...t, e.id]))}
-                  className={cn('flex h-11 items-center gap-2 rounded-full border pl-1.5 pr-3 text-[13px] transition', on ? 'border-ink bg-ink text-white' : 'border-line2 bg-white hover:bg-sub')}
+                  className={cn('flex h-11 items-center gap-2 rounded-full border pl-1.5 pr-3 text-[13px] transition', on ? 'border-ink bg-ink text-white' : 'border-halo-line bg-white hover:bg-halo-track')}
                 >
                   <Avatar initials={e.initials} color={e.color} size={30} />
                   {e.firstName}

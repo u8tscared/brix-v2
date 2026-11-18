@@ -20,7 +20,7 @@ export function RightsMatrix() {
       <Card className="hidden overflow-hidden xl:block">
         <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-line bg-[#fafafc] text-left text-[11.5px] text-ink-2">
+            <tr className="border-b border-halo-line bg-halo-hover text-left text-[11.5px] text-ink-2">
               <th className="w-[230px] px-4 py-2.5 font-medium">Droit</th>
               {ROLES.map((r) => (
                 <th key={r.key} className="px-1 py-2.5 text-center font-medium leading-tight">
@@ -32,7 +32,7 @@ export function RightsMatrix() {
           </thead>
           <tbody>
             {PERMISSIONS.map((p) => (
-              <tr key={p.key} className="border-b border-line last:border-0 hover:bg-[#fafafc]">
+              <tr key={p.key} className="border-b border-halo-line last:border-0 hover:bg-halo-hover">
                 <td className="px-4 py-2.5">
                   <div className="font-medium">{p.label}</div>
                   <div className="text-[11.5px] text-ink-3">{p.help}</div>
@@ -48,16 +48,16 @@ export function RightsMatrix() {
       <div className="xl:hidden">
         <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-2 scrollbar-none md:mx-0 md:flex-wrap md:px-0">
           {ROLES.map((r) => (
-            <button key={r.key} onClick={() => setRole(r.key)} className={cn('flex h-10 shrink-0 items-center gap-2 rounded-full border px-3.5 text-[13px] font-medium transition', role === r.key ? 'border-ink bg-ink text-white' : 'border-line bg-white text-ink-2')}>
+            <button key={r.key} onClick={() => setRole(r.key)} className={cn('flex h-10 shrink-0 items-center gap-2 rounded-full border px-3.5 text-[13px] font-medium transition', role === r.key ? 'border-ink bg-ink text-white' : 'border-halo-line bg-white text-ink-2')}>
               <i className="h-2 w-2 rounded-full" style={{ background: r.color }} />
               {r.name}
             </button>
           ))}
         </div>
         <Card className="mt-2">
-          <div className="border-b border-line px-4 py-3 text-[13px] text-ink-2"><span className="font-semibold text-ink">{ROLES.find((r) => r.key === role)?.name}</span> · {ROLES.find((r) => r.key === role)?.short}</div>
+          <div className="border-b border-halo-line px-4 py-3 text-[13px] text-ink-2"><span className="font-semibold text-ink">{ROLES.find((r) => r.key === role)?.name}</span> · {ROLES.find((r) => r.key === role)?.short}</div>
           {PERMISSIONS.map((p) => (
-            <div key={p.key} className="flex min-h-[52px] items-center gap-3 border-b border-line px-4 py-2 last:border-0">
+            <div key={p.key} className="flex min-h-[52px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-0">
               <div className="min-w-0 flex-1">
                 <div className="text-[13.5px] font-medium">{p.label}</div>
                 <div className="text-[11.5px] text-ink-3">{p.help}</div>

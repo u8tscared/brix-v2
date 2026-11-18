@@ -1,5 +1,5 @@
-import { BellRing, CalendarCheck, Check, ShieldCheck } from 'lucide-react';
-import { Avatar, Badge, Button, Card, EmptyState, Icon, Switch, cn, toast } from '@/components/ui';
+import { BellRing, CalendarCheck, Check, ShieldCheck, Wrench } from 'lucide-react';
+import { Avatar, Badge, Button, EmptyState, Icon, IconTile, Switch, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { dateLong, dateShort, money, relative, todayISO, uid } from '@/lib/format';
 import { useChantiersLocal, type Contract, type Intervention } from '../../store';
@@ -25,19 +25,17 @@ export function ContractsList({ onPlan }: { onPlan: (t: PlanTarget) => void }) {
   if (!list.length) return <EmptyState icon={<CalendarCheck />} title="Aucun contrat d’entretien" text="Un contrat d’entretien, c’est un client qui revient chaque année. Brix le rappelle tout seul." />;
 
   return (
-    <Card>
+    <div className="stagger-fast space-y-2">
       {list.map((c) => {
         const client = clients.find((x) => x.id === c.clientId);
         const st = contractState(c);
         const due = dueOf(c);
         return (
-          <div key={c.id} className="flex flex-col gap-3 border-b border-line px-4 py-3.5 last:border-b-0 md:flex-row md:items-center">
+          <div key={c.id} className="row-card flex-col items-stretch gap-3 md:flex-row md:items-center">
             <div className="flex min-w-0 flex-1 items-center gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sub text-ink-2">
-                <Icon name={EQUIPMENT[c.equipment].icon} className="h-[18px] w-[18px]" />
-              </span>
+              <IconTile tone="peach" icon={<Icon name={EQUIPMENT[c.equipment].icon} />} />
               <div className="min-w-0">
-                <div className="truncate text-[14px] font-medium">{client?.name}</div>
+                <div className="truncate text-[14.5px] font-semibold tracking-[-0.015em]">{client?.name}</div>
                 <div className="truncate text-xs text-ink-3">{c.label}{c.brand ? ` · ${c.brand}` : ''} · {money(c.priceHt, true)} HT / {c.frequencyMonths === 12 ? 'an' : `${c.frequencyMonths} mois`}</div>
               </div>
             </div>
@@ -62,7 +60,7 @@ export function ContractsList({ onPlan }: { onPlan: (t: PlanTarget) => void }) {
           </div>
         );
       })}
-    </Card>
+    </div>
   );
 }
 
@@ -84,20 +82,23 @@ export function InterventionsList({ onPlan, filter }: { onPlan: (t: PlanTarget) 
   if (!list.length) return <EmptyState icon={<Check />} title={filter === 'ouvertes' ? 'Aucune demande en attente' : 'Aucune intervention terminée'} text={filter === 'ouvertes' ? 'Les pannes signalées par vos clients arrivent ici.' : undefined} />;
 
   return (
-    <Card>
+    <div className="stagger-fast space-y-2">
       {list.map((i) => {
         const client = clients.find((c) => c.id === i.clientId);
         const emp = employees.find((e) => e.id === i.employeeId);
         return (
-          <div key={i.id} className="flex flex-col gap-3 border-b border-line px-4 py-3.5 last:border-b-0 md:flex-row md:items-center">
+          <div key={i.id} className="row-card flex-col items-stretch gap-3 md:flex-row md:items-center">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+            <IconTile tone={i.priority === 'urgente' ? 'rose' : i.underWarranty ? 'blue' : 'peach'} icon={<Wrench />} />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[14px] font-medium">{i.title}</span>
+                <span className="text-[14.5px] font-semibold tracking-[-0.015em]">{i.title}</span>
                 {i.priority !== 'normale' && <Badge tone={PRIORITY[i.priority].tone} dot={i.priority === 'urgente'}>{PRIORITY[i.priority].label}</Badge>}
                 {i.underWarranty && <Badge tone="info" icon={<ShieldCheck />}>Garantie</Badge>}
               </div>
               <div className="mt-0.5 text-xs text-ink-3">{client?.name} · signalé {relative(i.createdAt)}</div>
               {i.description && <p className="mt-1 line-clamp-2 text-[13px] text-ink-2">{i.description}</p>}
+            </div>
             </div>
             <div className="flex items-center gap-2 md:w-[260px] md:justify-end">
               {i.status === 'planifiee' && i.plannedAt ? (
@@ -118,6 +119,6 @@ export function InterventionsList({ onPlan, filter }: { onPlan: (t: PlanTarget) 
           </div>
         );
       })}
-    </Card>
+    </div>
   );
 }

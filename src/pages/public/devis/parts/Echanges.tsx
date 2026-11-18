@@ -31,12 +31,12 @@ export function Question({ open, onClose, prenom, onEnvoyer }: { open: boolean; 
         <div>
           <div className="flex flex-wrap gap-2">
             {SUGGESTIONS.map((s) => (
-              <button key={s} onClick={() => setTexte(s)} className={cn('min-h-[36px] rounded-full border px-3.5 text-[13px] transition', texte === s ? 'border-ink bg-ink text-white' : 'border-line2 text-ink-2 hover:bg-page')}>
+              <button key={s} onClick={() => setTexte(s)} className={cn('min-h-[36px] rounded-full px-3.5 text-[13px] transition duration-300 ease-spring', texte === s ? 'bg-ink text-white shadow-ink' : 'bg-white text-ink-2 shadow-[0_0_0_1px_#ece8f6] hover:-translate-y-px hover:text-ink')}>
                 {s}
               </button>
             ))}
           </div>
-          <textarea value={texte} onChange={(e) => setTexte(e.target.value)} rows={4} placeholder="Votre question…" className="mt-4 w-full resize-none rounded-2xl border border-line2 px-4 py-3 text-[15px] outline-none transition focus:border-[#8b5cf6] focus:shadow-[0_0_0_4px_rgba(139,92,246,.12)]" />
+          <textarea value={texte} onChange={(e) => setTexte(e.target.value)} rows={4} placeholder="Votre question…" className="mt-4 w-full resize-none rounded-field bg-white px-4 py-3 text-[15px] shadow-[0_0_0_1px_#e6e1f1] outline-none transition focus:shadow-[0_0_0_1px_#c4b5fd,0_0_0_4px_rgba(167,139,250,.22)]" />
           <BoutonEncre className="mt-4 w-full" disabled={texte.trim().length < 3} chargement={busy} icone={<Send className="h-4 w-4" />} onClick={async () => {
             setBusy(true);
             await onEnvoyer(texte.trim());
@@ -57,17 +57,17 @@ export function Refus({ open, onClose, onRefuser }: { open: boolean; onClose: ()
   const [busy, setBusy] = useState(false);
   return (
     <Feuille open={open} onClose={onClose} titre="Décliner ce devis" sousTitre="Votre réponse aide l’artisan. Vous pourrez toujours le recontacter.">
-      <div className="space-y-2">
+      <div className="space-y-2" role="radiogroup" aria-label="Motif">
         {MOTIFS.map((m) => (
-          <button key={m} onClick={() => setMotif(m)} className={cn('flex min-h-[52px] w-full items-center gap-3 rounded-2xl border px-4 text-left text-[14px] transition', motif === m ? 'border-ink bg-page font-medium' : 'border-line2 hover:bg-page')}>
-            <span className={cn('grid h-5 w-5 place-items-center rounded-full border-2', motif === m ? 'border-ink' : 'border-line2')}>
-              <span className={cn('h-2.5 w-2.5 rounded-full bg-ink transition-transform', motif === m ? 'scale-100' : 'scale-0')} />
+          <button key={m} onClick={() => setMotif(m)} role="radio" aria-checked={motif === m} className={cn('flex min-h-[52px] w-full items-center gap-3 rounded-card-sm bg-white px-4 text-left text-[14px] transition duration-300 ease-spring', motif === m ? 'font-medium shadow-[0_0_0_1.5px_#15122a]' : 'shadow-halo-sm hover:-translate-y-px')}>
+            <span className={cn('grid h-5 w-5 place-items-center rounded-full', motif === m ? 'bg-ink' : 'shadow-[inset_0_0_0_2px_#dcd6ea]')}>
+              <span className={cn('h-2 w-2 rounded-full bg-white transition-transform duration-300 ease-spring', motif === m ? 'scale-100' : 'scale-0')} />
             </span>
             {m}
           </button>
         ))}
       </div>
-      <textarea value={precision} onChange={(e) => setPrecision(e.target.value)} rows={2} placeholder="Une précision (facultatif)" className="mt-3 w-full resize-none rounded-2xl border border-line2 px-4 py-3 text-[14px] outline-none focus:border-[#8b5cf6]" />
+      <textarea value={precision} onChange={(e) => setPrecision(e.target.value)} rows={2} placeholder="Une précision (facultatif)" className="mt-3 w-full resize-none rounded-field bg-white px-4 py-3 text-[14px] shadow-[0_0_0_1px_#e6e1f1] outline-none transition focus:shadow-[0_0_0_1px_#c4b5fd,0_0_0_4px_rgba(167,139,250,.22)]" />
       <BoutonEncre className="mt-4 w-full" disabled={!motif} chargement={busy} onClick={async () => {
         setBusy(true);
         await onRefuser([motif, precision.trim()].filter(Boolean).join(' : '));

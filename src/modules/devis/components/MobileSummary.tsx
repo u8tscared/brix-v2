@@ -15,13 +15,13 @@ export function MobileSummary({ open, onClose, d, t, update }: { open: boolean; 
   );
   return (
     <Sheet open={open} onClose={onClose} title="Totaux du devis">
-      <div className="divide-y divide-line">
+      <div className="divide-y divide-[#f2eff8]">
         {row('Total HT', money(t.ht))}
         {t.byVat.map((v) => row(`TVA ${pct(v.rate, v.rate % 1 ? 1 : 0)}`, money(v.tva)))}
         {row('Total TTC', money(t.ttc), true)}
         {aides > 0 && row('Reste à charge après aides', money(t.ttc - aides))}
       </div>
-      <div className="mt-4 rounded-xl border border-line p-4">
+      <div className="mt-4 rounded-card-sm bg-white p-4 shadow-halo-sm">
         <div className="flex items-center justify-between text-[13px]">
           <span className="flex items-center gap-1.5 text-ink-2">Marge estimée {low && <AlertTriangle className="h-3.5 w-3.5 text-warn" />}</span>
           <span className={`num font-semibold ${low ? 'text-warn' : ''}`}>

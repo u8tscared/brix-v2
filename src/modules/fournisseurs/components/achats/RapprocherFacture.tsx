@@ -44,7 +44,7 @@ export default function RapprocherFacture({ commande, open, onClose }: { command
       }
     >
       <div className="space-y-4">
-        <dl className="divide-y divide-line rounded-[12px] border border-line text-[13.5px]">
+        <dl className="divide-y divide-halo-line rounded-card-sm bg-white shadow-halo-sm text-[13.5px]">
           <div className="flex justify-between px-3.5 py-2.5"><dt className="text-ink-2">Articles commandés</dt><dd className="num">{money(totalCommande(commande))}</dd></div>
           <div className="flex justify-between px-3.5 py-2.5"><dt className="text-ink-2">Frais de port</dt><dd className="num">{commande.port ? money(commande.port) : 'Offerts'}</dd></div>
           {Math.abs(livre - totalCommande(commande)) > 0.01 && (
@@ -58,7 +58,7 @@ export default function RapprocherFacture({ commande, open, onClose }: { command
         </Field>
 
         {ecart != null && (
-          <div className={cn('flex gap-2.5 rounded-[12px] border px-3.5 py-3 text-[13px]', alerte ? 'border-[#fde3b5] bg-warn-bg text-[#92400e]' : 'border-[#c9f0d6] bg-ok-bg text-[#166534]')}>
+          <div className={cn('flex gap-2.5 rounded-card-sm border px-4 py-3.5 text-[13px]', alerte ? 'border-[#fde3b5] bg-warn-bg text-[#92400e]' : 'border-[#c9f0d6] bg-ok-bg text-[#166534]')}>
             {alerte ? <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" /> : <CircleCheck className="mt-0.5 h-4 w-4 shrink-0" />}
             <div>
               <div className="font-medium">{alerte ? `Écart de ${ecart > 0 ? '+' : ''}${money(ecart)}` : ecart === 0 ? 'Montant identique à la commande' : `Écart de ${money(ecart)}, dans la marge normale`}</div>

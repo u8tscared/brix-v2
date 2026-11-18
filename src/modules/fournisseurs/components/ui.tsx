@@ -6,14 +6,17 @@ import { useTween } from '@/modules/fournisseurs/components/portail/anim';
 import { STATUT_COMMANDE, STATUT_DEMANDE, STATUT_DESTINATAIRE } from '../data/helpers';
 import type { Fournisseur, StatutCommande, StatutDemande, StatutDestinataire } from '../data/types';
 
-const COULEURS: Record<string, string> = {
-  rexel: '#e2ecff', sonepar: '#e6f6ee', yesss: '#fff1d6', cedeo: '#e4f3fb', point_p: '#fde6e6', wurth: '#fde8e8', richardson: '#efe9ff', gedimat: '#eef7e4',
+// Pastilles fournisseurs : tons pâles Halo (fond pâle + encre franche), stables par enseigne.
+const COULEURS: Record<string, { bg: string; fg: string }> = {
+  rexel: { bg: '#e8f0fe', fg: '#2f5fd0' }, sonepar: { bg: '#e5f6ef', fg: '#0f8a5f' }, yesss: { bg: '#fdf3dc', fg: '#a86206' }, cedeo: { bg: '#e3f5f8', fg: '#0e7490' },
+  point_p: { bg: '#fde9ee', fg: '#c81e4a' }, wurth: { bg: '#fff0e4', fg: '#d4661b' }, richardson: { bg: '#f1eafe', fg: '#6d28d9' }, gedimat: { bg: '#eceefe', fg: '#4338ca' },
 };
 
 export function FournisseurPastille({ f, size = 36 }: { f?: Pick<Fournisseur, 'nom' | 'enseigne'>; size?: number }) {
   const initiales = (f?.nom ?? '?').replace(/[^A-Za-zÀ-ÿ ]/g, '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  const c = COULEURS[f?.enseigne ?? ''] ?? { bg: '#f3f1f8', fg: '#5d5a72' };
   return (
-    <span className="inline-grid shrink-0 place-items-center rounded-[10px] border border-line font-semibold text-ink" style={{ width: size, height: size, background: COULEURS[f?.enseigne ?? ''] ?? '#f1f1f5', fontSize: size * 0.34 }}>
+    <span className="inline-grid shrink-0 place-items-center font-semibold tracking-[-0.02em]" style={{ width: size, height: size, borderRadius: Math.round(size * 0.33), background: c.bg, color: c.fg, fontSize: size * 0.34 }}>
       {initiales}
     </span>
   );
@@ -37,7 +40,7 @@ export function Section({ title, action, children, className }: { title: ReactNo
   return (
     <section className={cn('space-y-3', className)}>
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-[15px] font-semibold">{title}</h2>
+        <h2 className="text-[17px] font-semibold tracking-[-0.025em]">{title}</h2>
         {action}
       </div>
       {children}
@@ -47,7 +50,7 @@ export function Section({ title, action, children, className }: { title: ReactNo
 
 /** Bandeau « mode démo » : rien ne part chez un vrai fournisseur. */
 export function BandeauDemo({ children }: { children: ReactNode }) {
-  return <div className="rounded-[12px] border border-dashed border-vi-200 bg-vi-50/60 px-3.5 py-2.5 text-[12.5px] text-vi-700">{children}</div>;
+  return <div className="rounded-card-sm bg-pale-v/70 px-4 py-3 text-[12.5px] leading-snug text-deep-v">{children}</div>;
 }
 
 /** Nombre qui glisse jusqu'à sa valeur (montants, compteurs). */
@@ -56,11 +59,22 @@ export function Anime({ v, euros, arrondi, className }: { v: number; euros?: boo
   return <span className={cn('num', className)}>{euros ? money(t, arrondi) : Math.round(t)}</span>;
 }
 
-/** Tuile d'icône colorée (Lucide, trait 1,75). */
-const TONS = { ink: 'bg-[#130f26] text-white', violet: 'bg-vi-50 text-vi-700', ok: 'bg-ok-bg text-ok', warn: 'bg-warn-bg text-warn', bad: 'bg-bad-bg text-bad', neutre: 'bg-page text-ink-2' } as const;
-export function Tuile({ icon, ton = 'neutre', size = 36, className }: { icon: ReactNode; ton?: keyof typeof TONS; size?: number; className?: string }) {
+/** Tuile d'icône colorée : pastille Halo (fond pâle + encre franche). */
+const TONS = {
+  ink: 'bg-ink text-white',
+  violet: 'bg-pale-v text-deep-v',
+  ok: 'bg-pale-g text-deep-g',
+  warn: 'bg-pale-a text-deep-a',
+  bad: 'bg-pale-r text-deep-r',
+  neutre: 'bg-pale-n text-deep-n',
+  bleu: 'bg-pale-b text-deep-b',
+  peche: 'bg-pale-p text-deep-p',
+  mag: 'bg-pale-m text-deep-m',
+} as const;
+export type TonTuile = keyof typeof TONS;
+export function Tuile({ icon, ton = 'neutre', size = 36, className }: { icon: ReactNode; ton?: TonTuile; size?: number; className?: string }) {
   return (
-    <span className={cn('grid shrink-0 place-items-center rounded-[11px] [&_svg]:h-[17px] [&_svg]:w-[17px] [&_svg]:stroke-[1.75]', TONS[ton], className)} style={{ width: size, height: size }}>
+    <span className={cn('grid shrink-0 place-items-center [&_svg]:h-[17px] [&_svg]:w-[17px] [&_svg]:stroke-[1.9]', TONS[ton], className)} style={{ width: size, height: size, borderRadius: Math.round(size * 0.33) }}>
       {icon}
     </span>
   );

@@ -72,13 +72,13 @@ export function SignaturePad({ label, value, onChange, className }: { label: str
   };
 
   return (
-    <div className={cn('overflow-hidden rounded-[16px] bg-white shadow-card transition-shadow duration-300', !empty && 'shadow-[0_0_0_1.5px_#86d9a6,0_8px_20px_-12px_rgba(21,128,61,.35)]', className)}>
-      <div className="flex h-11 items-center justify-between gap-2 border-b border-line pl-3.5 pr-2">
+    <div className={cn('overflow-hidden rounded-card bg-white shadow-halo transition-shadow duration-300', !empty && 'shadow-[0_0_0_1.5px_#86d9a6,0_8px_20px_-12px_rgba(21,128,61,.35)]', className)}>
+      <div className="flex h-11 items-center justify-between gap-2 border-b border-halo-line pl-3.5 pr-2">
         <span className="flex min-w-0 items-center gap-2 text-[13px] font-medium">
           {!empty ? <SuccessDot size={18} /> : <span className="h-[18px] w-[18px] shrink-0 rounded-full border-[1.5px] border-dashed border-line2" />}
           <span className="truncate">{label}</span>
         </span>
-        <button onClick={clear} className="flex h-8 items-center gap-1 rounded-lg px-2 text-xs text-ink-2 hover:bg-sub" type="button">
+        <button onClick={clear} className="flex h-8 items-center gap-1 rounded-full px-2.5 text-xs text-ink-2 hover:bg-halo-track" type="button">
           <Eraser className="h-3.5 w-3.5" /> Effacer
         </button>
       </div>

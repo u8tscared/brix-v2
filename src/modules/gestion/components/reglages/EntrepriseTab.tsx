@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
-import { Field, Icon, Input, Select, Switch, cn, toast } from '@/components/ui';
+import { Field, IconTile, Input, Select, Switch, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { SIZES, TRADES } from '@/lib/catalog';
 import type { Company, TradeKey } from '@/lib/types';
@@ -50,9 +50,10 @@ export default function EntrepriseTab() {
                   key={t.key}
                   type="button"
                   onClick={() => setD((x) => ({ ...x, trade: t.key, secondaryTrades: x.secondaryTrades.filter((k) => k !== t.key) }))}
-                  className={cn('press flex min-h-[44px] items-center gap-2 rounded-[11px] px-2.5 text-left text-[12.5px] font-medium transition-[box-shadow,background,color] duration-200', d.trade === t.key ? 'bg-white text-ink shadow-[0_0_0_1.5px_var(--ink)]' : 'bg-[#f7f6fb] text-ink-2 hover:text-ink')}
+                  aria-pressed={d.trade === t.key}
+                  className={cn('press flex min-h-[48px] items-center gap-2.5 rounded-card-sm px-2 text-left text-[12.5px] font-medium transition-[box-shadow,background,color] duration-300 ease-spring', d.trade === t.key ? 'bg-white text-ink shadow-[0_0_0_1.5px_#c9b5f7,0_8px_20px_-10px_rgba(109,40,217,.45)]' : 'bg-halo-track text-ink-2 hover:bg-white hover:text-ink hover:shadow-halo-sm')}
                 >
-                  <Icon name={t.icon} className={cn('h-4 w-4 shrink-0', d.trade === t.key ? 'text-[#4f46e5]' : 'text-ink-3')} />
+                  <IconTile name={t.icon} tone={d.trade === t.key ? 'violet' : 'neutral'} size="sm" className="transition-colors duration-300" />
                   <span className="line-clamp-2 leading-tight">{t.name}</span>
                 </button>
               ))}
@@ -64,7 +65,7 @@ export default function EntrepriseTab() {
               {TRADES.filter((t) => t.key !== d.trade && t.key !== 'autre').map((t) => {
                 const on = d.secondaryTrades.includes(t.key);
                 return (
-                  <button key={t.key} type="button" onClick={() => toggleSecondary(t.key)} className={cn('press min-h-[36px] rounded-full px-3 text-[12.5px] font-medium transition-[background,color,box-shadow] duration-200', on ? 'bg-ink text-white' : 'bg-white text-ink-2 shadow-[0_0_0_1px_var(--line2)] hover:text-ink')}>
+                  <button key={t.key} type="button" aria-pressed={on} onClick={() => toggleSecondary(t.key)} className={cn('press min-h-[36px] rounded-full px-3.5 text-[12.5px] font-medium transition-[background,color,box-shadow] duration-300 ease-spring', on ? 'bg-pale-v text-deep-v shadow-[0_0_0_1px_#e4d8fd]' : 'bg-white text-ink-2 shadow-[0_0_0_1px_#ece8f6] hover:text-ink')}>
                     {t.plural}
                   </button>
                 );
@@ -95,9 +96,9 @@ export default function EntrepriseTab() {
         <div className="space-y-3">
           <Field label="Assurance décennale" hint="Assureur, numéro de contrat, zone couverte"><Input value={d.decennale} onChange={(e) => set('decennale', e.target.value)} /></Field>
           <Field label="IBAN"><Input value={d.iban} onChange={(e) => set('iban', e.target.value)} className="font-mono" /></Field>
-          <div className="flex min-h-[56px] items-center justify-between gap-3 rounded-[12px] bg-[#f7f6fb] px-3.5 py-2.5">
-            <span className="flex min-w-0 items-start gap-2.5">
-              <ShieldCheck className={cn('mt-0.5 h-4 w-4 shrink-0 transition-colors', d.rge ? 'text-ok' : 'text-ink-3')} strokeWidth={1.75} />
+          <div className="flex min-h-[60px] items-center justify-between gap-3 rounded-card-sm bg-white px-3.5 py-3 shadow-halo-sm">
+            <span className="flex min-w-0 items-center gap-3">
+              <IconTile icon={<ShieldCheck />} tone={d.rge ? 'green' : 'neutral'} size="row" className="transition-colors duration-300" />
               <span>
                 <span className="block text-[13.5px] font-medium">Qualification RGE</span>
                 <span className="block text-[12px] text-ink-3">Débloque les mentions et les aides sur les devis de rénovation énergétique.</span>
@@ -116,13 +117,14 @@ export default function EntrepriseTab() {
 /** En-tête de devis tel que le client le verra : il se met à jour en direct. */
 function HeaderPreview({ c }: { c: Company }) {
   return (
-    <div className="relative overflow-hidden rounded-[18px] bg-white shadow-card">
-      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-2 md:px-6">
+    <div className="relative overflow-hidden rounded-card bg-white shadow-halo">
+      <div aria-hidden className="pointer-events-none absolute -right-16 -top-24 h-56 w-72 rounded-full bg-[radial-gradient(closest-side,#fbe3f6,transparent)] opacity-70 blur-xl" />
+      <div className="relative flex items-center justify-between gap-3 border-b border-halo-line px-4 py-2.5 md:px-6">
         <span className="eyebrow">Aperçu de vos documents</span>
         <span className="font-mono text-[11.5px] text-ink-3">D-2026-118</span>
       </div>
-      <div className="flex flex-wrap items-start gap-4 px-4 py-4 md:px-6 md:py-5">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[13px] bg-night text-[15px] font-semibold tracking-[-0.02em] text-white">{c.logoInitials || initials(c.name) || '?'}</span>
+      <div className="relative flex flex-wrap items-start gap-4 px-4 py-4 md:px-6 md:py-5">
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[15px] bg-night text-[15px] font-semibold tracking-[-0.02em] text-white">{c.logoInitials || initials(c.name) || '?'}</span>
         <div className="min-w-0 flex-1">
           <div key={c.name} className="animate-[fade-in_.25s_ease_both] truncate text-[17px] font-semibold tracking-[-0.025em]">{c.name || 'Nom de votre entreprise'}</div>
           <div className="mt-0.5 truncate text-[12.5px] text-ink-2">{[c.address, c.city].filter(Boolean).join(', ') || 'Adresse'}</div>
@@ -131,7 +133,7 @@ function HeaderPreview({ c }: { c: Company }) {
         <div className="text-right text-[11.5px] leading-relaxed text-ink-3 max-sm:w-full max-sm:text-left">
           <div>SIRET <span className="font-mono text-ink-2">{c.siret || '—'}</span></div>
           <div>TVA <span className="font-mono text-ink-2">{c.vatNumber || '—'}</span></div>
-          {c.rge && <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-ok-bg px-2 py-0.5 font-medium text-ok"><ShieldCheck className="h-3 w-3" />RGE</div>}
+          {c.rge && <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-pale-g px-2 py-0.5 font-medium text-deep-g"><ShieldCheck className="h-3 w-3" />RGE</div>}
         </div>
       </div>
     </div>

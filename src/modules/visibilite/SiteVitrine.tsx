@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Check, ExternalLink, Globe, Monitor, Smartphone } from 'lucide-react';
+import { Check, ExternalLink, Eye, Globe, LayoutList, Link2, Monitor, Palette, Search, Smartphone } from 'lucide-react';
 import { Badge, Button, Card, CardHeader, IconTile, Input, PageHeader, Segmented, Stat, Switch, Textarea, cn, toast } from '@/components/ui';
 import { AnimatedNumber, LiveDot } from '@/components/motion';
 import { useBrix } from '@/lib/store';
@@ -59,6 +59,7 @@ export default function SiteVitrine() {
       <PageHeader
         icon={<IconTile name="Globe" dept="visibilite" size="lg" />}
         title="Site vitrine"
+        titleMuted={site.published ? 'en ligne, et à jour.' : 'prêt à être publié.'}
         subtitle={
           site.published ? (
             <span className="inline-flex items-center gap-2"><LiveDot />En ligne sur <span className="font-medium text-ink">{url}</span></span>
@@ -77,23 +78,23 @@ export default function SiteVitrine() {
 
       {site.published && (
         <StatStrip>
-          <Stat label="Visites (30 jours)" value={<AnimatedNumber value={412} />} sub="dont 71 % sur téléphone" />
-          <Stat label="Demandes de devis" value={<AnimatedNumber value={9} />} sub="arrivées dans Demandes" />
-          <Stat label="Visites réservées" value={<AnimatedNumber value={4} />} sub="via le bouton rendez-vous" />
-          <Stat label="Position Google" value="3e" sub={`« ${company.trade === 'electricien' ? 'électricien' : 'artisan'} ${company.city.replace(/^\d+\s/, '').toLowerCase()} »`} />
+          <Stat icon={<IconTile icon={<Eye />} tone="rose" size="row" />} label="Visites (30 jours)" value={<AnimatedNumber value={412} />} sub="dont 71 % sur téléphone" />
+          <Stat icon={<IconTile name="Inbox" tone="violet" size="row" />} label="Demandes de devis" value={<AnimatedNumber value={9} />} sub="arrivées dans Demandes" />
+          <Stat icon={<IconTile name="CalendarCheck" tone="peach" size="row" />} label="Visites réservées" value={<AnimatedNumber value={4} />} sub="via le bouton rendez-vous" />
+          <Stat icon={<IconTile icon={<Search />} tone="green" size="row" />} label="Position Google" value="3e" sub={`« ${company.trade === 'electricien' ? 'électricien' : 'artisan'} ${company.city.replace(/^\d+\s/, '').toLowerCase()} »`} />
         </StatStrip>
       )}
 
       <div className="grid gap-6 [&>*]:min-w-0 xl:grid-cols-[320px_minmax(0,1fr)]">
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Style" meta="L’aperçu change en direct" />
+            <CardHeader icon={<IconTile icon={<Palette />} tone="mag" size="sm" />} title="Style" meta="l’aperçu suit" />
             <div className="grid grid-cols-3 gap-2.5 p-4">
               {(Object.keys(THEMES) as SiteTheme[]).map((k) => {
                 const t = THEMES[k];
                 const on = site.theme === k;
                 return (
-                  <button key={k} onClick={() => setSite({ theme: k })} className={cn('press group relative overflow-hidden rounded-[12px] text-left transition-shadow duration-300', on ? 'shadow-[0_0_0_2px_var(--ink),0_8px_18px_-10px_rgba(19,15,38,.4)]' : 'shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_#cfcbdd]')}>
+                  <button key={k} onClick={() => setSite({ theme: k })} aria-pressed={on} className={cn('press group relative overflow-hidden rounded-card-sm text-left transition-shadow duration-300', on ? 'shadow-[0_0_0_2px_#a78bfa,0_10px_22px_-10px_rgba(109,40,217,.45)]' : 'shadow-halo-sm hover:shadow-[0_0_0_1px_#e3dcf3,0_10px_24px_-12px_rgba(60,30,120,.18)]')}>
                     <div className="h-16 p-2 transition-transform duration-500 ease-out-quint group-hover:scale-[1.04]" style={{ background: t.hero }}>
                       <div className="h-1.5 w-10 rounded-full" style={{ background: t.ink, opacity: 0.8 }} />
                       <div className="mt-1 h-1.5 w-7 rounded-full" style={{ background: t.sub, opacity: 0.5 }} />
@@ -101,7 +102,7 @@ export default function SiteVitrine() {
                     </div>
                     <div className="flex items-center justify-between bg-white px-2 py-1.5 text-[12px] font-medium">
                       {t.label}
-                      {on && <span className="grid h-4 w-4 animate-pop place-items-center rounded-full bg-ink text-white"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>}
+                      {on && <span className="grid h-4 w-4 animate-pop place-items-center rounded-full bg-deep-v text-white"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>}
                     </div>
                   </button>
                 );
@@ -110,13 +111,13 @@ export default function SiteVitrine() {
           </Card>
 
           <Card>
-            <CardHeader title="Adresse du site" />
+            <CardHeader icon={<IconTile icon={<Link2 />} tone="violet" size="sm" />} title="Adresse du site" />
             <div className="space-y-2 p-4">
               {(['brix', 'perso'] as const).map((d) => {
                 const on = site.domain === d;
                 return (
-                  <button key={d} onClick={() => setSite({ domain: d })} className={cn('flex min-h-[56px] w-full items-center gap-3 rounded-[12px] px-3 text-left transition-shadow duration-200', on ? 'shadow-[0_0_0_1.5px_var(--ink)]' : 'shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_#cfcbdd]')}>
-                    <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors', on ? 'border-ink' : 'border-line2')}><i className={cn('h-2.5 w-2.5 rounded-full bg-ink transition-transform duration-300 ease-spring', on ? 'scale-100' : 'scale-0')} /></span>
+                  <button key={d} onClick={() => setSite({ domain: d })} aria-pressed={on} className={cn('flex min-h-[58px] w-full items-center gap-3 rounded-card-sm px-3.5 text-left transition-[box-shadow,background] duration-300', on ? 'bg-white shadow-[0_0_0_1.5px_#c4b5fd,0_8px_20px_-12px_rgba(109,40,217,.4)]' : 'bg-halo-track hover:bg-white hover:shadow-halo-sm')}>
+                    <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors duration-300', on ? 'border-deep-v' : 'border-[#d6cfe8]')}><i className={cn('h-2.5 w-2.5 rounded-full bg-deep-v transition-transform duration-300 ease-spring', on ? 'scale-100' : 'scale-0')} /></span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13px] font-medium">{d === 'brix' ? sub : 'Mon propre nom de domaine'}</span>
                       <span className="text-[11.5px] text-ink-3">{d === 'brix' ? 'Gratuit, tout de suite' : 'Plus pro, ex. benali-elec.fr'}</span>
@@ -137,13 +138,13 @@ export default function SiteVitrine() {
           </Card>
 
           <Card>
-            <CardHeader title="Contenu" />
+            <CardHeader icon={<IconTile icon={<LayoutList />} tone="blue" size="sm" />} title="Contenu" />
             <div className="p-4 pb-3">
               <div className="mb-1.5 text-[12.5px] font-medium text-ink-2">Phrase d’accroche</div>
               <Textarea value={site.tagline} onChange={(e) => setSite({ tagline: e.target.value })} className="min-h-[76px] text-[13px]" aria-label="Phrase d'accroche" />
             </div>
             {SECTIONS.map(([k, label]) => (
-              <div key={k} className="flex min-h-[48px] items-center justify-between border-t border-line px-4">
+              <div key={k} className="flex min-h-[52px] items-center justify-between border-t border-halo-line px-4 transition-colors hover:bg-halo-hover">
                 <span className="text-[13px]">{label}</span>
                 <Switch checked={!!site.sections[k]} onChange={(on) => setSite({ sections: { ...site.sections, [k]: on } })} label={label} />
               </div>
@@ -153,7 +154,7 @@ export default function SiteVitrine() {
 
         <div className="order-first xl:order-none">
           <div className="mb-3 flex items-center gap-2">
-            <span className="eyebrow">Aperçu</span>
+            <span className="text-[15px] font-semibold tracking-[-0.02em]">Aperçu</span>
             {changed && <Badge tone="peach" dot>Changements non publiés</Badge>}
             <div className="flex-1" />
             <Segmented size="sm" value={device} onChange={setDevice} options={[{ value: 'desktop', label: <><Monitor className="h-3.5 w-3.5" />Ordinateur</> }, { value: 'mobile', label: <><Smartphone className="h-3.5 w-3.5" />Téléphone</> }]} />
@@ -163,7 +164,7 @@ export default function SiteVitrine() {
               {device === 'desktop' ? (
                 <ScaledFrame width={1180} height={620} url={url}><SitePreview mobile={false} /></ScaledFrame>
               ) : (
-                <div className="rounded-[20px] bg-[radial-gradient(closest-side,#fdecef,transparent)] py-2"><PhoneFrame width={300} height={610}><SitePreview mobile /></PhoneFrame></div>
+                <div className="rounded-card bg-[radial-gradient(closest-side,#fce4f3,transparent)] py-2"><PhoneFrame width={300} height={610}><SitePreview mobile /></PhoneFrame></div>
               )}
             </div>
           </div>

@@ -110,10 +110,11 @@ export function SendSheet({ open, onClose, d, client, company, user, meta, check
     <Sheet open={open} onClose={onClose} width={560} title={done ? undefined : d.status === 'brouillon' ? 'Envoyer pour signature' : 'Renvoyer le devis'} subtitle={done ? undefined : client ? `${d.number} · ${money(t.ttc)} TTC` : 'Choisissez d’abord un client'} footer={footer}>
       {done ? (
         <SendSuccess title="Devis envoyé" text={<>{client?.name ?? 'Votre client'} le reçoit {via} à <b className="font-medium text-ink">{done.to}</b>. Vous serez prévenu dès qu’il l’ouvre, puis quand il signe.</>} onClose={onClose}>
-          <div className="mx-auto max-w-[340px] rounded-[14px] bg-[#faf9fd] p-3 text-left text-[12.5px] shadow-[inset_0_0_0_1px_var(--line)]">
+          <div className="mx-auto max-w-[340px] rounded-card-sm bg-white p-4 text-left text-[13px] shadow-halo-sm">
             {['Envoyé', 'Ouvert', 'Signé', 'Acompte payé'].map((s, i) => (
-              <div key={s} className="flex items-center gap-2.5 py-1">
-                <span className={cn('h-2 w-2 rounded-full', i === 0 ? 'bg-ok' : 'bg-line2')} />
+              <div key={s} className="relative flex items-center gap-3 py-1.5">
+                {i < 3 && <span aria-hidden className="absolute left-[9px] top-[26px] h-[14px] w-[1.5px] rounded-full bg-[#ece8f6]" />}
+                <span className={cn('grid h-5 w-5 place-items-center rounded-full', i === 0 ? 'bg-[#10b981] text-white' : 'bg-halo-track')}>{i === 0 && <Check className="h-3 w-3" strokeWidth={3} />}</span>
                 <span className={i === 0 ? 'font-medium text-ink' : 'text-ink-3'}>{s}</span>
                 {i === 0 && <span className="ml-auto text-ink-3">à l’instant</span>}
               </div>
@@ -121,7 +122,7 @@ export function SendSheet({ open, onClose, d, client, company, user, meta, check
           </div>
         </SendSuccess>
       ) : !client ? (
-        <div className="rounded-[16px] border border-dashed border-line2 p-6 text-center">
+        <div className="rounded-card-sm bg-white/60 p-6 text-center shadow-[inset_0_0_0_1.5px_#e6dcfb]">
           <p className="text-[13.5px] text-ink-2">Ce devis n’a pas encore de client.</p>
           <Button className="mt-3" variant="primary" onClick={onPickClient}>
             Choisir le client
@@ -143,8 +144,8 @@ export function SendSheet({ open, onClose, d, client, company, user, meta, check
                     { value: 'whatsapp', label: <><MessageCircle className="h-3.5 w-3.5" /> WhatsApp</> },
                   ]}
                 />
-                <div className="flex items-center gap-3 rounded-[14px] bg-[#faf9fd] p-3 shadow-[inset_0_0_0_1px_var(--line)]">
-                  <Avatar initials={initials(client.name)} size={40} color="#f3edff" fg="#6d28d9" />
+                <div className="row-card">
+                  <Avatar initials={initials(client.name)} size={42} />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[14px] font-semibold">{client.name}</div>
                     <div className="truncate text-[12.5px] text-ink-3">{[client.address, client.city].filter(Boolean).join(', ') || 'Adresse à compléter'}</div>
@@ -165,7 +166,7 @@ export function SendSheet({ open, onClose, d, client, company, user, meta, check
                 <Field label="Message" hint="Préparé par Bob, modifiable. Le lien de signature est ajouté automatiquement.">
                   <Textarea value={message} onChange={(e) => setMessage(e.target.value)} className={channel === 'email' ? 'min-h-[220px]' : 'min-h-[120px]'} />
                 </Field>
-                <button onClick={() => setOptions((o) => !o)} className="flex w-full items-center justify-between rounded-[12px] px-1 py-2 text-[13px] font-medium text-ink-2 hover:text-ink">
+                <button onClick={() => setOptions((o) => !o)} className="flex h-11 w-full items-center justify-between rounded-full px-4 text-[13px] font-medium text-ink-2 shadow-[0_0_0_1px_#ece8f6] transition hover:bg-white hover:text-ink">
                   Formules et paiement de l’acompte
                   <ChevronDown className={cn('h-4 w-4 transition-transform duration-300', options && 'rotate-180')} />
                 </button>
@@ -177,16 +178,16 @@ export function SendSheet({ open, onClose, d, client, company, user, meta, check
                 {channel === 'email' ? (
                   <MailPreview from={`${user.firstName} ${user.lastName} · ${company.name}`} to={to} subject={subject} body={message} cta="Consulter et signer le devis" attachment={{ name: `Devis ${d.number}.pdf`, meta: `PDF · ${money(t.ttc)} TTC · cliquer pour l’ouvrir` }} onAttachment={onPreview} />
                 ) : (
-                  <div className="rounded-[16px] bg-[#f4f3f8] p-4">
-                    <div className="ml-auto max-w-[85%] rounded-[16px] rounded-br-[4px] bg-[#15122a] px-3.5 py-2.5 text-[13px] leading-relaxed text-white">{message.replace('[lien]', `brix.fr/s/${d.number.toLowerCase()}`)}</div>
+                  <div className="rounded-card-sm bg-halo-track/70 p-4">
+                    <div className="ml-auto max-w-[85%] rounded-[18px] rounded-br-[6px] bg-[#15122a] px-3.5 py-2.5 text-[13px] leading-relaxed text-white">{message.replace('[lien]', `brix.fr/s/${d.number.toLowerCase()}`)}</div>
                     <div className="mt-1 text-right text-[11px] text-ink-3">vers {to}</div>
                   </div>
                 )}
-                <button onClick={onPreview} className="flex w-full items-center gap-3 rounded-[14px] bg-white p-3 text-left shadow-card transition hover:shadow-raise">
+                <button onClick={onPreview} className="row-card w-full text-left">
                   <div className="min-w-0 flex-1">
                     <CheckSummary items={checks} compact />
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-1 text-[12.5px] font-medium text-vi-700">
+                  <span className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full bg-pale-v px-3 text-[12.5px] font-medium text-deep-v">
                     <Eye className="h-3.5 w-3.5" /> Voir le devis
                   </span>
                 </button>
@@ -227,10 +228,10 @@ function SendOptions({ d, meta, onPatchMeta, ttc }: { d: Devis; meta: DevisMeta;
                 key={v.key}
                 disabled={locked}
                 onClick={() => onPatchMeta({ variants: { ...meta.variants, [v.key]: !on } })}
-                className={cn('relative flex min-h-[48px] items-center gap-3 rounded-[12px] p-3 text-left transition sm:block', on ? 'bg-vi-50/70 shadow-[inset_0_0_0_1.5px_#c4b5fd]' : 'bg-white shadow-[inset_0_0_0_1px_var(--line2)] hover:bg-sub', locked && 'cursor-default')}
+                className={cn('relative flex min-h-[48px] items-center gap-3 rounded-card-sm p-3.5 text-left transition duration-300 ease-out-quint sm:block', on ? 'bg-dawn-pale shadow-[0_0_0_1.5px_#d9ccfb]' : 'bg-white shadow-halo-sm hover:-translate-y-px', locked && 'cursor-default')}
                 aria-pressed={on}
               >
-                <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-md transition sm:absolute sm:right-2.5 sm:top-2.5', on ? 'bg-vi-700 text-white' : 'bg-white shadow-[inset_0_0_0_1px_var(--line2)]')}>{on && <Check className="h-3 w-3" />}</span>
+                <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-full transition sm:absolute sm:right-2.5 sm:top-2.5', on ? 'bg-ink text-white' : 'bg-white shadow-[inset_0_0_0_1.5px_#dcd6ea]')}>{on && <Check className="h-3 w-3" />}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13px] font-semibold">{v.label}</span>
                   <span className="num block text-[13.5px]">{money(ttc * v.factor, true)}</span>
@@ -242,7 +243,7 @@ function SendOptions({ d, meta, onPatchMeta, ttc }: { d: Devis; meta: DevisMeta;
         </div>
       </div>
       {d.depositPercent > 0 && (
-        <div className="divide-y divide-line overflow-hidden rounded-[12px] bg-white shadow-[inset_0_0_0_1px_var(--line)]">
+        <div className="divide-y divide-[#f2eff8] overflow-hidden rounded-card-sm bg-white shadow-halo-sm">
           {(
             [
               ['card', 'Carte bancaire', 'Encaissé sous 2 jours'],

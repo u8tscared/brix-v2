@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, ChevronLeft } from 'lucide-react';
-import { Button, EmptyState, Input, Segmented, Sheet, Switch, cn, toast } from '@/components/ui';
+import { Check, ChevronLeft, FileSignature } from 'lucide-react';
+import { Button, EmptyState, IconTile, Input, Segmented, Sheet, Switch, cn, toast } from '@/components/ui';
 import { dateFull, dayOffset, money, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { AnimatedNumber } from '@/components/motion';
@@ -69,15 +69,16 @@ function DevisPick({ d, onPick }: { d: Devis; onPick: () => void }) {
   const billed = billedFor(d.id, factures).reduce((sum, f) => sum + amounts(f).ht, 0);
   const pct = ht ? Math.min(100, Math.round((billed / ht) * 100)) : 0;
   return (
-    <button onClick={onPick} className="group flex w-full items-center gap-3 rounded-[14px] bg-white p-3.5 text-left shadow-card transition duration-200 hover:-translate-y-px hover:shadow-raise">
+    <button onClick={onPick} className="row-card group w-full gap-3 text-left">
+      <IconTile icon={<FileSignature />} tone="violet" size="row" />
       <div className="min-w-0 flex-1">
         <div className="truncate text-[14px] font-medium">{client?.name}</div>
         <div className="truncate text-[12.5px] text-ink-2">
           {d.number} · {d.title}
         </div>
         <div className="mt-2 flex items-center gap-2">
-          <div className="h-1.5 w-28 overflow-hidden rounded-full bg-sub">
-            <div className="h-full rounded-full bg-ink" style={{ width: `${pct}%` }} />
+          <div className="h-1.5 w-28 overflow-hidden rounded-full bg-halo-track">
+            <div className="h-full rounded-full bg-dawn" style={{ width: `${pct}%` }} />
           </div>
           <span className="text-[11.5px] text-ink-3">{pct} % facturé</span>
         </div>
@@ -123,7 +124,7 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
           <ChevronLeft className="h-4 w-4" /> Autre devis
         </button>
       )}
-      <div className="grid grid-cols-3 gap-2 rounded-xl bg-sub p-3 text-[12.5px]">
+      <div className="grid grid-cols-3 gap-2 rounded-card-sm bg-dawn-pale p-3.5 text-[12.5px] shadow-halo-sm">
         <div>
           <div className="text-ink-3">Devis</div>
           <div className="num font-semibold">{money(t.ht)} HT</div>
@@ -152,9 +153,9 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
       {kind === 'acompte' && (
         <div className="space-y-3">
           <p className="text-[13px] text-ink-2">Une avance demandée au démarrage, déduite ensuite des situations et du solde.</p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1 rounded-full bg-halo-track p-1">
             {[20, 30, 40, 50].map((p) => (
-              <button key={p} onClick={() => setPercent(p)} className={cn('h-11 min-w-[64px] rounded-[10px] border px-3 text-[14px] font-medium transition', percent === p ? 'border-ink bg-ink text-white' : 'border-line2 bg-white hover:bg-sub')}>
+              <button key={p} onClick={() => setPercent(p)} aria-pressed={percent === p} className={cn('h-10 min-w-[60px] rounded-full px-3 text-[14px] font-medium transition duration-300 ease-spring', percent === p ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:text-ink')}>
                 {p} %
               </button>
             ))}
@@ -169,9 +170,9 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
             Situation n°{prev.index}. Glissez l’avancement <b className="font-medium text-ink">cumulé</b> de chaque lot : Brix facture seulement la différence
             {prev.depositsHt > 0 ? ' et déduit l’acompte au prorata.' : '.'}
           </p>
-          <div className="divide-y divide-line rounded-[14px] bg-white shadow-card">
+          <div className="space-y-2">
             {lots.map((l, i) => (
-              <div key={l.name} className="p-3">
+              <div key={l.name} className="rounded-card-sm bg-white p-3.5 shadow-halo-sm">
                 <div className="flex items-center justify-between gap-2 text-[13px]">
                   <span className="min-w-0 truncate font-medium">{l.name}</span>
                   <span className="num shrink-0 text-ink-2">
@@ -196,12 +197,12 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
             ))}
           </div>
           {plan.deductionHt > 0 && (
-            <div className="flex justify-between rounded-lg bg-sub px-3 py-2 text-[12.5px]">
+            <div className="flex justify-between rounded-field bg-pale-n px-3.5 py-2.5 text-[12.5px]">
               <span className="text-ink-2">Déduction acompte au prorata</span>
               <span className="num font-medium">−{money(plan.deductionHt)} HT</span>
             </div>
           )}
-          <label className="flex items-center gap-3 rounded-[14px] bg-white p-3 shadow-card">
+          <label className="row-card cursor-pointer gap-3">
             <div className="min-w-0 flex-1">
               <div className="text-[13.5px] font-medium">Retenue de garantie 5 %</div>
               <div className="text-[12px] text-ink-2">Gardée par le client un an, libérable le {dateFull(release)}. Brix vous le rappellera.</div>
@@ -217,7 +218,7 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
           {already.length ? (
             <ul className="space-y-1">
               {already.map((f) => (
-                <li key={f.id} className="flex justify-between rounded-lg bg-sub px-3 py-2">
+                <li key={f.id} className="flex justify-between rounded-field bg-pale-n px-3.5 py-2.5">
                   <span>
                     {f.number} · {f.kind === 'acompte' ? 'acompte' : 'situation'}
                   </span>
@@ -226,17 +227,17 @@ function DevisBilling({ devis, kind, setKind, onBack, onCreate, extras }: { devi
               ))}
             </ul>
           ) : (
-            <p className="rounded-lg bg-sub px-3 py-2">Rien n’a encore été facturé : le solde est le devis complet.</p>
+            <p className="rounded-field bg-pale-n px-3.5 py-2.5">Rien n’a encore été facturé : le solde est le devis complet.</p>
           )}
         </div>
       )}
 
-      <div className="flex items-center gap-3 border-t border-line pt-4">
+      <div className="flex items-center gap-3 border-t border-halo-line pt-4">
         <div className="min-w-0 flex-1">
-          <div className="text-[12px] text-ink-3">Montant de la facture</div>
-          <div className="num text-[24px] font-semibold tracking-[-0.03em]"><AnimatedNumber value={previewTtc} format={(n) => money(n)} duration={400} /> <span className="text-[13px] font-medium text-ink-3">TTC</span></div>
+          <div className="label-halo">Montant de la facture</div>
+          <div className="num-halo text-[28px]"><AnimatedNumber value={previewTtc} format={(n) => money(n)} duration={400} /> <span className="text-[13px] font-medium text-ink-3">TTC</span></div>
         </div>
-        <Button variant="primary" size="lg" icon={<Check className="h-4 w-4" />} onClick={create}>
+        <Button variant="dawn" size="lg" icon={<Check className="h-4 w-4" />} onClick={create}>
           Créer le brouillon
         </Button>
       </div>

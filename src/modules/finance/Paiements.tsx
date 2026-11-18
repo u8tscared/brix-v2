@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link2, Nfc } from 'lucide-react';
+import { Hourglass, Link2, Nfc, Timer, Wallet } from 'lucide-react';
 import { Button, Card, IconTile, PageHeader, Sheet } from '@/components/ui';
 import { AnimatedNumber, GrowBar } from '@/components/motion';
 import { daysBetween, money, todayISO } from '@/lib/format';
@@ -44,7 +44,9 @@ export default function Paiements() {
     <div className="space-y-6">
       <PageHeader
         icon={<IconTile name="CreditCard" dept="facturer" size="lg" />}
+        kicker="Facturer et encaisser"
         title="Paiements"
+        titleMuted="payé plus vite, sans courir."
         subtitle="Faites-vous payer plus vite : lien, carte sur votre téléphone, paiement en plusieurs fois."
         actions={
           <>
@@ -54,29 +56,32 @@ export default function Paiements() {
         }
       />
 
-      <Card className="grid grid-cols-2 overflow-hidden md:grid-cols-[1.1fr_1fr_1fr]">
-        <div className="col-span-2 p-5 md:col-span-1 md:p-6">
-          <Label>Encaissé ce mois</Label>
-          <BigMoney value={cashed} className="mt-3 block text-[40px] md:text-[44px]" />
+      <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <Card className="col-span-2 p-5 md:p-7 lg:col-span-1">
+          <IconTile icon={<Wallet />} tone="green" />
+          <Label className="mt-4">Encaissé ce mois</Label>
+          <BigMoney value={cashed} className="mt-1.5 block text-[40px] md:text-[48px]" />
           <div className="mt-2 text-[12.5px] text-ink-2">{monthPays.length} paiement{monthPays.length > 1 ? 's' : ''} · frais <span className="num">{money(fees)}</span></div>
-        </div>
-        <div className="border-line p-4 max-md:border-r max-md:border-t md:border-l md:p-6">
-          <Label>On vous doit</Label>
-          <BigMoney value={owed} className="mt-3 block text-[24px] md:text-[28px]" />
+        </Card>
+        <Card className="p-4 md:p-6">
+          <IconTile icon={<Hourglass />} tone="peach" />
+          <Label className="mt-4">On vous doit</Label>
+          <BigMoney value={owed} className="mt-1.5 block text-[24px] md:text-[30px]" />
           <div className="mt-2 text-[12.5px] text-ink-2">{unpaid.length} facture{unpaid.length > 1 ? 's' : ''} ouverte{unpaid.length > 1 ? 's' : ''}</div>
-        </div>
-        <div className="border-line p-4 max-md:border-t md:border-l md:p-6">
-          <Label>Vos clients paient en</Label>
-          <div className="mt-3 flex items-baseline gap-1.5">
-            <AnimatedNumber value={avgDelay} className="text-[24px] md:text-[28px] font-semibold leading-none tracking-[-0.045em]" />
+        </Card>
+        <Card className="p-4 md:p-6">
+          <IconTile icon={<Timer />} tone="blue" />
+          <Label className="mt-4">Vos clients paient en</Label>
+          <div className="mt-1.5 flex items-baseline gap-1.5">
+            <AnimatedNumber value={avgDelay} className="num-halo text-[24px] leading-none md:text-[30px]" />
             <span className="text-[14px] font-medium text-ink-2">{avgDelay > 1 ? 'jours' : 'jour'}</span>
           </div>
           <div className="mt-3 space-y-1.5 text-[11.5px] text-ink-3">
-            <div className="flex items-center gap-2"><span className="w-12 shrink-0">Vous</span><GrowBar value={(avgDelay / SECTOR_DELAY) * 100} className="flex-1" barClassName="bg-ok" /></div>
-            <div className="flex items-center gap-2"><span className="w-12 shrink-0">Secteur</span><GrowBar value={100} className="flex-1" barClassName="bg-[#d6d3e2]" /><span className="num">{SECTOR_DELAY} j</span></div>
+            <div className="flex items-center gap-2"><span className="w-12 shrink-0">Vous</span><GrowBar value={(avgDelay / SECTOR_DELAY) * 100} className="flex-1" barClassName="bg-[#10b981]" /></div>
+            <div className="flex items-center gap-2"><span className="w-12 shrink-0">Secteur</span><GrowBar value={100} className="flex-1" barClassName="bg-[#dcd5ee]" /><span className="num">{SECTOR_DELAY} j</span></div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       <OwedCard unpaid={unpaid} onLink={setLinkFor} onTap={(id) => setTap({ open: true, id })} />
 
@@ -96,7 +101,8 @@ export default function Paiements() {
       <Sheet open={pick} onClose={() => setPick(false)} title="Lien de paiement" subtitle="Pour quelle facture ?">
         <div className="stagger-fast space-y-2">
           {unpaid.map((f) => (
-            <button key={f.id} onClick={() => { setPick(false); setLinkFor(f.id); }} className="press flex min-h-[56px] w-full items-center gap-3 rounded-xl border border-line px-3.5 py-2.5 text-left transition hover:border-vi-200 hover:bg-vi-25">
+            <button key={f.id} onClick={() => { setPick(false); setLinkFor(f.id); }} className="row-card press min-h-[56px] w-full gap-3 py-2.5 text-left">
+              <IconTile icon={<Link2 />} tone="violet" size="row" />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[13.5px] font-medium">{s.clients.find((c) => c.id === f.clientId)?.name}</div>
                 <div className="truncate text-[12px] text-ink-3">{f.number} · {f.title}</div>

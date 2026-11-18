@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Copy, FileSignature, KeyRound, Mail, Phone, ShieldCheck } from 'lucide-react';
-import { Badge, Button, Select, Sheet, Switch, toast } from '@/components/ui';
+import { Badge, Button, Select, Sheet, Switch, toast, IconTile } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { dateFull, money } from '@/lib/format';
 import type { SubContractor } from '../data';
@@ -40,22 +40,22 @@ export function SubSheet({ sub, onClose }: { sub: SubContractor | null; onClose:
   return (
     <Sheet open onClose={onClose} width={560} title={sub.name} subtitle={`${sub.trade} · SIRET ${sub.siret}`}
       footer={<>
-        <a href={`tel:${sub.phone.replace(/\s/g, '')}`} className="mr-auto inline-flex h-10 min-w-0 items-center gap-2 whitespace-nowrap rounded-[10px] px-3 text-sm font-medium text-ink-2 hover:bg-sub"><Phone className="h-4 w-4 shrink-0" /><span className="truncate">{sub.contact}</span></a>
+        <a href={`tel:${sub.phone.replace(/\s/g, '')}`} className="mr-auto inline-flex h-10 min-w-0 items-center gap-2 whitespace-nowrap rounded-full px-3.5 text-sm font-medium text-ink-2 transition-colors hover:bg-halo-hover"><Phone className="h-4 w-4 shrink-0" /><span className="truncate">{sub.contact}</span></a>
         {todo.length > 0 && <Button variant="primary" loading={busy === 'ask'} icon={<Mail className="h-4 w-4" />} onClick={ask}>Demander les documents</Button>}
       </>}
     >
       <div className="space-y-5">
         {st.level === 2 && (
-          <div className="rounded-xl border border-[#fbd1d1] bg-bad-bg px-3 py-2.5 text-[12.5px] text-bad">
+          <div className="rounded-card-sm bg-pale-r px-3.5 py-3 text-[12.5px] text-deep-r">
             Document expiré : en cas de travail dissimulé, vous seriez solidaire de ses dettes sociales et fiscales. Suspendez les paiements tant qu’il n’est pas à jour.
           </div>
         )}
 
         <section>
           <h4 className="mb-2 text-[12.5px] font-medium text-ink-2">Documents obligatoires</h4>
-          <div className="divide-y divide-line rounded-xl border border-line">
+          <div className="divide-y divide-halo-line overflow-hidden rounded-card-sm bg-white shadow-halo-sm">
             {docs.map((d) => (
-              <div key={d.key} className="flex items-center gap-3 px-3 py-2.5">
+              <div key={d.key} className="flex min-h-[56px] items-center gap-3 px-3.5 py-2.5">
                 <div className="min-w-0 flex-1">
                   <div className="text-[13.5px] font-medium">{d.label}</div>
                   <div className="text-[11.5px] text-ink-3">{d.detail}</div>
@@ -73,7 +73,7 @@ export function SubSheet({ sub, onClose }: { sub: SubContractor | null; onClose:
             {sub.contracts.map((c) => {
               const ch = chantiers.find((x) => x.id === c.chantierId);
               return (
-                <div key={c.id} className="rounded-xl border border-line p-3">
+                <div key={c.id} className="rounded-card-sm bg-white p-3.5 shadow-halo-sm">
                   <div className="flex items-start gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="text-[13.5px] font-medium">{c.object}</div>
@@ -94,18 +94,18 @@ export function SubSheet({ sub, onClose }: { sub: SubContractor | null; onClose:
           <p className="mt-2 text-[11.5px] leading-relaxed text-ink-3">Le contrat reprend la loi de 1975 : acceptation par le client final et garantie de paiement (caution bancaire ou délégation de paiement).</p>
         </section>
 
-        <section className="rounded-xl bg-sub p-3">
+        <section className="rounded-card-sm bg-dawn-pale p-4">
           <div className="text-[12.5px] font-medium">Autoliquidation de la TVA</div>
           <p className="mt-1 text-[12px] text-ink-2">Le sous-traitant facture hors taxe et c’est vous qui déclarez la TVA. Brix ajoute la mention au contrat et la vérifie sur ses factures :</p>
-          <div className="mt-2 flex items-center gap-2 rounded-lg border border-line bg-white px-3 py-2">
+          <div className="mt-2.5 flex items-center gap-2 rounded-full bg-white py-1.5 pl-4 pr-1.5 shadow-halo-sm">
             <span className="min-w-0 flex-1 text-[12.5px] font-medium">« {AUTOLIQ_MENTION} »</span>
-            <button aria-label="Copier la mention" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-ink-3 hover:bg-sub hover:text-ink" onClick={async () => { try { await navigator.clipboard.writeText(AUTOLIQ_MENTION); } catch { /* indisponible */ } toast('Mention copiée.'); }}><Copy className="h-4 w-4" /></button>
+            <button aria-label="Copier la mention" className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-3 transition-colors hover:bg-halo-hover hover:text-ink" onClick={async () => { try { await navigator.clipboard.writeText(AUTOLIQ_MENTION); } catch { /* indisponible */ } toast('Mention copiée.'); }}><Copy className="h-4 w-4" /></button>
           </div>
         </section>
 
         <section>
           <div className="flex items-center gap-3">
-            <KeyRound className="h-4 w-4 text-ink-3" />
+            <IconTile icon={<KeyRound />} tone="violet" size="row" />
             <div className="min-w-0 flex-1">
               <div className="text-[13.5px] font-medium">Accès à Brix</div>
               <div className="text-[11.5px] text-ink-3">Un seul chantier, sans aucun prix : planning, plans, photos, réserves.</div>

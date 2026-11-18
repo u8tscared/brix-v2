@@ -8,7 +8,7 @@ import { BANK_COLOR, BANKS, connectBank, useTreso } from './tresorerieService';
 
 export function BankLogo({ bank, size = 32 }: { bank: string; size?: number }) {
   return (
-    <span className="grid shrink-0 place-items-center rounded-lg font-display font-semibold text-white" style={{ width: size, height: size, background: BANK_COLOR[bank] ?? '#5f5f70', fontSize: size * 0.4 }}>
+    <span className="grid shrink-0 place-items-center rounded-[11px] font-display font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,.2)]" style={{ width: size, height: size, background: BANK_COLOR[bank] ?? '#5f5f70', fontSize: size * 0.4 }}>
       {bank.replace(/^(La|Crédit|Caisse d'|Banque) ?/i, '').charAt(0)}
     </span>
   );
@@ -37,16 +37,16 @@ export function AccountsCard({ onSync, syncing }: { onSync: () => void; syncing:
 
   return (
     <Card>
-      <div className="flex items-center gap-2 border-b border-line px-4 py-3">
-        <h4 className="text-[14px] font-semibold tracking-[-0.015em]">Comptes reliés</h4>
+      <div className="flex items-center gap-2 border-b border-halo-line px-4 py-3">
+        <h4 className="text-[15px] font-semibold tracking-[-0.02em]">Comptes reliés</h4>
         <div className="flex-1" />
-        <button onClick={onSync} disabled={syncing} className="flex h-9 items-center gap-1.5 rounded-full px-2.5 text-[12px] text-ink-2 transition hover:bg-sub hover:text-ink">
+        <button onClick={onSync} disabled={syncing} className="flex h-9 items-center gap-1.5 rounded-full px-2.5 text-[12px] text-ink-2 transition hover:bg-halo-hover hover:text-ink">
           {syncing ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <LiveDot />}
           {syncing ? 'Synchronisation…' : 'Synchronisé'}
         </button>
       </div>
       {accounts.map((a) => (
-        <div key={a.id} className="flex min-h-[60px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0 animate-[fade-up_.4s_var(--ease)_both]">
+        <div key={a.id} className="flex min-h-[60px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-b-0 animate-[fade-up_.4s_var(--ease)_both]">
           <BankLogo bank={a.bank} />
           <div className="min-w-0 flex-1">
             <div className="truncate text-[13.5px] font-medium">{a.bank} · {a.label}</div>
@@ -55,7 +55,7 @@ export function AccountsCard({ onSync, syncing }: { onSync: () => void; syncing:
           <div className="num text-[14px] font-semibold">{money(a.main ? cash : a.balance ?? 0, true)}</div>
         </div>
       ))}
-      <button onClick={() => setOpen(true)} className="flex h-12 w-full items-center gap-2 border-t border-line px-4 text-[13px] font-medium text-ink-2 hover:bg-sub hover:text-ink">
+      <button onClick={() => setOpen(true)} className="flex h-12 w-full items-center gap-2 border-t border-halo-line px-4 text-[13px] font-medium text-ink-2 hover:bg-halo-hover hover:text-ink">
         <Plus className="h-4 w-4" /> Relier une autre banque
       </button>
 
@@ -65,15 +65,15 @@ export function AccountsCard({ onSync, syncing }: { onSync: () => void; syncing:
           {BANKS.filter((b) => b.toLowerCase().includes(q.toLowerCase())).map((b) => {
             const has = accounts.some((a) => a.bank === b);
             return (
-              <button key={b} disabled={!!busy || has} onClick={() => connect(b)} className={cn('flex min-h-[56px] items-center gap-2.5 rounded-xl border border-line px-3 text-left text-[13px] font-medium transition hover:border-line2 hover:bg-sub disabled:opacity-60')}>
+              <button key={b} disabled={!!busy || has} onClick={() => connect(b)} className="row-card min-h-[56px] gap-2.5 px-3 py-2.5 text-left text-[13px] font-medium disabled:opacity-60">
                 <BankLogo bank={b} size={28} />
                 <span className="min-w-0 flex-1 truncate">{b}</span>
-                {busy === b ? <RefreshCw className="h-4 w-4 animate-spin text-ink-3" /> : has ? <Check className="h-4 w-4 text-ok" /> : null}
+                {busy === b ? <RefreshCw className="h-4 w-4 animate-spin text-ink-3" /> : has ? <Check className="h-4 w-4 text-deep-g" /> : null}
               </button>
             );
           })}
         </div>
-        <div className="mt-4 flex items-start gap-2 rounded-xl bg-sub p-3 text-[12px] text-ink-2">
+        <div className="mt-4 flex items-start gap-2 rounded-field bg-pale-n p-3.5 text-[12px] text-ink-2">
           <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           Connexion sécurisée par un agrégateur agréé par la Banque de France (norme européenne DSP2). Vos identifiants ne passent jamais par Brix.
         </div>

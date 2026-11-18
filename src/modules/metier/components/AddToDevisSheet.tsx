@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, FilePlus2, FileText } from 'lucide-react';
-import { Button, Field, Select, Sheet, cn } from '@/components/ui';
+import { ArrowRight, Clock3, FilePlus2, FileText, Package } from 'lucide-react';
+import { Button, Card, Field, IconTile, Select, Sheet, cn } from '@/components/ui';
 import { AnimatedNumber, SuccessDot } from '@/components/motion';
 import { useBrix } from '@/lib/store';
 import { money } from '@/lib/format';
@@ -38,13 +38,13 @@ export function AddToDevisSheet({ open, onClose, lines, title }: { open: boolean
       <Sheet open={open} onClose={onClose} side="center" width={420}>
         <div className="flex flex-col items-center px-2 pb-2 pt-8 text-center">
           <SuccessDot size={56} />
-          <h3 className="mt-5 text-[19px] font-semibold tracking-[-0.025em]">{done.last ? 'Lignes ajoutées' : 'Brouillon créé'}</h3>
+          <h3 className="mt-5 text-[22px] font-semibold tracking-[-0.035em]">{done.last ? 'Lignes ajoutées' : 'Brouillon créé'}</h3>
           <p className="mt-1.5 max-w-xs text-[13.5px] leading-relaxed text-ink-2">
             {valid.length} ligne{valid.length > 1 ? 's' : ''} pour <span className="num font-medium text-ink">{money(total)} HT</span> dans le devis <span className="font-mono text-[12.5px] text-ink">{done.number}</span>. Rien n’est envoyé au client : vous relisez d’abord.
           </p>
           <div className="mt-6 flex w-full flex-col gap-2 sm:flex-row">
             <Button variant="ghost" className="flex-1 justify-center" onClick={onClose}>Continuer le calcul</Button>
-            <Button variant="primary" className="flex-1 justify-center" iconRight={<ArrowRight />} onClick={() => navigate(`/app/devis/${done.id}`)}>Ouvrir le devis</Button>
+            <Button variant="dawn" className="flex-1 justify-center" iconRight={<ArrowRight />} onClick={() => navigate(`/app/devis/${done.id}`)}>Ouvrir le devis</Button>
           </div>
         </div>
       </Sheet>
@@ -57,11 +57,11 @@ export function AddToDevisSheet({ open, onClose, lines, title }: { open: boolean
       onClose={onClose}
       title="Ajouter au devis"
       subtitle="Prix indicatifs, modifiables dans le devis."
-      icon={<span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[#fdf6e3] text-[#a16207] shadow-[inset_0_0_0_1px_#f5e3b3]"><FilePlus2 className="h-[18px] w-[18px]" strokeWidth={1.9} /></span>}
+      icon={<IconTile icon={<FilePlus2 />} dept="vendre" />}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>Annuler</Button>
-          <Button variant="primary" disabled={!valid.length || (effMode === 'new' && !clientId)} onClick={confirm}>{effMode === 'last' ? 'Ajouter les lignes' : 'Créer le brouillon'}</Button>
+          <Button variant="dawn" disabled={!valid.length || (effMode === 'new' && !clientId)} onClick={confirm}>{effMode === 'last' ? 'Ajouter les lignes' : 'Créer le brouillon'}</Button>
         </>
       }
     >
@@ -80,11 +80,13 @@ export function AddToDevisSheet({ open, onClose, lines, title }: { open: boolean
         <div>
           <div className="mb-2 flex items-center gap-2">
             <FileText className="h-4 w-4 text-ink-3" strokeWidth={1.75} />
-            <span className="text-[13px] font-semibold">{title}</span>
+            <span className="text-[13.5px] font-semibold tracking-[-0.01em]">{title}</span>
+            <span className="ml-auto text-[12px] text-ink-3">{valid.length} ligne{valid.length > 1 ? 's' : ''}</span>
           </div>
-          <div className="stagger-fast overflow-hidden rounded-[14px] shadow-card">
+          <div className="stagger-fast space-y-2">
             {valid.map((l, i) => (
-              <div key={i} className="flex items-baseline gap-3 border-b border-line bg-white px-3.5 py-2.5 text-[13px] last:border-b-0">
+              <div key={i} className="row-card gap-3 px-3.5 py-3 text-[13px]">
+                <IconTile size="row" icon={l.unit === 'h' ? <Clock3 /> : <Package />} tone={l.unit === 'h' ? 'blue' : 'peach'} />
                 <span className="min-w-0 flex-1 leading-snug">
                   {l.designation}
                   <span className="num block text-[11.5px] text-ink-3">{String(Math.round(l.quantity * 100) / 100).replace('.', ',')} {l.unit} × {money(priceOf(l))}</span>
@@ -93,10 +95,10 @@ export function AddToDevisSheet({ open, onClose, lines, title }: { open: boolean
               </div>
             ))}
           </div>
-          <div className="mt-3 flex items-baseline justify-between px-1">
-            <span className="text-[13px] text-ink-2">Total fournitures et pose</span>
-            <span className="text-[20px] font-semibold tracking-[-0.03em]"><AnimatedNumber value={total} format={(n) => money(n)} /> <span className="text-[12px] font-medium text-ink-3">HT</span></span>
-          </div>
+          <Card tone="dawn" className="mt-3 flex flex-col gap-1.5 p-5 sm:flex-row sm:items-end sm:justify-between sm:gap-3">
+            <span className="label-halo">Total fournitures et pose</span>
+            <span className="num-halo whitespace-nowrap text-[30px] leading-none"><AnimatedNumber value={total} format={(n) => money(n)} /> <span className="text-[13px] font-medium tracking-normal text-ink-3">HT</span></span>
+          </Card>
         </div>
       </div>
     </Sheet>
@@ -105,9 +107,9 @@ export function AddToDevisSheet({ open, onClose, lines, title }: { open: boolean
 
 function Option({ active, onClick, title, text }: { active: boolean; onClick: () => void; title: string; text: string }) {
   return (
-    <button type="button" onClick={onClick} className={cn('flex w-full items-start gap-3 rounded-[14px] p-3.5 text-left transition-[box-shadow,background] duration-200', active ? 'bg-white shadow-[0_0_0_1.5px_var(--ink),0_6px_16px_-10px_rgba(19,15,38,.35)]' : 'bg-white shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_#cfcbdd]')}>
-      <span className={cn('mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors', active ? 'border-ink' : 'border-line2')}>
-        <i className={cn('h-2.5 w-2.5 rounded-full bg-ink transition-transform duration-300 ease-spring', active ? 'scale-100' : 'scale-0')} />
+    <button type="button" onClick={onClick} className={cn('flex w-full items-start gap-3 rounded-card-sm p-4 text-left transition-[box-shadow,background] duration-200', active ? 'bg-white shadow-[0_0_0_1.5px_#c4a8f8,0_10px_24px_-12px_rgba(109,40,217,.35)]' : 'bg-white shadow-halo-sm hover:shadow-[0_0_0_1px_#e3dcf3]')}>
+      <span className={cn('mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 transition-colors', active ? 'border-vi-600' : 'border-[#ddd6ee]')}>
+        <i className={cn('h-2.5 w-2.5 rounded-full bg-dawn transition-transform duration-300 ease-spring', active ? 'scale-100' : 'scale-0')} />
       </span>
       <span>
         <span className="block text-[13.5px] font-semibold">{title}</span>

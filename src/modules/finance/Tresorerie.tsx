@@ -56,19 +56,21 @@ export default function Tresorerie() {
     <div className="space-y-6">
       <PageHeader
         icon={<IconTile name="Landmark" dept="facturer" size="lg" />}
+        kicker="Facturer et encaisser"
         title="Trésorerie"
+        titleMuted={low ? 'un creux à anticiper.' : 'vous êtes serein pour 90 jours.'}
         subtitle="Votre argent aujourd'hui, et ce qu'il sera dans 90 jours."
         actions={<Button variant="secondary" loading={syncing} icon={<RefreshCw />} onClick={sync} className="max-sm:w-full">Actualiser la banque</Button>}
       />
 
       <Card className="overflow-hidden">
-        <div className="grid gap-6 p-5 md:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end">
+        <div className="grid gap-6 p-5 md:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end">
           <div className="min-w-0">
             <Label>Sur vos comptes aujourd'hui</Label>
-            <BigMoney value={total} dawn className="mt-3 block text-[46px] md:text-[56px]" />
+            <BigMoney value={total} dawn className="mt-2 block text-[46px] md:text-[56px]" />
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-2">
               <span>Dans 90 jours : <b className="num font-semibold text-ink">{money(f.end, true)}</b></span>
-              <span className={cn('inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[12px] font-medium', delta >= 0 ? 'bg-ok-bg text-ok' : 'bg-sub text-ink-2')}>
+              <span className={cn('chip', delta >= 0 ? 'tone-green' : 'tone-neutral')}>
                 {delta >= 0 ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
                 <span className="num">{delta >= 0 ? '+' : ''}{money(delta, true)}</span>
               </span>
@@ -77,24 +79,26 @@ export default function Tresorerie() {
           <div className="min-w-0">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label><span className="h-2 w-2 rounded-full bg-[#16a34a]" />Va rentrer</Label>
-                <BigMoney value={f.ins} signed className="mt-1.5 block text-[24px] text-ok" />
+                <IconTile icon={<ArrowDownLeft />} tone="green" size="sm" className="mb-3" />
+                <Label>Va rentrer</Label>
+                <BigMoney value={f.ins} signed className="mt-1.5 block text-[26px] text-deep-g md:text-[30px]" />
                 <div className="mt-1 text-[12px] text-ink-3">factures et devis signés</div>
               </div>
               <div>
-                <Label><span className="h-2 w-2 rounded-full bg-[#a78bfa]" />Va sortir</Label>
-                <BigMoney value={f.outs} className="mt-1.5 block text-[24px]" />
+                <IconTile icon={<ArrowUpRight />} tone="violet" size="sm" className="mb-3" />
+                <Label>Va sortir</Label>
+                <BigMoney value={f.outs} className="mt-1.5 block text-[26px] md:text-[30px]" />
                 <div className="mt-1 text-[12px] text-ink-3">salaires, URSSAF, TVA, charges</div>
               </div>
             </div>
-            <SplitBar className="mt-4" parts={[{ value: f.ins, color: '#16a34a', label: 'Entrées' }, { value: -f.outs, color: '#c4b5fd', label: 'Sorties' }]} />
+            <SplitBar className="mt-4" parts={[{ value: f.ins, color: '#34d399', label: 'Entrées' }, { value: -f.outs, color: '#c4b5fd', label: 'Sorties' }]} />
           </div>
         </div>
 
-        <div className="border-t border-line px-2 pb-3 pt-4 md:px-5">
+        <div className="border-t border-halo-line px-2 pb-3 pt-4 md:px-5">
           <div className="mb-1 flex flex-wrap items-center justify-between gap-2 px-2 md:px-0">
             <div className="flex items-baseline gap-2">
-              <h2 className="text-[14.5px] font-semibold tracking-[-0.015em]">Prévision à 90 jours</h2>
+              <h2 className="text-[16px] font-semibold tracking-[-0.025em]">Prévision à 90 jours</h2>
               <span className="hidden text-[12.5px] text-ink-3 md:inline">passez la souris sur la courbe</span>
             </div>
             <label className="flex cursor-pointer items-center gap-2 text-[12.5px] text-ink-2">
@@ -124,27 +128,25 @@ export default function Tresorerie() {
         <TransactionsCard />
         <div className="space-y-5">
           <Card className="overflow-hidden">
-            <div className="flex min-h-[56px] items-center justify-between gap-2 border-b border-line px-4">
-              <h4 className="text-[14px] font-semibold tracking-[-0.015em]">À venir</h4>
+            <div className="flex min-h-[56px] items-center justify-between gap-2 border-b border-halo-line px-4">
+              <h4 className="text-[15px] font-semibold tracking-[-0.02em]">À venir</h4>
               <Segmented size="sm" value={dir} onChange={setDir} options={[{ value: 'tout', label: 'Tout' }, { value: 'in', label: 'Entrées' }, { value: 'out', label: 'Sorties' }]} />
             </div>
             <ul key={dir} className="stagger-fast">
               {upcoming.map((e, i) => {
                 const n = daysBetween(today, e.date);
                 return (
-                  <li key={i} className="flex min-h-[54px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0">
+                  <li key={i} className="flex min-h-[54px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-b-0">
                     <span className="w-11 shrink-0 text-center">
-                      <span className="block text-[13px] font-semibold leading-none">{short(e.date).split(' ')[0]}</span>
+                      <span className="num-halo block text-[16px] leading-none">{short(e.date).split(' ')[0]}</span>
                       <span className="mt-0.5 block text-[10.5px] uppercase tracking-wide text-ink-3">{short(e.date).split(' ')[1]}</span>
                     </span>
-                    <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-full', e.amount > 0 ? 'bg-ok-bg text-ok' : 'bg-vi-50 text-vi-700')}>
-                      {e.amount > 0 ? <ArrowDownLeft className="h-3.5 w-3.5" /> : <ArrowUpRight className="h-3.5 w-3.5" />}
-                    </span>
+                    <IconTile icon={e.amount > 0 ? <ArrowDownLeft /> : <ArrowUpRight />} tone={e.amount > 0 ? 'green' : 'violet'} size="sm" />
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[13px] font-medium">{e.label}</div>
                       <div className="text-[11.5px] text-ink-3">{n <= 1 ? 'demain' : `dans ${n} jours`}</div>
                     </div>
-                    <span className={cn('num shrink-0 text-[13px] font-semibold', e.amount > 0 && 'text-ok')}>{e.amount > 0 ? '+' : ''}{money(e.amount, true)}</span>
+                    <span className={cn('num shrink-0 text-[13px] font-semibold', e.amount > 0 && 'text-deep-g')}>{e.amount > 0 ? '+' : ''}{money(e.amount, true)}</span>
                   </li>
                 );
               })}

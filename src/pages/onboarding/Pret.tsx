@@ -47,8 +47,8 @@ export function Pret({ d, set, imported, setImported, onBack, onOpen, instant }:
           {ready ? (
             <span className="ob-tile-in relative"><BrandTile size={84} animated /></span>
           ) : (
-            <span className="relative grid h-[84px] w-[84px] place-items-center rounded-[22px] bg-white shadow-[0_0_0_1px_#ececf1]">
-              <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#e4e2ee] border-t-[#130f26]" aria-hidden />
+            <span className="relative grid h-[84px] w-[84px] place-items-center rounded-[22px] bg-white shadow-halo-sm">
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#ece8f6] border-t-[#d946ef]" aria-hidden />
             </span>
           )}
         </div>
@@ -66,10 +66,10 @@ export function Pret({ d, set, imported, setImported, onBack, onOpen, instant }:
             const t = TONE[b.dep.key];
             return (
               <span key={b.dep.key} className={instant ? '' : 'ob-brick'} style={{ ['--i' as string]: i, ['--r' as string]: `${i % 2 ? 5 : -5}deg` }}>
-                <span className="flex h-11 items-center gap-2 rounded-[12px] bg-white pl-1.5 pr-3.5 text-[13px] font-medium shadow-[0_0_0_1px_#ececf1,0_6px_14px_-10px_rgba(45,20,90,.35)]">
+                <span className="flex h-11 items-center gap-2 rounded-[12px] bg-white pl-1.5 pr-3.5 text-[13px] font-medium shadow-[0_0_0_1px_#f0edf7,0_6px_14px_-10px_rgba(45,20,90,.35)]">
                   <span className="grid h-8 w-8 place-items-center rounded-[9px]" style={{ background: t.bg, color: t.fg }}><I className="h-4 w-4" strokeWidth={1.75} /></span>
                   {b.dep.name}
-                  <span className="num text-[12px] text-[#9898a8]">{b.n}</span>
+                  <span className="num text-[12px] text-ink-3">{b.n}</span>
                 </span>
               </span>
             );
@@ -81,7 +81,7 @@ export function Pret({ d, set, imported, setImported, onBack, onOpen, instant }:
         <div className="ob-rise mt-12 grid gap-4 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:gap-6" style={{ animationDelay: instant ? '0ms' : '250ms' }}>
           <Recap d={d} offerName={offer.name} />
           <div className="space-y-4">
-            <section className="rounded-[22px] bg-white p-5 shadow-[0_0_0_1px_#ececf1]" aria-labelledby="ob-start">
+            <section className="rounded-[22px] bg-white p-5 shadow-halo-sm" aria-labelledby="ob-start">
               <h2 id="ob-start" className="text-[16px] font-semibold tracking-[-0.02em]">Comment voulez-vous commencer ?</h2>
               <div role="radiogroup" aria-labelledby="ob-start" className="mt-3.5 grid gap-2.5 sm:grid-cols-2">
                 {[
@@ -89,21 +89,21 @@ export function Pret({ d, set, imported, setImported, onBack, onOpen, instant }:
                   { v: false, I: Sprout, t: 'Partir de zéro', s: 'Un Brix vide, prêt pour vos vrais clients et vos vrais prix.' },
                 ].map((o) => (
                   <button key={String(o.v)} type="button" role="radio" aria-checked={d.withDemo === o.v} onClick={() => set({ withDemo: o.v })} className="ob-card flex flex-col items-start p-4 pr-10">
-                    <span className="ob-tile" style={{ width: 36, height: 36, borderRadius: 11, background: d.withDemo === o.v ? '#130f26' : '#f4f3fa', color: d.withDemo === o.v ? '#fff' : '#130f26' }}>
+                    <span className="ob-tile" style={{ width: 36, height: 36, borderRadius: 11, background: d.withDemo === o.v ? 'var(--ob-dawn)' : '#f1eafe', color: d.withDemo === o.v ? '#fff' : '#6d28d9', boxShadow: d.withDemo === o.v ? '0 6px 16px -6px rgba(217,70,239,.6)' : 'none' }}>
                       <o.I className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
                     </span>
                     <span className="mt-3 text-[14px] font-semibold tracking-[-0.01em]">{o.t}</span>
-                    <span className="mt-1 text-[12.5px] leading-snug text-[#9898a8]">{o.s}</span>
+                    <span className="mt-1 text-[12.5px] leading-snug text-ink-3">{o.s}</span>
                     {d.withDemo === o.v && <CheckDot />}
                   </button>
                 ))}
               </div>
             </section>
             <Import d={d} set={set} imported={imported} setImported={setImported} />
-            <label className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-[22px] bg-white px-5 py-3 shadow-[0_0_0_1px_#ececf1]">
+            <label className="flex min-h-[64px] cursor-pointer items-center gap-3 rounded-[22px] bg-white px-5 py-3 shadow-halo-sm">
               <span className="min-w-0 flex-1">
                 <span className="block text-[14px] font-semibold tracking-[-0.01em]">Visite guidée à l'ouverture</span>
-                <span className="block text-[12.5px] text-[#9898a8]">Les 5 écrans clés de Brix, en une minute.</span>
+                <span className="block text-[12.5px] text-ink-3">Les 5 écrans clés de Brix, en une minute.</span>
               </span>
               <Toggle on={d.tour} onChange={(v) => set({ tour: v })} label="Visite guidée" />
             </label>
@@ -112,8 +112,8 @@ export function Pret({ d, set, imported, setImported, onBack, onOpen, instant }:
       )}
 
       {ready && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[#ececf1] bg-[#f4f3fa]/85 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
-          <div className="mx-auto flex h-[76px] max-w-[1040px] items-center gap-3 px-4 md:px-8">
+        <div className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] md:px-6">
+          <div className="glass-strong mx-auto flex h-[68px] max-w-[720px] items-center gap-3 rounded-[24px] px-2.5 md:px-3">
             <button type="button" onClick={onBack} className="ob-btn ob-btn-ghost h-12 w-12 px-0 sm:w-auto sm:px-4" aria-label="Modifier mes réponses">
               <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.75} /> <span className="hidden sm:inline">Modifier mes réponses</span>
             </button>
@@ -141,12 +141,12 @@ function Recap({ d, offerName }: { d: Draft; offerName: string }) {
     ['Accès', d.email || 'À compléter'],
   ];
   return (
-    <section className="order-last h-fit rounded-[22px] bg-white p-5 md:order-none shadow-[0_0_0_1px_#ececf1]" aria-labelledby="ob-recap">
+    <section className="order-last h-fit rounded-[22px] bg-white p-5 md:order-none shadow-halo-sm" aria-labelledby="ob-recap">
       <h2 id="ob-recap" className="text-[16px] font-semibold tracking-[-0.02em]">Récapitulatif</h2>
       <dl className="ob-cascade mt-3 divide-y divide-[#f0eff5]">
         {rows.map(([k, v], i) => (
           <div key={k} className="flex gap-4 py-2.5 text-[13.5px]" style={{ ['--i' as string]: i }}>
-            <dt className="w-[86px] shrink-0 text-[#9898a8]">{k}</dt>
+            <dt className="w-[86px] shrink-0 text-ink-3">{k}</dt>
             <dd className="min-w-0 flex-1 break-words font-medium">{v}</dd>
           </div>
         ))}
@@ -173,16 +173,16 @@ function Import({ d, set, imported, setImported }: Pick<Props, 'd' | 'set' | 'im
     });
   };
   return (
-    <section className="rounded-[22px] bg-white p-5 shadow-[0_0_0_1px_#ececf1]" aria-labelledby="ob-imp">
-      <h2 id="ob-imp" className="text-[16px] font-semibold tracking-[-0.02em]">Récupérer vos données <span className="font-normal text-[#9898a8]">(facultatif)</span></h2>
+    <section className="rounded-[22px] bg-white p-5 shadow-halo-sm" aria-labelledby="ob-imp">
+      <h2 id="ob-imp" className="text-[16px] font-semibold tracking-[-0.02em]">Récupérer vos données <span className="font-normal text-ink-3">(facultatif)</span></h2>
       {imported.length ? (
-        <div className="ob-rise mt-3.5 flex items-center gap-3 rounded-2xl bg-[#ecfdf3] p-3.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-[#16a34a]"><FileUp className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
+        <div className="ob-rise mt-3.5 flex items-center gap-3 rounded-card-sm bg-[#e5f6ef] p-3.5">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-[#0f8a5f]"><FileUp className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
           <span className="min-w-0 flex-1 text-[13px]">
             <b className="num block font-semibold">{imported.length} clients prêts à importer</b>
-            <span className="block truncate text-[#5f5f70]">{imported.slice(0, 3).map((c) => c.name).join(', ')}{imported.length > 3 ? '…' : ''}</span>
+            <span className="block truncate text-ink-2">{imported.slice(0, 3).map((c) => c.name).join(', ')}{imported.length > 3 ? '…' : ''}</span>
           </span>
-          <button type="button" onClick={() => { setImported([]); setFile(undefined); }} className="grid h-11 w-11 place-items-center rounded-xl text-[#5f5f70] hover:bg-white" aria-label={`Retirer ${file ?? 'le fichier'}`}>
+          <button type="button" onClick={() => { setImported([]); setFile(undefined); }} className="grid h-11 w-11 place-items-center rounded-xl text-ink-2 hover:bg-white" aria-label={`Retirer ${file ?? 'le fichier'}`}>
             <X className="h-4 w-4" strokeWidth={1.75} />
           </button>
         </div>
@@ -194,9 +194,9 @@ function Import({ d, set, imported, setImported }: Pick<Props, 'd' | 'set' | 'im
           onDragLeave={() => setOver(false)}
           onDrop={(e) => { e.preventDefault(); setOver(false); read(e.dataTransfer.files[0]); }}
         >
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#f4f3fa]"><FileUp className="h-[19px] w-[19px]" strokeWidth={1.75} aria-hidden /></span>
-          <span className="text-[13px] leading-snug text-[#5f5f70]">
-            <b className="block font-semibold text-[#130f26]">Déposez votre fichier clients</b>
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#f3f1f8]"><FileUp className="h-[19px] w-[19px]" strokeWidth={1.75} aria-hidden /></span>
+          <span className="text-[13px] leading-snug text-ink-2">
+            <b className="block font-semibold text-ink">Déposez votre fichier clients</b>
             CSV ou export Excel. Nom, e-mail, téléphone, ville : Brix reconnaît les colonnes.
           </span>
           <input type="file" accept=".csv,text/csv,.txt" className="sr-only" onChange={(e) => read(e.target.files?.[0])} />
@@ -204,17 +204,17 @@ function Import({ d, set, imported, setImported }: Pick<Props, 'd' | 'set' | 'im
       )}
       {err && <p className="mt-2 text-[12.5px] text-[#dc2626]" role="alert">{err}</p>}
 
-      <h3 className="mb-2.5 mt-5 text-[13.5px] font-medium text-[#5f5f70]">Vous venez d'un autre logiciel ?</h3>
+      <h3 className="mb-2.5 mt-5 text-[13.5px] font-medium text-ink-2">Vous venez d'un autre logiciel ?</h3>
       <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Ancien logiciel">
         {LOGICIELS.map((x) => (
           <button key={x} type="button" role="radio" aria-checked={d.importFrom === x} onClick={() => set({ importFrom: d.importFrom === x ? undefined : x })}
-            className={`h-10 rounded-full px-3.5 text-[13px] font-medium transition ${d.importFrom === x ? 'bg-[#130f26] text-white' : 'bg-[#f4f3fa] text-[#5f5f70] hover:text-[#130f26]'}`}>
+            className={`h-10 rounded-full px-3.5 text-[13px] font-medium transition ${d.importFrom === x ? 'bg-ink text-white shadow-ink' : 'bg-[#f3f1f8] text-ink-2 hover:text-ink'}`}>
             {x}
           </button>
         ))}
       </div>
       {d.importFrom && (
-        <p key={d.importFrom} className="ob-rise mt-3 text-[12.5px] leading-relaxed text-[#5f5f70]">
+        <p key={d.importFrom} className="ob-rise mt-3 text-[12.5px] leading-relaxed text-ink-2">
           {d.importFrom === 'Autre' || d.importFrom === 'Excel'
             ? 'Exportez vos clients et vos prix en CSV, puis déposez le fichier ci-dessus. Bob s\'adapte aux colonnes.'
             : `Dans ${d.importFrom}, exportez vos clients, votre bibliothèque de prix et vos devis (format CSV ou Excel). Déposez le fichier clients ici, le reste se reprend depuis Réglages, Import.`}

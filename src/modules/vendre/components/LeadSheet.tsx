@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarCheck, Check, FileText, Mail, MessageCircle, Phone, XCircle } from 'lucide-react';
-import { Badge, Button, cn, Sheet } from '@/components/ui';
+import { BrandTile } from '@/components/brand/Logo';
+import { Badge, Button, cn, IconTile, Sheet } from '@/components/ui';
 import { capitalize, dateLong, money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Lead } from '@/lib/types';
@@ -9,6 +10,7 @@ import { freeSlots, qualifyLead } from '../service';
 import { ScoreDot } from './LeadCard';
 import { useLeadActions } from './useLeadActions';
 
+const ACTION = 'flex h-[76px] flex-col items-center justify-center gap-1.5 rounded-card-sm bg-white text-[12.5px] font-medium shadow-halo-sm transition-[box-shadow,transform] duration-300 ease-spring hover:-translate-y-0.5 hover:shadow-halo active:scale-[.97]';
 const hm = (t: string) => { const [h, m] = t.split(':'); return `${Number(h)} h${m !== '00' ? ' ' + m : ''}`; };
 
 export function LeadSheet({ lead, onClose }: { lead: Lead | null; onClose: () => void }) {
@@ -61,22 +63,22 @@ export function LeadSheet({ lead, onClose }: { lead: Lead | null; onClose: () =>
       }
     >
       <div className="space-y-4">
-        <div className="rounded-xl bg-sub p-3.5">
-          <div className="mb-1 text-[11.5px] font-medium uppercase tracking-wide text-ink-3">La demande</div>
+        <div className="rounded-card-sm bg-halo-track p-4">
+          <div className="mb-1 text-[12.5px] font-medium text-ink-3">La demande</div>
           <p className="text-[14px] leading-relaxed">« {lead.request} »</p>
         </div>
 
-        <div className="rounded-xl border border-line p-3.5">
-          <div className="flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-ink text-[11px] font-semibold text-white">B</span>
+        <div className="relative overflow-hidden rounded-card-sm bg-dawn-mist p-4 shadow-halo-sm">
+          <div className="flex items-center gap-2.5">
+            <BrandTile size={28} className="rounded-[9px]" />
             <span className="text-[13px] font-semibold">Ce que Bob en pense</span>
             <div className="flex-1" />
             {qualifying ? <span className="text-xs text-ink-3">Bob lit la demande…</span> : <ScoreDot score={lead.score} />}
           </div>
           {qualifying ? (
             <div className="mt-3 space-y-2">
-              <div className="h-3 w-3/4 animate-pulse rounded bg-sub" />
-              <div className="h-3 w-1/2 animate-pulse rounded bg-sub" />
+              <div className="skeleton h-3 w-3/4 rounded-full" />
+              <div className="skeleton h-3 w-1/2 rounded-full" />
             </div>
           ) : (
             <>
@@ -95,20 +97,20 @@ export function LeadSheet({ lead, onClose }: { lead: Lead | null; onClose: () =>
 
         {!closed && (
           <div className="grid grid-cols-3 gap-2">
-            <a href={telHref(lead.phone)} className="flex h-[68px] flex-col items-center justify-center gap-1 rounded-xl border border-line bg-white text-[12.5px] font-medium hover:bg-sub">
-              <Phone className="h-5 w-5 text-vi-700" strokeWidth={1.75} /> Appeler
+            <a href={telHref(lead.phone)} className={ACTION}>
+              <IconTile icon={<Phone />} tone="violet" size="sm" className="rounded-full" /> Appeler
             </a>
-            <a href={waHref(lead.phone, `Bonjour ${lead.name.split(' ')[0]}, ici Karim de Benali Électricité suite à votre demande.`)} target="_blank" rel="noreferrer" className="flex h-[68px] flex-col items-center justify-center gap-1 rounded-xl border border-line bg-white text-[12.5px] font-medium hover:bg-sub">
-              <MessageCircle className="h-5 w-5 text-vi-700" strokeWidth={1.75} /> WhatsApp
+            <a href={waHref(lead.phone, `Bonjour ${lead.name.split(' ')[0]}, ici Karim de Benali Électricité suite à votre demande.`)} target="_blank" rel="noreferrer" className={ACTION}>
+              <IconTile icon={<MessageCircle />} tone="green" size="sm" className="rounded-full" /> WhatsApp
             </a>
-            <button onClick={() => setPickSlot((v) => !v)} className={cn('flex h-[68px] flex-col items-center justify-center gap-1 rounded-xl border text-[12.5px] font-medium', pickSlot ? 'border-vi-200 bg-vi-50 text-vi-700' : 'border-line bg-white hover:bg-sub')}>
-              <CalendarCheck className="h-5 w-5 text-vi-700" strokeWidth={1.75} /> Visite
+            <button onClick={() => setPickSlot((v) => !v)} aria-pressed={pickSlot} className={cn(ACTION, pickSlot && '!shadow-[0_0_0_1.5px_#c4b5fd,0_10px_24px_-12px_rgba(109,40,217,.35)]')}>
+              <IconTile icon={<CalendarCheck />} tone="peach" size="sm" className="rounded-full" /> Visite
             </button>
           </div>
         )}
 
         {pickSlot && !closed && (
-          <div className="animate-fade-up rounded-xl border border-line p-3.5">
+          <div className="animate-fade-up rounded-card-sm bg-white p-4 shadow-halo-sm">
             <div className="text-[13px] font-semibold">Créneaux libres dans votre agenda</div>
             <p className="mt-0.5 text-xs text-ink-3">Le client reçoit un SMS et confirme en un clic.</p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -124,7 +126,7 @@ export function LeadSheet({ lead, onClose }: { lead: Lead | null; onClose: () =>
                       setSending(null);
                       setPickSlot(false);
                     }}
-                    className="flex min-h-[48px] items-center gap-2 rounded-lg border border-line px-3 text-left text-[13px] hover:border-vi-200 hover:bg-vi-50"
+                    className="flex min-h-[52px] items-center gap-2 rounded-card-sm bg-halo-track px-3.5 text-left text-[13px] transition-[background,box-shadow] duration-300 hover:bg-white hover:shadow-[0_0_0_1.5px_#d9c6fb]"
                   >
                     <span className="flex-1">
                       <span className="block font-medium">{capitalize(dateLong(sl.date))}</span>
@@ -139,13 +141,18 @@ export function LeadSheet({ lead, onClose }: { lead: Lead | null; onClose: () =>
         )}
 
         <div>
-          <div className="mb-2 text-[12px] font-medium text-ink-3">Étape</div>
-          <div className="flex flex-wrap gap-1.5">
-            {(['nouveau', 'qualifie', 'rdv', 'devis', 'gagne'] as Lead['status'][]).map((st) => (
-              <button key={st} onClick={() => setStatus(lead, st)} className={cn('h-9 rounded-full border px-3 text-[12.5px] font-medium transition', lead.status === st ? 'border-ink bg-ink text-white' : 'border-line bg-white text-ink-2 hover:text-ink')}>
-                {LEAD_STATUS[st].label.replace(/s$/, '')}
-              </button>
-            ))}
+          <div className="mb-2.5 text-[12.5px] font-medium text-ink-3">Étape</div>
+          <div className="flex flex-wrap gap-x-1 gap-y-1.5">
+            {(['nouveau', 'qualifie', 'rdv', 'devis', 'gagne'] as Lead['status'][]).map((st, i, all) => {
+              const cur = all.indexOf(lead.status);
+              const state = lead.status === st ? 'on' : cur > i ? 'done' : undefined;
+              return (
+                <button key={st} onClick={() => setStatus(lead, st)} aria-pressed={lead.status === st} className={cn('step-halo h-9 rounded-full pl-1.5 pr-3 transition-colors hover:bg-white', lead.status === st && 'bg-white shadow-pill')} data-state={state}>
+                  <b>{state === 'done' ? <Check className="h-3 w-3" strokeWidth={2.6} /> : i + 1}</b>
+                  {LEAD_STATUS[st].label.replace(/s$/, '')}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

@@ -1,20 +1,20 @@
 import { lazy, Suspense } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Building2, ChevronRight, CircleUser, CreditCard, LayoutGrid, Plug, Users, type LucideIcon } from 'lucide-react';
-import { IconTile, PageHeader, cn } from '@/components/ui';
+import { IconTile, PageHeader, cn, type HaloTone } from '@/components/ui';
 import { PageLoader } from '@/components/layout/AppShell';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
 import { useBrix } from '@/lib/store';
 import { MODULES, OFFERS } from '@/lib/catalog';
 
 const TABS = {
-  entreprise: { label: 'Entreprise', hint: 'Identité, assurance, métier, prix', icon: Building2, C: lazy(() => import('./components/reglages/EntrepriseTab')) },
-  modules: { label: 'Modules', hint: 'Ce qui apparaît dans votre menu', icon: LayoutGrid, C: lazy(() => import('./components/reglages/ModulesTab')) },
-  offre: { label: 'Offre', hint: 'Votre abonnement Brix', icon: CreditCard, C: lazy(() => import('./components/reglages/OffreTab')) },
-  equipe: { label: 'Équipe et droits', hint: 'Invitations et qui voit quoi', icon: Users, C: lazy(() => import('./components/reglages/EquipeTab')) },
-  integrations: { label: 'Intégrations', hint: 'Banque, agenda, paiements', icon: Plug, C: lazy(() => import('./components/reglages/IntegrationsTab')) },
-  compte: { label: 'Mon compte', hint: 'Profil, export, sécurité', icon: CircleUser, C: lazy(() => import('./components/reglages/CompteTab')) },
-} as const;
+  entreprise: { label: 'Entreprise', hint: 'Identité, assurance, métier, prix', icon: Building2, tone: 'violet', C: lazy(() => import('./components/reglages/EntrepriseTab')) },
+  modules: { label: 'Modules', hint: 'Ce qui apparaît dans votre menu', icon: LayoutGrid, tone: 'mag', C: lazy(() => import('./components/reglages/ModulesTab')) },
+  offre: { label: 'Offre', hint: 'Votre abonnement Brix', icon: CreditCard, tone: 'peach', C: lazy(() => import('./components/reglages/OffreTab')) },
+  equipe: { label: 'Équipe et droits', hint: 'Invitations et qui voit quoi', icon: Users, tone: 'blue', C: lazy(() => import('./components/reglages/EquipeTab')) },
+  integrations: { label: 'Intégrations', hint: 'Banque, agenda, paiements', icon: Plug, tone: 'green', C: lazy(() => import('./components/reglages/IntegrationsTab')) },
+  compte: { label: 'Mon compte', hint: 'Profil, export, sécurité', icon: CircleUser, tone: 'indigo', C: lazy(() => import('./components/reglages/CompteTab')) },
+} as const satisfies Record<string, { tone: HaloTone } & Record<string, unknown>>;
 type TabKey = keyof typeof TABS;
 const KEYS = Object.keys(TABS) as TabKey[];
 
@@ -32,12 +32,12 @@ export default function Reglages() {
     return (
       <div className="space-y-5">
         <PageHeader icon={<IconTile name="Settings" dept="gestion" size="lg" />} title="Réglages" subtitle="Votre entreprise, vos outils, votre offre." />
-        <nav className="stagger-fast overflow-hidden rounded-[18px] bg-white shadow-card">
+        <nav className="stagger-fast space-y-2.5">
           {KEYS.map((k) => {
             const t = TABS[k];
             return (
-              <Link key={k} to={`/app/reglages/${k}`} className="flex min-h-[64px] items-center gap-3 border-b border-line px-4 py-2.5 last:border-b-0 active:bg-sub">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-[#eef0fd] text-[#3730a3]"><t.icon className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
+              <Link key={k} to={`/app/reglages/${k}`} className="row-card min-h-[68px] active:scale-[.99]">
+                <IconTile icon={<t.icon />} tone={t.tone} size="row" />
                 <span className="min-w-0 flex-1">
                   <span className="block text-[14.5px] font-medium">{t.label}</span>
                   <span className="block truncate text-[12.5px] text-ink-3">{metaLong[k] ?? t.hint}</span>
@@ -55,10 +55,10 @@ export default function Reglages() {
     return (
       <div className="space-y-5">
         <div className="animate-[page-in_.45s_var(--ease)_both]">
-          <button onClick={() => navigate('/app/reglages')} className="-ml-1.5 inline-flex h-10 items-center gap-1.5 rounded-[9px] px-1.5 text-[13.5px] font-medium text-ink-2 active:bg-sub">
+          <button onClick={() => navigate('/app/reglages')} className="glass -ml-1 inline-flex h-10 items-center gap-1.5 rounded-full pl-3 pr-4 text-[13.5px] font-medium text-ink-2 active:scale-95">
             <ArrowLeft className="h-4 w-4" /> Réglages
           </button>
-          <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-[-0.035em]">{label}</h1>
+          <h1 className="mt-3 text-[30px] font-semibold leading-[1.06] tracking-[-0.042em]">{label}</h1>
           <p className="mt-1 text-[13.5px] text-ink-2">{hint}</p>
         </div>
         <Suspense fallback={<PageLoader />}>
@@ -70,7 +70,7 @@ export default function Reglages() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Settings" dept="gestion" size="lg" />} title="Réglages" subtitle="Votre entreprise, vos outils, votre offre." />
+      <PageHeader icon={<IconTile name="Settings" dept="gestion" size="lg" />} title="Réglages" titleMuted="votre entreprise, vos outils, votre offre." />
       <div className="grid items-start gap-6 lg:grid-cols-[220px_minmax(0,1fr)] xl:gap-8">
         <nav className="flex gap-1 overflow-x-auto scrollbar-none lg:sticky lg:top-4 lg:flex-col lg:overflow-visible" aria-label="Sections des réglages">
           {KEYS.map((k) => {
@@ -81,11 +81,11 @@ export default function Reglages() {
                 key={k}
                 to={`/app/reglages/${k}`}
                 className={cn(
-                  'group relative flex h-10 shrink-0 items-center gap-2.5 rounded-[10px] px-3 text-[13.5px] font-medium transition-[background,color,box-shadow] duration-200',
-                  on ? 'bg-white text-ink shadow-card' : 'text-ink-2 hover:bg-[#efedf5] hover:text-ink',
+                  'group relative flex h-11 shrink-0 items-center gap-2.5 rounded-full pl-1.5 pr-3.5 text-[13.5px] font-medium transition-[background,color,box-shadow] duration-300 ease-spring',
+                  on ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:bg-white/60 hover:text-ink',
                 )}
               >
-                <t.icon className={cn('h-4 w-4 transition-colors', on ? 'text-[#4f46e5]' : 'text-ink-3 group-hover:text-ink-2')} strokeWidth={1.75} />
+                <IconTile icon={<t.icon />} tone={t.tone} size="sm" className={cn('rounded-full transition-[filter,opacity] duration-300', !on && 'opacity-80 grayscale-[.5] group-hover:opacity-100 group-hover:grayscale-0')} />
                 {t.label}
                 {meta[k] && <span className={cn('num ml-auto hidden text-[11.5px] lg:inline', 'text-ink-3')}>{meta[k]}</span>}
               </Link>
@@ -94,7 +94,7 @@ export default function Reglages() {
         </nav>
         <section className="min-w-0">
           <div className="mb-5 hidden lg:block">
-            <h2 className="text-[19px] font-semibold tracking-[-0.025em]">{label}</h2>
+            <h2 className="text-[22px] font-semibold tracking-[-0.035em]">{label}</h2>
             <p className="mt-0.5 text-[13px] text-ink-2">{hint}</p>
           </div>
           <Suspense fallback={<PageLoader />}>

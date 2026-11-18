@@ -76,11 +76,11 @@ export default function SaisieReponse({ d, fournisseurs, open, onClose }: { d: D
             <span>Prix unitaire HT</span>
             <span className="text-ink-3">vide = pas disponible</span>
           </div>
-          <ul className="overflow-hidden rounded-[14px] border border-line">
+          <ul className="overflow-hidden rounded-field border border-halo-line">
             {d.lignes.map((l) => {
               const v = prix[l.id] ?? '';
               return (
-                <li key={l.id} className="flex items-center gap-3 border-b border-line px-3.5 py-2 last:border-b-0">
+                <li key={l.id} className="flex items-center gap-3 border-b border-halo-line px-3.5 py-2 last:border-b-0">
                   <span className="min-w-0 flex-1">
                     <span className="block text-[13.5px] leading-snug">{l.designation}</span>
                     <span className="num text-[12px] text-ink-3">
@@ -95,7 +95,7 @@ export default function SaisieReponse({ d, fournisseurs, open, onClose }: { d: D
                     placeholder="0,00"
                     suffix="€"
                     aria-label={`Prix de ${l.designation}`}
-                    className={cn('w-[112px] shrink-0 [&_input]:text-right [&_input]:num', !v && '[&_input]:bg-[#fafafc]')}
+                    className={cn('w-[112px] shrink-0 [&_input]:text-right [&_input]:num', !v && '[&_input]:bg-halo-hover')}
                   />
                 </li>
               );

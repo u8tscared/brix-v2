@@ -27,20 +27,20 @@ function LigneSaisie({ l, v, index, onChange }: { l: LigneDemande; v: SaisieLign
   const maj = (x: Partial<SaisieLigne>) => onChange(l.id, x);
 
   return (
-    <li className={cn('relative grid grid-cols-[52px_minmax(0,1fr)] gap-x-3.5 px-4 py-4 transition-colors sm:grid-cols-[52px_minmax(0,1fr)_auto] sm:px-5', off && 'bg-[#fafafc]')}>
+    <li className={cn('relative grid grid-cols-[52px_minmax(0,1fr)] gap-x-3.5 px-4 py-4 transition-colors sm:grid-cols-[52px_minmax(0,1fr)_auto] sm:px-5', off && 'bg-halo-hover')}>
       <div className="contents">
-        <span className={cn('flex h-[52px] min-w-[52px] shrink-0 flex-col items-center justify-center rounded-[14px] border px-1.5 transition', off ? 'border-[#ececf1] bg-white text-[#9898a8]' : 'border-[#e7e5f0] bg-[#f4f3fa] text-[#130f26]')}>
+        <span className={cn('flex h-[52px] min-w-[52px] shrink-0 flex-col items-center justify-center rounded-field border px-1.5 transition', off ? 'border-halo-line bg-white text-ink-3' : 'border-[#e3ddf0] bg-halo-track text-ink')}>
           <span className="num text-[17px] font-semibold leading-none tracking-[-0.02em]">{num(l.quantite)}</span>
-          <span className="mt-1 text-[10.5px] font-medium uppercase tracking-[0.04em] text-[#9898a8]">{l.unite}</span>
+          <span className="mt-1 text-[10.5px] font-medium uppercase tracking-[0.04em] text-ink-3">{l.unite}</span>
         </span>
         <div className="min-w-0 flex-1 pt-0.5">
-          <div className={cn('text-[15px] font-medium leading-snug tracking-[-0.01em]', off && 'text-[#9898a8] line-through decoration-[#c9c8d4]')}>{l.designation}</div>
-          {l.reference && <div className="bx-mono mt-1 truncate text-[12px] text-[#9898a8]">{l.reference}</div>}
+          <div className={cn('text-[15px] font-medium leading-snug tracking-[-0.01em]', off && 'text-ink-3 line-through decoration-[#c4bfd6]')}>{l.designation}</div>
+          {l.reference && <div className="bx-mono mt-1 truncate text-[12px] text-ink-3">{l.reference}</div>}
         </div>
       </div>
 
       <div className="col-span-2 mt-3.5 flex items-center gap-3 sm:col-span-1 sm:col-start-3 sm:row-start-1 sm:mt-0">
-        <label className={cn('fx-prix flex h-[52px] w-[172px] shrink-0 sm:w-[156px] items-center rounded-[14px] border bg-white pl-4 pr-3 transition', off ? 'border-[#ececf1] opacity-50' : p != null ? 'border-[#d9c9fd]' : 'border-[#e2e2ea]')}>
+        <label className={cn('fx-prix flex h-[52px] w-[172px] shrink-0 sm:w-[156px] items-center rounded-field border bg-white pl-4 pr-3 transition', off ? 'border-halo-line opacity-50' : p != null ? 'border-[#d9c9fd]' : 'border-[#e3ddf0]')}>
           <input
             data-prix={index}
             inputMode="decimal"
@@ -52,25 +52,25 @@ function LigneSaisie({ l, v, index, onChange }: { l: LigneDemande; v: SaisieLign
             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), suivant(index))}
             placeholder="0,00"
             aria-label={`Prix unitaire HT de ${l.designation}`}
-            className="h-full w-full min-w-0 bg-transparent text-[18px] font-semibold tracking-[-0.01em] text-[#130f26] placeholder:font-normal placeholder:text-[#c9c8d4] focus:outline-none"
+            className="h-full w-full min-w-0 bg-transparent text-[18px] font-semibold tracking-[-0.01em] text-ink placeholder:font-normal placeholder:text-[#c4bfd6] focus:outline-none"
           />
-          <span className="shrink-0 text-[12.5px] font-medium text-[#9898a8]">€ HT</span>
+          <span className="shrink-0 text-[12.5px] font-medium text-ink-3">€ HT</span>
         </label>
         <div className="min-w-0 flex-1 text-right sm:w-[104px] sm:flex-none">
           {off ? (
-            <span className="text-[13px] text-[#9898a8]">Non chiffré</span>
+            <span className="text-[13px] text-ink-3">Non chiffré</span>
           ) : p != null ? (
             <span key={p} className="bx-fade block">
-              <span className="block text-[11.5px] text-[#9898a8]">{num(l.quantite)} × {money(p)}</span>
+              <span className="block text-[11.5px] text-ink-3">{num(l.quantite)} × {money(p)}</span>
               <span className="num block text-[16px] font-semibold tracking-[-0.01em]">{money(p * l.quantite)}</span>
             </span>
           ) : (
-            <span className="text-[13px] text-[#c9c8d4]">à chiffrer</span>
+            <span className="text-[13px] text-[#c4bfd6]">à chiffrer</span>
           )}
         </div>
       </div>
 
-      <div role="radiogroup" aria-label="Disponibilité" className="col-span-2 mt-3 grid grid-cols-4 gap-1 rounded-[13px] bg-[#f4f3fa] p-1 sm:col-start-2 sm:max-w-[440px]">
+      <div role="radiogroup" aria-label="Disponibilité" className="col-span-2 mt-3 grid grid-cols-4 gap-1 rounded-[22px] bg-halo-track p-1 sm:col-start-2 sm:max-w-[440px]">
         {DISPOS.map((d) => (
           <button
             key={d.v}
@@ -79,9 +79,9 @@ function LigneSaisie({ l, v, index, onChange }: { l: LigneDemande; v: SaisieLign
             aria-checked={v.dispo === d.v}
             onClick={() => maj({ dispo: d.v })}
             className={cn(
-              'flex h-11 min-w-0 items-center justify-center gap-1 rounded-[10px] px-1 text-[12.5px] font-medium transition sm:h-10 [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0',
-              v.dispo === d.v ? 'bg-white text-[#130f26] shadow-[0_1px_2px_rgba(19,15,38,.1),0_0_0_1px_rgba(19,15,38,.04)]' : 'text-[#5f5f70] hover:text-[#130f26]',
-              v.dispo === d.v && d.v === 'stock' && '[&_svg]:text-[#16a34a]',
+              'flex h-11 min-w-0 items-center justify-center gap-1 rounded-pill px-1 text-[12.5px] font-medium transition sm:h-10 [&_svg]:h-3.5 [&_svg]:w-3.5 [&_svg]:shrink-0',
+              v.dispo === d.v ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:text-ink',
+              v.dispo === d.v && d.v === 'stock' && '[&_svg]:text-deep-g',
               v.dispo === d.v && d.v === 'indispo' && '[&_svg]:text-[#dc2626]',
             )}
           >
@@ -92,14 +92,14 @@ function LigneSaisie({ l, v, index, onChange }: { l: LigneDemande; v: SaisieLign
       </div>
 
       {v.dispo === 'delai' && (
-        <div className="bx-rise col-span-2 mt-2.5 flex items-center gap-2 text-[13.5px] text-[#5f5f70] sm:col-start-2">
+        <div className="bx-rise col-span-2 mt-2.5 flex items-center gap-2 text-[13.5px] text-ink-2 sm:col-start-2">
           Disponible sous
           <input
             inputMode="numeric"
             value={v.jours}
             onChange={(e) => maj({ jours: e.target.value.replace(/\D/g, '').slice(0, 2) })}
             aria-label="Nombre de jours"
-            className="num h-11 w-14 rounded-[11px] border border-[#e2e2ea] bg-white text-center text-[16px] font-semibold text-[#130f26] focus:border-[#b9a2f5] focus:outline-none focus:ring-4 focus:ring-[#ebe2fe]"
+            className="num h-11 w-14 rounded-field border border-[#e3ddf0] bg-white text-center text-[16px] font-semibold text-ink focus:border-[#b9a2f5] focus:outline-none focus:ring-4 focus:ring-[#ebe2fe]"
           />
           jour{Number(v.jours) > 1 ? 's' : ''}
         </div>
@@ -111,14 +111,14 @@ function LigneSaisie({ l, v, index, onChange }: { l: LigneDemande; v: SaisieLign
             onChange={(e) => maj({ designation: e.target.value })}
             placeholder="Article proposé (marque, modèle)"
             aria-label="Article proposé"
-            className="h-11 rounded-[11px] border border-[#e2e2ea] bg-white px-3.5 text-[16px] placeholder:text-[#9898a8] focus:border-[#b9a2f5] focus:outline-none focus:ring-4 focus:ring-[#ebe2fe] sm:text-[14px]"
+            className="h-11 rounded-field border border-[#e3ddf0] bg-white px-3.5 text-[16px] placeholder:text-ink-3 focus:border-[#b9a2f5] focus:outline-none focus:ring-4 focus:ring-[#ebe2fe] sm:text-[14px]"
           />
           <input
             value={v.reference}
             onChange={(e) => maj({ reference: e.target.value })}
             placeholder="Référence"
             aria-label="Référence proposée"
-            className="bx-mono h-11 rounded-[11px] border border-[#e2e2ea] bg-white px-3.5 text-[16px] placeholder:text-[#9898a8] focus:border-[#b9a2f5] focus:outline-none focus:ring-4 focus:ring-[#ebe2fe] sm:text-[13px]"
+            className="bx-mono h-11 rounded-field border border-[#e3ddf0] bg-white px-3.5 text-[16px] placeholder:text-ink-3 focus:border-[#b9a2f5] focus:outline-none focus:ring-4 focus:ring-[#ebe2fe] sm:text-[13px]"
           />
         </div>
       )}

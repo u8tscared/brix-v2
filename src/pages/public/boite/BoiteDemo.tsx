@@ -2,6 +2,7 @@
 // rendu exactement comme le destinataire le verra. Onglet « Tous les modèles » : la galerie complète.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { HaloBackdrop } from '@/components/layout/HaloBackdrop';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Inbox, Info, LayoutGrid, Mail, Trash2, X } from 'lucide-react';
 import '@/parcours/parcours.css';
@@ -70,8 +71,8 @@ function Onglets({ onglet, nb }: { onglet: 'recus' | 'modeles'; nb: number }) {
     { id: 'modeles', to: '/boite/modeles', libelle: 'Tous les modèles', icone: LayoutGrid, nb: ORDRE_MODELES.length },
   ] as const;
   return (
-    <nav aria-label="Vues" className="relative inline-grid grid-cols-2 rounded-xl bg-[#ecebf3] p-0.5 max-md:w-full">
-      <span className="boite-onglet-curseur absolute inset-y-0.5 left-0.5 w-[calc(50%-2px)] rounded-[10px] bg-white shadow-[0_1px_2px_rgba(19,15,38,.08),0_0_0_1px_rgba(19,15,38,.04)]" style={{ transform: onglet === 'modeles' ? 'translateX(100%)' : 'none' }} aria-hidden />
+    <nav aria-label="Vues" className="relative inline-grid grid-cols-2 rounded-full bg-halo-track p-1 max-md:w-full">
+      <span className="boite-onglet-curseur absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-white shadow-pill" style={{ transform: onglet === 'modeles' ? 'translateX(100%)' : 'none' }} aria-hidden />
       {items.map((i) => (
         <Link key={i.id} to={i.to} aria-current={onglet === i.id ? 'page' : undefined} className={`relative z-[1] inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap px-3.5 text-[13px] font-medium transition-colors max-md:h-11 ${onglet === i.id ? 'text-[#130f26]' : 'text-ink-3 hover:text-ink-2'}`}>
           <i.icone size={15} strokeWidth={1.75} />
@@ -94,7 +95,7 @@ function BoutonVider({ onVider }: { onVider: () => void }) {
     <button
       type="button"
       onClick={() => (arme ? (onVider(), setArme(false)) : setArme(true))}
-      className={`inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-[13px] font-medium transition-all duration-200 ${arme ? 'bg-bad-bg text-bad' : 'text-ink-3 hover:bg-white hover:text-[#130f26]'}`}
+      className={`inline-flex h-10 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium transition-all duration-200 ${arme ? 'bg-bad-bg text-bad' : 'text-ink-3 hover:bg-white hover:text-ink'}`}
     >
       <Trash2 size={16} strokeWidth={1.75} />
       <span className={arme ? '' : 'max-lg:sr-only'}>{arme ? 'Confirmer' : 'Vider'}</span>
@@ -183,14 +184,15 @@ export default function BoiteDemo() {
   const lectureMobile = mobile && onglet === 'recus' && !!msg;
 
   return (
-    <div className="bx-root boite flex h-dvh flex-col bg-page text-[#130f26]">
+    <div className="bx-root boite relative isolate flex h-dvh flex-col text-ink">
+      <HaloBackdrop />
       {!lectureMobile && (
-        <header className="relative z-20 shrink-0 border-b border-line bg-white/80 backdrop-blur-xl">
+        <header className="glass-strong relative z-20 shrink-0">
           <div className="flex items-center gap-3 px-4 py-3 md:px-6">
             <Link to="/app" className="-ml-1 inline-flex h-10 items-center rounded-xl px-1" aria-label="Retour à l'app Brix">
               <BrandLogo size={26} />
             </Link>
-            <span className="hidden h-5 w-px bg-line md:block" />
+            <span className="hidden h-5 w-px bg-halo-line md:block" />
             <span className="hidden text-[14px] font-medium text-ink-2 md:block">Boîte de démo</span>
             <div className="flex-1" />
             <div className="max-md:hidden">
@@ -198,17 +200,17 @@ export default function BoiteDemo() {
             </div>
             <div className="flex-1 max-md:hidden" />
             {mails.length > 0 && <BoutonVider onVider={() => (vider(), navigate('/boite'))} />}
-            <Link to="/app" className="inline-flex h-10 items-center gap-1.5 rounded-xl px-3 text-[13px] font-medium text-ink-2 transition hover:bg-white hover:text-[#130f26] max-md:hidden">
+            <Link to="/app" className="inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-ink-2 transition hover:bg-white hover:text-ink hover:shadow-[0_0_0_1px_#ece8f6] max-md:hidden">
               <ArrowLeft size={16} strokeWidth={1.75} /> Retour à l'app
             </Link>
           </div>
           <div className="px-4 pb-3 md:hidden">
             <Onglets onglet={onglet} nb={mails.length} />
           </div>
-          <div className="flex items-center gap-2 border-t border-line bg-[#faf9fd] px-4 py-2 text-[12.5px] text-ink-2 md:px-6">
+          <div className="flex items-center gap-2 border-t border-halo-line px-4 py-2 text-[12.5px] text-ink-2 md:px-6">
             <Info size={14} strokeWidth={1.75} className="shrink-0 text-ink-3" />
             <span>
-              <strong className="font-medium text-[#130f26]">Boîte de démonstration</strong> : aucun e-mail réel n'est envoyé.
+              <strong className="font-medium text-ink">Boîte de démonstration</strong> : aucun e-mail réel n'est envoyé.
               <span className="max-sm:hidden"> Les liens ouvrent les vraies pages client et fournisseur.</span>
             </span>
           </div>
@@ -233,9 +235,9 @@ export default function BoiteDemo() {
       ) : (
         <main className="flex min-h-0 flex-1">
           {!lectureMobile && (
-            <aside className="boite-defile flex w-full shrink-0 flex-col overflow-y-auto border-line md:w-[360px] md:border-r lg:w-[400px]" aria-label="Liste des e-mails">
+            <aside className="boite-defile flex w-full shrink-0 flex-col overflow-y-auto border-halo-line md:w-[360px] md:border-r lg:w-[400px]" aria-label="Liste des e-mails">
               {mails.length > 0 && (
-                <div className="sticky top-0 z-[5] bg-page/90 px-3 pb-2 pt-3 backdrop-blur-xl md:px-4">
+                <div className="glass sticky top-0 z-[5] rounded-b-[18px] px-3 pb-2 pt-3 md:px-4">
                   <Filtres filtre={filtre} onFiltre={setFiltre} compte={compte} />
                 </div>
               )}
@@ -245,7 +247,7 @@ export default function BoiteDemo() {
             </aside>
           )}
           {(!mobile || lectureMobile) && (
-            <section className={`boite-defile min-w-0 flex-1 overflow-y-auto bg-[#efedf6] ${lectureMobile ? 'boite-glisse' : ''}`} aria-label="Lecture">
+            <section className={`boite-defile min-w-0 flex-1 overflow-y-auto bg-white/40 ${lectureMobile ? 'boite-glisse' : ''}`} aria-label="Lecture">
               {msg ? (
                 <Lecteur msg={msg} telephoneSeul={mobile} onRetour={mobile ? () => navigate('/boite') : undefined} />
               ) : (
@@ -263,9 +265,9 @@ export default function BoiteDemo() {
 
       {msgModele && (
         <div className="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-label={msgModele.rendu.sujet}>
-          <button type="button" className="boite-voile absolute inset-0 bg-[#130f26]/30 backdrop-blur-[2px]" aria-label="Fermer" onClick={() => setModeleOuvert(null)} />
-          <div className="boite-panneau boite-defile relative h-full w-full overflow-y-auto bg-[#efedf6] shadow-pop md:w-[min(880px,92vw)]">
-            <button type="button" onClick={() => setModeleOuvert(null)} aria-label="Fermer l'aperçu" className="absolute right-4 top-4 z-20 hidden h-10 w-10 place-items-center rounded-xl text-ink-3 transition hover:bg-[#ecebf3] hover:text-[#130f26] md:grid">
+          <button type="button" className="boite-voile absolute inset-0 bg-[#1b1240]/20 backdrop-blur-[4px]" aria-label="Fermer" onClick={() => setModeleOuvert(null)} />
+          <div className="boite-panneau boite-defile relative h-full w-full overflow-y-auto bg-[#f3f0fa] shadow-pop md:my-3 md:mr-3 md:h-[calc(100%-24px)] md:w-[min(880px,92vw)] md:rounded-sheet">
+            <button type="button" onClick={() => setModeleOuvert(null)} aria-label="Fermer l'aperçu" className="absolute right-4 top-4 z-20 hidden h-10 w-10 place-items-center rounded-full text-ink-3 transition hover:bg-white hover:text-ink md:grid">
               <X size={18} strokeWidth={1.75} />
             </button>
             <Lecteur msg={msgModele} telephoneSeul={mobile} onRetour={() => setModeleOuvert(null)} />
@@ -274,7 +276,7 @@ export default function BoiteDemo() {
       )}
 
       {dernier && onglet === 'recus' && !lectureMobile && (
-        <button type="button" onClick={() => (ouvrir(dernier.id), fermer())} className="boite-toast fixed bottom-5 z-30 flex max-w-[calc(100vw-32px)] items-center gap-3 rounded-2xl bg-[#130f26] py-2.5 pl-3 pr-4 text-left text-white shadow-pop md:max-w-[360px] lg:max-w-[380px]" style={{ marginBottom: 'var(--safe-b)' }}>
+        <button type="button" onClick={() => (ouvrir(dernier.id), fermer())} className="boite-toast fixed bottom-5 z-30 flex max-w-[calc(100vw-32px)] items-center gap-3 rounded-full bg-ink py-2.5 pl-3 pr-5 text-left text-white shadow-pop md:max-w-[360px] lg:max-w-[380px]" style={{ marginBottom: 'var(--safe-b)' }}>
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-white/10">
             <Mail size={16} strokeWidth={1.75} />
           </span>

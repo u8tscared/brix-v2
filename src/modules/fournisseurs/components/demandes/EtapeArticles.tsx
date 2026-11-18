@@ -44,9 +44,9 @@ export default function EtapeArticles({ lignes, onChange }: { lignes: LigneBroui
       </div>
 
       {lignes.length > 0 && (
-        <ul className="overflow-hidden rounded-[14px] border border-line">
+        <ul className="overflow-hidden rounded-field border border-halo-line">
           {lignes.map((l, i) => (
-            <li key={l.cle} className={cn('flex items-center gap-1 border-b border-line py-1.5 pl-1 pr-2.5 last:border-b-0 transition', !l.actif && 'bg-[#fafafc]')}>
+            <li key={l.cle} className={cn('flex items-center gap-1 border-b border-halo-line py-1.5 pl-1 pr-2.5 last:border-b-0 transition', !l.actif && 'bg-halo-hover')}>
               <button type="button" aria-label={l.actif ? 'Retirer de la demande' : 'Ajouter à la demande'} onClick={() => maj(l.cle, { actif: !l.actif })} className="grid h-11 w-11 shrink-0 place-items-center">
                 <Coche on={l.actif} />
               </button>
@@ -59,7 +59,7 @@ export default function EtapeArticles({ lignes, onChange }: { lignes: LigneBroui
                     onChange={(e) => maj(l.cle, { designation: e.target.value })}
                     placeholder="Ex. : disjoncteur 20 A courbe C"
                     aria-label="Désignation"
-                    className="h-10 w-full rounded-lg border border-transparent bg-transparent px-2 text-[14px] placeholder:text-ink-3 hover:border-line2 focus:border-vi-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-vi-100"
+                    className="h-10 w-full rounded-lg border border-transparent bg-transparent px-2 text-[14px] placeholder:text-ink-3 hover:border-[#e3ddf0] focus:border-vi-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-vi-100"
                   />
                 ) : (
                   <div className="px-0.5">
@@ -70,7 +70,7 @@ export default function EtapeArticles({ lignes, onChange }: { lignes: LigneBroui
               </div>
 
               <div className={cn('flex shrink-0 items-center gap-1.5', !l.actif && 'pointer-events-none opacity-40')}>
-                <div className="flex h-10 items-center rounded-[10px] border border-line2 bg-white">
+                <div className="flex h-10 items-center rounded-field border border-[#e3ddf0] bg-white">
                   <button type="button" aria-label="Moins" onClick={() => maj(l.cle, { quantite: String(Math.max(1, Math.ceil(quantite(l)) - 1)) })} className="hidden h-10 w-8 place-items-center text-ink-3 hover:text-ink sm:grid">
                     <Minus className="h-3.5 w-3.5" />
                   </button>
@@ -87,7 +87,7 @@ export default function EtapeArticles({ lignes, onChange }: { lignes: LigneBroui
                   </button>
                 </div>
                 {l.libre ? (
-                  <select value={l.unite} onChange={(e) => maj(l.cle, { unite: e.target.value })} aria-label="Unité" className="h-10 w-[68px] rounded-[10px] border border-line2 bg-white px-1.5 text-[13px] text-ink-2 focus:outline-none">
+                  <select value={l.unite} onChange={(e) => maj(l.cle, { unite: e.target.value })} aria-label="Unité" className="h-10 w-[68px] rounded-field border border-[#e3ddf0] bg-white px-1.5 text-[13px] text-ink-2 focus:outline-none">
                     {UNITES.map((u) => (
                       <option key={u}>{u}</option>
                     ))}

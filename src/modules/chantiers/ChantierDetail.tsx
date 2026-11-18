@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Camera, ClipboardCheck, FileSignature, HardHat, Mic, Send, Timer } from 'lucide-react';
-import { Button, EmptyState, UnderlineTabs, toast } from '@/components/ui';
+import { Button, EmptyState, IconTile, UnderlineTabs, toast, type HaloTone } from '@/components/ui';
 import { SuccessDot } from '@/components/motion';
 import { uid } from '@/lib/format';
 import { useBrix } from '@/lib/store';
@@ -62,11 +62,11 @@ export default function ChantierDetail() {
   };
 
   const actions = [
-    { key: 'photo', label: 'Photo', icon: <Camera />, run: () => capture.open() },
-    { key: 'clock', label: clockedToday ? 'Pointé' : 'Pointer', icon: clockedToday ? <SuccessDot size={20} /> : <Timer />, run: clockIn },
-    { key: 'voice', label: 'Note vocale', short: 'Dicter', icon: <Mic />, run: () => setSheet('voice') },
-    { key: 'report', label: 'Rapport', icon: <Send />, run: () => setSheet('report') },
-    { key: 'avenant', label: 'Avenant', icon: <FileSignature />, run: () => setSheet('avenant') },
+    { key: 'photo', label: 'Photo', icon: <Camera />, tone: 'peach' as HaloTone, run: () => capture.open() },
+    { key: 'clock', label: clockedToday ? 'Pointé' : 'Pointer', icon: clockedToday ? <SuccessDot size={20} /> : <Timer />, tone: 'green' as HaloTone, run: clockIn },
+    { key: 'voice', label: 'Note vocale', short: 'Dicter', icon: <Mic />, tone: 'violet' as HaloTone, run: () => setSheet('voice') },
+    { key: 'report', label: 'Rapport', icon: <Send />, tone: 'blue' as HaloTone, run: () => setSheet('report') },
+    { key: 'avenant', label: 'Avenant', icon: <FileSignature />, tone: 'mag' as HaloTone, run: () => setSheet('avenant') },
   ];
 
   return (
@@ -82,7 +82,7 @@ export default function ChantierDetail() {
         ))}
         <div className="flex-1" />
         {!done && (
-          <Button variant="primary" icon={<ClipboardCheck className="h-4 w-4" />} onClick={() => navigate(`/app/pv-reception?chantier=${ch.id}`)}>
+          <Button variant="dawn" icon={<ClipboardCheck className="h-4 w-4" />} onClick={() => navigate(`/app/pv-reception?chantier=${ch.id}`)}>
             Signer le PV de réception
           </Button>
         )}
@@ -91,8 +91,8 @@ export default function ChantierDetail() {
       {/* Téléphone : grosses actions au pouce, utilisables avec des gants */}
       <div className="stagger-fast grid grid-cols-5 gap-2 md:hidden">
         {actions.map((a) => (
-          <button key={a.key} onClick={a.run} className="press flex h-[76px] flex-col items-center justify-center gap-2 rounded-[16px] bg-white text-[11.5px] font-medium shadow-card [&_svg]:h-5 [&_svg]:w-5">
-            <span className="grid h-6 place-items-center text-ink">{a.icon}</span>
+          <button key={a.key} onClick={a.run} className="press flex h-[84px] flex-col items-center justify-center gap-2 rounded-card-sm bg-white text-[11.5px] font-medium shadow-halo">
+            <IconTile size="sm" tone={a.tone} icon={a.icon} />
             <span className="max-w-full truncate px-1">{'short' in a ? a.short : a.label}</span>
           </button>
         ))}
@@ -121,7 +121,7 @@ export default function ChantierDetail() {
       </div>
 
       {!done && ch.status !== 'a_planifier' && (
-        <Button variant="primary" size="lg" className="sticky bottom-[calc(96px+var(--safe-b))] z-10 w-full shadow-lift md:hidden" icon={<ClipboardCheck className="h-5 w-5" />} onClick={() => navigate(`/app/pv-reception?chantier=${ch.id}`)}>
+        <Button variant="dawn" size="lg" className="sticky bottom-[calc(96px+var(--safe-b))] z-10 w-full md:hidden" icon={<ClipboardCheck className="h-5 w-5" />} onClick={() => navigate(`/app/pv-reception?chantier=${ch.id}`)}>
           Terminer le chantier et signer le PV
         </Button>
       )}

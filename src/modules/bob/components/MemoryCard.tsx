@@ -18,7 +18,7 @@ export function MemoryCard() {
       <CardHeader title="Ce que Bob a appris" meta={`${memory.length} éléments`} action={<Button size="sm" variant="ghost" icon={<Plus className="h-4 w-4" />} onClick={() => setAdding(true)}>Ajouter</Button>} />
       <div className="flex gap-1.5 overflow-x-auto px-4 pt-3 scrollbar-none">
         {(['all', 'prix', 'habitude', 'formulation'] as const).map((k) => (
-          <button key={k} onClick={() => setFilter(k)} className={`h-8 shrink-0 rounded-full px-3 text-[12.5px] font-medium ${filter === k ? 'bg-ink text-white' : 'bg-sub text-ink-2'}`}>
+          <button key={k} onClick={() => setFilter(k)} className={`h-8 shrink-0 rounded-full px-3 text-[12.5px] font-medium ${filter === k ? 'bg-ink text-white shadow-ink' : 'bg-halo-hover text-ink-2 hover:text-ink'}`}>
             {k === 'all' ? 'Tout' : KIND[k] + 's'}
           </button>
         ))}
@@ -30,7 +30,7 @@ export function MemoryCard() {
           editing === m.id ? (
             <MemoryEditor key={m.id} initial={m} onCancel={() => setEditing(null)} onSave={(p) => { updateMemory(m.id, p); setEditing(null); toast('Mémoire mise à jour.'); }} />
           ) : (
-            <div key={m.id} className="group flex items-start gap-3 border-t border-line px-4 py-3">
+            <div key={m.id} className="group flex items-start gap-3 border-t border-halo-line px-4 py-3">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[13.5px] font-medium">{m.label}</span>
@@ -39,8 +39,8 @@ export function MemoryCard() {
                 <div className="mt-0.5 text-[13px] text-ink-2">{m.value}</div>
                 <div className="mt-0.5 text-[11.5px] text-ink-3">Appris de {m.learnedFrom}</div>
               </div>
-              <button onClick={() => setEditing(m.id)} className="grid h-10 w-10 place-items-center rounded-lg text-ink-3 hover:bg-sub hover:text-ink" aria-label="Modifier"><Pencil className="h-4 w-4" /></button>
-              <button onClick={() => { removeMemory(m.id); toast('Bob a oublié cet élément.', 'info', { label: 'Annuler', run: () => addMemory(m) }); }} className="grid h-10 w-10 place-items-center rounded-lg text-ink-3 hover:bg-bad-bg hover:text-bad" aria-label="Oublier"><Trash2 className="h-4 w-4" /></button>
+              <button onClick={() => setEditing(m.id)} className="grid h-10 w-10 place-items-center rounded-full text-ink-3 hover:bg-halo-hover hover:text-ink" aria-label="Modifier"><Pencil className="h-4 w-4" /></button>
+              <button onClick={() => { removeMemory(m.id); toast('Bob a oublié cet élément.', 'info', { label: 'Annuler', run: () => addMemory(m) }); }} className="grid h-10 w-10 place-items-center rounded-full text-ink-3 hover:bg-bad-bg hover:text-bad" aria-label="Oublier"><Trash2 className="h-4 w-4" /></button>
             </div>
           ),
         )}
@@ -54,7 +54,7 @@ function MemoryEditor({ initial, onSave, onCancel }: { initial?: BobMemory; onSa
   const [label, setLabel] = useState(initial?.label ?? '');
   const [value, setValue] = useState(initial?.value ?? '');
   return (
-    <div className="space-y-2 border-t border-line bg-[#fbfbfd] px-4 py-3">
+    <div className="space-y-2 border-t border-halo-line bg-halo-hover px-4 py-3">
       <div className="grid gap-2 sm:grid-cols-[140px_1fr]">
         <Select value={kind} onChange={(e) => setKind(e.target.value as MemoryKind)}>
           <option value="prix">Prix</option>

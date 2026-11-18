@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { AlertTriangle, Camera, CheckCircle2, ImageOff } from 'lucide-react';
 import { PhotoViewer } from '../common/PhotoViewer';
-import { Button, Card, EmptyState, Segmented, cn, toast } from '@/components/ui';
+import { Button, Card, EmptyState, IconTile, Segmented, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import type { Chantier } from '@/lib/types';
 import { useChantiersLocal, type ChantierPhoto, type Phase } from '../../store';
@@ -10,9 +10,9 @@ import { PhotoArt } from '../common/PhotoArt';
 
 export function PhotoTile({ p, onClick, showChantier }: { p: ChantierPhoto; onClick: () => void; showChantier?: string }) {
   return (
-    <button onClick={onClick} className="group press relative block aspect-[4/3] w-full overflow-hidden rounded-[14px] bg-sub text-left shadow-xs transition-shadow duration-300 hover:shadow-lift">
+    <button onClick={onClick} className="group press relative block aspect-[4/3] w-full overflow-hidden rounded-card-sm bg-halo-track text-left shadow-halo transition-[box-shadow,transform] duration-[450ms] ease-out-quint hover:-translate-y-[3px] hover:shadow-halo-lg">
       <PhotoArt art={p.art} phase={p.phase} seed={p.id} src={p.src} alt={p.caption} className="transition duration-500 ease-out-quint group-hover:scale-[1.05]" />
-      <span className="absolute left-2 top-2 rounded-md bg-white/90 px-1.5 py-0.5 text-[10.5px] font-medium text-ink-2 backdrop-blur">{showChantier ?? p.room}</span>
+      <span className="absolute left-2 top-2 max-w-[calc(100%-16px)] truncate rounded-full bg-white/85 px-2 py-0.5 text-[10.5px] font-medium text-ink-2 shadow-pill backdrop-blur-md">{showChantier ?? p.room}</span>
       <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/65 to-transparent px-2.5 pb-2 pt-6">
         <span className="line-clamp-2 text-[12px] font-medium leading-snug text-white">{p.caption}</span>
       </span>
@@ -44,15 +44,15 @@ export function PhotosPanel({ chantiers, onTake, compact }: { chantiers: Chantie
   return (
     <div className="space-y-4">
       {single && checks.length > 0 && (
-        <Card className={cn('p-4', missing.length && 'border-[#fde3b5] bg-[#fffdf7]')}>
-          <div className="flex items-center gap-2 text-[13.5px] font-semibold">
-            {missing.length ? <AlertTriangle className="h-4 w-4 text-warn" /> : <CheckCircle2 className="h-4 w-4 text-ok" />}
+        <Card className="p-4 md:p-5">
+          <div className="flex items-center gap-3 text-[14.5px] font-semibold tracking-[-0.015em]">
+            {missing.length ? <IconTile size="sm" tone="amber" icon={<AlertTriangle />} /> : <IconTile size="sm" tone="green" icon={<CheckCircle2 />} />}
             {missing.length ? `Contrôle qualité : ${missing.length} photo${missing.length > 1 ? 's' : ''} à prendre` : 'Contrôle qualité : toutes les photos utiles sont là'}
           </div>
           <ul className="mt-2.5 space-y-1.5">
             {checks.map((c) => (
-              <li key={c.tag} className="flex min-h-[40px] items-center gap-2.5 text-[13px]">
-                {c.ok ? <CheckCircle2 className="h-4 w-4 shrink-0 text-ok" /> : <span className="h-4 w-4 shrink-0 rounded-full border-2 border-warn" />}
+              <li key={c.tag} className={cn('flex min-h-[44px] items-center gap-2.5 rounded-[14px] px-3 text-[13px]', !c.ok && 'bg-pale-a/60')}>
+                {c.ok ? <CheckCircle2 className="h-4 w-4 shrink-0 text-ok" /> : <span className="h-4 w-4 shrink-0 rounded-full border-2 border-[#f59e0b]" />}
                 <span className={cn('flex-1', c.ok ? 'text-ink-3 line-through decoration-line2' : 'text-ink')}>{c.ok ? c.message.replace('Il manque la photo', 'Photo').replace('Il manque une photo', 'Photo') : c.message}</span>
                 {!c.ok && onTake && (
                   <Button size="sm" variant="secondary" icon={<Camera className="h-3.5 w-3.5" />} onClick={() => onTake(c.tag)}>
@@ -78,7 +78,7 @@ export function PhotosPanel({ chantiers, onTake, compact }: { chantiers: Chantie
         {rooms.length > 1 && (
           <div className="-mx-1 flex min-w-0 gap-1.5 overflow-x-auto px-1 scrollbar-none sm:ml-2">
             {['toutes', ...rooms].map((r) => (
-              <button key={r} onClick={() => setRoom(r)} className={cn('h-8 shrink-0 rounded-full border px-3 text-[12.5px] transition', room === r ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')}>
+              <button key={r} onClick={() => setRoom(r)} className={cn('h-8 shrink-0 rounded-full border px-3 text-[12.5px] transition', room === r ? 'border-transparent bg-ink text-white shadow-ink' : 'border-transparent bg-white text-ink-2 shadow-halo-sm hover:text-ink')}>
                 {r === 'toutes' ? 'Toutes les pièces' : r}
               </button>
             ))}
@@ -86,7 +86,7 @@ export function PhotosPanel({ chantiers, onTake, compact }: { chantiers: Chantie
         )}
         <div className="flex-1" />
         {onTake && (
-          <Button variant="primary" icon={<Camera className="h-4 w-4" />} onClick={() => onTake()} className="hidden sm:inline-flex">
+          <Button variant="soft" icon={<Camera className="h-4 w-4" />} onClick={() => onTake()} className="hidden sm:inline-flex">
             Ajouter une photo
           </Button>
         )}
@@ -101,8 +101,8 @@ export function PhotosPanel({ chantiers, onTake, compact }: { chantiers: Chantie
           return (
             <section key={ph}>
               <div className="mb-2 flex items-center gap-2">
-                <h3 className="text-[13.5px] font-semibold">{PHASE_LABEL[ph]}</h3>
-                <span className="text-xs text-ink-3">{list.length}</span>
+                <h3 className="text-[15px] font-semibold tracking-[-0.02em]">{PHASE_LABEL[ph]}</h3>
+                <span className="num tone-neutral rounded-full px-2 py-0.5 text-[11px] font-semibold">{list.length}</span>
               </div>
               <div className={cn('stagger-fast grid grid-cols-2 gap-2.5 sm:grid-cols-3', compact ? 'lg:grid-cols-4' : 'lg:grid-cols-4 xl:grid-cols-5')}>
                 {list.map((p) => (

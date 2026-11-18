@@ -24,7 +24,7 @@ export function BobNav() {
           to={i.to}
           end
           className={({ isActive }) =>
-            cn('flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition', isActive ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')
+            cn('flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium transition duration-300 ease-spring', isActive ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:bg-white/70 hover:text-ink')
           }
         >
           <Icon name={i.icon} className="h-3.5 w-3.5" />

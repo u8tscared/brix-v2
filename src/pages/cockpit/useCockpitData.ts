@@ -56,6 +56,16 @@ export function useCockpitData() {
     const prevCurve = cumul(prevMonth, daysInMonth);
 
     const goal = Math.max(30000, Math.ceil((prevPaid * 1.1) / 1000) * 1000);
+    // Meilleur mois de l'année ? On compare aux mois précédents de la même année.
+    const year = month.slice(0, 4);
+    const byMonth = new Map<string, number>();
+    all.filter((p) => p.date.startsWith(year) && !p.date.startsWith(month)).forEach((p) => byMonth.set(p.date.slice(0, 7), (byMonth.get(p.date.slice(0, 7)) ?? 0) + p.amount));
+    const bestOfYear = paidThisMonth > 0 && byMonth.size > 0 && [...byMonth.values()].every((v) => paidThisMonth >= v);
+    // Agenda du jour : les rendez-vous du patron (ou de toute l'équipe s'il n'en a pas).
+    const me = s.employees.find((e) => e.firstName === s.user.firstName && e.lastName === s.user.lastName) ?? s.employees.find((e) => e.role === 'patron');
+    const todayAll = s.events.filter((e) => e.date === today).sort((a, b) => a.start.localeCompare(b.start));
+    const mine = me ? todayAll.filter((e) => e.employeeId === me.id) : [];
+    const agenda = (mine.length ? mine : todayAll).filter((e) => e.kind !== 'absence');
     const habAlerts = s.employees.flatMap((e) => e.habilitations.map((h) => ({ e, h, left: daysBetween(today, h.expires) }))).filter((x) => x.left <= 30).sort((a, b) => a.left - b.left);
 
     return {
@@ -88,11 +98,15 @@ export function useCockpitData() {
       prevCurve,
       goal,
       habAlerts,
+      remaining: Math.max(0, goal - paidThisMonth),
+      bestOfYear,
+      agenda,
+      hotSeen: [...seen].sort((a, b) => (b.d.views ?? 0) - (a.d.views ?? 0))[0],
       activeChantiers: s.chantiers.filter((c) => c.status === 'en_cours' || c.status === 'a_planifier'),
       todayEvents: s.events.filter((e) => e.date === today),
       newLeads: s.leads.filter((l) => l.status === 'nouveau').sort((a, b) => (b.score ?? 0) - (a.score ?? 0)),
     };
-  }, [payments, s.factures, s.devis, s.chantiers, s.events, s.employees, s.leads, s.cashBalance]);
+  }, [payments, s.factures, s.devis, s.chantiers, s.events, s.employees, s.leads, s.cashBalance, s.user]);
 }
 
 export type CockpitData = ReturnType<typeof useCockpitData>;

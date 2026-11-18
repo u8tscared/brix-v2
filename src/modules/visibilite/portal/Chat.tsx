@@ -38,8 +38,8 @@ export function Chat({ proName, proInitials }: { proName: string; proInitials: s
       <div className="space-y-2.5">
         {messages.slice(-6).map((m) => (
           <div key={m.id} className={cn('flex items-end gap-2', m.from === 'client' && 'flex-row-reverse')}>
-            {m.from === 'pro' && <Avatar initials={proInitials} color="#1F389D" size={28} />}
-            <div className={cn('max-w-[80%] rounded-[18px] px-3.5 py-2.5', m.from === 'pro' ? 'rounded-bl-md bg-sub' : 'rounded-br-md bg-brand text-white')}>
+            {m.from === 'pro' && <Avatar initials={proInitials} color="#f1eafe" size={28} />}
+            <div className={cn('max-w-[80%] rounded-[18px] px-3.5 py-2.5', m.from === 'pro' ? 'rounded-bl-[6px] bg-halo-track' : 'rounded-br-[6px] bg-ink text-white')}>
               <p className="text-[14px] leading-snug">{m.text}</p>
               <div className={cn('mt-1 text-[11px]', m.from === 'pro' ? 'text-ink-3' : 'text-white/70')}>{m.from === 'pro' ? `${proName} · ` : ''}{fmt(m.at)}</div>
             </div>
@@ -47,15 +47,15 @@ export function Chat({ proName, proInitials }: { proName: string; proInitials: s
         ))}
         {typing && (
           <div className="flex items-end gap-2">
-            <Avatar initials={proInitials} color="#1F389D" size={28} />
-            <div className="flex gap-1 rounded-[18px] rounded-bl-md bg-sub px-4 py-3.5">{[0, 1, 2].map((i) => <i key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-3" style={{ animationDelay: `${i * 0.15}s` }} />)}</div>
+            <Avatar initials={proInitials} color="#f1eafe" size={28} />
+            <div className="flex gap-1 rounded-[18px] rounded-bl-[6px] bg-halo-track px-4 py-3.5">{[0, 1, 2].map((i) => <i key={i} className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-3" style={{ animationDelay: `${i * 0.15}s` }} />)}</div>
           </div>
         )}
         <div ref={end} />
       </div>
       <div className="mt-3 flex items-center gap-2">
-        <input value={text} onChange={(e) => setText(e.target.value)} placeholder={`Écrire à ${proName}…`} className="h-12 min-w-0 flex-1 rounded-full border border-line2 bg-white px-4 text-[15px] placeholder:text-ink-3 focus:border-vi-300 focus:outline-none focus:ring-4 focus:ring-vi-100" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }} />
-        <button onClick={send} disabled={!text.trim()} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-white transition disabled:opacity-30" aria-label="Envoyer"><ArrowUp className="h-5 w-5" /></button>
+        <input value={text} onChange={(e) => setText(e.target.value)} placeholder={`Écrire à ${proName}…`} className="h-12 min-w-0 flex-1 rounded-full bg-white px-4 text-[15px] shadow-[inset_0_0_0_1px_#ece8f6] transition-shadow placeholder:text-ink-3 focus:shadow-focus focus:outline-none" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }} />
+        <button onClick={send} disabled={!text.trim()} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-white shadow-ink transition-[opacity,transform] duration-300 ease-spring active:scale-90 disabled:opacity-30" aria-label="Envoyer"><ArrowUp className="h-5 w-5" /></button>
       </div>
     </div>
   );
@@ -68,7 +68,7 @@ export function Review({ proName }: { proName: string }) {
   if (review) {
     return (
       <div className="text-center">
-        <div className="flex justify-center gap-1">{[1, 2, 3, 4, 5].map((i) => <Star key={i} className={cn('h-6 w-6', i <= review.rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-line2')} />)}</div>
+        <div className="flex justify-center gap-1">{[1, 2, 3, 4, 5].map((i) => <Star key={i} className={cn('h-6 w-6', i <= review.rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-[#ddd6ee]')} />)}</div>
         <p className="mt-2 text-[14px] text-ink-2">Merci pour votre avis ! {review.rating >= 4 ? 'Il sera aussi proposé sur Google en un clic.' : `${proName} vous recontacte rapidement.`}</p>
       </div>
     );
@@ -78,7 +78,7 @@ export function Review({ proName }: { proName: string }) {
       <div className="flex justify-center gap-1.5">
         {[1, 2, 3, 4, 5].map((i) => (
           <button key={i} onClick={() => setRating(i)} className="grid h-12 w-12 place-items-center rounded-full transition active:scale-90" aria-label={`${i} étoile${i > 1 ? 's' : ''}`}>
-            <Star className={cn('h-8 w-8 transition', i <= rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-line2')} strokeWidth={1.5} />
+            <Star className={cn('h-8 w-8 transition', i <= rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-[#ddd6ee]')} strokeWidth={1.5} />
           </button>
         ))}
       </div>

@@ -11,7 +11,7 @@ import { printDoc } from '@/modules/devis/components/doc/print';
 import { SavedPill } from '@/modules/devis/components/TopBar';
 import { DocViewer } from '@/modules/devis/components/viewer/DocViewer';
 import { flashField } from '@/modules/devis/focus';
-import { EDot, KindBadge, StatusBadge } from './components/bits';
+import { EDot, KindBadge, KindTile, StatusBadge } from './components/bits';
 import { CreateFromDevisSheet } from './components/CreateFromDevisSheet';
 import { EInvoicePanel } from './components/EInvoicePanel';
 import { DetailTotals, ScaledInvoice } from './components/DetailParts';
@@ -184,8 +184,8 @@ function Detail({ f }: { f: Facture }) {
   const editor = (
     <div className="space-y-5">
       <div>
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          <KindBadge kind={f.kind} />
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <KindBadge kind={f.kind} className="h-[26px] px-2.5 text-[12.5px]" />
           {devis && (
             <Link to={`/app/devis/${devis.id}`} className="text-[12.5px] text-ink-2 hover:text-ink hover:underline">
               Devis <span className="font-mono">{devis.number}</span>
@@ -210,14 +210,14 @@ function Detail({ f }: { f: Facture }) {
             onChange={(e) => update({ title: e.target.value.replace(/\n/g, ' ') })}
             placeholder="Objet de la facture"
             aria-label="Objet de la facture"
-            className="-ml-1.5 block w-[calc(100%+12px)] resize-none overflow-hidden rounded-[10px] bg-transparent px-1.5 py-0.5 text-[24px] font-semibold leading-tight tracking-[-0.035em] transition placeholder:text-ink-3 hover:bg-white/60 focus:bg-white focus:outline-none md:text-[28px]"
+            className="-ml-1.5 block w-[calc(100%+12px)] resize-none overflow-hidden rounded-field bg-transparent px-1.5 py-0.5 text-[28px] font-semibold leading-[1.08] tracking-[-0.042em] transition placeholder:text-halo-mute hover:bg-white/60 focus:bg-white focus:shadow-focus focus:outline-none md:text-[34px]"
           />
         ) : (
-          <h1 className="text-[24px] font-semibold tracking-[-0.035em] md:text-[28px]">{f.title || f.number}</h1>
+          <h1 className="text-[28px] font-semibold leading-[1.08] tracking-[-0.042em] md:text-[34px]">{f.title || f.number}</h1>
         )}
       </div>
       <MetaForm f={f} extra={extra} readOnly={!draft} onChange={update} onExtra={(p) => fx.setExtra(f.id, p)} />
-      <div data-field="lines" className="rounded-[16px] bg-white p-3 shadow-card md:p-4">
+      <div data-field="lines" className="rounded-card bg-white p-3 shadow-halo md:p-4">
         <LineEditor lines={f.lines} readOnly={!draft} defaultVat={s.company.defaultVat || 10} onChange={(lines) => update({ lines })} negativeNote={f.kind === 'situation' || f.kind === 'solde' ? 'Les lignes en violet sont des déductions (acomptes ou situations déjà facturés).' : undefined} />
       </div>
       <DetailTotals f={f} />
@@ -226,11 +226,12 @@ function Detail({ f }: { f: Facture }) {
 
   return (
     <div className="min-h-full">
-      <header className="sticky top-14 z-20 flex h-14 items-center gap-2 border-b border-line bg-white/90 px-3 backdrop-blur-xl md:top-0 md:h-[60px] md:px-6">
+      <header className="glass sticky top-[60px] z-20 mx-1 mt-1 flex h-14 items-center gap-2 rounded-full px-2 md:top-3 md:mx-4 md:mt-2 md:h-[60px] md:px-2.5">
         <Button variant="ghost" size="icon" aria-label="Retour aux factures" onClick={() => navigate('/app/factures')}>
           <ArrowLeft className="h-[18px] w-[18px]" />
         </Button>
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <span className="hidden sm:inline-flex"><KindTile kind={f.kind} size="sm" /></span>
           <span className="truncate font-mono text-[13.5px] font-semibold">{f.number}</span>
           <span className="hidden sm:inline-flex">
             <StatusBadge status={st} />
@@ -262,7 +263,7 @@ function Detail({ f }: { f: Facture }) {
           <div className="min-w-0 px-8 py-7">
             <div className="mx-auto max-w-[860px] animate-[fade-up_.45s_var(--ease)_both]">{editor}</div>
           </div>
-          <aside className="sticky top-[60px] h-[calc(100dvh-60px)] overflow-y-auto border-l border-line bg-[#f4f3f8] p-5">
+          <aside className="scrollbar-thin sticky top-[76px] h-[calc(100dvh-76px)] overflow-y-auto px-5 pb-8 pt-7">
             <Segmented value={side} onChange={setSide} className="mb-4 w-full [&>button]:flex-1 [&>button]:justify-center" options={[{ value: 'apercu', label: 'Aperçu' }, { value: 'paiement', label: 'Paiement' }, { value: 'efacture', label: 'E-facture' }]} />
             <div key={side} className="animate-[fade-up_.35s_var(--ease)_both]">
               {sidePanels[side]}

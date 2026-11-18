@@ -22,9 +22,9 @@ export function NewFactureSheet({ open, onClose, signedCount, onFromDevis, onBla
             key={o.key}
             disabled={o.disabled}
             onClick={o.run}
-            className="group flex w-full items-start gap-3.5 rounded-[14px] bg-white p-4 text-left shadow-card transition duration-200 hover:-translate-y-px hover:shadow-raise disabled:pointer-events-none disabled:opacity-55"
+            className="row-card group w-full !items-start p-4 text-left disabled:pointer-events-none disabled:opacity-55"
           >
-            <IconTile icon={o.icon} dept="facturer" />
+            <IconTile icon={o.icon} tone={o.key === 'devis' ? 'violet' : 'mag'} />
             <div className="min-w-0 flex-1">
               <div className="text-[14.5px] font-semibold tracking-[-0.01em]">{o.title}</div>
               <div className="mt-0.5 text-[12.5px] leading-relaxed text-ink-2">{o.text}</div>

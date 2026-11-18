@@ -28,12 +28,12 @@ export default function EtapeEnvoi({ fournisseurs, conseilles, envoi, onChange }
           <span className="text-[12px] text-ink-3">3 réponses suffisent pour bien comparer</span>
         </div>
         {fournisseurs.length === 0 ? (
-          <p className="rounded-[14px] border border-dashed border-line2 px-4 py-5 text-center text-[13px] text-ink-2">Ajoutez d'abord vos fournisseurs dans « Mes fournisseurs ».</p>
+          <p className="rounded-field border border-dashed border-[#e3ddf0] px-4 py-5 text-center text-[13px] text-ink-2">Ajoutez d'abord vos fournisseurs dans « Mes fournisseurs ».</p>
         ) : (
-          <ul className="overflow-hidden rounded-[14px] border border-line">
+          <ul className="overflow-hidden rounded-field border border-halo-line">
             {ordre.map((f) => (
-              <li key={f.id} className="border-b border-line last:border-b-0">
-                <button type="button" onClick={() => basculer(f.id)} aria-pressed={choisi(f.id)} className={cn('flex min-h-[60px] w-full items-center gap-3 px-3.5 py-2.5 text-left transition hover:bg-[#fafafc]', choisi(f.id) && 'bg-[#fbfaff]')}>
+              <li key={f.id} className="border-b border-halo-line last:border-b-0">
+                <button type="button" onClick={() => basculer(f.id)} aria-pressed={choisi(f.id)} className={cn('flex min-h-[60px] w-full items-center gap-3 px-3.5 py-2.5 text-left transition hover:bg-halo-hover', choisi(f.id) && 'bg-[#fbfaff]')}>
                   <Coche on={choisi(f.id)} />
                   <FournisseurPastille f={f} size={34} />
                   <span className="min-w-0 flex-1">

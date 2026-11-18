@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronRight, Contact, Download, Phone, Plus, Search } from 'lucide-react';
-import { Avatar, Button, Card, EmptyState, IconTile, Input, PageHeader, Segmented } from '@/components/ui';
+import { Avatar, Badge, Button, EmptyState, IconTile, Input, PageHeader, Segmented, type Tone } from '@/components/ui';
 import { GrowBar } from '@/components/motion';
 import { initials, money, relative } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { ClientFormSheet } from './components/ClientFormSheet';
 import { ImportSheet } from './components/ImportSheet';
-import { clientColor, clientStats, telHref } from './lib';
+import { clientColor, clientInk, clientStats, telHref } from './lib';
 
 type Kind = 'tous' | 'particulier' | 'pro';
 type Sort = 'recent' | 'ca' | 'nom';
@@ -41,7 +41,7 @@ export default function Clients() {
       <PageHeader
         icon={<IconTile name="Contact" dept="vendre" size="lg" />}
         title="Clients"
-        subtitle={`${s.clients.length} clients, dont ${pros} professionnels`}
+        titleMuted={`${s.clients.length} clients, dont ${pros} pros.`}
         actions={
           <>
             <Button icon={<Download className="h-4 w-4" />} onClick={() => setImporting(true)}>Importer</Button>
@@ -62,68 +62,61 @@ export default function Clients() {
       ) : rows.length === 0 ? (
         <EmptyState icon={<Search />} title="Personne ne correspond" text="Essayez avec un autre nom ou une ville." />
       ) : (
-        <Card className="overflow-hidden">
-          <div className="hidden h-10 items-center gap-4 border-b border-line px-5 text-[12px] font-medium text-ink-3 md:flex">
+        <div>
+          <div className="hidden h-9 items-center gap-4 px-5 text-[12.5px] font-medium text-ink-3 md:flex">
+            <span className="w-10" />
             <span className="flex-1">Client</span>
             <span className="w-48 lg:w-56">En ce moment</span>
             <span className="w-32">Valeur client HT</span>
             <span className="hidden w-24 text-right lg:block">Dernier contact</span>
             <span className="w-14" />
           </div>
-          <div className="stagger-fast">
+          <div className="stagger-fast space-y-2">
             {rows.map(({ c, st }) => {
               const open = st.devis.filter((d) => ['envoye', 'vu'].includes(d.status)).length;
               const live = st.chantiers.filter((x) => x.status === 'en_cours').length;
               const flags = [
-                st.late.length > 0 && { t: `${st.late.length} facture${st.late.length > 1 ? 's' : ''} en retard`, c: '#dc2626' },
-                live > 0 && { t: 'Chantier en cours', c: '#ea580c' },
-                open > 0 && { t: `${open} devis en attente`, c: '#7c3aed' },
-              ].filter(Boolean) as { t: string; c: string }[];
+                st.late.length > 0 && { t: `${st.late.length} facture${st.late.length > 1 ? 's' : ''} en retard`, tone: 'bad' },
+                live > 0 && { t: 'Chantier en cours', tone: 'peach' },
+                open > 0 && { t: `${open} devis en attente`, tone: 'violet' },
+              ].filter(Boolean) as { t: string; tone: Tone }[];
+              const go = () => navigate(`/app/clients/${c.id}`);
               return (
-                <div key={c.id} onClick={() => navigate(`/app/clients/${c.id}`)} className="group flex min-h-[68px] cursor-pointer items-center gap-3.5 border-b border-line px-4 py-3 transition-colors duration-150 last:border-b-0 hover:bg-[#faf9fd] md:gap-4 md:px-5">
-                  <Avatar initials={initials(c.name)} color={clientColor(c.id)} size={40} className="transition-transform duration-300 ease-spring group-hover:scale-105" />
+                <div key={c.id} role="link" tabIndex={0} onClick={go} onKeyDown={(e) => e.key === 'Enter' && go()} className="row-card group min-h-[72px] cursor-pointer md:gap-4 md:px-5">
+                  <Avatar initials={initials(c.name)} color={clientColor(c.id)} fg={clientInk(c.id)} size={42} className="transition-transform duration-300 ease-spring group-hover:scale-105" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="truncate text-[14.5px] font-semibold tracking-[-0.01em]">{c.name}</span>
-                      {c.kind === 'pro' && <span className="rounded-[5px] bg-sub px-1.5 py-px text-[10.5px] font-semibold uppercase tracking-wide text-ink-2">Pro</span>}
+                      <span className="truncate text-[14.5px] font-semibold tracking-[-0.015em]">{c.name}</span>
+                      {c.kind === 'pro' && <Badge tone="blue">Pro</Badge>}
                     </div>
                     <div className="truncate text-[12.5px] text-ink-3">{[c.contact, c.city].filter(Boolean).join(' · ')}</div>
                     {flags.length > 0 && (
-                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 md:hidden">
-                        {flags.map((f) => <Flag key={f.t} {...f} />)}
+                      <div className="mt-1.5 flex flex-wrap gap-1 md:hidden">
+                        {flags.map((f) => <Badge key={f.t} tone={f.tone} dot>{f.t}</Badge>)}
                       </div>
                     )}
                   </div>
-                  <div className="hidden w-48 flex-col gap-1 md:flex lg:w-56">
-                    {flags.length ? flags.map((f) => <Flag key={f.t} {...f} />) : <span className="text-[12.5px] text-ink-3">Rien en cours</span>}
+                  <div className="hidden w-48 flex-wrap gap-1 md:flex lg:w-56">
+                    {flags.length ? flags.map((f) => <Badge key={f.t} tone={f.tone} dot>{f.t}</Badge>) : <span className="text-[12.5px] text-ink-3">Rien en cours</span>}
                   </div>
                   <div className="hidden w-32 md:block">
-                    <div className="num text-[13.5px] font-semibold">{st.caHt ? money(st.caHt, true) : <span className="font-normal text-ink-3">Pas encore</span>}</div>
-                    {st.caHt > 0 && <GrowBar value={(st.caHt / maxCa) * 100} className="mt-1.5 h-1 w-24" barClassName="bg-vi-500" />}
+                    <div className="num text-[14px] font-semibold">{st.caHt ? money(st.caHt, true) : <span className="font-normal text-ink-3">Pas encore</span>}</div>
+                    {st.caHt > 0 && <GrowBar value={(st.caHt / maxCa) * 100} className="mt-1.5 w-24" barClassName="bg-[#a78bfa]" />}
                   </div>
                   <div className="hidden w-24 text-right text-[12.5px] text-ink-2 lg:block">{relative(st.lastActivity ?? c.createdAt)}</div>
-                  <a href={telHref(c.phone)} onClick={(e) => e.stopPropagation()} aria-label={`Appeler ${c.name}`} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink-2 transition hover:bg-vi-50 hover:text-vi-700 md:h-9 md:w-9">
-                    <Phone className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                  <a href={telHref(c.phone)} onClick={(e) => e.stopPropagation()} aria-label={`Appeler ${c.name}`} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-pale-v text-deep-v transition-transform duration-300 ease-spring hover:scale-105 active:scale-95 md:h-9 md:w-9">
+                    <Phone className="h-[17px] w-[17px]" strokeWidth={1.9} />
                   </a>
                   <ChevronRight className="hidden h-4 w-4 text-ink-3 transition group-hover:translate-x-0.5 md:block" />
                 </div>
               );
             })}
           </div>
-        </Card>
+        </div>
       )}
 
       <ClientFormSheet open={creating} onClose={() => setCreating(false)} onSaved={(c) => navigate(`/app/clients/${c.id}`)} />
       <ImportSheet open={importing} onClose={() => setImporting(false)} />
     </div>
-  );
-}
-
-function Flag({ t, c }: { t: string; c: string }) {
-  return (
-    <span className="flex items-center gap-1.5 text-[12px] text-ink-2">
-      <i className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: c }} />
-      {t}
-    </span>
   );
 }

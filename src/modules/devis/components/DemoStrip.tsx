@@ -3,7 +3,7 @@ import { lienPublic } from '@/parcours/liens';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BadgeCheck, Eye, FileText, PenLine } from 'lucide-react';
-import { Button, cn } from '@/components/ui';
+import { Button, IconTile, cn } from '@/components/ui';
 import { dateShort, money, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Devis } from '@/lib/types';
@@ -23,8 +23,8 @@ export function DemoStrip({ d, onOpen, onSign, onConvert, className }: { d: Devi
 
   if (d.status === 'signe')
     return (
-      <div className={cn('flex flex-col gap-2 rounded-xl border border-[#c9f0d6] bg-ok-bg px-4 py-3 sm:flex-row sm:items-center', className)}>
-        <BadgeCheck className="hidden h-5 w-5 shrink-0 text-ok sm:block" />
+      <div className={cn('flex flex-col gap-3 rounded-card-sm bg-pale-g/80 px-4 py-3 sm:flex-row sm:items-center', className)}>
+        <IconTile icon={<BadgeCheck />} tone="green" size="sm" className="hidden bg-white sm:inline-grid" />
         <div className="min-w-0 flex-1 text-[13px] text-ink">
           <b className="font-semibold">Signé{d.signedAt ? ` le ${dateShort(d.signedAt.slice(0, 10))}` : ''}</b> ·{' '}
           {acompte ? `acompte ${acompte.number} de ${money(totals(acompte.lines).ttc)} ${acompte.status === 'payee' ? 'réglé' : 'demandé'}.` : 'vous pouvez facturer.'}
@@ -45,9 +45,9 @@ export function DemoStrip({ d, onOpen, onSign, onConvert, className }: { d: Devi
   if (d.status === 'refuse' || d.status === 'expire') return null;
 
   return (
-    <div className={cn('flex flex-col gap-2.5 rounded-xl border border-dashed border-vi-200 bg-vi-50/50 px-4 py-3 md:flex-row md:items-center', className)}>
+    <div className={cn('flex flex-col gap-3 rounded-card-sm bg-white/55 px-4 py-3 shadow-[inset_0_0_0_1.5px_#e6dcfb] md:flex-row md:items-center', className)}>
       <div className="min-w-0 flex-1 text-[13px] text-ink-2">
-        <span className="mr-1.5 rounded bg-white px-1.5 py-0.5 text-[10.5px] font-semibold uppercase tracking-[.05em] text-vi-700">Démo</span>
+        <span className="mr-1.5 inline-flex h-[20px] items-center rounded-full bg-pale-v px-2 text-[11px] font-semibold text-deep-v">Démo</span>
         {d.status === 'vu' ? `Ouvert ${d.views ?? 1} fois, dernière fois ${ago(d.viewedAt)}. En attente de signature.` : `Envoyé ${ago(d.sentAt)}. Le client ne l’a pas encore ouvert.`}
       </div>
       <div className="grid grid-cols-2 gap-2 md:flex">

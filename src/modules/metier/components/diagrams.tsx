@@ -142,7 +142,7 @@ export function SplitBar({ parts }: { parts: { label: string; value: number; col
   const total = parts.reduce((x, p) => x + p.value, 0) || 1;
   return (
     <div>
-      <div className="flex h-3 overflow-hidden rounded-full bg-[#eeecf4]">
+      <div className="flex h-3 overflow-hidden rounded-full bg-halo-track">
         {parts.map((p) => <div key={p.label} className="h-full transition-[width] duration-700 ease-out-quint first:rounded-l-full last:rounded-r-full" style={{ width: `${(p.value / total) * 100}%`, background: p.color }} />)}
       </div>
       <div className="mt-2.5 grid grid-cols-3 gap-2">

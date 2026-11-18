@@ -64,20 +64,20 @@ export default function DemandeDetail() {
 
   return (
     <div className="bx-stagger space-y-5">
-      <Link to="/app/fournisseurs/demandes" className="-ml-1 inline-flex h-10 items-center gap-1.5 rounded-lg px-1 md:h-9 text-[13px] font-medium text-ink-2 hover:text-ink">
-        <ArrowLeft className="h-4 w-4" /> Demandes de prix
+      <Link to="/app/fournisseurs/demandes" className="group -ml-1 inline-flex h-10 items-center gap-1.5 rounded-pill px-3 text-[13px] font-medium text-ink-2 transition-[background,color,box-shadow] duration-300 hover:bg-white hover:text-ink hover:shadow-pill md:h-9">
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" /> Demandes de prix
       </Link>
 
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">
-          <span className="bx-mono">{d.numero}</span>
+          <span className="font-mono text-[12.5px] text-ink-2">{d.numero}</span>
           <BadgeDemande s={d.statut} />
         </div>
-        <h1 className="text-[24px] font-semibold leading-[1.15] tracking-[-0.03em] md:text-[30px]">{d.titre}</h1>
-        <div className="grid grid-cols-1 gap-3 rounded-[14px] border border-line bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Info icon={<FileText />} label="Devis">
+        <h1 className="title-halo text-ink">{d.titre}</h1>
+        <Card className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 xl:grid-cols-4">
+          <Info icon={<FileText />} label="Devis" ton="violet">
             {lie ? (
-              <Link to={`/app/devis/${lie.id}`} className="font-medium text-brand hover:underline">
+              <Link to={`/app/devis/${lie.id}`} className="font-medium text-deep-v hover:underline">
                 {lie.number}
               </Link>
             ) : (
@@ -85,10 +85,10 @@ export default function DemandeDetail() {
             )}
             <span className="text-ink-3"> · {pluriel(d.lignes.length, 'article')}</span>
           </Info>
-          <Info icon={<CalendarClock />} label="Réponses attendues">{d.dateLimite ? echeance(d.dateLimite) : 'Pas de date'}</Info>
-          <Info icon={<Truck />} label="Livraison souhaitée">{d.livraisonSouhaitee ? dateLong(d.livraisonSouhaitee) : 'Dès que possible'}</Info>
-          <Info icon={<MapPin />} label="Adresse">{d.adresse ?? 'Retrait en agence'}</Info>
-        </div>
+          <Info icon={<CalendarClock />} label="Réponses attendues" ton="mag">{d.dateLimite ? echeance(d.dateLimite) : 'Pas de date'}</Info>
+          <Info icon={<Truck />} label="Livraison souhaitée" ton="peche">{d.livraisonSouhaitee ? dateLong(d.livraisonSouhaitee) : 'Dès que possible'}</Info>
+          <Info icon={<MapPin />} label="Adresse" ton="bleu">{d.adresse ?? 'Retrait en agence'}</Info>
+        </Card>
       </header>
 
       {d.statut === 'annulee' && (
@@ -118,7 +118,7 @@ export default function DemandeDetail() {
             </Card>
           )}
           {active && (
-            <button type="button" onClick={() => setAnnuler(true)} className="flex h-11 w-full items-center justify-center rounded-[12px] text-[13px] font-medium text-ink-3 transition hover:bg-bad-bg hover:text-bad">
+            <button type="button" onClick={() => setAnnuler(true)} className="flex h-11 w-full items-center justify-center rounded-pill text-[13px] font-medium text-ink-3 transition hover:bg-pale-r hover:text-deep-r">
               Annuler la demande
             </button>
           )}

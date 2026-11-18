@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, AudioLines, Play, ShieldCheck, Timer } from 'lucide-react';
 import { BrandLogo } from '@/components/brand/Logo';
-import { Button, Icon, cn } from '@/components/ui';
+import { Button, Card, cn, HALO_TONE, Icon, IconTile } from '@/components/ui';
+import { HaloBackdrop } from '@/components/layout/HaloBackdrop';
+import { TRADE_TONE } from '@/pages/onboarding/icons';
 import { TRADES } from '@/lib/catalog';
 import type { TradeKey } from '@/lib/types';
 import { packFor } from '@/lib/demoTrades';
@@ -22,30 +24,26 @@ export default function Welcome() {
   const demo = demoCompany(trade);
 
   return (
-    <div className="relative flex min-h-dvh flex-col overflow-x-hidden bg-page">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[560px] overflow-hidden" aria-hidden>
-        <div className="absolute -left-40 -top-40 h-[520px] w-[520px] animate-aurora rounded-full bg-[#c4b5fd] opacity-40 blur-[120px]" />
-        <div className="absolute -right-32 top-10 h-[420px] w-[420px] animate-aurora rounded-full bg-[#f0abfc] opacity-35 blur-[120px] [animation-delay:-5s]" />
-        <div className="absolute left-1/3 top-64 h-[320px] w-[520px] animate-aurora rounded-full bg-[#fdba74] opacity-30 blur-[130px] [animation-delay:-9s]" />
-      </div>
+    <div className="relative isolate flex min-h-dvh flex-col overflow-x-hidden">
+      <HaloBackdrop />
 
       <header className="relative z-10 flex items-center justify-between px-5 pt-[calc(20px+var(--safe-t))] md:px-10">
         <BrandLogo size={30} />
         {onboarded ? (
-          <button onClick={() => navigate('/app')} className="flex min-h-[44px] items-center gap-1 text-[13px] font-medium text-ink-2 transition hover:text-ink">
+          <button onClick={() => navigate('/app')} className="glass flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-[13px] font-medium text-ink-2 transition hover:text-ink">
             Retour à {company || 'mon Brix'} <ArrowRight className="h-3.5 w-3.5" />
           </button>
         ) : null}
       </header>
 
       <main className="relative z-10 mx-auto flex w-full max-w-[880px] flex-1 flex-col justify-center px-5 py-10 text-center md:py-10">
-        <div className="mx-auto mb-6 inline-flex animate-[fade-up_.5s_var(--ease)_both] items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[12.5px] font-medium text-ink-2 shadow-card backdrop-blur">
-          <span className="h-1.5 w-1.5 rounded-full bg-ok" /> Facture électronique 2026-2027 incluse, même en gratuit
+        <div className="mx-auto mb-6 inline-flex animate-[fade-up_.5s_var(--ease)_both] items-center gap-2 rounded-full glass px-3.5 py-1.5 text-[12.5px] font-medium text-ink-2">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ok" /> Facture électronique 2026-2027 incluse, même en gratuit
         </div>
-        <h1 className="animate-[fade-up_.6s_var(--ease)_.05s_both] text-[38px] font-semibold leading-[1.04] tracking-[-0.04em] md:text-[60px]">
+        <h1 className="animate-[fade-up_.6s_var(--ease)_.05s_both] text-[40px] font-semibold leading-[1.02] tracking-[-0.05em] md:text-[68px]">
           Votre entreprise,
           <br />
-          <span className="dawn-text md:whitespace-nowrap">réglée comme une horloge.</span>
+          <span className="text-halo-mute md:whitespace-nowrap">réglée comme une <span className="dawn-text">horloge.</span></span>
         </h1>
         <p className="mx-auto mt-5 max-w-[520px] animate-[fade-up_.6s_var(--ease)_.12s_both] text-[16px] leading-relaxed text-ink-2 md:text-[17px]">
           Devis à la voix, factures payées plus vite, chantiers, planning, équipe et paie. Brix s’adapte à votre métier et à votre taille.
@@ -58,10 +56,10 @@ export default function Welcome() {
         </div>
 
         {/* Démo par métier */}
-        <section className="mx-auto mt-10 w-full max-w-[720px] animate-[fade-up_.6s_var(--ease)_.26s_both] rounded-[22px] bg-white p-4 text-left shadow-raise md:p-5" aria-label="Essayer la démo">
+        <Card className="mx-auto mt-10 w-full max-w-[720px] animate-[fade-up_.6s_var(--ease)_.26s_both] p-4 text-left md:p-5" aria-label="Essayer la démo" role="region">
           <div className="flex items-baseline justify-between gap-3 px-1">
             <h2 className="text-[16px] font-semibold tracking-[-0.02em]">Essayer la démo de votre métier</h2>
-            <span className="hidden text-[12px] text-ink-3 sm:block">Sans inscription</span>
+            <span className="chip tone-green hidden h-6 text-[11.5px] sm:inline-flex">Sans inscription</span>
           </div>
           <div className="stagger-fast mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4">
             {TRADES.map((t) => {
@@ -72,11 +70,11 @@ export default function Welcome() {
                   onClick={() => setTrade(t.key)}
                   aria-pressed={on}
                   className={cn(
-                    'flex min-h-[48px] items-center gap-2.5 rounded-[12px] px-2.5 text-left text-[13px] font-medium transition duration-200 active:scale-[.98]',
-                    on ? 'bg-ink text-white shadow-ink' : 'bg-sub text-ink-2 hover:bg-line hover:text-ink',
+                    'flex min-h-[48px] items-center gap-2.5 rounded-pill py-1 pl-1 pr-3 text-left text-[13px] font-medium transition duration-300 ease-spring active:scale-[.97]',
+                    on ? 'bg-ink text-white shadow-ink' : 'bg-white text-ink-2 shadow-halo-sm hover:-translate-y-px hover:text-ink',
                   )}
                 >
-                  <span className={cn('grid h-7 w-7 shrink-0 place-items-center rounded-[8px] transition-colors', on ? 'bg-white/15 text-white' : 'bg-white text-ink-2')}>
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors" style={on ? { background: 'rgba(255,255,255,.14)', color: '#fff' } : { background: HALO_TONE[TRADE_TONE[t.key]].bg, color: HALO_TONE[TRADE_TONE[t.key]].fg }}>
                     <Icon name={t.icon} className="h-4 w-4" />
                   </span>
                   <span className="min-w-0 leading-tight">{t.key === 'cuisiniste' ? 'Cuisine et bain' : t.key === 'renovation' ? 'Rénovation' : t.name.replace('-chauffagiste', '')}</span>
@@ -84,7 +82,7 @@ export default function Welcome() {
               );
             })}
           </div>
-          <div className="mt-4 flex flex-col gap-3 border-t border-line pt-4 sm:flex-row sm:items-center">
+          <div className="mt-4 flex flex-col gap-3 border-t border-halo-line pt-4 sm:flex-row sm:items-center">
             <p key={trade} className="min-w-0 flex-1 animate-fade-in px-1 text-[13px] leading-snug text-ink-2">
               Vous entrez chez <b className="font-semibold text-ink">{demo.name}</b> : ses devis, ses chantiers, son équipe, et Bob qui parle votre métier.
             </p>
@@ -92,16 +90,16 @@ export default function Welcome() {
               Essayer la démo
             </Button>
           </div>
-        </section>
+        </Card>
 
         <div className="mx-auto mt-6 grid w-full max-w-[600px] animate-[fade-up_.6s_var(--ease)_.34s_both] grid-cols-3 gap-2 text-left sm:gap-3">
           {[
-            { I: Timer, t: '3 minutes', s: 'pour un Brix sur mesure' },
-            { I: AudioLines, t: 'Bob', s: 'l’assistant qui travaille la nuit' },
-            { I: ShieldCheck, t: 'Sans engagement', s: 'vous partez quand vous voulez' },
-          ].map(({ I, t, s }) => (
-            <div key={t} className="rounded-[16px] bg-white/70 p-3 shadow-card backdrop-blur">
-              <I className="mb-2 h-4 w-4 text-vi-700" strokeWidth={1.75} />
+            { I: Timer, t: '3 minutes', s: 'pour un Brix sur mesure', tone: 'violet' as const },
+            { I: AudioLines, t: 'Bob', s: 'l’assistant qui travaille la nuit', tone: 'mag' as const },
+            { I: ShieldCheck, t: 'Sans engagement', s: 'vous partez quand vous voulez', tone: 'green' as const },
+          ].map(({ I, t, s, tone }) => (
+            <div key={t} className="glass rounded-card-sm p-3">
+              <IconTile size="sm" tone={tone} className="mb-2.5" icon={<I strokeWidth={1.9} />} />
               <div className="text-[13px] font-semibold">{t}</div>
               <div className="text-[12px] leading-snug text-ink-2">{s}</div>
             </div>

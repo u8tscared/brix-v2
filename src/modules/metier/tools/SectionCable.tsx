@@ -68,10 +68,10 @@ export default function SectionCable() {
       <ResultRow label="Section pour la chute de tension" value={`${fmtS(r.sDrop)} mm²`} />
       <ResultRow label="Câble conseillé" value={`R2V ${conductors}${fmtS(r.section)}`} strong />
       {r.section > r.sThermal && <div className="mt-2"><Note tone="warn">C’est la longueur qui impose la section : sans elle, {fmtS(r.sThermal)} mm² suffirait.</Note></div>}
-      <div className="my-3 overflow-hidden rounded-[12px] border border-line">
-        <div className="grid grid-cols-3 bg-sub px-3 py-1.5 text-[11.5px] font-medium text-ink-3"><span>Section</span><span className="text-right">Iz</span><span className="text-right">Chute</span></div>
+      <div className="my-3 overflow-hidden rounded-card-sm bg-white shadow-halo-sm">
+        <div className="grid grid-cols-3 bg-halo-track/70 px-3 py-2 text-[11.5px] font-medium text-ink-3"><span>Section</span><span className="text-right">Iz</span><span className="text-right">Chute</span></div>
         {r.table.map((t) => (
-          <div key={t.S} className={cn('num grid grid-cols-3 border-t border-line px-3 py-1.5 text-[12.5px]', t.S === r.section && 'bg-[#fdf6e3] font-semibold')}>
+          <div key={t.S} className={cn('num grid grid-cols-3 border-t border-halo-line px-3 py-2 text-[12.5px]', t.S === r.section && 'bg-pale-a font-semibold text-deep-a')}>
             <span>{fmtS(t.S)} mm²</span>
             <span className={cn('text-right', t.iz < r.In && 'text-bad')}>{n1(t.iz)} A</span>
             <span className={cn('text-right', t.drop > limit ? 'text-bad' : 'text-ok')}>{pct(t.drop, 2)}</span>

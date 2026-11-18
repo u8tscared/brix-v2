@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Check, FileCode2, Send, ShieldCheck, UserRound } from 'lucide-react';
-import { Badge, Button, cn, toast } from '@/components/ui';
+import { AlertTriangle, FileCode2, Send, ShieldCheck, UserRound } from 'lucide-react';
+import { Badge, Button, IconTile, cn, toast } from '@/components/ui';
+import { DrawCheck } from '@/components/motion';
 import { EINVOICE_STATUS } from '@/lib/status';
 import type { Client, Facture } from '@/lib/types';
 import { advanceDemo, pushEinvoice, transmit } from '../lib/actions';
@@ -34,14 +35,14 @@ export function EInvoicePanel({ f, client, missing, onDownload }: { f: Facture; 
   if (b2c) {
     return (
       <div className="space-y-4">
-        <div className="flex gap-3 rounded-xl bg-sub p-4">
-          <UserRound className="mt-0.5 h-5 w-5 shrink-0 text-ink-2" />
+        <div className="flex gap-3 rounded-card bg-white p-5 shadow-halo">
+          <IconTile icon={<UserRound />} tone="neutral" />
           <div className="text-[13px] leading-relaxed text-ink-2">
             <div className="font-semibold text-ink">Client particulier : pas de facture électronique</div>
             Vous lui envoyez la facture en PDF, comme d’habitude. Brix déclare simplement le montant au fisc chaque mois (e-reporting), sans rien vous demander.
           </div>
         </div>
-        <Link to="/app/facture-electronique" className="block text-[13px] font-medium text-vi-700 hover:underline">
+        <Link to="/app/facture-electronique" className="block px-1 text-[13px] font-medium text-deep-v hover:underline">
           Voir l’e-reporting de vos ventes aux particuliers
         </Link>
         <Downloads onDownload={onDownload} />
@@ -51,10 +52,11 @@ export function EInvoicePanel({ f, client, missing, onDownload }: { f: Facture; 
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <ShieldCheck className="h-4 w-4 text-ok" />
-        <span className="text-[13px] font-medium">Via {PLATFORMS[platform].name}, plateforme agréée</span>
-        <Badge tone={EINVOICE_STATUS[status].tone} className="ml-auto">{EINVOICE_STATUS[status].label}</Badge>
+      <div className="rounded-card bg-white p-5 shadow-halo">
+      <div className="mb-4 flex items-center gap-2.5">
+        <IconTile icon={<ShieldCheck />} tone="green" size="sm" />
+        <span className="min-w-0 text-[13.5px] font-medium">Via {PLATFORMS[platform].name}, plateforme agréée</span>
+        <Badge tone={EINVOICE_STATUS[status].tone} size="md" dot className="ml-auto">{EINVOICE_STATUS[status].label}</Badge>
       </div>
 
       <ol className="relative">
@@ -64,9 +66,9 @@ export function EInvoicePanel({ f, client, missing, onDownload }: { f: Facture; 
           const current = s === status;
           return (
             <li key={s} className="relative flex gap-3 pb-3.5 last:pb-0">
-              {i < LIFECYCLE.length - 1 && <span className={cn('absolute left-[9px] top-5 h-[calc(100%-16px)] w-px', done && idx > i ? 'bg-ok/50' : 'bg-line2')} />}
-              <span className={cn('relative z-[1] mt-0.5 grid h-[19px] w-[19px] shrink-0 place-items-center rounded-full border text-white transition', done ? 'border-ok bg-ok' : 'border-line2 bg-white', current && 'ring-4 ring-ok/15')}>
-                {done && <Check className="h-3 w-3" strokeWidth={3} />}
+              {i < LIFECYCLE.length - 1 && <span className={cn('absolute left-[9px] top-5 h-[calc(100%-16px)] w-px', done && idx > i ? 'bg-[#10b981]/40' : 'bg-halo-line')} />}
+              <span className={cn('relative z-[1] mt-0.5 grid h-[19px] w-[19px] shrink-0 place-items-center rounded-full text-white transition duration-500 ease-spring', done ? 'bg-[#10b981]' : 'bg-white shadow-[inset_0_0_0_1.5px_#e3dcf3]', current && 'ring-4 ring-[#10b981]/15')}>
+                {done && <DrawCheck className="h-3 w-3" strokeWidth={3} delay={i * 60} />}
               </span>
               <div className="min-w-0 flex-1">
                 <div className={cn('flex items-baseline justify-between gap-2 text-[13px]', done ? 'font-medium text-ink' : 'text-ink-3')}>
@@ -79,10 +81,11 @@ export function EInvoicePanel({ f, client, missing, onDownload }: { f: Facture; 
           );
         })}
       </ol>
+      </div>
 
       {off && (
-        <div className="flex gap-2 rounded-xl border border-[#fde3b5] bg-warn-bg p-3 text-[13px] text-ink">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warn" />
+        <div className="flex gap-2.5 rounded-card-sm bg-pale-a p-3.5 text-[13px] text-ink">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-deep-a" />
           <div>
             <b className="font-semibold">{EINVOICE_STATUS[status].label}.</b> {f.einvoice.history[f.einvoice.history.length - 1]?.note ?? 'Le client conteste la facture.'} Appelez-le, puis faites un avoir si besoin.
           </div>
@@ -92,12 +95,12 @@ export function EInvoicePanel({ f, client, missing, onDownload }: { f: Facture; 
       {status === 'non_transmise' ? (
         <div className="space-y-2">
           {missing.length > 0 && (
-            <div className="rounded-xl border border-[#fbd1d1] bg-bad-bg p-3 text-[12.5px] text-ink">
-              <div className="mb-1 font-semibold text-bad">À compléter avant l’envoi</div>
+            <div className="rounded-card-sm bg-pale-r p-3.5 text-[12.5px] text-ink">
+              <div className="mb-1 font-semibold text-deep-r">À compléter avant l’envoi</div>
               {missing.join(' · ')}
             </div>
           )}
-          <Button variant="primary" className="w-full" size="lg" loading={busy} disabled={missing.length > 0} icon={<Send className="h-4 w-4" />} onClick={go}>
+          <Button variant="dawn" className="w-full" size="lg" loading={busy} disabled={missing.length > 0} icon={<Send className="h-4 w-4" />} onClick={go}>
             Transmettre via la plateforme agréée
           </Button>
           <p className="text-center text-[11.5px] text-ink-3">En démo : la transmission et les réponses du client sont simulées.</p>
@@ -118,9 +121,9 @@ export function EInvoicePanel({ f, client, missing, onDownload }: { f: Facture; 
 
 function Downloads({ onDownload }: { onDownload: (fmt: 'cii' | 'ubl') => void }) {
   return (
-    <div className="rounded-xl border border-line p-3">
-      <div className="mb-2 flex items-center gap-2 text-[12.5px] font-medium">
-        <FileCode2 className="h-4 w-4 text-ink-2" /> Fichiers de la facture électronique
+    <div className="rounded-card bg-white p-4 shadow-halo">
+      <div className="mb-3 flex items-center gap-2.5 text-[13.5px] font-medium">
+        <IconTile icon={<FileCode2 />} tone="indigo" size="sm" /> Fichiers de la facture électronique
       </div>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="secondary" onClick={() => onDownload('cii')}>Factur-X (XML CII)</Button>

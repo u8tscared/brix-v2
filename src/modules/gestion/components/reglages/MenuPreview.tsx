@@ -9,7 +9,7 @@ export function MenuPreview({ fresh }: { fresh: string | null }) {
   return (
     <aside className="sticky top-4 hidden 2xl:block">
       <div className="eyebrow mb-2 px-1">Votre menu</div>
-      <div className="max-h-[calc(100dvh-120px)] overflow-y-auto rounded-[16px] bg-[#f1eff7] p-2 shadow-[inset_0_0_0_1px_var(--line)] scrollbar-thin">
+      <div className="max-h-[calc(100dvh-120px)] overflow-y-auto glass rounded-card p-2.5 scrollbar-thin">
         {DEPARTMENTS.map((d) => {
           const items = on.filter((m) => m.dept === d.key);
           if (!items.length) return null;
@@ -24,7 +24,7 @@ export function MenuPreview({ fresh }: { fresh: string | null }) {
                 return (
                   <div
                     key={m.key}
-                    className={cn('flex h-8 items-center gap-2 rounded-[8px] px-2 text-[12.5px] text-ink-2 transition-colors duration-700', isFresh && 'animate-[slide-left_.45s_var(--ease)_both] bg-white font-medium text-ink shadow-xs')}
+                    className={cn('flex h-8 items-center gap-2 rounded-full px-2.5 text-[12.5px] text-ink-2 transition-colors duration-700', isFresh && 'animate-[slide-left_.45s_var(--ease)_both] bg-white font-medium text-ink shadow-pill')}
                   >
                     <Icon name={m.icon} className="h-3.5 w-3.5 shrink-0" style={isFresh ? { color: DEPT_TONE[m.dept].fg } : undefined} />
                     <span className="truncate">{m.name}</span>

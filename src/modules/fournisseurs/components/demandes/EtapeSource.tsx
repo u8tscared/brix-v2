@@ -28,16 +28,16 @@ export default function EtapeSource({ onDevis, onLibre }: { onDevis: (d: Devis) 
       <p className="text-[13.5px] text-ink-2">Choisissez le devis : Brix reprend la liste des fournitures, vous n'avez rien à recopier.</p>
 
       {liste.length > 0 ? (
-        <div className="overflow-hidden rounded-[14px] border border-line">
+        <div className="overflow-hidden rounded-field border border-halo-line">
           {liste.map(({ d, n, client }) => (
             <button
               key={d.id}
               type="button"
               disabled={n === 0}
               onClick={() => onDevis(d)}
-              className="flex min-h-[64px] w-full items-center gap-3 border-b border-line px-3.5 py-3 text-left transition last:border-b-0 hover:bg-[#fafafc] disabled:cursor-not-allowed disabled:opacity-55"
+              className="flex min-h-[64px] w-full items-center gap-3 border-b border-halo-line px-3.5 py-3 text-left transition last:border-b-0 hover:bg-halo-hover disabled:cursor-not-allowed disabled:opacity-55"
             >
-              <span className={cn('grid h-10 w-10 shrink-0 place-items-center rounded-[10px]', d.status === 'signe' ? 'bg-ok-bg text-ok' : 'bg-sub text-ink-2')}>
+              <span className={cn('grid h-10 w-10 shrink-0 place-items-center rounded-[10px]', d.status === 'signe' ? 'bg-ok-bg text-ok' : 'bg-halo-track text-ink-2')}>
                 <FileText className="h-[18px] w-[18px]" strokeWidth={1.75} />
               </span>
               <span className="min-w-0 flex-1">
@@ -55,7 +55,7 @@ export default function EtapeSource({ onDevis, onLibre }: { onDevis: (d: Devis) 
           ))}
         </div>
       ) : (
-        <div className="rounded-[14px] border border-dashed border-line2 px-4 py-6 text-center text-[13px] text-ink-2">
+        <div className="rounded-field border border-dashed border-[#e3ddf0] px-4 py-6 text-center text-[13px] text-ink-2">
           Aucun devis envoyé ou signé pour l'instant. Vous pouvez partir d'une liste libre.
         </div>
       )}
@@ -63,9 +63,9 @@ export default function EtapeSource({ onDevis, onLibre }: { onDevis: (d: Devis) 
       <button
         type="button"
         onClick={onLibre}
-        className="flex min-h-[60px] w-full items-center gap-3 rounded-[14px] border border-dashed border-line2 bg-white px-3.5 py-3 text-left transition hover:border-ink-3 hover:bg-[#fafafc]"
+        className="flex min-h-[60px] w-full items-center gap-3 rounded-field border border-dashed border-[#e3ddf0] bg-white px-3.5 py-3 text-left transition hover:border-ink-3 hover:bg-halo-hover"
       >
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-sub text-ink-2">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[10px] bg-halo-track text-ink-2">
           <ListPlus className="h-[18px] w-[18px]" strokeWidth={1.75} />
         </span>
         <span className="min-w-0 flex-1">

@@ -90,28 +90,28 @@ export default function Paie() {
       </div>
 
       {rows.length === 0 ? (
-        <EmptyState icon={<FileSpreadsheet />} title="Pas de salarié à payer" text="Ajoutez vos salariés avec leur salaire brut : Brix prépare leurs bulletins chaque mois." action={<Link to="/app/equipe"><Button variant="primary">Aller à l’équipe</Button></Link>} />
+        <EmptyState icon={<FileSpreadsheet />} title="Pas de salarié à payer" text="Ajoutez vos salariés avec leur salaire brut : Brix prépare leurs bulletins chaque mois." action={<Link to="/app/equipe"><Button variant="dawn">Aller à l’équipe</Button></Link>} />
       ) : (
         <>
           <Card className="grid grid-cols-2 overflow-hidden lg:grid-cols-4">
-            <div className="col-span-2 border-b border-line p-4 lg:col-span-1 lg:border-b-0 lg:border-r">
-              <div className="text-xs font-medium text-ink-2">Coût total {mo.short}</div>
-              <AnimatedNumber value={tot.cout} format={(n) => money(n, true)} className="mt-2 block text-[32px] font-semibold leading-none tracking-[-0.045em] dawn-text" />
+            <div className="col-span-2 border-b border-halo-line bg-dawn-pale p-5 lg:col-span-1 lg:border-b-0 lg:border-r">
+              <div className="label-halo">Coût total {mo.short}</div>
+              <AnimatedNumber value={tot.cout} format={(n) => money(n, true)} className="num-halo dawn-text mt-2 block text-[38px] leading-none" />
               <div className="mt-0.5 text-xs text-ink-2">salaires, charges et indemnités</div>
             </div>
-            <div className="border-r border-line p-4">
-              <div className="text-xs font-medium text-ink-2">Salaires bruts</div>
-              <div className="num mt-1 text-[22px] font-semibold">{money(tot.brut, true)}</div>
+            <div className="border-r border-halo-line p-5">
+              <div className="label-halo">Salaires bruts</div>
+              <div className="num-halo mt-2 text-[28px] leading-none">{money(tot.brut, true)}</div>
               <div className="mt-0.5 text-xs text-ink-2">dont {hhmm(tot.hs)} sup</div>
             </div>
-            <div className="p-4 lg:border-r lg:border-line">
-              <div className="text-xs font-medium text-ink-2">Nets à virer</div>
-              <div className="num mt-1 text-[22px] font-semibold">{money(tot.net, true)}</div>
+            <div className="p-5 lg:border-r lg:border-halo-line">
+              <div className="label-halo">Nets à virer</div>
+              <div className="num-halo mt-2 text-[28px] leading-none">{money(tot.net, true)}</div>
               <div className="mt-0.5 text-xs text-ink-2">le {new Date(mo.payDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}</div>
             </div>
-            <div className="col-span-2 border-t border-line p-4 lg:col-span-1 lg:border-t-0">
-              <div className="text-xs font-medium text-ink-2">Cotisations</div>
-              <div className="num mt-1 text-[22px] font-semibold">{money(tot.cot, true)}</div>
+            <div className="col-span-2 border-t border-halo-line p-5 lg:col-span-1 lg:border-t-0">
+              <div className="label-halo">Cotisations</div>
+              <div className="num-halo mt-2 text-[28px] leading-none">{money(tot.cot, true)}</div>
               <div className="mt-0.5 text-xs text-ink-2">dont caisse de congés CIBTP</div>
             </div>
           </Card>
@@ -119,24 +119,24 @@ export default function Paie() {
           {!provisional && (
             <PaySteps
               steps={[
-                { title: 'Heures reprises', sub: weeksDone >= weeks.length ? `${weeks.length} semaines validées` : <>Depuis le pointage{weeksDone ? ` · ${weeksDone} semaine${weeksDone > 1 ? "s" : ""} sur ${weeks.length} validée${weeksDone > 1 ? "s" : ""}` : ""} · <Link to="/app/pointage" className="font-medium text-[#0e7490] hover:underline">voir</Link></>, done: true },
-                { title: 'Vérifier les bulletins', sub: `${rows.filter((r) => r.validated).length} sur ${rows.length} validés`, done: allValidated, action: <Button size="sm" variant="primary" icon={<CheckCircle2 />} onClick={() => setOpen(rows.find((r) => !r.validated) ?? null)}>Vérifier le suivant</Button> },
-                { title: 'Envoyer au comptable', sub: sent[period] ? 'Reçu par votre cabinet' : 'Il contrôle et déclare la DSN', done: !!sent[period], action: <Button size="sm" variant="primary" loading={sending} icon={<Send />} onClick={send}>Envoyer</Button> },
-                { title: 'Virer les salaires', sub: paid[period] ? 'Virements programmés' : `${money(tot.net, true)} le ${new Date(mo.payDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`, done: !!paid[period], action: <Button size="sm" variant="primary" onClick={() => { setPaid((x) => ({ ...x, [period]: true })); toast(`${rows.length} virements programmés pour le ${new Date(mo.payDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`); }}>Programmer les virements</Button> },
+                { title: 'Heures reprises', sub: weeksDone >= weeks.length ? `${weeks.length} semaines validées` : <>Depuis le pointage{weeksDone ? ` · ${weeksDone} semaine${weeksDone > 1 ? "s" : ""} sur ${weeks.length} validée${weeksDone > 1 ? "s" : ""}` : ""} · <Link to="/app/pointage" className="font-medium text-[#2f5fd0] hover:underline">voir</Link></>, done: true },
+                { title: 'Vérifier les bulletins', sub: `${rows.filter((r) => r.validated).length} sur ${rows.length} validés`, done: allValidated, action: <Button size="sm" variant="dawn" icon={<CheckCircle2 />} onClick={() => setOpen(rows.find((r) => !r.validated) ?? null)}>Vérifier le suivant</Button> },
+                { title: 'Envoyer au comptable', sub: sent[period] ? 'Reçu par votre cabinet' : 'Il contrôle et déclare la DSN', done: !!sent[period], action: <Button size="sm" variant="dawn" loading={sending} icon={<Send />} onClick={send}>Envoyer</Button> },
+                { title: 'Virer les salaires', sub: paid[period] ? 'Virements programmés' : `${money(tot.net, true)} le ${new Date(mo.payDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`, done: !!paid[period], action: <Button size="sm" variant="dawn" onClick={() => { setPaid((x) => ({ ...x, [period]: true })); toast(`${rows.length} virements programmés pour le ${new Date(mo.payDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}`); }}>Programmer les virements</Button> },
               ]}
             />
           )}
 
-          {provisional && <p className="rounded-xl bg-sub px-4 py-3 text-[12.5px] text-ink-2">Mois en cours : estimation avec les heures pointées jusqu’à aujourd’hui. Les bulletins définitifs se préparent à la fin du mois.</p>}
+          {provisional && <p className="glass rounded-pill px-5 py-3 text-[12.5px] text-ink-2">Mois en cours : estimation avec les heures pointées jusqu’à aujourd’hui. Les bulletins définitifs se préparent à la fin du mois.</p>}
 
-          <Card>
-            <CardHeader title={`Bulletins de ${mo.label.toLowerCase()}`} meta={`${rows.filter((r) => r.validated).length} / ${rows.length} validés`}
+          <section className="space-y-2">
+            <CardHeader className="min-h-0 border-0 px-1 pb-1" title={`Bulletins de ${mo.label.toLowerCase()}`} meta={`${rows.filter((r) => r.validated).length} / ${rows.length} validés`}
               action={!provisional && !allValidated ? <Button size="sm" variant="ghost" icon={<CheckCircle2 className="h-3.5 w-3.5" />} onClick={() => { rows.forEach((r) => validatePayslip(r.key)); toast('Tous les bulletins sont validés.'); }}>Tout valider</Button> : undefined} />
-            <div className="hidden grid-cols-[minmax(0,1.5fr)_1fr_.9fr_.9fr_.9fr_110px_20px] gap-3 border-b border-line bg-[#fafafc] px-4 py-2 text-[11.5px] font-medium text-ink-2 lg:grid">
+            <div className="hidden grid-cols-[minmax(0,1.5fr)_1fr_.9fr_.9fr_.9fr_110px_20px] gap-3 px-4 py-1 text-[12.5px] font-medium text-ink-2 lg:grid">
               <span>Salarié</span><span>Heures</span><span className="text-right">Brut</span><span className="text-right">Net à payer</span><span className="text-right">Coût employeur</span><span>État</span><span />
             </div>
             {rows.map((r) => (
-              <button key={r.key} onClick={() => setOpen(r)} className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-line px-4 py-3 text-left transition last:border-0 hover:bg-[#fafafc] lg:grid-cols-[minmax(0,1.5fr)_1fr_.9fr_.9fr_.9fr_110px_20px]">
+              <button key={r.key} onClick={() => setOpen(r)} className="row-card grid w-full grid-cols-[auto_minmax(0,1fr)_auto] gap-3 text-left lg:grid-cols-[minmax(0,1.5fr)_1fr_.9fr_.9fr_.9fr_110px_20px]">
                 <span className="flex min-w-0 items-center gap-3 max-lg:contents">
                   <span className="relative">
                     <Avatar initials={r.emp.initials} color={r.emp.color} size={36} />
@@ -161,7 +161,7 @@ export default function Paie() {
                 <ChevronRight className="hidden h-4 w-4 text-ink-3 lg:block" />
               </button>
             ))}
-          </Card>
+          </section>
 
         </>
       )}
@@ -182,7 +182,7 @@ export default function Paie() {
       >
         {current && (
           <div className={cn('mx-auto space-y-4', big && 'max-w-[900px]')}>
-            <div className="flex flex-wrap items-end gap-3 rounded-xl bg-sub p-3">
+            <div className="flex flex-wrap items-end gap-3 rounded-card-sm bg-halo-hover p-3.5">
               <Field label="Taux de prélèvement à la source" className="w-[220px]">
                 <Input inputMode="decimal" placeholder={`taux neutre (${num(current.slip.pasRate, 1)} %)`} defaultValue={current.slip.pasNeutral ? '' : String(current.slip.pasRate).replace('.', ',')} suffix="%" disabled={current.validated}
                   onBlur={(e) => { const v = e.target.value.trim(); overridePayslip(current.key, { pasRate: v ? Number(v.replace(',', '.')) : null }); }} />
@@ -191,7 +191,7 @@ export default function Paie() {
             </div>
             <div className={cn('mx-auto transition-[max-width] duration-500 ease-out-quint', big ? 'max-w-[900px]' : 'max-w-full')}>
               <SlipSummary row={current} />
-              <div className="mt-4 rounded-[14px] bg-white p-3 shadow-[0_0_0_1px_var(--line),0_12px_32px_-16px_rgba(19,15,38,.18)] md:p-5">
+              <div className="mt-4 rounded-card-sm bg-white p-3 shadow-halo-lg md:p-5">
                 <PayslipView row={current} period={{ label: mo.label, payDate: mo.payDate }} />
               </div>
             </div>
@@ -207,16 +207,16 @@ function SlipSummary({ row }: { row: PayrollRow }) {
   const { slip } = row;
   const extra = slip.nonSoumis.reduce((a, l) => a + (l.gain ?? 0), 0);
   const parts = [
-    { label: 'Net au salarié', value: slip.netAPayer, color: '#0891b2' },
-    { label: 'Impôt et cotisations du salarié', value: slip.brut + extra - slip.netAPayer, color: '#67c6d9' },
-    { label: 'Charges employeur', value: slip.coutEmployeur - slip.brut - extra, color: '#c7e6ee' },
+    { label: 'Net au salarié', value: slip.netAPayer, color: '#3b82f6' },
+    { label: 'Impôt et cotisations du salarié', value: slip.brut + extra - slip.netAPayer, color: '#93b4f8' },
+    { label: 'Charges employeur', value: slip.coutEmployeur - slip.brut - extra, color: '#d6e2fc' },
   ];
   return (
-    <div className="rounded-[14px] bg-sub/70 p-4">
+    <div className="rounded-card-sm bg-dawn-pale p-4 md:p-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <div className="text-[12.5px] font-medium text-ink-2">Net payé à {row.emp.firstName}</div>
-          <AnimatedNumber value={slip.netAPayer} format={(n) => money(n)} className="mt-1 block text-[28px] font-semibold leading-none tracking-[-0.04em]" />
+          <AnimatedNumber value={slip.netAPayer} format={(n) => money(n)} className="num-halo mt-1.5 block text-[34px] leading-none" />
         </div>
         <div className="text-right text-[12.5px] text-ink-2">Coût pour l’entreprise<div className="num text-[15px] font-semibold text-ink">{money(slip.coutEmployeur)}</div></div>
       </div>

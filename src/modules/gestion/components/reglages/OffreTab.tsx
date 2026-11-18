@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
-import { Badge, Button, Card, Segmented, Switch, cn, toast } from '@/components/ui';
+import { Badge, Button, Card, IconTile, Segmented, Switch, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { OFFERS, PLAN_ORDER, type Plan } from '@/lib/catalog';
 import { money } from '@/lib/format';
@@ -32,28 +32,28 @@ export default function OffreTab() {
           const current = o.key === plan;
           const price = o.price === null ? null : period === 'an' ? o.price * 10 : o.price;
           return (
-            <Card key={o.key} className={cn('relative flex flex-col p-5 transition-shadow duration-300', current ? 'shadow-[0_0_0_2px_var(--ink),0_12px_28px_-16px_rgba(19,15,38,.4)]' : 'hover:shadow-raise')}>
+            <Card key={o.key} className={cn('relative flex flex-col p-5 transition-shadow duration-300', current ? 'bg-dawn-mist shadow-[0_0_0_1.5px_#d9c6fb,0_16px_40px_-16px_rgba(109,40,217,.35)]' : 'lift')}>
               <div className="flex items-center gap-2">
-                <h3 className="text-[17px] font-semibold">{o.name}</h3>
-                {current && <Badge tone="dark">Votre offre</Badge>}
-                {o.highlight && !current && <Badge tone="violet">La plus choisie</Badge>}
+                <h3 className="text-[18px] font-semibold tracking-[-0.03em]">{o.name}</h3>
+                {current && <Badge tone="violet" dot>Votre offre</Badge>}
+                {o.highlight && !current && <Badge tone="mag">La plus choisie</Badge>}
               </div>
               <p className="text-[12.5px] text-ink-2">{o.pitch}</p>
               <div className="mt-4 min-h-[60px]">
                 {price === null ? (
-                  <div className="text-[28px] font-semibold tracking-[-0.035em]">Sur devis</div>
+                  <div className="num-halo text-[30px]">Sur devis</div>
                 ) : price === 0 ? (
-                  <div className="text-[28px] font-semibold tracking-[-0.035em]">Gratuit</div>
+                  <div className="num-halo text-[30px]">Gratuit</div>
                 ) : (
                   <>
-                    <div className="num text-[28px] font-semibold leading-tight tracking-[-0.035em]"><AnimatedNumber value={price} duration={600} format={(n) => money(n, price % 1 === 0)} /><span className="ml-1 text-[13px] font-normal text-ink-2">HT / {period === 'an' ? 'an' : 'mois'}</span></div>
+                    <div className="num-halo text-[30px]"><AnimatedNumber value={price} duration={600} format={(n) => money(n, price % 1 === 0)} /><span className="ml-1 text-[13px] font-normal text-ink-2">HT / {period === 'an' ? 'an' : 'mois'}</span></div>
                     <div className="text-[12px] text-ink-3">{period === 'an' ? `soit ${money(price / 12)} par mois` : o.unit}</div>
                   </>
                 )}
               </div>
               <ul className="mt-3 flex-1 space-y-2">
                 {o.includes.map((i) => (
-                  <li key={i} className="flex gap-2 text-[13px]"><Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{i}</li>
+                  <li key={i} className="flex gap-2.5 text-[13px]"><span className="mt-px grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-pale-g text-deep-g"><Check className="h-3 w-3" strokeWidth={2.4} /></span>{i}</li>
                 ))}
               </ul>
               <Button className="mt-5 w-full justify-center" variant={current ? 'secondary' : o.key === 'entreprise' ? 'secondary' : PLAN_ORDER.indexOf(o.key) > PLAN_ORDER.indexOf(plan) ? (o.highlight || PLAN_ORDER.indexOf(o.key) === PLAN_ORDER.indexOf(plan) + 1 ? 'dawn' : 'primary') : 'ghost'} disabled={current} onClick={() => choose(o.key)}>
@@ -64,7 +64,8 @@ export default function OffreTab() {
         })}
       </div>
 
-      <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+      <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center md:p-5">
+        <IconTile name="Plug" dept="bob" size="md" />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-[14px] font-semibold">Option Brix AI MCP <Badge tone="violet">Nouveau</Badge></div>
           <p className="text-[12.5px] text-ink-2">

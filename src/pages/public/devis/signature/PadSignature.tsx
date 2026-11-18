@@ -122,25 +122,25 @@ export const PadSignature = forwardRef<PadRef, Props>(function PadSignature({ no
   return (
     <div>
       <div className="mb-2.5 flex items-center justify-between">
-        <div className="inline-flex rounded-full bg-[#f4f3fa] p-1 text-[13px] font-medium">
+        <div className="inline-flex rounded-full bg-halo-track p-1 text-[13px] font-medium">
           {(
             [
               ['dessin', 'Dessiner', PenLine],
               ['texte', 'Écrire mon nom', Type],
             ] as const
           ).map(([k, l, I]) => (
-            <button key={k} onClick={() => onMode(k)} className={cn('inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 transition', mode === k ? 'bg-white text-[#130f26] shadow-[0_1px_3px_rgba(19,15,38,.12)]' : 'text-[#5f5f70] hover:text-[#130f26]')} aria-pressed={mode === k}>
+            <button key={k} onClick={() => onMode(k)} className={cn('inline-flex h-9 items-center gap-1.5 rounded-full px-3.5 transition', mode === k ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:text-ink')} aria-pressed={mode === k}>
               <I className="h-3.5 w-3.5" strokeWidth={2} /> {l}
             </button>
           ))}
         </div>
         {mode === 'dessin' && !vide && (
-          <button onClick={preparer} className="bx-fade inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium text-[#5f5f70] hover:bg-[#f4f3fa] hover:text-[#130f26]">
+          <button onClick={preparer} className="bx-fade inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[13px] font-medium text-ink-2 hover:bg-halo-hover hover:text-ink">
             <RotateCcw className="h-3.5 w-3.5" strokeWidth={2} /> Effacer
           </button>
         )}
       </div>
-      <div className="relative h-[170px] overflow-hidden rounded-2xl bg-[#fbfaff] shadow-[inset_0_0_0_1px_#e4e1f0]">
+      <div className="relative h-[180px] overflow-hidden rounded-card bg-dawn-mist shadow-[0_0_0_1px_#ece8f6,0_12px_30px_-18px_rgba(60,30,120,.25)]">
         {mode === 'dessin' ? (
           <>
             <canvas ref={canvas} className="absolute inset-0 h-full w-full cursor-crosshair touch-none" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onPointerLeave={up} aria-label="Zone de signature" />

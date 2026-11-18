@@ -56,15 +56,15 @@ export default function Tableau() {
           <div className="text-[12.5px] font-medium text-ink-2">Circuits du logement</div>
           <div className="space-y-1.5">
             {circuits.map((c) => (
-              <div key={c.id} className="flex items-center gap-1.5 rounded-[10px] border border-line py-1 pl-3 pr-1.5">
+              <div key={c.id} className="flex items-center gap-1.5 rounded-card-sm bg-white py-1 pl-3.5 pr-1.5 shadow-halo-sm">
                 <span className="min-w-0 flex-1 truncate text-[13px]">{c.label}</span>
                 <div className="w-[84px] shrink-0">
                 <Select value={c.amps} onChange={(e) => setCircuits((cs) => cs.map((x) => (x.id === c.id ? { ...x, amps: Number(e.target.value) } : x)))} className="h-10 text-[13px]" aria-label={`Calibre ${c.label}`}>
                   {[2, 10, 16, 20, 25, 32, 40].map((a) => <option key={a} value={a}>{a} A</option>)}
                 </Select>
                 </div>
-                <button onClick={() => setCircuits((cs) => cs.map((x) => (x.id === c.id ? { ...x, typeA: !x.typeA } : x)))} aria-pressed={c.typeA} className={cn('h-10 shrink-0 whitespace-nowrap rounded-lg border px-2 text-[11.5px] font-medium', c.typeA ? 'border-vi-200 bg-vi-50 text-vi-700' : 'border-line2 text-ink-3')} title="Sur le différentiel type A dédié">Type A</button>
-                <button onClick={() => setCircuits((cs) => cs.filter((x) => x.id !== c.id))} className="-mr-1.5 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-ink-3 hover:text-bad" aria-label={`Retirer ${c.label}`}><X className="h-4 w-4" /></button>
+                <button onClick={() => setCircuits((cs) => cs.map((x) => (x.id === c.id ? { ...x, typeA: !x.typeA } : x)))} aria-pressed={c.typeA} className={cn('h-10 shrink-0 whitespace-nowrap rounded-pill border px-2.5 text-[11.5px] font-medium', c.typeA ? 'border-transparent bg-pale-v text-deep-v' : 'border-halo-line text-ink-3')} title="Sur le différentiel type A dédié">Type A</button>
+                <button onClick={() => setCircuits((cs) => cs.filter((x) => x.id !== c.id))} className="-mr-1.5 grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink-3 transition-colors hover:bg-pale-r hover:text-deep-r" aria-label={`Retirer ${c.label}`}><X className="h-4 w-4" /></button>
               </div>
             ))}
           </div>
@@ -95,17 +95,17 @@ export default function Tableau() {
       ]}
       quoteTitle="Tableau électrique"
     >
-      <div className="rounded-[12px] border border-line bg-sub p-2.5">
+      <div className="rounded-card-sm bg-halo-track/70 p-3">
         {Array.from({ length: rows }, (_, ri) => (
           <div key={ri} className="mb-1.5 grid grid-cols-[repeat(13,minmax(0,1fr))] gap-[3px] last:mb-0">
             {slots.slice(ri * 13, ri * 13 + 13).map((s, i) => (
-              <span key={i} title={s.title} className={cn('h-9 rounded-[3px] border', s.kind === 'free' ? 'border-dashed border-line2 bg-white/60' : 'border-transparent')} style={s.kind !== 'free' ? { background: s.kind === 'id' ? s.color : `${s.color}26`, borderColor: s.color } : undefined} />
+              <span key={i} title={s.title} className={cn('h-9 rounded-[3px] border', s.kind === 'free' ? 'border-dashed border-[#ddd6ee] bg-white/70' : 'border-transparent')} style={s.kind !== 'free' ? { background: s.kind === 'id' ? s.color : `${s.color}26`, borderColor: s.color } : undefined} />
             ))}
           </div>
         ))}
       </div>
       <div className="mt-3 space-y-2">
-        <div className="flex items-center gap-2 rounded-[10px] bg-ink px-3 py-2 text-[12.5px] text-white">Disjoncteur de branchement (AGCP) · 500 mA</div>
+        <div className="flex items-center gap-2 rounded-pill bg-ink px-4 py-2 text-[12.5px] text-white shadow-ink">Disjoncteur de branchement (AGCP) · 500 mA</div>
         {groups.map((g, gi) => (
           <div key={g.label} className="ml-3 border-l-2 pl-3" style={{ borderColor: COLORS[gi % COLORS.length] }}>
             <div className="text-[12.5px] font-semibold">{g.label} · 40 A 30 mA type {g.type}</div>

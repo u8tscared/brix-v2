@@ -103,14 +103,16 @@ export default function FacturesList() {
     <div className="space-y-5">
       <PageHeader
         icon={<IconTile name="Receipt" dept="facturer" size="lg" />}
+        kicker="Facturer et encaisser"
         title="Factures"
+        titleMuted={late.length ? `${late.length} à relancer, le reste suit.` : 'tout est dans les temps.'}
         subtitle={subtitle}
         actions={
           <>
             <Button variant="secondary" size={phone ? 'lg' : 'md'} icon={<FileSignature className="h-4 w-4" />} onClick={() => setFromDevis(true)} className="max-sm:flex-1 max-sm:justify-center">
               Depuis un devis
             </Button>
-            <Button variant="primary" size={phone ? 'lg' : 'md'} icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/factures/nouvelle')} className="max-sm:flex-1 max-sm:justify-center">
+            <Button variant="dawn" size={phone ? 'lg' : 'md'} icon={<Plus className="h-4 w-4" />} onClick={() => navigate('/app/factures/nouvelle')} className="max-sm:flex-1 max-sm:justify-center">
               Nouvelle facture
             </Button>
           </>
@@ -163,17 +165,17 @@ export default function FacturesList() {
             }
           />
         ) : desk ? (
-          <div className="overflow-hidden rounded-[18px] bg-white shadow-card">
-            <div className={`grid gap-4 border-b border-line px-5 py-2.5 text-[11.5px] font-medium text-ink-3 ${ROW_GRID}`}>
-              <span>Facture</span>
+          <div>
+            <div className={`grid gap-4 px-4 pb-2 text-[12px] font-medium text-ink-3 ${ROW_GRID}`}>
               <span>Client et chantier</span>
+              <span>Facture</span>
               <span>Échéance</span>
               <span className="text-right">Total TTC</span>
               <span className="text-right">Reste à payer</span>
               <span>Statut</span>
               <span />
             </div>
-            <div key={filter} className="stagger-fast">
+            <div key={filter} className="stagger-fast space-y-2">
               {visible.map((r) => (
                 <FactureRow key={r.f.id} {...itemProps(r)} />
               ))}

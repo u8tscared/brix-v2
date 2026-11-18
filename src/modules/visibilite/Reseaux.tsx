@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Check, ChevronLeft, ChevronRight, Inbox, Plus } from 'lucide-react';
-import { Button, Card, CardHeader, cn, IconTile, PageHeader, Sheet, Stat, Switch, toast } from '@/components/ui';
+import { Check, ChevronLeft, ChevronRight, Eye, Images, Inbox, Plus } from 'lucide-react';
+import { Button, Card, CardHeader, cn, EmptyState, IconTile, PageHeader, Sheet, Stat, Switch, toast } from '@/components/ui';
 import { AnimatedNumber } from '@/components/motion';
 import { PhotoArt } from '@/modules/chantiers/components/common/PhotoArt';
 import { artFor } from './lib';
@@ -10,7 +10,7 @@ import { StatStrip } from '@/modules/vendre/components/StatStrip';
 import { NETWORKS, PostCard } from './components/PostCard';
 import { useVisi } from './store';
 
-const DOT = { publie: 'bg-ok', programme: 'bg-[#0a66c2]', pret: 'bg-[#e11d48]' } as const;
+const DOT = { publie: 'bg-[#10b981]', programme: 'bg-[#3b82f6]', pret: 'bg-[#d946ef]' } as const;
 
 const iso = (d: Date) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
@@ -45,31 +45,26 @@ export default function Reseaux() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={<IconTile name="Share2" dept="visibilite" size="lg" />} title="Réseaux sociaux" subtitle="À chaque fin de chantier, Bob prépare un avant/après. Vous validez, c’est publié." actions={<Button variant="primary" icon={<Plus />} onClick={() => setCreating(true)}>Nouvelle publication</Button>} />
+      <PageHeader icon={<IconTile name="Share2" dept="visibilite" size="lg" />} title="Réseaux sociaux" titleMuted="vos chantiers parlent pour vous." subtitle="À chaque fin de chantier, Bob prépare un avant/après. Vous validez, c’est publié." actions={<Button variant="primary" icon={<Plus />} onClick={() => setCreating(true)}>Nouvelle publication</Button>} />
 
       <StatStrip>
-        <Stat label="Vues ce mois" value={<AnimatedNumber value={2340} />} sub="+38 % par rapport au mois dernier" />
-        <Stat label="Publications" value={<AnimatedNumber value={done.length} />} sub={`${ready.length} en attente`} />
-        <Stat label="Demandes venues des réseaux" value={<AnimatedNumber value={3} />} sub="arrivées dans Demandes" />
-        <Stat label="Temps passé" value="0 min" sub="Bob s’occupe de tout" />
+        <Stat icon={<IconTile icon={<Eye />} tone="rose" size="row" />} label="Vues ce mois" value={<AnimatedNumber value={2340} />} sub="+38 % par rapport au mois dernier" />
+        <Stat icon={<IconTile icon={<Images />} tone="peach" size="row" />} label="Publications" value={<AnimatedNumber value={done.length} />} sub={`${ready.length} en attente`} />
+        <Stat icon={<IconTile name="Inbox" tone="violet" size="row" />} label="Demandes venues des réseaux" value={<AnimatedNumber value={3} />} sub="arrivées dans Demandes" />
+        <Stat icon={<IconTile name="Timer" tone="green" size="row" />} label="Temps passé" value="0 min" sub="Bob s’occupe de tout" />
       </StatStrip>
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-4">
-          <h2 className="eyebrow px-1">À valider{ready.length > 0 && <span className="num ml-1.5 text-ink-3">{ready.length}</span>}</h2>
+          <h2 className="flex items-center gap-2 px-1 text-[16px] font-semibold tracking-[-0.025em]">À valider{ready.length > 0 && <span className="num inline-grid h-6 min-w-6 place-items-center rounded-full bg-pale-m px-2 text-[12px] font-medium text-deep-m">{ready.length}</span>}</h2>
           {ready.length ? (
             <div className="stagger grid gap-4 [&>*]:min-w-0 md:grid-cols-2">{ready.map((p) => <PostCard key={p.id} post={p} />)}</div>
           ) : (
-            <Card className="flex flex-col items-center px-6 py-10 text-center">
-              <IconTile icon={<Inbox strokeWidth={1.75} />} dept="visibilite" size="lg" />
-              <div className="mt-4 text-[15px] font-semibold">Tout est publié</div>
-              <p className="mt-1 max-w-xs text-[13px] text-ink-2">À la prochaine fin de chantier, Bob préparera un avant/après. Vous pouvez aussi en créer un maintenant.</p>
-              <Button className="mt-5" icon={<Plus />} onClick={() => setCreating(true)}>Préparer une publication</Button>
-            </Card>
+            <EmptyState icon={<Inbox />} title="Tout est publié" text="À la prochaine fin de chantier, Bob préparera un avant/après. Vous pouvez aussi en créer un maintenant." action={<Button icon={<Plus />} onClick={() => setCreating(true)}>Préparer une publication</Button>} />
           )}
           {done.length > 0 && (
             <>
-              <h2 className="eyebrow px-1 pt-3">Déjà publiées</h2>
+              <h2 className="px-1 pt-3 text-[16px] font-semibold tracking-[-0.025em]">Déjà publiées</h2>
               <div className="grid gap-4 [&>*]:min-w-0 md:grid-cols-2">{done.map((p) => <PostCard key={p.id} post={p} />)}</div>
             </>
           )}
@@ -77,10 +72,10 @@ export default function Reseaux() {
 
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Comptes reliés" meta={`${NETWORKS.filter((n) => accounts[n.key]).length} sur ${NETWORKS.length}`} />
+            <CardHeader icon={<IconTile name="Share2" tone="rose" size="sm" />} title="Comptes reliés" meta={`${NETWORKS.filter((n) => accounts[n.key]).length} sur ${NETWORKS.length}`} />
             {NETWORKS.map((n) => (
-              <div key={n.key} className="flex min-h-[54px] items-center gap-3 border-b border-line px-4 last:border-b-0">
-                <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-[9px] transition-[background,color] duration-300', accounts[n.key] ? 'text-white' : 'bg-sub text-ink-3')} style={accounts[n.key] ? { background: n.color } : undefined}><n.icon className="h-4 w-4" strokeWidth={1.75} /></span>
+              <div key={n.key} className="flex min-h-[60px] items-center gap-3 border-b border-halo-line px-4 last:border-b-0">
+                <span className={cn('grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[11px] transition-[background,color] duration-300', accounts[n.key] ? '' : 'bg-pale-n text-ink-3')} style={accounts[n.key] ? { background: `${n.color}1a`, color: n.color } : undefined}><n.icon className="h-4 w-4" strokeWidth={1.75} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13.5px] font-medium">{n.label}</span>
                   <span className="block text-[11.5px] text-ink-3">{accounts[n.key] ? 'Relié, Bob peut publier' : 'Non relié'}</span>
@@ -91,10 +86,10 @@ export default function Reseaux() {
           </Card>
 
           <Card>
-            <div className="flex h-12 items-center gap-1 border-b border-line px-2">
-              <button onClick={() => setOffset((o) => o - 1)} className="grid h-10 w-10 place-items-center rounded-lg text-ink-2 hover:bg-sub" aria-label="Mois précédent"><ChevronLeft className="h-4 w-4" /></button>
+            <div className="flex h-14 items-center gap-1 border-b border-halo-line px-2">
+              <button onClick={() => setOffset((o) => o - 1)} className="grid h-10 w-10 place-items-center rounded-full text-ink-2 transition-colors hover:bg-halo-hover" aria-label="Mois précédent"><ChevronLeft className="h-4 w-4" /></button>
               <span className="flex-1 text-center text-[13.5px] font-semibold">{capitalize(base.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }))}</span>
-              <button onClick={() => setOffset((o) => o + 1)} className="grid h-10 w-10 place-items-center rounded-lg text-ink-2 hover:bg-sub" aria-label="Mois suivant"><ChevronRight className="h-4 w-4" /></button>
+              <button onClick={() => setOffset((o) => o + 1)} className="grid h-10 w-10 place-items-center rounded-full text-ink-2 transition-colors hover:bg-halo-hover" aria-label="Mois suivant"><ChevronRight className="h-4 w-4" /></button>
             </div>
             <div className="grid grid-cols-7 px-2 pb-2 pt-1 text-center">
               {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((d, i) => <span key={i} className="py-1.5 text-[11px] font-medium text-ink-3">{d}</span>)}
@@ -108,7 +103,7 @@ export default function Reseaux() {
                     type="button"
                     disabled={!ps.length}
                     onClick={() => setSel(sel === d ? null : d)}
-                    className={cn('flex h-10 flex-col items-center justify-center gap-0.5 rounded-lg text-[12.5px] transition-colors duration-200', today ? 'bg-[#15122a] font-semibold text-white' : sel === d ? 'bg-[#fdecef] text-[#be123c]' : ps.length ? 'hover:bg-sub' : 'text-ink-2')}
+                    className={cn('mx-auto flex h-10 w-10 flex-col items-center justify-center gap-0.5 rounded-full text-[12.5px] transition-colors duration-200', today ? 'bg-ink font-semibold text-white' : sel === d ? 'bg-pale-r text-deep-r' : ps.length ? 'hover:bg-halo-hover' : 'text-ink-2')}
                     aria-label={ps.length ? `${ps.length} publication${ps.length > 1 ? 's' : ''} le ${Number(d.slice(8))}` : undefined}
                   >
                     <span className="num leading-none">{Number(d.slice(8))}</span>
@@ -118,7 +113,7 @@ export default function Reseaux() {
               })}
             </div>
             {sel && (
-              <div className="animate-[fade-up_.3s_var(--ease)_both] space-y-1 border-t border-line px-4 py-3">
+              <div className="animate-[fade-up_.3s_var(--ease)_both] space-y-1 border-t border-halo-line px-4 py-3">
                 {posts.filter((p) => p.date === sel).map((p) => (
                   <div key={p.id} className="flex items-center gap-2 text-[12.5px]">
                     <i className={cn('h-2 w-2 shrink-0 rounded-full', DOT[p.status])} />
@@ -128,7 +123,7 @@ export default function Reseaux() {
                 ))}
               </div>
             )}
-            <div className="flex flex-wrap gap-3 border-t border-line px-4 py-2.5 text-[11.5px] text-ink-2">
+            <div className="flex flex-wrap gap-3 border-t border-halo-line px-4 py-3 text-[11.5px] text-ink-2">
               <span className="flex items-center gap-1.5"><i className={cn('h-2 w-2 rounded-full', DOT.publie)} />Publiée</span>
               <span className="flex items-center gap-1.5"><i className={cn('h-2 w-2 rounded-full', DOT.programme)} />Programmée</span>
               <span className="flex items-center gap-1.5"><i className={cn('h-2 w-2 rounded-full', DOT.pret)} />À valider</span>
@@ -142,13 +137,13 @@ export default function Reseaux() {
           {chantiers.map((c) => {
             const on = pick === c.id;
             return (
-              <button key={c.id} type="button" role="radio" aria-checked={on} onClick={() => setPick(c.id)} className={cn('flex w-full items-center gap-3 rounded-[12px] p-2 text-left transition-shadow duration-200', on ? 'shadow-[0_0_0_1.5px_var(--ink)]' : 'shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_#cfcbdd]')}>
-                <span className="relative h-12 w-16 shrink-0 overflow-hidden rounded-[8px]"><PhotoArt art={artFor(c.id)} phase="apres" seed={c.id + 'apres'} /></span>
+              <button key={c.id} type="button" role="radio" aria-checked={on} onClick={() => setPick(c.id)} className={cn('flex w-full items-center gap-3 rounded-card-sm bg-white p-2 text-left transition-shadow duration-300', on ? 'shadow-[0_0_0_1.5px_#c4b5fd,0_10px_24px_-12px_rgba(109,40,217,.35)]' : 'shadow-halo-sm hover:shadow-[0_0_0_1px_#e3dcf3,0_10px_24px_-12px_rgba(60,30,120,.18)]')}>
+                <span className="relative h-12 w-16 shrink-0 overflow-hidden rounded-[11px]"><PhotoArt art={artFor(c.id)} phase="apres" seed={c.id + 'apres'} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13.5px] font-medium">{c.name}</span>
                   <span className="block truncate text-[12px] text-ink-3">{c.city}</span>
                 </span>
-                <span className={cn('mr-1 grid h-5 w-5 shrink-0 place-items-center rounded-full transition-colors duration-200', on ? 'bg-ink text-white' : 'shadow-[inset_0_0_0_1.5px_var(--line2)]')}>{on && <Check className="h-3 w-3 animate-pop" strokeWidth={3} />}</span>
+                <span className={cn('mr-1 grid h-5 w-5 shrink-0 place-items-center rounded-full transition-colors duration-200', on ? 'bg-deep-v text-white' : 'shadow-[inset_0_0_0_1.5px_#dcd5ee]')}>{on && <Check className="h-3 w-3 animate-pop" strokeWidth={3} />}</span>
               </button>
             );
           })}

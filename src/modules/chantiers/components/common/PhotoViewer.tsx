@@ -78,7 +78,7 @@ export function PhotoViewer({ photos, index, onIndex, onClose, onDelete, label }
           if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
         }}
       >
-        <div key={p.id} className={cn('aspect-[4/3] max-h-full w-full max-w-[1000px] overflow-hidden rounded-[16px] bg-black/30 shadow-[0_30px_80px_-20px_rgba(0,0,0,.6)]', dir === 1 ? 'animate-[slide-left_.35s_var(--ease)_both]' : 'animate-[fade-up_.35s_var(--ease)_both]', closing && 'animate-[scale-out_.2s_var(--ease)_both]')}>
+        <div key={p.id} className={cn('aspect-[4/3] max-h-full w-full max-w-[1000px] overflow-hidden rounded-card-sm bg-black/30 shadow-[0_30px_80px_-20px_rgba(0,0,0,.6)]', dir === 1 ? 'animate-[slide-left_.35s_var(--ease)_both]' : 'animate-[fade-up_.35s_var(--ease)_both]', closing && 'animate-[scale-out_.2s_var(--ease)_both]')}>
           <PhotoArt art={p.art} phase={p.phase} seed={p.id} src={p.src} alt={p.caption} />
         </div>
         {photos.length > 1 && (

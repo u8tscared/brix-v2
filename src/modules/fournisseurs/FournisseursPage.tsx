@@ -36,7 +36,7 @@ export default function FournisseursPage() {
   return (
     <div className="bx-root space-y-6">
       <nav className="fx-nobar -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0" aria-label="Achats">
-        <div className="flex w-max gap-1 rounded-[14px] border border-line bg-white/80 p-1 shadow-[0_1px_2px_rgba(20,20,40,.04)] backdrop-blur">
+        <div className="glass flex w-max gap-1 rounded-pill p-1">
           {ONGLETS.map((o) => (
             <NavLink
               key={o.to}
@@ -44,8 +44,8 @@ export default function FournisseursPage() {
               end={o.end}
               className={({ isActive }) =>
                 cn(
-                  'flex h-10 items-center gap-2 whitespace-nowrap rounded-[10px] px-3 text-[13px] font-medium transition md:h-9',
-                  isActive ? 'bg-[#130f26] text-white shadow-[0_4px_12px_-6px_rgba(19,15,38,.6)]' : 'text-ink-2 hover:bg-sub hover:text-ink',
+                  'flex h-10 items-center gap-2 whitespace-nowrap rounded-pill px-4 text-[13px] font-medium transition-[background,color,box-shadow] duration-300 ease-out-quint md:h-9',
+                  isActive ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:bg-white/60 hover:text-ink',
                 )
               }
             >

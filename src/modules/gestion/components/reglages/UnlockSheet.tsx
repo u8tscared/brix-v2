@@ -27,7 +27,7 @@ export function UnlockSheet({ module: m, onClose, onDone }: { module: ModuleDef 
       width={440}
       title={m ? `Débloquer ${m.name}` : ''}
       subtitle={offer ? `Inclus dans l’offre ${offer.name}. Vous êtes en offre ${current?.name}.` : undefined}
-      icon={m ? <IconTile name={m.icon} dept={m.dept} size="md" solid /> : undefined}
+      icon={m ? <IconTile name={m.icon} dept={m.dept} size="md" /> : undefined}
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>Plus tard</Button>
@@ -37,14 +37,14 @@ export function UnlockSheet({ module: m, onClose, onDone }: { module: ModuleDef 
     >
       {offer && (
         <div className="space-y-4">
-          <div className="rounded-[14px] bg-[#f7f6fb] p-4">
+          <div className="rounded-card-sm bg-dawn-pale p-4 shadow-halo-sm">
             <div className="flex items-baseline justify-between">
               <span className="text-[15px] font-semibold">Offre {offer.name}</span>
-              <span className="num text-[15px] font-semibold">{offer.price ? `${money(offer.price, offer.price % 1 === 0)}` : 'Sur devis'}<span className="ml-1 text-[12px] font-normal text-ink-3">{offer.price ? 'HT / mois' : ''}</span></span>
+              <span className="num-halo text-[22px]">{offer.price ? `${money(offer.price, offer.price % 1 === 0)}` : 'Sur devis'}<span className="ml-1 text-[12px] font-normal text-ink-3">{offer.price ? 'HT / mois' : ''}</span></span>
             </div>
             <ul className="stagger-fast mt-3 space-y-2">
               {offer.includes.map((i) => (
-                <li key={i} className="flex gap-2 text-[13px]"><Check className="mt-0.5 h-4 w-4 shrink-0 text-ok" />{i}</li>
+                <li key={i} className="flex gap-2.5 text-[13px]"><span className="mt-px grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-pale-g text-deep-g"><Check className="h-3 w-3" strokeWidth={2.4} /></span>{i}</li>
               ))}
             </ul>
           </div>

@@ -37,7 +37,7 @@ export function InvoicePaper({ f, company, client, extra, devis, chantier, origi
     <div className={cn('facture-paper bg-white text-[10.5px] leading-[1.45] text-[#1d1d27]', className)}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 flex-1 gap-2.5">
-          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-[#17171f] text-[11px] font-bold text-white">{company.logoInitials || company.name.slice(0, 2).toUpperCase()}</div>
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-[#15122a] text-[11px] font-semibold text-white">{company.logoInitials || company.name.slice(0, 2).toUpperCase()}</div>
           <div className="min-w-0">
             <div className="text-[12px] font-semibold">{company.name}</div>
             <div className="text-[#5f5f70]">
@@ -59,15 +59,17 @@ export function InvoicePaper({ f, company, client, extra, devis, chantier, origi
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-md bg-[#f6f6f9] p-2.5">
+      <div className="mt-3.5 h-[3px] w-[40px] rounded-full" style={{ background: 'linear-gradient(90deg,#6d28d9,#d946ef 62%,#fb923c)', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }} />
+
+      <div className="mt-3.5 grid grid-cols-2 gap-3">
+        <div className="rounded-[8px] bg-[#f6f5fa] p-2.5">
           <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9898a8]">Client</div>
           <div className="font-semibold">{client?.name ?? 'Client à choisir'}</div>
           {client?.contact && <div>{client.contact}</div>}
           <div className="text-[#5f5f70]">{client ? [client.address, client.city].filter(Boolean).join(', ') || '·' : '·'}</div>
           {pro && <div className={cn(!siren && 'font-medium text-[#dc2626]')}>SIREN {siren ? siren.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3') : 'à renseigner'}</div>}
         </div>
-        <div className="rounded-md bg-[#f6f6f9] p-2.5">
+        <div className="rounded-[8px] bg-[#f6f5fa] p-2.5">
           <div className="text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9898a8]">Adresse de livraison / du chantier</div>
           <div>{delivery || '·'}</div>
           <div className="mt-1 text-[9px] font-semibold uppercase tracking-[0.06em] text-[#9898a8]">Opération</div>
@@ -84,7 +86,7 @@ export function InvoicePaper({ f, company, client, extra, devis, chantier, origi
 
       <table className="mt-3 w-full border-collapse">
         <thead>
-          <tr className="border-b border-[#17171f] text-left text-[9px] uppercase tracking-[0.05em] text-[#5f5f70]">
+          <tr className="border-b border-[#15122a] text-left text-[9px] uppercase tracking-[0.05em] text-[#5f5f70]">
             <th className="py-1.5 font-semibold">Désignation</th>
             <th className="w-[38px] py-1.5 text-right font-semibold">Qté</th>
             <th className="w-[64px] py-1.5 text-right font-semibold">PU HT</th>
@@ -131,7 +133,7 @@ export function InvoicePaper({ f, company, client, extra, devis, chantier, origi
           {a.retenue > 0 && <Tot label={`Retenue de garantie ${f.retenueGarantie} %`} value={`−${money(a.retenue)}`} />}
           {a.paid > 0 && <Tot label="Déjà réglé" value={`−${money(a.paid)}`} />}
           {f.kind !== 'avoir' && (
-            <div className="mt-1 flex justify-between rounded-md bg-[#17171f] px-2 py-1.5 text-[11.5px] font-semibold text-white">
+            <div className="mt-1 flex justify-between rounded-md bg-[#15122a] px-2 py-1.5 text-[11.5px] font-semibold text-white">
               <span>Net à payer</span>
               <span className="num">{money(a.remaining)}</span>
             </div>

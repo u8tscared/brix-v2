@@ -50,7 +50,7 @@ export function PlanSheet({ target, onClose }: { target: PlanTarget | null; onCl
             <span className="mb-1.5 block text-[12.5px] font-medium text-ink-2">Qui y va ?</span>
             <div className="flex flex-wrap gap-2">
               {employees.map((e) => (
-                <button key={e.id} type="button" onClick={() => setEmp(e.id)} className={cn('flex h-11 items-center gap-2 rounded-full border pl-1.5 pr-3 text-[13px] transition', emp === e.id ? 'border-ink bg-ink text-white' : 'border-line2 bg-white hover:bg-sub')}>
+                <button key={e.id} type="button" onClick={() => setEmp(e.id)} className={cn('flex h-11 items-center gap-2 rounded-full border pl-1.5 pr-3 text-[13px] transition', emp === e.id ? 'border-ink bg-ink text-white' : 'border-halo-line bg-white hover:bg-halo-track')}>
                   <Avatar initials={e.initials} color={e.color} size={30} /> {e.firstName}
                 </button>
               ))}

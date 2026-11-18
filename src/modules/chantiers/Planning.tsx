@@ -7,7 +7,7 @@ import { dateShort, todayISO } from '@/lib/format';
 import type { PlanningEvent } from '@/lib/types';
 import { isOutdoor, isRainy, weatherFor } from './lib/weather';
 import { optimizeRoutes, type RouteOptimization } from './service';
-import { KIND_STYLE, KINDS } from './components/planning/kinds';
+import { KIND_STYLE, KINDS, personColor } from './components/planning/kinds';
 import { addDays, conflictsOf, freeSlot, mondayOf, weekDays } from './components/planning/utils';
 import { WeekGrid } from './components/planning/WeekGrid';
 import { DayStrip, DayView, SoloAgenda } from './components/planning/DayView';
@@ -69,7 +69,7 @@ export default function Planning() {
       <PageHeader
         icon={<IconTile name="CalendarRange" dept="chantiers" size="lg" />}
         title="Planning"
-        subtitle={solo ? 'Votre semaine, avec la météo.' : `${people.length} personnes, ${weekEvents.length} créneaux cette semaine`}
+        titleMuted={solo ? 'votre semaine, avec la météo.' : `${people.length} personnes, ${weekEvents.length} créneaux.`}
         actions={
           <>
             {!solo && (
@@ -77,7 +77,7 @@ export default function Planning() {
                 Optimiser les trajets
               </Button>
             )}
-            <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={create}>
+            <Button variant="dawn" icon={<Plus className="h-4 w-4" />} onClick={create}>
               Nouveau créneau
             </Button>
           </>
@@ -85,25 +85,25 @@ export default function Planning() {
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center rounded-[12px] bg-white shadow-card">
-          <button onClick={() => goWeek(week - 1)} className="grid h-10 w-10 place-items-center text-ink-2 hover:text-ink" aria-label="Semaine précédente"><ChevronLeft className="h-4 w-4" /></button>
+        <div className="glass flex items-center rounded-pill p-1">
+          <button onClick={() => goWeek(week - 1)} className="grid h-9 w-9 place-items-center rounded-full text-ink-2 transition hover:bg-white hover:text-ink hover:shadow-pill" aria-label="Semaine précédente"><ChevronLeft className="h-4 w-4" /></button>
           <span className="num min-w-[150px] text-center text-[13.5px] font-medium">Du {range}</span>
-          <button onClick={() => goWeek(week + 1)} className="grid h-10 w-10 place-items-center text-ink-2 hover:text-ink" aria-label="Semaine suivante"><ChevronRight className="h-4 w-4" /></button>
+          <button onClick={() => goWeek(week + 1)} className="grid h-9 w-9 place-items-center rounded-full text-ink-2 transition hover:bg-white hover:text-ink hover:shadow-pill" aria-label="Semaine suivante"><ChevronRight className="h-4 w-4" /></button>
         </div>
         {week !== 0 && <Button size="sm" onClick={() => goWeek(0)}>Cette semaine</Button>}
         {!solo && !isMobile && (
           <label className="ml-1 flex h-10 cursor-pointer items-center gap-2 text-[13px] text-ink-2">
-            <input type="checkbox" checked={weekend} onChange={(e) => setWeekend(e.target.checked)} className="h-4 w-4 accent-[#17171f]" /> Week-end
+            <input type="checkbox" checked={weekend} onChange={(e) => setWeekend(e.target.checked)} className="h-4 w-4 accent-[#6d28d9]" /> Week-end
           </label>
         )}
         <div className="flex-1" />
-        <div className="hidden flex-wrap items-center gap-3 text-xs text-ink-2 lg:flex">
+        <div className="hidden flex-wrap items-center gap-1.5 text-xs text-ink-2 lg:flex">
           {people.map((p) => (
-            <span key={p.id} className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-[3px]" style={{ background: p.color === '#17171f' ? '#3d3758' : p.color }} />{p.firstName}</span>
+            <span key={p.id} className="inline-flex h-[26px] items-center gap-1.5 rounded-full px-2.5 font-medium text-ink" style={{ background: `${personColor(p.color)}18` }}><i className="h-2 w-2 rounded-full" style={{ background: personColor(p.color) }} />{p.firstName}</span>
           ))}
-          <i className="mx-1 h-4 w-px bg-line2" />
+          <i className="mx-1.5 h-4 w-px bg-halo-line" />
           {KINDS.filter((k) => k !== 'chantier' && k !== 'absence').map((k) => (
-            <span key={k} className="flex items-center gap-1.5"><i className="h-1.5 w-1.5 rounded-full" style={{ background: KIND_STYLE[k].dot }} />{KIND_STYLE[k].label}</span>
+            <span key={k} className="flex items-center gap-1.5 px-1"><i className="h-1.5 w-1.5 rounded-full" style={{ background: KIND_STYLE[k].dot }} />{KIND_STYLE[k].label}</span>
           ))}
         </div>
       </div>
@@ -111,15 +111,15 @@ export default function Planning() {
       {(weekConflicts.length > 0 || rainAlerts.length > 0) && (
         <div className="grid gap-2 md:grid-cols-2">
           {weekConflicts.length > 0 && (
-            <div className="flex items-center gap-2.5 rounded-xl border border-[#fbd1d1] bg-bad-bg px-3.5 py-2.5 text-[13px] text-bad">
-              <AlertTriangle className="h-4 w-4 shrink-0" />
+            <div className="row-card py-2.5 text-[13px] text-ink">
+              <IconTile size="row" tone="rose" icon={<AlertTriangle />} />
               <span className="flex-1">{nConflicts} conflit{nConflicts > 1 ? 's' : ''} d’horaires cette semaine : {employees.find((p) => p.id === weekConflicts[0].employeeId)?.firstName} le {dateShort(weekConflicts[0].date).replace(/\.$/, "")}.</span>
               <Button size="sm" variant="secondary" onClick={() => setDraft({ ...weekConflicts[0] })}>Voir</Button>
             </div>
           )}
           {rainAlerts.length > 0 && (
-            <div className="flex items-center gap-2.5 rounded-xl border border-[#d5e3fb] bg-[#f3f7ff] px-3.5 py-2.5 text-[13px] text-brand">
-              <CloudRain className="h-4 w-4 shrink-0" />
+            <div className="row-card py-2.5 text-[13px] text-ink">
+              <IconTile size="row" tone="blue" icon={<CloudRain />} />
               <span className="flex-1">Pluie prévue le {dateShort(rainAlerts[0].date)} sur « {rainAlerts[0].title} », des travaux sont dehors.</span>
               <Button size="sm" variant="secondary" onClick={() => setDraft({ ...rainAlerts[0] })}>Décaler</Button>
             </div>
@@ -128,8 +128,8 @@ export default function Planning() {
       )}
 
       {opt && (
-        <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-white"><Route className="h-4 w-4" /></span>
+        <Card tone="mist" className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center">
+          <IconTile tone="violet" icon={<Route />} />
           <div className="min-w-0 flex-1 text-[13.5px]">
             <div className="font-semibold">
               Bob a trouvé <span className="num">{opt.kmBefore - opt.kmAfter} km</span> et <span className="num">{Math.floor(opt.minutesSaved / 60) ? `${Math.floor(opt.minutesSaved / 60)} h ` : ''}{opt.minutesSaved % 60} min</span> de route en moins cette semaine
@@ -139,7 +139,7 @@ export default function Planning() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button variant="primary" onClick={() => { toast("Trajets réorganisés, l'équipe est prévenue (démo)"); setOpt(null); }}>Appliquer</Button>
+            <Button variant="soft" onClick={() => { toast("Trajets réorganisés, l'équipe est prévenue (démo)"); setOpt(null); }}>Appliquer</Button>
             <Button variant="ghost" size="icon" onClick={() => setOpt(null)} aria-label="Fermer"><X className="h-4 w-4" /></Button>
           </div>
         </Card>

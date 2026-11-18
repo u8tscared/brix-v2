@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
-import { cn } from '@/components/ui';
+import { Card, cn } from '@/components/ui';
 import { AnimatedNumber, Ring } from '@/components/motion';
 import { money, pct } from '@/lib/format';
 
@@ -27,11 +27,11 @@ export function Pipeline({ stages, active, onPick, rate, pending, pendingCount }
   }, []);
 
   return (
-    <section className="overflow-hidden rounded-[18px] bg-white shadow-card">
-      <div className="flex flex-col gap-5 px-5 pb-4 pt-5 sm:flex-row sm:items-end sm:justify-between md:px-6">
+    <Card className="overflow-hidden">
+      <div className="flex flex-col gap-5 px-5 pb-5 pt-5 sm:flex-row sm:items-end sm:justify-between md:px-7 md:pt-6">
         <div>
-          <div className="text-[12.5px] font-medium text-ink-2">En attente de signature</div>
-          <div className="num dawn-text mt-1.5 text-[40px] font-semibold leading-none tracking-[-0.05em] md:text-[46px]">
+          <div className="label-halo">En attente de signature</div>
+          <div className="num-halo mt-1.5 text-[38px] text-ink md:text-[48px]">
             <AnimatedNumber value={pending} format={fmt0} />
           </div>
           <div className="mt-2 text-[12.5px] text-ink-2">
@@ -39,8 +39,8 @@ export function Pipeline({ stages, active, onPick, rate, pending, pendingCount }
           </div>
         </div>
         <div className="flex items-center gap-3 sm:pb-1">
-          <Ring value={rate} size={54} stroke={5} tone="ok">
-            <span className="text-[12px]">{Math.round(rate)}%</span>
+          <Ring value={rate} size={64} stroke={6} tone="ok">
+            <span className="text-[13px]">{Math.round(rate)}%</span>
           </Ring>
           <div className="leading-tight">
             <div className="text-[13px] font-semibold">Taux de signature</div>
@@ -50,7 +50,7 @@ export function Pipeline({ stages, active, onPick, rate, pending, pendingCount }
       </div>
 
       {/* Barre segmentée : chaque étape prend la place de son montant */}
-      <div className="mx-5 flex h-2.5 gap-[3px] overflow-hidden rounded-full md:mx-6" aria-hidden>
+      <div className="mx-5 flex h-2 gap-[3px] overflow-hidden rounded-full md:mx-7" aria-hidden>
         {flow.map((s, i) => (
           <i
             key={s.key}
@@ -60,27 +60,26 @@ export function Pipeline({ stages, active, onPick, rate, pending, pendingCount }
         ))}
       </div>
 
-      <div className="mt-3 grid grid-cols-2 border-t border-line sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-1 p-2 sm:grid-cols-4">
         {flow.map((s, i) => (
           <button
             key={s.key}
             onClick={() => onPick(active === s.key ? 'tous' : s.key)}
-            className={cn('group relative min-h-[72px] px-5 py-3 text-left transition-colors hover:bg-[#faf9fd] md:px-6', i % 2 === 0 && 'border-r border-line', i < 2 && 'max-sm:border-b', i === 1 && 'sm:border-r', i === 2 && 'sm:border-r', active === s.key && 'bg-[#faf9fd]')}
+            className={cn('group relative min-h-[72px] rounded-[16px] px-4 py-3 text-left transition-colors duration-300 hover:bg-halo-hover md:px-5', active === s.key && 'bg-halo-track')}
             aria-pressed={active === s.key}
           >
             <div className="flex items-center gap-2 text-[12.5px] font-medium text-ink-2">
               <i className="h-2 w-2 rounded-full" style={{ background: s.color }} />
               {s.label}
-              <span className="num rounded-full bg-sub px-1.5 text-[11px] font-semibold text-ink-2">{s.count}</span>
+              <span className="num rounded-full bg-[#f3f1f8] px-1.5 text-[11px] font-semibold text-ink-2">{s.count}</span>
             </div>
-            <div className="num mt-1 text-[18px] font-semibold tracking-[-0.025em]">
+            <div className="num-halo mt-1 text-[20px]">
               <AnimatedNumber value={s.amount} format={fmt0} delay={i * 80} />
             </div>
-            {i < flow.length - 1 && <ChevronRight className="absolute right-[-9px] top-1/2 z-[1] hidden h-[18px] w-[18px] -translate-y-1/2 rounded-full bg-white p-[2px] text-ink-3 shadow-[0_0_0_1px_var(--line)] sm:block" />}
-            <span className={cn('absolute inset-x-5 bottom-0 h-[2px] origin-left rounded-full transition-transform duration-300 ease-out-quint md:inset-x-6', active === s.key ? 'scale-x-100' : 'scale-x-0')} style={{ background: s.color }} />
+            {i < flow.length - 1 && <ChevronRight className="absolute right-[-10px] top-1/2 z-[1] hidden h-[18px] w-[18px] -translate-y-1/2 text-[#c9c4d9] sm:block" />}
           </button>
         ))}
       </div>
-    </section>
+    </Card>
   );
 }

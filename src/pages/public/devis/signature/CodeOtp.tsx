@@ -50,9 +50,9 @@ export function CodeOtp({ valeur, onChange, erreur, desactive }: { valeur: strin
               if (e.key === 'ArrowRight') refs.current[Math.min(5, i + 1)]?.focus();
             }}
             className={cn(
-              'bx-mono h-[58px] w-[46px] rounded-2xl border bg-white text-center text-[24px] font-medium text-ink outline-none transition-all duration-200 sm:h-16 sm:w-[52px]',
-              erreur ? 'border-[#f2a3a3] bg-[#fff6f6]' : c ? 'border-[#c9b8f5] bg-[#faf7ff]' : 'border-line2',
-              actif && !erreur && 'border-[#8b5cf6] shadow-[0_0_0_4px_rgba(139,92,246,.14)]',
+              'bx-mono h-[58px] w-[46px] rounded-field bg-white text-center text-[24px] font-medium text-ink outline-none transition-all duration-300 ease-spring sm:h-16 sm:w-[52px]',
+              erreur ? 'bg-[#fff6f7] shadow-[0_0_0_1.5px_#f6b8c4]' : c ? 'bg-dawn-pale shadow-[0_0_0_1.5px_#e9b8f5]' : 'shadow-[0_0_0_1px_#e6e1f1]',
+              actif && !erreur && '-translate-y-0.5 shadow-[0_0_0_1.5px_#c4b5fd,0_0_0_5px_rgba(167,139,250,.2)]',
               i === 2 && 'mr-1.5 sm:mr-2.5',
             )}
           />

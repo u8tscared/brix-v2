@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowDownLeft, ArrowRightLeft, ArrowUpRight, PackageMinus, ScanLine, Search, ShoppingCart, Truck } from 'lucide-react';
-import { Avatar, Button, IconTile, Input, PageHeader, Segmented, cn } from '@/components/ui';
+import { Avatar, Button, Card, IconTile, Input, PageHeader, Segmented, cn } from '@/components/ui';
 import { AnimatedNumber, GrowBar } from '@/components/motion';
 import { useBrix } from '@/lib/store';
 import { money, relative } from '@/lib/format';
@@ -13,7 +13,7 @@ import { StockList } from './components/StockList';
 import { BigMoney, Label, SectionHead, SplitBar } from '@/modules/finance/components/kit';
 
 type Filter = 'all' | LocationKey | 'low';
-const LOC_COLOR: Record<LocationKey, string> = { depot: '#0d9488', van_yanis: '#5eead4', van_mehdi: '#b7ece2' };
+const LOC_COLOR: Record<LocationKey, string> = { depot: '#10b981', van_yanis: '#6ee7b7', van_mehdi: '#c4ebd9' };
 const short = (name: string) => name.split(' ').slice(0, 3).join(' ');
 
 export default function Stock() {
@@ -65,6 +65,7 @@ export default function Stock() {
       <PageHeader
         icon={<IconTile name="Boxes" dept="achats" size="lg" />}
         title="Stock"
+        titleMuted="compté sans y penser."
         subtitle="Ce qu’il reste au dépôt et dans chaque camion."
         actions={<>
           <Button variant="secondary" icon={<ScanLine />} onClick={() => setScan(true)} className="max-sm:flex-1">Inventaire</Button>
@@ -74,7 +75,8 @@ export default function Stock() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         {/* Valeur et répartition */}
-        <div className="rounded-[16px] bg-white p-5 shadow-card">
+        <Card className="relative overflow-hidden p-5 md:p-6">
+          <div aria-hidden className="pointer-events-none absolute -right-12 -top-16 h-48 w-64 rounded-full bg-[radial-gradient(closest-side,#dcf5ea,transparent)] opacity-90 blur-xl" />
           <Label>Valeur du stock, au prix d’achat HT</Label>
           <BigMoney value={value} dawn className="mt-2 block text-[40px] md:text-[44px]" />
           <div className="mt-1 text-[12.5px] text-ink-3"><AnimatedNumber value={articles.length} className="num font-medium text-ink-2" /> articles suivis sur 3 emplacements</div>
@@ -87,25 +89,27 @@ export default function Stock() {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
 
         {/* À recommander : présent, mais sans crier */}
-        <div className="relative overflow-hidden rounded-[16px] bg-white p-5 shadow-card">
-          {low.length > 0 && <span aria-hidden className="absolute inset-y-0 left-0 w-[3px] bg-[#f59e0b]" />}
+        <Card className="relative overflow-hidden p-5 md:p-6">
           <div className="flex items-start justify-between gap-3">
-            <div>
-              <Label><ShoppingCart className="h-3.5 w-3.5" />À recommander</Label>
-              <div className="mt-1 text-[17px] font-semibold tracking-[-0.02em]">{low.length ? `${low.length} article${low.length > 1 ? 's' : ''} sous le seuil au dépôt` : 'Rien à recommander'}</div>
+            <div className="flex min-w-0 items-start gap-3">
+              <IconTile icon={<ShoppingCart />} tone={low.length ? 'amber' : 'green'} size="md" />
+              <div className="min-w-0">
+              <Label>À recommander</Label>
+              <div className="mt-1 text-[18px] font-semibold tracking-[-0.03em]">{low.length ? `${low.length} article${low.length > 1 ? 's' : ''} sous le seuil au dépôt` : 'Rien à recommander'}</div>
+              </div>
             </div>
             {low.length > 0 && <Button variant="primary" icon={<ShoppingCart />} onClick={() => nav('/app/fournisseurs')} className="max-sm:hidden">Commander</Button>}
           </div>
           {low.length ? (
             <>
-              <div className="mt-3 divide-y divide-dashed divide-line">
+              <div className="mt-4 space-y-1.5">
                 {low.map((a) => (
-                  <div key={a.id} className="flex items-center gap-3 py-2">
+                  <div key={a.id} className="flex min-h-[40px] items-center gap-3 rounded-full bg-halo-track/70 py-1.5 pl-4 pr-3">
                     <span className="min-w-0 flex-1 truncate text-[13px]">{short(a.name)}</span>
-                    <GrowBar value={(a.qty.depot / a.min) * 100} className="w-16 shrink-0 sm:w-24" barClassName="bg-[#f59e0b]" />
+                    <GrowBar value={(a.qty.depot / a.min) * 100} className="w-16 shrink-0 bg-white sm:w-24" barClassName="bg-[#fbbf24]" />
                     <span className="num w-14 shrink-0 text-right text-[12.5px] text-ink-2"><span className="font-semibold text-ink">{a.qty.depot}</span> / {a.min}</span>
                   </div>
                 ))}
@@ -118,7 +122,7 @@ export default function Stock() {
           ) : (
             <p className="mt-2 text-[13px] text-ink-2">Tous les articles sont au-dessus de leur seuil. Brix vous prévient dès que l’un passe en dessous.</p>
           )}
-        </div>
+        </Card>
       </div>
 
       {vansLow.length > 0 && (
@@ -126,7 +130,7 @@ export default function Stock() {
           {vansLow.map(({ l, items }) => {
             const driver = employees.find((e) => e.id === l.employeeId);
             return (
-              <div key={l.key} className="lift flex items-center gap-3 rounded-[16px] bg-white p-3.5 shadow-card">
+              <div key={l.key} className="row-card">
                 <span className="relative">
                   <IconTile icon={<Truck />} dept="achats" />
                   {driver && <Avatar initials={driver.initials} color={driver.color} size={20} className="absolute -bottom-1 -right-1 ring-2 ring-white" />}
@@ -152,7 +156,7 @@ export default function Stock() {
       <StockList list={list} flash={flash} onOut={(id) => setMove({ id, kind: 'sortie' })} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-[16px] bg-white p-4 shadow-card md:p-5">
+        <Card className="p-4 md:p-5">
           <SectionHead title="Sorties par chantier" meta="ajoutées à leur coût réel" />
           <div className="mt-3 space-y-3.5">
             {byChantier.map(([id, v]) => {
@@ -163,13 +167,13 @@ export default function Stock() {
                     <span className="min-w-0 truncate">{c?.name ?? 'Chantier'}</span>
                     <span className="num shrink-0 font-medium">{money(v)}</span>
                   </div>
-                  <GrowBar value={(v / maxCh) * 100} className="mt-1.5" barClassName="bg-[#0d9488]" />
+                  <GrowBar value={(v / maxCh) * 100} className="mt-1.5" barClassName="bg-[#10b981]" />
                 </div>
               );
             })}
           </div>
-        </div>
-        <div className="rounded-[16px] bg-white p-4 shadow-card md:p-5">
+        </Card>
+        <Card className="p-4 md:p-5">
           <SectionHead title="Derniers mouvements" />
           <div className="mt-2">
             {movements.slice(0, 6).map((m) => {
@@ -178,8 +182,8 @@ export default function Stock() {
               const c = chantiers.find((x) => x.id === m.chantierId);
               const Ico = m.kind === 'entree' ? ArrowDownLeft : m.kind === 'transfert' ? ArrowRightLeft : ArrowUpRight;
               return (
-                <div key={m.id} className="flex min-h-[52px] items-center gap-3 border-b border-dashed border-line py-2 last:border-0">
-                  <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-full', m.kind === 'entree' ? 'bg-[#e7f6f3] text-[#0f766e]' : 'bg-sub text-ink-2')}><Ico className="h-4 w-4" /></span>
+                <div key={m.id} className="flex min-h-[56px] items-center gap-3 border-b border-halo-line py-2 last:border-0">
+                  <span className={cn('grid h-[34px] w-[34px] shrink-0 place-items-center rounded-full', m.kind === 'entree' ? 'bg-pale-g text-deep-g' : m.kind === 'transfert' ? 'bg-pale-b text-deep-b' : 'bg-pale-p text-deep-p')}><Ico className="h-4 w-4" /></span>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px]"><span className="num font-semibold">{m.kind === 'entree' ? '+' : '−'}{m.qty} {a?.unit}</span> {a?.name}</div>
                     <div className="truncate text-[11.5px] text-ink-3">{LOCATIONS.find((l) => l.key === m.from)?.short}{m.kind === 'transfert' ? ` vers ${LOCATIONS.find((l) => l.key === m.to)?.short}` : c ? ` vers ${c.name}` : ''}{e ? ` · ${e.firstName}` : ''}</div>
@@ -189,7 +193,7 @@ export default function Stock() {
               );
             })}
           </div>
-        </div>
+        </Card>
       </div>
 
       <MoveSheet open={!!move} onClose={() => setMove(null)} articleId={move?.id} kind={move?.kind} />

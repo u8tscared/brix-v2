@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AlertTriangle, ArrowUp, Landmark, Mic, Percent, Plus, Receipt, TrendingUp, Undo2 } from 'lucide-react';
-import { Button, cn, toast } from '@/components/ui';
+import { Button, IconTile, cn, toast, type HaloTone } from '@/components/ui';
+import { BrandTile } from '@/components/brand/Logo';
 import type { Client, Company, Devis } from '@/lib/types';
 import { buildSuggestions, interpret, type Suggestion } from '../bob';
 import { mainVat } from '../logic';
@@ -15,23 +16,18 @@ export interface BobMsg {
   undoPatch?: Partial<Devis>;
 }
 
-const ICONS: Record<Suggestion['icon'], JSX.Element> = {
-  alert: <AlertTriangle className="h-4 w-4 text-warn" />,
-  trend: <TrendingUp className="h-4 w-4 text-ink-2" />,
-  percent: <Percent className="h-4 w-4 text-ink-2" />,
-  aide: <Landmark className="h-4 w-4 text-ink-2" />,
-  tva: <Receipt className="h-4 w-4 text-ink-2" />,
-  plus: <Plus className="h-4 w-4 text-ink-2" />,
+const ICONS: Record<Suggestion['icon'], { tone: HaloTone; icon: JSX.Element }> = {
+  alert: { tone: 'amber', icon: <AlertTriangle /> },
+  trend: { tone: 'green', icon: <TrendingUp /> },
+  percent: { tone: 'mag', icon: <Percent /> },
+  aide: { tone: 'blue', icon: <Landmark /> },
+  tva: { tone: 'violet', icon: <Receipt /> },
+  plus: { tone: 'peach', icon: <Plus /> },
 };
 
+/** Bob signe avec le logo B (assistant calme, jamais d'étincelles). */
 export function BobAvatar({ size = 32 }: { size?: number }) {
-  return (
-    <span className="grid shrink-0 place-items-center rounded-full bg-ink text-white" style={{ width: size, height: size }}>
-      <svg viewBox="0 0 24 24" className="h-[45%] w-[45%]" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-        <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2" />
-      </svg>
-    </span>
-  );
+  return <BrandTile size={size} />;
 }
 
 export function useBobSuggestions(d: Devis, client: Client | undefined, company: Company) {
@@ -86,16 +82,16 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
 
   return (
     <div className={cn('flex min-h-0 flex-col', className)}>
-      <div className="flex items-center gap-2.5 border-b border-line px-4 py-3">
-        <BobAvatar />
+      <div className="flex items-center gap-3 px-5 pb-1 pt-5">
+        <BobAvatar size={34} />
         <div className="min-w-0 flex-1 leading-tight">
-          <div className="text-[14px] font-semibold">Bob</div>
+          <div className="text-[15px] font-semibold tracking-[-0.02em]">Bob</div>
           <div className="truncate text-[12px] text-ink-3">connaît ce chantier et ta bibliothèque</div>
         </div>
       </div>
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4">
-        <button onClick={onVoice} className="group flex w-full items-center gap-3 rounded-xl border border-line bg-[#fafafc] px-3 py-3 text-left transition hover:border-vi-200 hover:bg-vi-50/50">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-white transition group-hover:scale-105">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
+        <button onClick={onVoice} className="group flex w-full items-center gap-3 rounded-card-sm bg-pale-v/60 px-3 py-3 text-left transition duration-300 ease-out-quint hover:-translate-y-px hover:bg-pale-v">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white text-deep-v shadow-pill transition duration-300 ease-spring group-hover:scale-110">
             <Mic className="h-4 w-4" />
           </span>
           <span className="min-w-0 flex-1">
@@ -106,11 +102,11 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
 
         {last.map((m) =>
           m.from === 'me' ? (
-            <div key={m.id} className="ml-8 rounded-xl rounded-br-sm bg-ink px-3 py-2 text-[13px] text-white">
+            <div key={m.id} className="ml-8 rounded-[18px] rounded-br-[6px] bg-ink px-3.5 py-2.5 text-[13px] text-white">
               {m.text}
             </div>
           ) : (
-            <div key={m.id} className="animate-[fade-up_.3s_ease_both] rounded-xl border border-line bg-white p-3">
+            <div key={m.id} className="animate-[fade-up_.3s_ease_both] rounded-card-sm bg-white p-3.5 shadow-halo-sm">
               <div className="mb-1 flex items-center gap-1.5 text-[12px]">
                 <BobAvatar size={18} />
                 <b className="font-semibold">Bob</b>
@@ -141,8 +137,8 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
         )}
 
         <div>
-          <h6 className="mb-2 text-[11px] font-semibold uppercase tracking-[.06em] text-ink-3">{suggestions.length ? `Suggestions sur ce devis · ${suggestions.length}` : 'Suggestions'}</h6>
-          {suggestions.length === 0 && <p className="rounded-xl border border-dashed border-line2 px-3 py-4 text-center text-[12.5px] text-ink-3">Rien à redire : ton devis est complet et bien margé.</p>}
+          <h6 className="mb-2.5 text-[12.5px] font-medium text-ink-2">{suggestions.length ? `${suggestions.length} conseil${suggestions.length > 1 ? 's' : ''} sur ce devis` : 'Conseils'}</h6>
+          {suggestions.length === 0 && <p className="rounded-card-sm bg-pale-g/70 px-3 py-4 text-center text-[12.5px] text-deep-g">Rien à redire : ton devis est complet et bien margé.</p>}
           <div className="space-y-2.5">
             {suggestions.map((s) => (
               <SuggestionCard key={s.key} s={s} onApply={() => apply(s)} onDismiss={() => dismiss(d.id, s.key)} />
@@ -155,15 +151,15 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
           e.preventDefault();
           send(q);
         }}
-        className="flex shrink-0 items-center gap-2 border-t border-line p-3"
+        className="flex shrink-0 items-center gap-2 px-4 pb-4 pt-2"
       >
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Demande ou dicte à Bob…" className="h-11 min-w-0 flex-1 rounded-[10px] border border-line2 bg-white px-3 text-[13.5px] placeholder:text-ink-3 focus:border-vi-300 focus:outline-none focus:ring-4 focus:ring-vi-100" aria-label="Demande à Bob" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Demande ou dicte à Bob…" className="h-11 min-w-0 flex-1 rounded-full bg-white px-4 text-[13.5px] shadow-[0_0_0_1px_#ece8f6] placeholder:text-ink-3 focus:shadow-[0_0_0_1.5px_#c4b5fd,0_0_0_5px_#f1eafe] focus:outline-none" aria-label="Demande à Bob" />
         {q.trim() ? (
-          <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-[10px] bg-ink text-white" aria-label="Envoyer à Bob">
+          <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-white transition active:scale-95" aria-label="Envoyer à Bob">
             <ArrowUp className="h-4 w-4" />
           </button>
         ) : (
-          <button type="button" onClick={onVoice} className="grid h-11 w-11 shrink-0 place-items-center rounded-[10px] bg-ink text-white" aria-label="Dicter à Bob">
+          <button type="button" onClick={onVoice} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-white transition active:scale-95" aria-label="Dicter à Bob">
             <Mic className="h-4 w-4" />
           </button>
         )}
@@ -173,17 +169,18 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
 }
 
 export function SuggestionCard({ s, onApply, onDismiss }: { s: Suggestion; onApply: () => void; onDismiss: () => void }) {
+  const ic = ICONS[s.icon];
   return (
-    <div className="rounded-xl border border-line bg-white p-3">
-      <div className="flex gap-2.5">
-        <span className="mt-0.5 shrink-0">{ICONS[s.icon]}</span>
-        <p className="text-[13px] leading-relaxed text-ink-2">
+    <div className="rounded-card-sm bg-white p-3.5 shadow-halo-sm transition duration-300 ease-out-quint hover:-translate-y-px hover:shadow-[0_0_0_1px_#e3dcf3,0_10px_24px_-12px_rgba(60,30,120,.18)]">
+      <div className="flex gap-3">
+        <IconTile icon={ic.icon} tone={ic.tone} size="sm" />
+        <p className="min-w-0 text-[13px] leading-relaxed text-ink-2">
           <b className="font-semibold text-ink">{s.title}</b> {s.text}
         </p>
       </div>
-      <div className="mt-2.5 flex flex-wrap gap-2 pl-[26px]">
+      <div className="mt-3 flex flex-wrap gap-2 pl-11">
         {s.action && (
-          <Button size="sm" onClick={onApply} className="max-md:h-10">
+          <Button size="sm" variant="soft" onClick={onApply} className="max-md:h-10">
             {s.action.label}
           </Button>
         )}

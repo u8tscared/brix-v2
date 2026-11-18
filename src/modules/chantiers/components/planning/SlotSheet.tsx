@@ -67,7 +67,7 @@ export function SlotSheet({ draft, onClose }: { draft: SlotDraft | null; onClose
       <div className="space-y-4">
         <div className="flex flex-wrap gap-1.5">
           {KINDS.map((k) => (
-            <button key={k} type="button" onClick={() => set({ kind: k })} className={cn('flex h-9 items-center gap-1.5 rounded-full border px-3 text-[12.5px] transition', e.kind === k ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')}>
+            <button key={k} type="button" onClick={() => set({ kind: k })} className={cn('flex h-9 items-center gap-1.5 rounded-full border px-3 text-[12.5px] transition', e.kind === k ? 'border-transparent bg-ink text-white shadow-ink' : 'border-halo-line bg-white text-ink-2 hover:text-ink')}>
               <i className={cn('h-2 w-2 rounded-full', KIND_STYLE[k].bar)} /> {KIND_STYLE[k].label}
             </button>
           ))}
@@ -102,7 +102,7 @@ export function SlotSheet({ draft, onClose }: { draft: SlotDraft | null; onClose
           </Field>
         </div>
         {clash && (
-          <div className="flex items-start gap-2 rounded-xl bg-bad-bg px-3 py-2.5 text-[13px] text-bad">
+          <div className="flex items-start gap-2 rounded-card-sm bg-pale-r px-3.5 py-3 text-[13px] text-deep-r">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             <span>Conflit avec « {clash.title} » ({clash.start} – {clash.end}). Vous pouvez enregistrer quand même.</span>
           </div>

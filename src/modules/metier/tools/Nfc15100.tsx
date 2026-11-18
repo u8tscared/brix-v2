@@ -46,7 +46,7 @@ export default function Nfc15100() {
                     {(Object.keys(ROOM_LABEL) as RoomType[]).map((k) => <option key={k} value={k}>{ROOM_LABEL[k]}</option>)}
                   </Select>
                   <NumField label="" value={room.surface} onChange={(v) => upd(room.id, { surface: v })} suffix="m²" />
-                  <button onClick={() => setRooms((rs) => rs.filter((x) => x.id !== room.id))} className="grid h-11 w-10 place-items-center rounded-lg text-ink-3 hover:bg-sub hover:text-bad" aria-label="Retirer"><X className="h-4 w-4" /></button>
+                  <button onClick={() => setRooms((rs) => rs.filter((x) => x.id !== room.id))} className="grid h-11 w-10 place-items-center rounded-full text-ink-3 transition-colors hover:bg-pale-r hover:text-deep-r" aria-label="Retirer"><X className="h-4 w-4" /></button>
                 </div>
               ))}
             </div>
@@ -56,7 +56,7 @@ export default function Nfc15100() {
             <div className="mb-2 text-[12.5px] font-medium text-ink-2">Équipements</div>
             <div className="grid gap-2 2xl:grid-cols-2">
               {EXTRAS.map((e) => (
-                <label key={e.key} className="flex min-h-[44px] items-center justify-between gap-2 rounded-[10px] border border-line px-3">
+                <label key={e.key} className="flex min-h-[44px] items-center justify-between gap-2 rounded-card-sm bg-white px-3.5 shadow-halo-sm">
                   <span className="text-[13px]">{e.label}</span>
                   <Switch checked={ex[e.key]} onChange={(v) => setEx({ ...ex, [e.key]: v })} label={e.label} />
                 </label>
@@ -91,7 +91,7 @@ export default function Nfc15100() {
       <ResultRow label="Modules occupés" value={`${r.modules}`} sub={`${r.rows} rangée${r.rows > 1 ? 's' : ''} avec réserve`} />
       <div className="mt-3 space-y-1.5">
         {r.needs.map(({ r: room, n }) => (
-          <div key={room.id} className="rounded-[10px] bg-sub px-3 py-2 text-[12.5px]">
+          <div key={room.id} className="rounded-card-sm bg-halo-track/70 px-3.5 py-2.5 text-[12.5px]">
             <div className="flex justify-between font-medium"><span>{ROOM_LABEL[room.type]} · {room.surface.toLocaleString('fr-FR')} m²</span><span className="num">{n.prises} PC · {n.lumieres} PL{n.rj45 ? ` · ${n.rj45} RJ45` : ''}</span></div>
             {(n.note || n.dedicated.length > 0) && <div className="mt-0.5 text-ink-2">{[n.dedicated.map((d) => `${d.label} ${d.amps} A`).join(', '), n.note].filter(Boolean).join(' · ')}</div>}
           </div>
@@ -99,7 +99,7 @@ export default function Nfc15100() {
       </div>
       <div className="mt-3 text-[12.5px] font-medium text-ink-2">Circuits</div>
       <div className="mt-1 flex flex-wrap gap-1.5">
-        {r.circuits.map((c, i) => <span key={i} className="rounded-md border border-line bg-white px-2 py-1 text-[12px]">{c.label} · {c.amps} A{c.count ? ` · ${c.count}` : ''}</span>)}
+        {r.circuits.map((c, i) => <span key={i} className="rounded-pill bg-pale-a px-2.5 py-1 text-[12px] font-medium text-deep-a">{c.label} · {c.amps} A{c.count ? ` · ${c.count}` : ''}</span>)}
       </div>
     </ToolLayout>
   );

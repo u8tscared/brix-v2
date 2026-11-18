@@ -1,6 +1,7 @@
 // En-tête éditable d'une facture : client, objet, dates et mentions obligatoires 2026.
 
-import { Field, Input, Select, Switch, cn } from '@/components/ui';
+import { ScrollText } from 'lucide-react';
+import { Field, IconTile, Input, Select, Switch, cn } from '@/components/ui';
 import { dateFull, dayOffset, daysBetween } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Facture } from '@/lib/types';
@@ -17,7 +18,7 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
 
   if (readOnly) {
     return (
-      <div data-field="client" className="grid grid-cols-2 gap-px overflow-hidden rounded-[16px] bg-line shadow-card md:grid-cols-4">
+      <div data-field="client" className="grid grid-cols-2 gap-px overflow-hidden rounded-card bg-halo-line shadow-halo md:grid-cols-4">
         <Cell label="Client" value={client?.name ?? '·'} />
         <Cell label="Émise le" value={dateFull(f.issueDate)} />
         <Cell label="Échéance" value={f.kind === 'avoir' ? '·' : dateFull(f.dueDate)} />
@@ -65,9 +66,9 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
           <Input type="date" value={f.issueDate} onChange={(e) => onChange({ issueDate: e.target.value, dueDate: dayOffset(terms, new Date(e.target.value + 'T12:00')) })} />
         </Field>
         <Field label="Échéance" hint={client?.kind === 'pro' ? 'Entre pros : 60 jours maximum (45 jours fin de mois).' : undefined}>
-          <div data-field="validity" className="flex gap-1.5 rounded-[10px]">
+          <div data-field="validity" className="flex gap-1 rounded-full bg-halo-track p-1">
             {[0, 15, 30, 45].map((d) => (
-              <button key={d} onClick={() => onChange({ dueDate: dayOffset(d, new Date(f.issueDate + 'T12:00')) })} className={cn('h-11 flex-1 whitespace-nowrap rounded-[10px] border px-1 text-[12.5px] font-medium transition', d === 0 && 'flex-[1.6]', terms === d ? 'border-ink bg-ink text-white' : 'border-line2 bg-white hover:bg-sub')}>
+              <button key={d} onClick={() => onChange({ dueDate: dayOffset(d, new Date(f.issueDate + 'T12:00')) })} aria-pressed={terms === d} className={cn('h-10 flex-1 whitespace-nowrap rounded-full px-1 text-[12.5px] font-medium transition duration-300 ease-spring', d === 0 && 'flex-[1.6]', terms === d ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:text-ink')}>
                 {d === 0 ? 'À réception' : `${d} j`}
               </button>
             ))}
@@ -75,9 +76,12 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
         </Field>
       </div>
 
-      <div data-field="chantier" className="rounded-[16px] bg-white shadow-card">
-        <div className="border-b border-line px-4 py-2.5 text-[12.5px] font-semibold text-ink-2">Mentions obligatoires 2026</div>
-        <div className="grid gap-3 p-4 md:grid-cols-2">
+      <div data-field="chantier" className="rounded-card bg-white shadow-halo">
+        <div className="flex items-center gap-2.5 border-b border-halo-line px-4 py-3 text-[14px] font-semibold tracking-[-0.02em] md:px-5">
+          <IconTile icon={<ScrollText />} tone="indigo" size="sm" />
+          Mentions obligatoires 2026
+        </div>
+        <div className="grid gap-3 p-4 md:grid-cols-2 md:p-5">
           <Field label="Catégorie de l’opération">
             <Select value={extra.category ?? 'services'} onChange={(e) => onExtra({ category: e.target.value as OperationCategory })}>
               {(Object.keys(CATEGORY_LABEL) as OperationCategory[]).map((k) => (
@@ -91,7 +95,7 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
             </Field>
           ) : (
             <Field label="SIREN du client">
-              <div className="flex h-11 items-center rounded-[10px] bg-sub px-3 text-[13px] text-ink-2">{client ? 'Particulier : non requis' : 'Choisissez d’abord le client'}</div>
+              <div className="flex h-11 items-center rounded-field bg-pale-n px-3.5 text-[13px] text-ink-2">{client ? 'Particulier : non requis' : 'Choisissez d’abord le client'}</div>
             </Field>
           )}
           <Field label="Adresse de livraison ou du chantier" className="md:col-span-2" hint="Si elle diffère de l’adresse du client.">
@@ -119,9 +123,9 @@ export function MetaForm({ f, extra, onChange, onExtra, readOnly }: { f: Facture
 
 function Cell({ label, value, bad, className }: { label: string; value: string; bad?: boolean; className?: string }) {
   return (
-    <div className={cn('min-w-0 bg-white px-3.5 py-2.5', className)}>
+    <div className={cn('min-w-0 bg-white px-4 py-3', className)}>
       <div className="text-[11.5px] text-ink-3">{label}</div>
-      <div className={cn('text-[13.5px] font-medium leading-snug', bad && 'text-bad')}>{value}</div>
+      <div className={cn('text-[13.5px] font-medium leading-snug', bad && 'text-deep-r')}>{value}</div>
     </div>
   );
 }

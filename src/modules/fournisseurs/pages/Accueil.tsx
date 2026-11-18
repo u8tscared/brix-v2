@@ -1,8 +1,8 @@
 // Vue d'ensemble des achats : ce qu'il faut faire aujourd'hui, ce qui arrive, ce qu'on a économisé.
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BellRing, CalendarClock, ChevronRight, PackageCheck, PackagePlus, PiggyBank, Scale, TrendingUp, Truck } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, EmptyState, PageHeader, cn } from '@/components/ui';
+import { ArrowRight, BellRing, CalendarClock, ChevronRight, PackageCheck, PackagePlus, PiggyBank, Scale, ShoppingBag, TrendingUp, Truck } from 'lucide-react';
+import { Badge, Button, Card, CardHeader, EmptyState, IconTile, PageHeader, cn } from '@/components/ui';
 import { dateShort, dayOffset, money, relative, todayISO } from '@/lib/format';
 import { comparatif, eur } from '@/modules/fournisseurs/data/helpers';
 import { totalCommande, useAchats } from '@/modules/fournisseurs/data/store';
@@ -62,7 +62,10 @@ export default function Accueil() {
   return (
     <div className="bx-stagger space-y-6">
       <PageHeader
+        icon={<IconTile name="Truck" dept="achats" size="xl" />}
+        kicker="Achats et fournisseurs"
         title="Achats"
+        titleMuted="au meilleur prix, sans un coup de fil."
         subtitle="Demandez vos prix à plusieurs fournisseurs en un clic, commandez au meilleur prix, suivez vos livraisons."
         actions={
           <>
@@ -72,39 +75,40 @@ export default function Accueil() {
         }
       />
 
-      <Card className="grid overflow-hidden md:grid-cols-[1.3fr_1fr_1fr_1fr]">
-        <div className="relative border-b border-line p-5 md:border-b-0 md:border-r">
-          <div className="flex items-center gap-2 text-[12.5px] font-medium text-ink-2"><Tuile icon={<PiggyBank />} ton="ok" size={28} />Économisé grâce aux comparatifs</div>
-          <Anime v={stats.economie} euros arrondi className="mt-3 block text-[34px] font-semibold leading-none tracking-[-0.035em] text-ok" />
-          <div className="mt-1.5 text-[12px] text-ink-3">par rapport à l’offre la plus chère, à chaque fois</div>
-        </div>
-        <div className="grid grid-cols-3 divide-x divide-line md:contents">
+      <div className="grid gap-4 md:grid-cols-[1.35fr_1fr_1fr_1fr] [&>*]:min-w-0">
+        <Card tone="dawn" className="halo-bg halo-clip relative overflow-hidden p-6">
+          <div className="flex items-center gap-2.5 label-halo"><Tuile icon={<PiggyBank />} ton="ok" size={32} />Économisé grâce aux comparatifs</div>
+          <Anime v={stats.economie} euros arrondi className="num-halo mt-4 block text-[44px] leading-none text-ink md:text-[48px]" />
+          <div className="mt-2 text-[12.5px] text-ink-2">par rapport à l’offre la plus chère, à chaque fois</div>
+        </Card>
+        <div className="grid grid-cols-3 gap-3 md:contents">
           {[
-            { l: 'Commandes en cours', v: stats.enCours.length, s: `${money(stats.enCours.reduce((s, c) => s + totalCommande(c), 0), true)} HT` },
-            { l: 'Livraisons sous 7 jours', v: stats.livraisons.length, s: stats.livraisons[0]?.livraisonPrevue ? `prochaine ${relative(stats.livraisons[0].livraisonPrevue)}` : 'aucune prévue' },
-            { l: 'Achats sur 30 jours', v: stats.depenses, s: 'HT, port compris', euros: true },
-          ].map((k, i) => (
-            <div key={k.l} className={cn('min-w-0 p-4 md:p-5', i < 2 && 'md:border-r md:border-line')}>
-              <div className="text-[12px] font-medium leading-tight text-ink-2">{k.l}</div>
-              <Anime v={k.v} euros={k.euros} arrondi className="mt-2 block text-[20px] font-semibold tracking-[-0.025em] md:text-[24px]" />
-              <div className="mt-1 truncate text-[11.5px] text-ink-3">{k.s}</div>
-            </div>
+            { l: 'Commandes en cours', v: stats.enCours.length, s: `${money(stats.enCours.reduce((s, c) => s + totalCommande(c), 0), true)} HT`, icon: <PackageCheck />, ton: 'violet' as const },
+            { l: 'Livraisons sous 7 jours', v: stats.livraisons.length, s: stats.livraisons[0]?.livraisonPrevue ? `prochaine ${relative(stats.livraisons[0].livraisonPrevue)}` : 'aucune prévue', icon: <Truck />, ton: 'peche' as const },
+            { l: 'Achats sur 30 jours', v: stats.depenses, s: 'HT, port compris', euros: true, icon: <ShoppingBag />, ton: 'bleu' as const },
+          ].map((k) => (
+            <Card key={k.l} className="min-w-0 p-3.5 md:p-5">
+              <Tuile icon={k.icon} ton={k.ton} size={34} className="max-md:hidden" />
+              <div className="mt-0 text-[12px] font-medium leading-tight text-ink-2 md:mt-4 md:text-[13px]">{k.l}</div>
+              <Anime v={k.v} euros={k.euros} arrondi className="num-halo mt-1.5 block text-[22px] md:text-[30px]" />
+              <div className="mt-0.5 truncate text-[11.5px] text-ink-3 md:text-[12px]">{k.s}</div>
+            </Card>
           ))}
         </div>
-      </Card>
+      </div>
 
       {aFaire.length > 0 && (
         <section className="space-y-2.5">
-          <h2 className="flex items-center gap-2 text-[15px] font-semibold">À faire <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#130f26] px-1.5 text-[11px] text-white">{aFaire.length}</span></h2>
+          <h2 className="flex items-center gap-2 text-[17px] font-semibold tracking-[-0.025em]">À faire <span className="num grid h-6 min-w-6 place-items-center rounded-full bg-ink px-1.5 text-[11.5px] font-semibold text-white">{aFaire.length}</span></h2>
           <div className="grid gap-2.5 md:grid-cols-2 [&>*]:min-w-0">
             {aFaire.map((a, i) => (
-              <button key={i} type="button" onClick={() => nav(a.lien)} className="group flex min-h-[68px] min-w-0 items-center gap-3 rounded-[14px] border border-line bg-white px-4 py-3 text-left shadow-[0_1px_2px_rgba(20,20,40,.04)] transition hover:-translate-y-px hover:shadow-[0_10px_24px_-16px_rgba(45,20,90,.35)]">
+              <button key={i} type="button" onClick={() => nav(a.lien)} className="row-card group min-h-[72px] min-w-0 text-left">
                 <Tuile icon={a.icon} ton={a.ton} size={38} />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[14px] font-medium first-letter:uppercase">{a.titre}</span>
                   <span className="block truncate text-[12.5px] text-ink-3">{a.texte}</span>
                 </span>
-                <span className="hidden items-center gap-1 text-[12.5px] font-medium text-ink-2 group-hover:text-ink sm:flex">{a.action}<ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" /></span>
+                <span className="hidden h-8 items-center gap-1 rounded-pill bg-halo-track px-3 text-[12.5px] font-medium text-ink-2 transition-colors group-hover:bg-ink group-hover:text-white sm:flex">{a.action}<ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" /></span>
                 <ChevronRight className="h-4 w-4 text-ink-3 sm:hidden" />
               </button>
             ))}
@@ -114,18 +118,18 @@ export default function Accueil() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
-          <CardHeader title="Livraisons à venir" icon={<Truck className="h-4 w-4 text-ink-3" strokeWidth={1.75} />} action={<Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => nav(`${BASE}/commandes`)}>Tout voir</Button>} />
+          <CardHeader title="Livraisons à venir" icon={<Tuile icon={<Truck />} ton="peche" size={30} />} action={<Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => nav(`${BASE}/commandes`)}>Tout voir</Button>} />
           {stats.livraisons.length === 0 ? (
             <div className="p-4"><EmptyState icon={<CalendarClock />} title="Rien à recevoir cette semaine" text="Les commandes confirmées par vos fournisseurs apparaîtront ici avec leur date de livraison." /></div>
           ) : (
-            <ol className="px-4 py-2">
+            <ol className="space-y-1 p-2.5">
               {stats.livraisons.map((c) => {
                 const j = new Date(c.livraisonPrevue! + 'T12:00:00');
                 return (
                   <li key={c.id}>
-                    <button type="button" onClick={() => nav(`${BASE}/commandes/${c.id}`)} className="flex w-full items-center gap-3 rounded-[12px] px-1 py-2.5 text-left transition hover:bg-[#fafafc]">
-                      <span className="flex w-12 shrink-0 flex-col items-center rounded-[11px] border border-line bg-white py-1.5">
-                        <span className="text-[10.5px] font-medium uppercase text-ink-3">{j.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '')}</span>
+                    <button type="button" onClick={() => nav(`${BASE}/commandes/${c.id}`)} className="flex w-full items-center gap-3 rounded-card-sm px-2.5 py-2.5 text-left transition hover:bg-halo-hover">
+                      <span className="flex w-12 shrink-0 flex-col items-center rounded-[13px] bg-pale-p py-1.5 text-deep-p">
+                        <span className="text-[10.5px] font-medium uppercase opacity-80">{j.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '')}</span>
                         <span className="num text-[18px] font-semibold leading-none tracking-[-0.02em]">{j.getDate()}</span>
                       </span>
                       <FournisseurPastille f={nomF(c.fournisseurId)} size={32} />
@@ -143,21 +147,21 @@ export default function Accueil() {
         </Card>
 
         <Card>
-          <CardHeader title="Demandes de prix en cours" icon={<Scale className="h-4 w-4 text-ink-3" strokeWidth={1.75} />} action={<Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => nav(`${BASE}/demandes`)}>Tout voir</Button>} />
+          <CardHeader title="Demandes de prix en cours" icon={<Tuile icon={<Scale />} ton="violet" size={30} />} action={<Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => nav(`${BASE}/demandes`)}>Tout voir</Button>} />
           {ouvertes.length === 0 ? (
             <div className="p-4">
-              <EmptyState icon={<Scale />} title="Aucune demande en cours" text="Depuis un devis signé, Brix prépare la liste du matériel et l’envoie à vos fournisseurs." action={<Button variant="primary" onClick={() => setOuvrir('demande')}>Demander des prix</Button>} />
+              <EmptyState icon={<Scale />} title="Aucune demande en cours" text="Depuis un devis signé, Brix prépare la liste du matériel et l’envoie à vos fournisseurs." action={<Button variant="secondary" onClick={() => setOuvrir('demande')}>Demander des prix</Button>} />
             </div>
           ) : (
-            <ul className="px-2 py-2">
+            <ul className="space-y-1 p-2.5">
               {ouvertes.map((d) => {
                 const comp = comparatif(d, fournisseurs);
                 return (
                   <li key={d.id}>
-                    <button type="button" onClick={() => nav(`${BASE}/demandes/${d.id}`)} className="flex w-full items-center gap-3 rounded-[12px] px-2 py-2.5 text-left transition hover:bg-[#fafafc]">
+                    <button type="button" onClick={() => nav(`${BASE}/demandes/${d.id}`)} className="flex w-full items-center gap-3 rounded-card-sm px-2.5 py-2.5 text-left transition hover:bg-halo-hover">
                       <span className="flex -space-x-2">
                         {d.destinataires.slice(0, 3).map((x) => (
-                          <span key={x.id} className={cn('rounded-[11px] ring-2 ring-white', x.statut !== 'repondue' && 'opacity-45')}><FournisseurPastille f={nomF(x.fournisseurId)} size={28} /></span>
+                          <span key={x.id} className={cn('rounded-[10px] ring-2 ring-white', x.statut !== 'repondue' && 'opacity-45')}><FournisseurPastille f={nomF(x.fournisseurId)} size={28} /></span>
                         ))}
                       </span>
                       <span className="min-w-0 flex-1">
@@ -179,10 +183,10 @@ export default function Accueil() {
 
       {stats.hausses.length > 0 && (
         <Card>
-          <CardHeader title="Hausses de prix récentes" icon={<TrendingUp className="h-4 w-4 text-warn" strokeWidth={1.75} />} meta="pensez à mettre à jour vos devis en cours" />
-          <div className="grid divide-y divide-line md:grid-cols-2 md:divide-y-0 [&>*]:min-w-0">
+          <CardHeader title="Hausses de prix récentes" icon={<Tuile icon={<TrendingUp />} ton="warn" size={30} />} meta="pensez à mettre à jour vos devis en cours" />
+          <div className="grid gap-2 p-2.5 md:grid-cols-2 [&>*]:min-w-0">
             {stats.hausses.slice(0, 4).map(({ a, avant, pct }) => (
-              <div key={a.id} className="flex min-h-[60px] min-w-0 items-center gap-3 border-line px-4 py-2.5 md:border-b md:odd:border-r">
+              <div key={a.id} className="flex min-h-[60px] min-w-0 items-center gap-3 rounded-card-sm px-2.5 py-2.5 transition-colors hover:bg-halo-hover">
                 <FournisseurPastille f={nomF(a.fournisseurId)} size={32} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13.5px]">{a.designation}</div>

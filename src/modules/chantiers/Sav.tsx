@@ -39,7 +39,7 @@ export default function Sav() {
         actions={
           <>
             <Button onClick={() => setNewCt(true)} icon={<Plus className="h-4 w-4" />}>Contrat</Button>
-            <Button variant="primary" onClick={() => setNewIt(true)} icon={<Plus className="h-4 w-4" />}>Demande de SAV</Button>
+            <Button variant="dawn" onClick={() => setNewIt(true)} icon={<Plus className="h-4 w-4" />}>Demande de SAV</Button>
           </>
         }
       />

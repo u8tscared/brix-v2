@@ -1,6 +1,7 @@
 // Petits éléments visuels réutilisés par les écrans de facturation.
 
-import { Badge, cn } from '@/components/ui';
+import { BadgeCheck, ChartGantt, Coins, ReceiptText, Undo2, type LucideIcon } from 'lucide-react';
+import { Badge, IconTile, cn, type HaloTone } from '@/components/ui';
 import { EINVOICE_STATUS, FACTURE_STATUS } from '@/lib/status';
 import type { EInvoiceStatus, Facture, FactureStatus } from '@/lib/types';
 import { KIND_LABEL, KIND_TONE } from '../lib/model';
@@ -13,18 +14,33 @@ export function KindBadge({ kind, className }: { kind: Facture['kind']; classNam
   );
 }
 
-export function StatusBadge({ status }: { status: FactureStatus }) {
+/** Pastille Halo d'une facture selon son type (facture, acompte, situation, solde, avoir). */
+const KIND_TILE: Record<Facture['kind'], { icon: LucideIcon; tone: HaloTone }> = {
+  facture: { icon: ReceiptText, tone: 'mag' },
+  acompte: { icon: Coins, tone: 'blue' },
+  situation: { icon: ChartGantt, tone: 'violet' },
+  solde: { icon: BadgeCheck, tone: 'green' },
+  avoir: { icon: Undo2, tone: 'amber' },
+};
+
+export function KindTile({ kind, size = 'row', className }: { kind: Facture['kind']; size?: 'sm' | 'row' | 'md'; className?: string }) {
+  const t = KIND_TILE[kind];
+  const I = t.icon;
+  return <IconTile icon={<I strokeWidth={1.9} />} tone={t.tone} size={size} className={className} />;
+}
+
+export function StatusBadge({ status, size = 'md' }: { status: FactureStatus; size?: 'sm' | 'md' }) {
   const s = FACTURE_STATUS[status];
   return (
-    <Badge tone={s.tone} dot>
+    <Badge tone={s.tone} dot size={size}>
       {s.label}
     </Badge>
   );
 }
 
 const DOT: Record<string, string> = {
-  neutral: 'bg-line2',
-  info: 'bg-brand',
+  neutral: 'bg-[#d9d4ea]',
+  info: 'bg-[#3b82f6]',
   violet: 'bg-vi-500',
   ok: 'bg-ok',
   warn: 'bg-warn',
@@ -50,5 +66,5 @@ export function DueText({ text, tone }: { text: string; tone: 'ok' | 'warn' | 'b
 
 /** Bandeau « en démo » discret pour les fonctions simulées. */
 export function DemoNote({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <p className={cn('rounded-lg bg-sub px-3 py-2 text-[12px] leading-relaxed text-ink-2', className)}>{children}</p>;
+  return <p className={cn('rounded-field bg-pale-n px-3.5 py-2.5 text-[12px] leading-relaxed text-ink-2', className)}>{children}</p>;
 }

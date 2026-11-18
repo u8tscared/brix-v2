@@ -80,7 +80,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
 
   const body = (
     <div className={cn('flex min-h-0 flex-1 flex-col gap-3', fullscreen ? 'overflow-y-auto px-4 pb-4' : '')}>
-      <div className="rounded-2xl border border-line bg-white p-4">
+      <div className="rounded-card bg-white p-4 shadow-halo">
         <div className="mb-1.5 flex items-center justify-between text-[12px] text-ink-3">
           <span>Tu dictes</span>
           <span>{dict.demo ? 'Dictée de démonstration' : 'Bob structure en direct'}</span>
@@ -89,7 +89,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
       </div>
 
       {groups.map(([lot, ls]) => (
-        <div key={lot} className="rounded-2xl border border-line bg-white px-4 py-1">
+        <div key={lot} className="rounded-card-sm bg-white px-4 py-1 shadow-halo-sm">
           <div className="flex items-center justify-between py-2.5 text-[13px]">
             <b className="font-semibold">{lot}</b>
             <span className="text-ink-3">
@@ -97,14 +97,14 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
             </span>
           </div>
           {ls.map((l, i) => (
-            <div key={`${l.designation}-${i}`} className="flex animate-[fade-up_.3s_ease_both] items-center gap-3 border-t border-line py-2.5">
+            <div key={`${l.designation}-${i}`} className="flex animate-[fade-up_.3s_ease_both] items-center gap-3 border-t border-[#f2eff8] py-2.5">
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[14px]">{l.designation}</div>
                 <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11.5px] text-ink-3">
                   <span className="num">
                     {l.supplierRef?.split(' ')[0] ?? 'Brix'} · {num(l.quantity)} {l.unit} × {money(l.unitPriceHt)}
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded bg-sub px-1.5 py-px text-[10.5px] text-ink-2">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-pale-v px-2 py-px text-[10.5px] text-deep-v">
                     {l.source === 'taux' ? <Clock className="h-3 w-3" /> : <BookOpen className="h-3 w-3" />}
                     {l.source === 'taux' ? 'Votre taux' : 'Bibliothèque'}
                   </span>
@@ -117,10 +117,10 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
       ))}
 
       {lines.length > 0 && (
-        <div className="flex items-end justify-between rounded-2xl border border-line bg-white px-4 py-3">
+        <div className="flex items-end justify-between rounded-card-sm bg-dawn-pale px-4 py-3 shadow-halo-sm">
           <div>
             <div className="text-[12px] text-ink-3">Total HT</div>
-            <div className="num font-display text-[24px] font-semibold leading-tight">{money(t.ht)}</div>
+            <div className="num-halo text-[26px] leading-tight">{money(t.ht)}</div>
           </div>
           <div className="num text-right text-[12px] text-ink-2">
             TVA {pct(vatRate, vatRate % 1 ? 1 : 0)} · {money(t.tva)}
@@ -134,7 +134,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
   const controls = (
     <div className="shrink-0">
       <div className="flex items-center justify-center gap-5 py-3">
-        <button onClick={listening ? dict.pause : dict.reset} className="grid h-12 w-12 place-items-center rounded-full border border-line2 bg-white text-ink shadow-card" aria-label={listening ? 'Pause' : 'Recommencer'}>
+        <button onClick={listening ? dict.pause : dict.reset} className="grid h-12 w-12 place-items-center rounded-full bg-white text-ink shadow-[0_1px_2px_rgba(60,30,120,.08),0_0_0_1px_#ece8f6]" aria-label={listening ? 'Pause' : 'Recommencer'}>
           {listening ? <Pause className="h-5 w-5" /> : <RotateCcw className="h-5 w-5" />}
         </button>
         <Wave on={listening} />
@@ -142,7 +142,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
           <Mic className="h-7 w-7" />
         </button>
         <Wave on={listening} />
-        <button onClick={validate} disabled={!lines.length} className="grid h-12 w-12 place-items-center rounded-full bg-ink text-white shadow-card disabled:opacity-40" aria-label="Ajouter au devis">
+        <button onClick={validate} disabled={!lines.length} className="grid h-12 w-12 place-items-center rounded-full bg-ink text-white shadow-ink disabled:opacity-40" aria-label="Ajouter au devis">
           <Check className="h-5 w-5" />
         </button>
       </div>
@@ -155,16 +155,16 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
 
   if (fullscreen)
     return createPortal(
-      <div className="fixed inset-0 z-[85] flex animate-[fade-up_.25s_ease_both] flex-col bg-page pb-[var(--safe-b)] pt-safe">
+      <div className="fixed inset-0 z-[85] flex animate-[fade-up_.25s_ease_both] flex-col bg-[#f7f5fc] pb-[var(--safe-b)] pt-safe">
         <div className="flex items-center gap-3 px-4 py-3">
-          <button onClick={onClose} className="grid h-11 w-11 place-items-center rounded-full bg-white shadow-card" aria-label="Fermer la dictée">
+          <button onClick={onClose} className="grid h-11 w-11 place-items-center rounded-full bg-white shadow-pill" aria-label="Fermer la dictée">
             <ChevronLeft className="h-5 w-5" />
           </button>
           <div className="min-w-0 flex-1 text-center">
             <div className="text-[16px] font-semibold">Dicter le devis</div>
             <div className="truncate text-[12px] text-ink-3">{subtitle}</div>
           </div>
-          <span className="num inline-flex h-9 items-center gap-1.5 rounded-full bg-white px-3 text-[13px] font-semibold shadow-card">
+          <span className="num inline-flex h-9 items-center gap-1.5 rounded-full bg-white px-3 text-[13px] font-semibold shadow-pill">
             <i className={cn('h-2 w-2 rounded-full', listening ? 'animate-pulse bg-[#f43f5e]' : 'bg-ink-3')} />
             {mm}
           </span>
@@ -177,14 +177,14 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
 
   return createPortal(
     <div className="fixed inset-0 z-[80] grid place-items-center p-4">
-      <div className="absolute inset-0 animate-[fade-up_.2s_ease_both] bg-[#17171f]/30 backdrop-blur-[2px]" onClick={onClose} />
-      <div role="dialog" aria-modal="true" aria-label="Dicter le devis" className="relative flex max-h-[88dvh] w-[600px] max-w-full animate-scale-in flex-col gap-3 rounded-[20px] bg-page p-5 shadow-pop">
+      <div className="absolute inset-0 animate-[fade-up_.2s_ease_both] bg-[#2a1f4d]/20 backdrop-blur-[3px]" onClick={onClose} />
+      <div role="dialog" aria-modal="true" aria-label="Dicter le devis" className="relative flex max-h-[88dvh] w-[600px] max-w-full animate-scale-in flex-col gap-3 rounded-sheet bg-[#f7f5fc] p-5 shadow-[0_30px_80px_-20px_rgba(60,30,120,.35)]">
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <div className="text-[17px] font-semibold">Dicter à Bob</div>
             <div className="truncate text-[12.5px] text-ink-3">{subtitle} · les lignes rejoignent les bons lots</div>
           </div>
-          <span className="num inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3 text-[12.5px] font-semibold shadow-card">
+          <span className="num inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3 text-[12.5px] font-semibold shadow-pill">
             <i className={cn('h-2 w-2 rounded-full', listening ? 'animate-pulse bg-[#f43f5e]' : 'bg-ink-3')} />
             {mm}
           </span>

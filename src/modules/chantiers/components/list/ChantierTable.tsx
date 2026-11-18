@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle, CalendarClock, ChevronRight, MapPin, Pin } from 'lucide-react';
-import { Badge, Card, Progress, cn } from '@/components/ui';
+import { AlertTriangle, CalendarClock, ChevronRight, HardHat, MapPin, Pin } from 'lucide-react';
+import { Badge, IconTile, Progress, cn } from '@/components/ui';
 import { CHANTIER_STATUS } from '@/lib/status';
 import { dateShort } from '@/lib/format';
 import type { ChantierView } from '../../lib/useChantier';
@@ -22,8 +22,9 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
   return (
     <>
       {/* Ordinateur et tablette */}
-      <Card className="hidden overflow-hidden lg:block">
-        <div className="grid grid-cols-[minmax(0,2.2fr)_88px_minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.6fr)_20px] items-center gap-4 border-b border-line bg-[#fbfbfd] px-4 py-2.5 text-xs font-medium text-ink-3">
+      <div className="stagger-fast hidden space-y-2 lg:block">
+        <div className="grid grid-cols-[34px_minmax(0,2.2fr)_88px_minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.6fr)_20px] items-center gap-4 px-4 pb-1 text-[12.5px] font-medium text-ink-2">
+          <span />
           <span>Chantier</span>
           <span>Équipe</span>
           <span>Avancement</span>
@@ -35,12 +36,13 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
           <button
             key={v.ch.id}
             onClick={() => open(v.ch.id)}
-            className="grid w-full grid-cols-[minmax(0,2.2fr)_88px_minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.6fr)_20px] items-center gap-4 border-b border-line px-4 py-3 text-left transition last:border-b-0 hover:bg-[#fafafc]"
+            className="row-card grid w-full grid-cols-[34px_minmax(0,2.2fr)_88px_minmax(0,1.2fr)_minmax(0,0.8fr)_minmax(0,1.6fr)_20px] gap-4 text-left"
           >
+            <IconTile size="row" dept="chantiers" icon={<HardHat />} />
             <span className="min-w-0">
               <span className="flex items-center gap-2">
-                {v.ch.pinned && <Pin className="h-3 w-3 shrink-0 text-vi-700" />}
-                <span className="truncate text-[14px] font-medium">{v.ch.name}</span>
+                {v.ch.pinned && <Pin className="h-3 w-3 shrink-0 text-deep-v" />}
+                <span className="truncate text-[14.5px] font-semibold tracking-[-0.015em]">{v.ch.name}</span>
                 <Badge tone={CHANTIER_STATUS[v.ch.status].tone} className="hidden xl:inline-flex">{CHANTIER_STATUS[v.ch.status].label}</Badge>
               </span>
               <span className="mt-0.5 block truncate text-xs text-ink-3">
@@ -49,7 +51,7 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
             </span>
             <TeamAvatars team={v.team} size={24} max={3} />
             <span className="flex items-center gap-2.5">
-              <Progress value={v.ch.progress} className="flex-1" tone={v.ch.status === 'termine' ? 'ok' : 'ink'} />
+              <Progress value={v.ch.progress} className="flex-1" tone={v.ch.status === 'termine' ? 'ok' : 'dawn'} />
               <span className="num w-9 text-right text-xs text-ink-2">{v.ch.progress} %</span>
             </span>
             <MarginDelta real={v.m.realMarginRate} planned={v.m.plannedMarginRate} />
@@ -57,12 +59,12 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
             <ChevronRight className="h-4 w-4 text-ink-3" />
           </button>
         ))}
-      </Card>
+      </div>
 
       {/* Téléphone */}
       <div className="grid gap-2.5 md:grid-cols-2 lg:hidden">
         {rows.map((v) => (
-          <button key={v.ch.id} onClick={() => open(v.ch.id)} className="block w-full rounded-[14px] border border-line bg-white p-4 text-left active:scale-[.99]">
+          <button key={v.ch.id} onClick={() => open(v.ch.id)} className="lift block w-full rounded-card bg-white p-4 text-left shadow-halo active:scale-[.99]">
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
@@ -76,7 +78,7 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
               <Badge tone={CHANTIER_STATUS[v.ch.status].tone}>{CHANTIER_STATUS[v.ch.status].label}</Badge>
             </div>
             <div className="mt-3 flex items-center gap-3">
-              <Progress value={v.ch.progress} className="flex-1" tone={v.ch.status === 'termine' ? 'ok' : 'ink'} />
+              <Progress value={v.ch.progress} className="flex-1" tone={v.ch.status === 'termine' ? 'ok' : 'dawn'} />
               <span className="num text-xs font-medium">{v.ch.progress} %</span>
             </div>
             <div className="mt-3 flex items-center justify-between gap-3">
@@ -85,7 +87,7 @@ export function ChantierTable({ rows }: { rows: ChantierView[] }) {
                 Marge <MarginDelta real={v.m.realMarginRate} planned={v.m.plannedMarginRate} compact />
               </span>
             </div>
-            <div className="mt-3 border-t border-line pt-2.5">
+            <div className="mt-3 border-t border-halo-line pt-2.5">
               <NextStep v={v} />
             </div>
           </button>

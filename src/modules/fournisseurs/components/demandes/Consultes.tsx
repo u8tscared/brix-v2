@@ -30,13 +30,13 @@ export default function Consultes({ d, fournisseurs }: { d: Demande; fournisseur
   return (
     <Card>
       <CardHeader title="Fournisseurs consultés" meta={`${d.destinataires.filter((x) => x.statut === 'repondue').length}/${d.destinataires.length} réponses`} />
-      <ul>
+      <ul className="space-y-0.5 p-2.5">
         {d.destinataires.map((x) => (
-          <li key={x.id} className="flex min-h-[64px] items-center gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
+          <li key={x.id} className="flex min-h-[64px] items-center gap-3 rounded-card-sm px-2.5 py-2.5 transition-colors hover:bg-halo-hover">
             <span className="relative">
               <FournisseurPastille f={f(x.fournisseurId)} size={36} />
-              {x.statut === 'vue' && <span className="fx-ping absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-vi-700" title="A ouvert la demande" />}
-              {x.statut === 'repondue' && <span className="bx-pop absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border-2 border-white bg-ok text-white"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>}
+              {x.statut === 'vue' && <span className="fx-ping absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-vi-600" title="A ouvert la demande" />}
+              {x.statut === 'repondue' && <span className="bx-pop absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border-2 border-white bg-[#10b981] text-white"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>}
             </span>
             <div className="min-w-0 flex-1">
               <div className="truncate text-[13.5px] font-medium">{f(x.fournisseurId)?.nom ?? 'Fournisseur'}</div>
@@ -54,7 +54,7 @@ export default function Consultes({ d, fournisseurs }: { d: Demande; fournisseur
       </ul>
 
       {active && (
-        <div className="space-y-2 border-t border-line p-3">
+        <div className="space-y-2 border-t border-halo-line p-4">
           {attente.length > 0 && (
             <Button
               variant="secondary"

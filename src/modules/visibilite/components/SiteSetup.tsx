@@ -14,8 +14,8 @@ export function SiteSetup({ step, onStart, url }: { step: number | null; onStart
   return (
     <div className="grid items-center gap-8 [&>*]:min-w-0 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       <div className="animate-[fade-up_.5s_var(--ease)_both]">
-        <IconTile name="Globe" dept="visibilite" size="xl" solid />
-        <h2 className="mt-5 text-[28px] font-semibold leading-[1.1] tracking-[-0.035em] md:text-[34px]">Votre site internet,<br />prêt en une minute.</h2>
+        <IconTile name="Globe" dept="visibilite" size="xl" />
+        <h2 className="mt-5 text-[30px] font-semibold leading-[1.04] tracking-[-0.045em] md:text-[40px]">Votre site internet,<br /><span className="text-halo-mute">prêt en une minute.</span></h2>
         <p className="mt-3 max-w-md text-[14.5px] leading-relaxed text-ink-2">Bob écrit les textes, choisit vos plus belles photos de chantier et ajoute vos avis Google. Les demandes de devis arrivent directement dans Brix.</p>
         {step === null ? (
           <Button variant="dawn" size="lg" className="mt-7" icon={<Globe />} onClick={onStart}>Créer mon site</Button>
@@ -23,8 +23,8 @@ export function SiteSetup({ step, onStart, url }: { step: number | null; onStart
           <ol className="mt-7 max-w-sm space-y-2.5">
             {SITE_STEPS.map((label, i) => (
               <li key={label} className={cn('flex items-center gap-3 text-[14px] transition-colors duration-300', i > s ? 'text-ink-3' : 'text-ink')}>
-                <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-full transition-all duration-300 ease-spring', i < s ? 'bg-ok text-white' : i === s ? 'bg-[#fdecef] text-[#be123c]' : 'bg-sub')}>
-                  {i < s ? <Check className="h-3.5 w-3.5 animate-pop" strokeWidth={2.6} /> : i === s ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <i className="h-1.5 w-1.5 rounded-full bg-line2" />}
+                <span className={cn('grid h-6 w-6 shrink-0 place-items-center rounded-full transition-all duration-300 ease-spring', i < s ? 'bg-pale-g text-deep-g' : i === s ? 'bg-dawn text-white shadow-dawn' : 'bg-halo-track')}>
+                  {i < s ? <Check className="h-3.5 w-3.5 animate-pop" strokeWidth={2.6} /> : i === s ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <i className="h-1.5 w-1.5 rounded-full bg-[#d6cfe8]" />}
                 </span>
                 {label}
               </li>
@@ -35,11 +35,11 @@ export function SiteSetup({ step, onStart, url }: { step: number | null; onStart
       </div>
 
       <div className="relative animate-[fade-up_.6s_var(--ease)_.1s_both]">
-        <div aria-hidden className="absolute -inset-6 max-md:inset-x-0 rounded-[40px] bg-[radial-gradient(closest-side,#fdecef,transparent)]" />
-        <div className="relative overflow-hidden rounded-[16px] bg-white shadow-pop">
-          <div className="flex h-9 items-center gap-2 border-b border-line bg-sub px-3">
+        <div aria-hidden className="absolute -inset-6 max-md:inset-x-0 rounded-[40px] bg-[radial-gradient(closest-side,#fbe0f1,transparent)] blur-md" />
+        <div className="relative overflow-hidden rounded-card bg-white shadow-halo-lg md:rotate-[-1deg]">
+          <div className="flex h-10 items-center gap-2 border-b border-halo-line bg-halo-track/60 px-3.5">
             <span className="flex gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><i className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><i className="h-2.5 w-2.5 rounded-full bg-[#28c840]" /></span>
-            <span className="mx-auto truncate rounded-md bg-white px-3 py-1 text-[11.5px] text-ink-2">{url}</span>
+            <span className="mx-auto truncate rounded-full bg-white px-3.5 py-1 text-[11.5px] text-ink-2 shadow-halo-sm">{url}</span>
           </div>
           <div className="min-h-[280px] space-y-1 p-5">
             {blocks.map((b, i) => (

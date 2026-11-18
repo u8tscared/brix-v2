@@ -33,8 +33,8 @@ const load = (): { rooms: Room[]; current?: string } => {
 
 function Stepper({ label, value, onChange, icon }: { label: string; value: number; onChange: (v: number) => void; icon: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3">
-      <span className="grid h-11 w-11 place-items-center rounded-xl bg-sub text-ink-2">{icon}</span>
+    <div className="row-card p-3">
+      <span className="tone-peach grid h-11 w-11 place-items-center rounded-tile">{icon}</span>
       <span className="flex-1 text-[15px] font-medium">{label}</span>
       <Button size="icon" onClick={() => onChange(Math.max(0, value - 1))} aria-label={`Moins de ${label.toLowerCase()}`} className="h-12 w-12"><Minus className="h-5 w-5" /></Button>
       <span className="num w-8 text-center text-[22px] font-semibold">{value}</span>
@@ -120,13 +120,13 @@ export default function Cotes() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
         <Card className="overflow-hidden">
           {/* Pièces */}
-          <div className="flex items-center gap-1.5 overflow-x-auto border-b border-line px-3 py-2.5 scrollbar-none">
+          <div className="flex items-center gap-1.5 overflow-x-auto border-b border-halo-line px-3 py-2.5 scrollbar-none">
             {rooms.map((r) => (
-              <button key={r.id} onClick={() => { setCurrent(r.id); setStep(r.L && r.W && r.H ? 'recap' : !r.L ? 'L' : !r.W ? 'W' : 'H'); }} className={cn('flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[13px] transition', r.id === current && step !== 'type' ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')}>
+              <button key={r.id} onClick={() => { setCurrent(r.id); setStep(r.L && r.W && r.H ? 'recap' : !r.L ? 'L' : !r.W ? 'W' : 'H'); }} className={cn('flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[13px] transition', r.id === current && step !== 'type' ? 'border-ink bg-ink text-white' : 'border-halo-line bg-white text-ink-2 hover:text-ink')}>
                 {r.L && r.W && r.H && <Check className="h-3.5 w-3.5" />} {r.name}
               </button>
             ))}
-            <button onClick={() => setStep('type')} className={cn('flex h-9 shrink-0 items-center gap-1 rounded-full border border-dashed px-3 text-[13px] transition', step === 'type' ? 'border-vi-300 bg-vi-50 text-vi-700' : 'border-line2 text-ink-2 hover:text-ink')}>
+            <button onClick={() => setStep('type')} className={cn('flex h-9 shrink-0 items-center gap-1 rounded-full border border-dashed px-3 text-[13px] transition', step === 'type' ? 'border-[#d9c9fd] bg-pale-v text-deep-v' : 'border-[#dcd6ec] text-ink-2 hover:text-ink')}>
               <Plus className="h-3.5 w-3.5" /> Pièce
             </button>
           </div>
@@ -139,8 +139,8 @@ export default function Cotes() {
                 {ROOM_TYPES.map((t) => {
                   const I = ROOM_ICON[t.key];
                   return (
-                    <button key={t.key} onClick={() => addRoom(t.key)} className="group lift press flex h-[76px] items-center gap-3 rounded-[16px] bg-white px-4 text-left text-[14.5px] font-medium shadow-card">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-[#fff1e7] text-[#c2410c] shadow-[inset_0_0_0_1px_#fdd9bf] transition-transform duration-300 ease-spring group-hover:scale-110">
+                    <button key={t.key} onClick={() => addRoom(t.key)} className="group lift press flex h-[76px] items-center gap-3 rounded-card-sm bg-white px-4 text-left text-[14.5px] font-medium shadow-halo">
+                      <span className="tone-peach grid h-10 w-10 shrink-0 place-items-center rounded-tile transition-transform duration-300 ease-spring group-hover:scale-110">
                         <I className="h-[19px] w-[19px]" strokeWidth={1.9} />
                       </span>
                       {t.label}
@@ -151,12 +151,12 @@ export default function Cotes() {
             </div>
           ) : (
             <div className="grid gap-0 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-              <div className="border-b border-line bg-[#fbfbfd] p-3 md:border-b-0 md:border-r md:p-5">
+              <div className="border-b border-halo-line bg-dawn-mist p-3 md:border-b-0 md:border-r md:p-5">
                 <div className="mb-1 flex items-center justify-between text-[13px]">
                   <span className="font-semibold">{room.name}</span>
                   <span className="flex gap-1">
                     {FLOW.slice(0, 4).map((s) => (
-                      <i key={s} className={cn('h-1.5 w-6 rounded-full', FLOW.indexOf(s) < FLOW.indexOf(step) ? 'bg-ink' : s === step ? 'bg-vi-500' : 'bg-line2')} />
+                      <i key={s} className={cn('h-1.5 w-6 rounded-full', FLOW.indexOf(s) < FLOW.indexOf(step) ? 'bg-[#10b981]' : s === step ? 'bg-[image:var(--dawn-d)]' : 'bg-halo-line')} />
                     ))}
                   </span>
                 </div>
@@ -169,7 +169,7 @@ export default function Cotes() {
                     return (
                       <div className="space-y-4">
                         <h2 className="flex items-center gap-2.5 text-[18px] font-semibold tracking-[-0.02em]"><SuccessDot size={24} /> {room.name} : c’est mesuré</h2>
-                        <dl className="divide-y divide-line rounded-xl border border-line text-[13.5px]">
+                        <dl className="divide-y divide-halo-line rounded-card-sm bg-white text-[13.5px] shadow-halo-sm">
                           {[
                             ['Sol', m2(m.floor)],
                             ['Plafond', m2(m.ceiling)],
@@ -195,7 +195,7 @@ export default function Cotes() {
                 ) : (
                   <div className="space-y-4">
                     <div className="flex items-start gap-2">
-                      <button onClick={back} className="-ml-2 grid h-10 w-10 shrink-0 place-items-center rounded-lg text-ink-2 hover:bg-sub" aria-label="Étape précédente"><ChevronLeft className="h-5 w-5" /></button>
+                      <button onClick={back} className="-ml-2 grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-halo-track" aria-label="Étape précédente"><ChevronLeft className="h-5 w-5" /></button>
                       <div>
                         <h2 className="text-[20px] font-semibold leading-tight">{INSTR[step][0]}</h2>
                         <p className="mt-0.5 text-[13px] text-ink-2">{INSTR[step][1]}</p>
@@ -223,13 +223,13 @@ export default function Cotes() {
             <CardHeader title="Métrés" meta={`${done.length} pièce${done.length > 1 ? 's' : ''}`} />
             {done.length === 0 ? (
               <div className="flex flex-col items-center px-6 py-9 text-center">
-                <span className="grid h-11 w-11 place-items-center rounded-full border border-dashed border-line2 text-ink-3"><Ruler className="h-[18px] w-[18px]" /></span>
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-pale-p text-deep-p"><Ruler className="h-[18px] w-[18px]" /></span>
                 <div className="mt-3 text-[14px] font-semibold">Rien de mesuré</div>
                 <p className="mt-1 text-[12.5px] text-ink-2">Les surfaces s’additionnent ici au fil des pièces.</p>
               </div>
             ) : (
               <>
-                <div className="divide-y divide-line">
+                <div className="divide-y divide-halo-line">
                   {done.map((r) => {
                     const m = measures(r);
                     return (
@@ -241,25 +241,25 @@ export default function Cotes() {
                     );
                   })}
                 </div>
-                <div className="grid grid-cols-2 gap-px border-t border-line bg-line">
+                <div className="grid grid-cols-2 gap-2 border-t border-halo-line p-3">
                   {[
                     ['Sol', m2(sum('floor'))],
                     ['Murs nets', m2(sum('wallsNet'))],
                     ['Plafonds', m2(sum('ceiling'))],
                     ['Plinthes', ml(sum('plinths'))],
                   ].map(([k, v]) => (
-                    <div key={k} className="bg-white px-4 py-3">
+                    <div key={k} className="rounded-[14px] bg-halo-hover px-3.5 py-3">
                       <div className="text-xs text-ink-2">{k}</div>
-                      <div className="num text-[16px] font-semibold">{v}</div>
+                      <div className="num-halo mt-0.5 text-[18px]">{v}</div>
                     </div>
                   ))}
                 </div>
               </>
             )}
           </Card>
-          <Card className="p-4">
-            <div className="text-xs text-ink-2">Devis estimé · {TRADE_BY_KEY[company.trade]?.name.toLowerCase()}</div>
-            <div className="num mt-1 text-[30px] font-semibold tracking-[-0.04em]"><AnimatedNumber value={est.ht} format={(n) => money(n, true)} /> <span className="text-[14px] font-normal text-ink-3">HT</span></div>
+          <Card tone="dawn" className="p-5">
+            <div className="label-halo">Devis estimé · {TRADE_BY_KEY[company.trade]?.name.toLowerCase()}</div>
+            <div className="num-halo mt-1.5 text-[38px]"><AnimatedNumber value={est.ht} format={(n) => money(n, true)} /> <span className="text-[14px] font-normal text-ink-3">HT</span></div>
             <div className="mt-0.5 text-xs text-ink-3">{lines.filter((l) => l.kind !== 'section').length} lignes calculées · marge {Math.round(est.marginRate)} %</div>
             <Button variant={done.length ? 'dawn' : 'secondary'} size="lg" className="mt-4 w-full justify-center" icon={<FileText className="h-4 w-4" />} disabled={!done.length} onClick={openCreate}>
               Créer le devis
@@ -279,7 +279,7 @@ export default function Cotes() {
           <Field label="Titre du devis">
             <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </Field>
-          <div className="rounded-xl bg-sub px-4 py-3 text-[13px] text-ink-2">
+          <div className="rounded-card-sm bg-halo-hover px-4 py-3 text-[13px] text-ink-2">
             {done.length} pièce{done.length > 1 ? 's' : ''}, {lines.filter((l) => l.kind !== 'section').length} lignes, <b className="num text-ink">{money(est.ht)} HT</b>.
           </div>
         </div>

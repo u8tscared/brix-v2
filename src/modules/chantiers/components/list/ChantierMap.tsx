@@ -87,7 +87,7 @@ export function ChantierMap({ rows }: { rows: ChantierView[] }) {
             );
           })}
         </svg>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line px-4 py-2.5 text-xs text-ink-2">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-halo-line px-4 py-2.5 text-xs text-ink-2">
           {(Object.keys(DOT) as ChantierStatus[]).map((s) => (
             <span key={s} className="flex items-center gap-1.5">
               <i className="h-2 w-2 rounded-full" style={{ background: DOT[s] }} /> {CHANTIER_STATUS[s].label}

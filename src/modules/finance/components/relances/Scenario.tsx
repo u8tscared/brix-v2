@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { Mail, MessageSquareText, Stamp } from 'lucide-react';
-import { Card, CardHeader, Segmented, Switch, cn } from '@/components/ui';
+import { Card, CardHeader, IconTile, Segmented, Switch, cn } from '@/components/ui';
+import { BrandTile } from '@/components/brand/Logo';
 import { useBrix } from '@/lib/store';
 import type { Facture } from '@/lib/types';
 import { reminderText } from '@/modules/factures/service';
@@ -25,9 +26,9 @@ export function ScenarioCard({ sample }: { sample?: Facture }) {
       <div className={cn('space-y-4 p-4 transition', !fx.relanceAuto && 'opacity-50')}>
         <ol className="space-y-2">
           {fx.steps.map((st, i) => (
-            <li key={st.id} className={cn('flex items-center gap-3 rounded-xl border p-3 transition', preview === st.id ? 'border-vi-200 bg-vi-50/50' : 'border-line')}>
+            <li key={st.id} className={cn('flex items-center gap-3 rounded-card-sm bg-white p-3 transition duration-300', preview === st.id ? 'shadow-[0_0_0_1.5px_#d9c9fb,0_8px_22px_-12px_rgba(109,40,217,.3)]' : 'shadow-halo-sm')}>
               <button onClick={() => setPreview(st.id)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white text-ink-2 ring-1 ring-line">{CH_ICON[st.channel]}</span>
+                <IconTile icon={CH_ICON[st.channel]} tone={st.channel === 'email' ? 'blue' : st.channel === 'sms' ? 'violet' : 'rose'} size="row" />
                 <div className="min-w-0">
                   <div className="text-[13.5px] font-medium">{st.label}</div>
                   <div className="text-[12px] text-ink-3">
@@ -37,7 +38,7 @@ export function ScenarioCard({ sample }: { sample?: Facture }) {
               </button>
               <label className="flex items-center gap-1 text-[12.5px] text-ink-2">
                 J+
-                <input type="number" min={0} max={90} value={st.day} onChange={(e) => fx.setStep(st.id, { day: Math.max(0, Number(e.target.value) || 0) })} className="num h-10 w-14 rounded-lg border border-line2 bg-white px-2 text-center text-[13.5px] focus:border-vi-300 focus:outline-none focus:ring-4 focus:ring-vi-100" aria-label={`Délai ${st.label}`} />
+                <input type="number" min={0} max={90} value={st.day} onChange={(e) => fx.setStep(st.id, { day: Math.max(0, Number(e.target.value) || 0) })} className="num h-10 w-14 rounded-full bg-pale-n px-2 text-center text-[13.5px] transition focus:bg-white focus:shadow-focus focus:outline-none" aria-label={`Délai ${st.label}`} />
               </label>
               <Switch checked={st.enabled} onChange={(v) => fx.setStep(st.id, { enabled: v })} label={st.label} />
             </li>
@@ -59,9 +60,9 @@ export function ScenarioCard({ sample }: { sample?: Facture }) {
             />
           </div>
           {sample ? (
-            <div className="rounded-xl bg-sub p-3.5">
-              <div className="mb-1.5 flex items-center gap-2 text-[11.5px] text-ink-3">
-                <span className="grid h-5 w-5 place-items-center rounded-full bg-ink text-[9px] font-bold text-white">B</span>
+            <div className="rounded-card-sm bg-dawn-mist p-4 shadow-halo-sm">
+              <div className="mb-2 flex items-center gap-2 text-[11.5px] text-ink-3">
+                <BrandTile size={20} />
                 Aperçu · {step.label} pour {client?.name}
               </div>
               <p className="line-clamp-[9] whitespace-pre-line text-[12.5px] leading-relaxed text-ink">{reminderText(sample, client, s.company, level, fx.relanceTone, s.user.firstName || 'Karim')}</p>

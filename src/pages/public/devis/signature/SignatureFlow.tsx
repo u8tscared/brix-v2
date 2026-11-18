@@ -1,7 +1,7 @@
 // Signature électronique du devis en 3 temps : vos informations, votre signature, le code reçu par e-mail.
-import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Fingerprint, Inbox, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
-import { cn } from '@/components/ui';
+import { Fragment, useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Check, Fingerprint, Inbox, Mail, RefreshCw, ShieldCheck } from 'lucide-react';
+import { cn, IconTile } from '@/components/ui';
 import { money } from '@/lib/format';
 import type { DevisPublicData, Formule } from '@/parcours/documents';
 import { masquer } from '@/parcours/documents';
@@ -28,8 +28,8 @@ interface Props {
 
 function Case({ coche, onChange, children }: { coche: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-2xl p-3 transition hover:bg-page">
-      <span className={cn('mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center rounded-[7px] border-2 transition-all duration-200', coche ? 'border-ink bg-ink' : 'border-line2 bg-white')}>
+    <label className="flex cursor-pointer items-start gap-3 rounded-card-sm p-3 transition hover:bg-halo-hover has-[:focus-visible]:shadow-focus">
+      <span className={cn('mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center rounded-[7px] transition-all duration-300 ease-spring', coche ? 'scale-100 bg-dawn-diag shadow-[0_4px_12px_-3px_rgba(217,70,239,.6)]' : 'bg-white shadow-[inset_0_0_0_2px_#dcd6ea]')}>
         <svg viewBox="0 0 16 16" className={cn('h-3 w-3 transition-opacity', coche ? 'opacity-100' : 'opacity-0')}>
           <path d="M3 8.5l3 3 7-7" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -113,16 +113,17 @@ export function SignatureFlow({ open, onClose, data, formule, onSigne }: Props) 
   return (
     <Feuille open={open} onClose={onClose} large titre="Signer le devis" sousTitre={`${devis.number} · ${formule.key !== 'confort' ? `formule ${formule.label} · ` : ''}${money(montant)} TTC`}>
       {/* Progression */}
-      <div className="mb-5 mt-1 grid grid-cols-3 gap-2">
+      <ol className="mb-6 mt-1 flex items-center gap-2" aria-label="Étapes">
         {ETAPES.map((e, i) => (
-          <div key={e.k}>
-            <div className="h-1 overflow-hidden rounded-full bg-[#ece9f5]">
-              <div className="bx-dawn h-full rounded-full transition-[width] duration-500 ease-[cubic-bezier(.2,.8,.2,1)]" style={{ width: i < idx ? '100%' : i === idx ? '50%' : '0%' }} />
-            </div>
-            <div className={cn('mt-1.5 text-[11.5px] font-medium transition-colors', i <= idx ? 'text-ink' : 'text-ink-3')}>{e.label}</div>
-          </div>
+          <Fragment key={e.k}>
+            {i > 0 && <span className={cn('h-[1.5px] min-w-[10px] flex-1 rounded-full transition-colors duration-500', i <= idx ? 'bg-[#bfe8d6]' : 'bg-[#e6e1f1]')} aria-hidden />}
+            <li className="step-halo shrink-0 text-[12.5px] max-sm:[&:not([data-state=on])>span]:sr-only" data-state={i < idx ? 'done' : i === idx ? 'on' : undefined} aria-current={i === idx ? 'step' : undefined}>
+              <b className="transition-all duration-300 ease-spring">{i < idx ? <Check className="h-3 w-3" strokeWidth={3} /> : i + 1}</b>
+              <span>{e.label}</span>
+            </li>
+          </Fragment>
         ))}
-      </div>
+      </ol>
 
       <div key={etape} className="bx-fade" style={{ animation: `bx-rise .4s cubic-bezier(.2,.8,.2,1) both`, ['--dir' as string]: dir }}>
         {etape === 'infos' && (
@@ -130,11 +131,11 @@ export function SignatureFlow({ open, onClose, data, formule, onSigne }: Props) 
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block">
                 <span className="mb-1.5 block text-[12.5px] font-medium text-ink-2">Nom et prénom du signataire</span>
-                <input value={nom} onChange={(e) => setNom(e.target.value)} autoComplete="name" className="h-12 w-full rounded-2xl border border-line2 bg-white px-4 text-[15px] outline-none transition focus:border-[#8b5cf6] focus:shadow-[0_0_0_4px_rgba(139,92,246,.12)]" />
+                <input value={nom} onChange={(e) => setNom(e.target.value)} autoComplete="name" className="h-12 w-full rounded-field bg-white px-4 text-[15px] shadow-[0_0_0_1px_#e6e1f1] outline-none transition focus:shadow-[0_0_0_1px_#c4b5fd,0_0_0_4px_rgba(167,139,250,.22)]" />
               </label>
               <label className="block">
                 <span className="mb-1.5 block text-[12.5px] font-medium text-ink-2">E-mail pour recevoir le code</span>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" className="h-12 w-full rounded-2xl border border-line2 bg-white px-4 text-[15px] outline-none transition focus:border-[#8b5cf6] focus:shadow-[0_0_0_4px_rgba(139,92,246,.12)]" />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" className="h-12 w-full rounded-field bg-white px-4 text-[15px] shadow-[0_0_0_1px_#e6e1f1] outline-none transition focus:shadow-[0_0_0_1px_#c4b5fd,0_0_0_4px_rgba(167,139,250,.22)]" />
               </label>
             </div>
             <div className="-mx-3">
@@ -148,7 +149,7 @@ export function SignatureFlow({ open, onClose, data, formule, onSigne }: Props) 
               )}
             </div>
             {particulier && (
-              <p className="rounded-2xl bg-page px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">
+              <p className="rounded-card-sm bg-halo-hover px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">
                 Vous disposez de 14 jours pour changer d’avis, sans frais ni justification (article L221-18 du Code de la consommation). Le formulaire de rétractation est joint à votre copie signée.
               </p>
             )}
@@ -167,10 +168,8 @@ export function SignatureFlow({ open, onClose, data, formule, onSigne }: Props) 
 
         {etape === 'code' && (
           <div className="text-center">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-page">
-              <Mail className="h-6 w-6 text-ink" strokeWidth={1.75} />
-            </span>
-            <h3 className="mt-4 text-[19px] font-semibold">Un code vient de partir</h3>
+            <IconTile size="xl" tone="violet" className="mx-auto" icon={<Mail strokeWidth={1.75} />} />
+            <h3 className="mt-4 text-[21px] font-semibold tracking-[-0.03em]">Un code vient de partir</h3>
             <p className="mt-1 text-[14px] text-ink-2">
               Saisissez les 6 chiffres envoyés à <b className="font-semibold text-ink">{masquer(email)}</b>
             </p>
@@ -179,16 +178,16 @@ export function SignatureFlow({ open, onClose, data, formule, onSigne }: Props) 
             </div>
             <div className={cn('mt-3 min-h-[20px] text-[13px]', erreur ? 'text-[#dc2626]' : 'text-ink-3')}>{erreur || (busy && !codeDemo ? 'Envoi du code…' : 'Valable 10 minutes')}</div>
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-              <button onClick={envoyerCode} disabled={renvoi > 0 || busy} className="inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-ink-2 transition hover:bg-page disabled:opacity-50">
+              <button onClick={envoyerCode} disabled={renvoi > 0 || busy} className="inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-ink-2 transition hover:bg-halo-hover disabled:opacity-50">
                 <RefreshCw className="h-3.5 w-3.5" /> {renvoi > 0 ? `Renvoyer dans ${renvoi} s` : 'Renvoyer le code'}
               </button>
-              <a href={lienPublic('boite')} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-[#7c3aed] transition hover:bg-[#f5f0ff]">
+              <a href={lienPublic('boite')} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center gap-1.5 rounded-full px-3.5 text-[13px] font-medium text-deep-v transition hover:bg-pale-v">
                 <Inbox className="h-3.5 w-3.5" /> Ouvrir la boîte de démo
               </a>
             </div>
             {codeDemo && (
-              <button onClick={() => setCode(codeDemo)} className="bx-rise mx-auto mt-4 flex items-center gap-2 rounded-2xl border border-dashed border-[#d9c9fd] bg-[#faf7ff] px-4 py-2.5 text-[12.5px] text-ink-2">
-                Démo, votre code : <span className="bx-mono text-[14px] font-semibold tracking-[.2em] text-ink">{codeDemo}</span> <span className="text-[#7c3aed]">Utiliser</span>
+              <button onClick={() => setCode(codeDemo)} className="bx-rise mx-auto mt-4 flex items-center gap-2 rounded-pill bg-dawn-pale px-4 py-2.5 text-[12.5px] text-ink-2 shadow-[0_0_0_1px_#efdcf7] transition hover:-translate-y-px">
+                Démo, votre code : <span className="bx-mono text-[14px] font-semibold tracking-[.2em] text-ink">{codeDemo}</span> <span className="font-medium text-deep-v">Utiliser</span>
               </button>
             )}
           </div>
@@ -197,7 +196,7 @@ export function SignatureFlow({ open, onClose, data, formule, onSigne }: Props) 
 
       <div className="mt-6 flex items-center gap-2">
         {idx > 0 && (
-          <button onClick={() => aller(ETAPES[idx - 1].k)} className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl text-ink-2 transition hover:bg-page" aria-label="Étape précédente">
+          <button onClick={() => aller(ETAPES[idx - 1].k)} className="grid h-[54px] w-[54px] shrink-0 place-items-center rounded-full bg-white text-ink-2 shadow-[0_0_0_1px_#ece8f6] transition hover:text-ink" aria-label="Étape précédente">
             <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
           </button>
         )}

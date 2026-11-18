@@ -61,7 +61,7 @@ export function PvDocument({ pv, ch, client, company }: { pv: Pv; ch: Chantier; 
           </thead>
           <tbody>
             {open.map((r, i) => (
-              <tr key={r.id} className="border-b border-line align-top">
+              <tr key={r.id} className="border-b border-halo-line align-top">
                 <td className="py-1.5 pr-2">{i + 1}</td>
                 <td className="py-1.5 pr-2">{r.text}</td>
                 <td className="py-1.5">{r.location}</td>
@@ -76,7 +76,7 @@ export function PvDocument({ pv, ch, client, company }: { pv: Pv; ch: Chantier; 
       <table className="mt-1.5 w-full border-collapse">
         <tbody>
           {guarantees(pv.date).map((g) => (
-            <tr key={g.label} className="border-b border-line">
+            <tr key={g.label} className="border-b border-halo-line">
               <td className="py-1.5 pr-2">{g.label} ({g.years} an{g.years > 1 ? 's' : ''})</td>
               <td className="py-1.5 text-right">jusqu’au {dateFull(g.until)}</td>
             </tr>
@@ -90,7 +90,7 @@ export function PvDocument({ pv, ch, client, company }: { pv: Pv; ch: Chantier; 
           <div key={k}>
             <div className="text-[11px] font-semibold uppercase tracking-wide text-ink-3">{k === 'client' ? 'Le maître d’ouvrage' : 'L’entreprise'}</div>
             <div className="text-ink-2">{k === 'client' ? pv.clientName : company.name}</div>
-            <div className="mt-1 grid h-24 place-items-center rounded-lg border border-line">
+            <div className="mt-1 grid h-24 place-items-center rounded-lg border border-halo-line">
               {pv.signatures[k] ? <img src={pv.signatures[k]} alt={`Signature ${k}`} className="max-h-full" /> : <span className="text-ink-3">Signature</span>}
             </div>
             <div className="mt-1 text-ink-3">Le {dateFull(pv.signedAt ?? pv.date)}</div>

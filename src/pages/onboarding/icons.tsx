@@ -8,6 +8,7 @@ import {
   Wallet, Wrench, Zap, Factory,
 } from 'lucide-react';
 import type { TradeKey } from '@/lib/types';
+import { DEPT_TONE, type HaloTone } from '@/components/ui';
 
 /** Un pictogramme par métier, lisible à 18 px. */
 export const TRADE_ICON: Record<TradeKey, LucideIcon> = {
@@ -46,17 +47,13 @@ export function Ico({ name, ...p }: { name: string } & LucideProps) {
   return <C strokeWidth={1.75} aria-hidden {...p} />;
 }
 
-/** Teinte de chaque département, alignée sur DEPT_TONE du kit (refonte en cours) : on reconnaît un domaine d'un coup d'œil. */
-export const TONE: Record<string, { fg: string; bg: string; ring: string }> = {
-  vendre: { fg: '#6d28d9', bg: '#f3edff', ring: '#e4d8fd' },
-  facturer: { fg: '#b0219f', bg: '#fcecfa', ring: '#f6d3f1' },
-  chantiers: { fg: '#c2410c', bg: '#fff1e7', ring: '#fdd9bf' },
-  equipe: { fg: '#0e7490', bg: '#e8f7fa', ring: '#c5e9f0' },
-  achats: { fg: '#0f766e', bg: '#e7f6f3', ring: '#c4ebe3' },
-  bob: { fg: '#15122a', bg: '#efeef4', ring: '#dfdce9' },
-  metier: { fg: '#a16207', bg: '#fdf6e3', ring: '#f5e3b3' },
-  visibilite: { fg: '#be123c', bg: '#fdecef', ring: '#f9d0d8' },
-  gestion: { fg: '#3730a3', bg: '#eef0fd', ring: '#d9ddfa' },
+/** Teinte de chaque département : celle du kit (DEPT_TONE), une seule source. */
+export const TONE: Record<string, { fg: string; bg: string; ring: string }> = DEPT_TONE;
+
+/** Teinte de chaque métier (pastilles de l'étape 1) : on reconnaît son métier d'un coup d'œil. */
+export const TRADE_TONE: Record<TradeKey, HaloTone> = {
+  electricien: 'amber', plombier: 'blue', peintre: 'mag', carreleur: 'cyan', plaquiste: 'indigo', menuisier: 'peach', couvreur: 'rose',
+  macon: 'peach', paysagiste: 'green', climaticien: 'cyan', serrurier: 'neutral', cuisiniste: 'violet', renovation: 'violet', autre: 'neutral',
 };
 
 /** Tuile d'icône teintée d'un département. */
@@ -65,7 +62,7 @@ export function Tile({ dept, name, size = 32, children }: { dept: string; name?:
   return (
     <span
       className="ob-tile"
-      style={{ width: size, height: size, borderRadius: size * 0.3, background: t.bg, color: t.fg, boxShadow: `inset 0 0 0 1px ${t.ring}` }}
+      style={{ width: size, height: size, borderRadius: size * 0.3, background: t.bg, color: t.fg, }}
     >
       {children ?? (name ? <Ico name={name} style={{ width: size * 0.5, height: size * 0.5 }} /> : null)}
     </span>

@@ -32,11 +32,11 @@ export default function Express() {
         <>
           <div className="space-y-2">
             {ITEMS.map((i) => (
-              <div key={i.key} className="flex items-center gap-2 rounded-[10px] border border-line px-3 py-1.5">
+              <div key={i.key} className="flex items-center gap-2 rounded-card-sm bg-white px-3.5 shadow-halo-sm py-1.5">
                 <span className="min-w-0 flex-1 text-[13px]">{i.label}<span className="block text-[11.5px] text-ink-3">{money(i.price)} HT</span></span>
-                <button className="grid h-10 w-10 place-items-center rounded-lg bg-sub" aria-label="Moins" onClick={() => setQ({ ...q, [i.key]: Math.max(0, q[i.key] - 1) })}><Minus className="h-4 w-4" /></button>
+                <button className="grid h-10 w-10 place-items-center rounded-full bg-halo-track text-ink-2 transition-colors hover:bg-pale-v hover:text-deep-v" aria-label="Moins" onClick={() => setQ({ ...q, [i.key]: Math.max(0, q[i.key] - 1) })}><Minus className="h-4 w-4" /></button>
                 <span className="num w-6 text-center font-semibold">{q[i.key]}</span>
-                <button className="grid h-10 w-10 place-items-center rounded-lg bg-sub" aria-label="Plus" onClick={() => setQ({ ...q, [i.key]: q[i.key] + 1 })}><Plus className="h-4 w-4" /></button>
+                <button className="grid h-10 w-10 place-items-center rounded-full bg-halo-track text-ink-2 transition-colors hover:bg-pale-v hover:text-deep-v" aria-label="Plus" onClick={() => setQ({ ...q, [i.key]: q[i.key] + 1 })}><Plus className="h-4 w-4" /></button>
               </div>
             ))}
           </div>

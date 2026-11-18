@@ -1,5 +1,6 @@
 import { Mic, Square } from 'lucide-react';
 import { cn } from '@/components/ui';
+import { BrandSymbol } from '@/components/brand/Logo';
 
 const RAYS = 28;
 
@@ -63,18 +64,16 @@ export function VoiceOrb({ listening, busy, onClick, size = 112 }: { listening: 
   );
 }
 
-/** Avatar de Bob : pastille encre avec ondes. `active` : les ondes bougent (il écoute ou réfléchit). */
+/**
+ * Avatar de Bob : le B de Brix, blanc sur pastille ronde Aube. Calme : aucune étincelle, aucune animation au repos.
+ * `active` (il écoute ou réfléchit) : un halo doux respire autour, rien de plus.
+ */
 export function BobMark({ size = 32, className, active }: { size?: number; className?: string; active?: boolean }) {
   return (
-    <span className={cn('grid shrink-0 place-items-center rounded-full bg-ink text-white', className)} style={{ width: size, height: size }}>
-      <span className="flex items-center gap-[2px]" aria-hidden>
-        {[0.45, 0.8, 1, 0.65, 0.4].map((h, i) => (
-          <i
-            key={i}
-            className={cn('block w-[2px] rounded-full bg-white', active && 'animate-wave')}
-            style={{ height: Math.round(size * 0.42 * h), animationDelay: active ? `${i * 0.12}s` : undefined, animationDuration: active ? '.9s' : undefined }}
-          />
-        ))}
+    <span className={cn('relative grid shrink-0 place-items-center rounded-full bg-dawn-diag text-white shadow-[0_6px_16px_-6px_rgba(217,70,239,.55),inset_0_1px_0_rgba(255,255,255,.25)]', className)} style={{ width: size, height: size }}>
+      {active && <span className="absolute -inset-[3px] animate-pulse rounded-full ring-2 ring-[#e9b8f5] motion-reduce:animate-none" aria-hidden />}
+      <span className="relative block" style={{ width: Math.round(size * 0.36), height: Math.round(size * 0.43) }}>
+        <BrandSymbol className="h-full w-full" color="#fff" />
       </span>
     </span>
   );

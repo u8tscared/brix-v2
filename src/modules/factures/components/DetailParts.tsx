@@ -14,7 +14,7 @@ export function DetailTotals({ f }: { f: Facture }) {
   const a = amounts(f);
   const sign = a.sign === -1 ? '−' : '';
   return (
-    <div className="flex flex-col gap-4 rounded-[16px] bg-white p-4 shadow-card md:flex-row md:items-end md:justify-between md:p-5">
+    <div className="flex flex-col gap-4 rounded-card bg-dawn-pale p-5 shadow-halo md:flex-row md:items-end md:justify-between md:p-6">
       <div className="space-y-1 text-[13px] text-ink-2">
         <div className="flex gap-6">
           <span>Total HT</span>
@@ -40,8 +40,8 @@ export function DetailTotals({ f }: { f: Facture }) {
         )}
       </div>
       <div className="text-right">
-        <div className="text-[12px] text-ink-3">{f.kind === 'avoir' ? 'Montant de l’avoir' : a.retenue ? 'Net à payer TTC' : 'Total TTC'}</div>
-        <div className="num text-[30px] font-semibold leading-tight tracking-[-0.04em]">
+        <div className="label-halo">{f.kind === 'avoir' ? 'Montant de l’avoir' : a.retenue ? 'Net à payer TTC' : 'Total TTC'}</div>
+        <div className="num-halo mt-1 text-[34px] md:text-[38px]">
           {sign}
           <AnimatedNumber value={f.kind === 'avoir' ? a.ttc : a.net} format={(n) => money(n)} duration={600} />
         </div>

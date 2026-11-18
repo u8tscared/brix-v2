@@ -1,6 +1,6 @@
 // La carte qui dit quoi faire : chez qui commander, combien, combien on économise.
-import { ArrowRight, Clock, ShoppingCart, Truck } from 'lucide-react';
-import { Button, Card, Progress } from '@/components/ui';
+import { ArrowRight, Clock, Scale, ShoppingCart, Truck } from 'lucide-react';
+import { Badge, Button, Card, IconTile, Progress } from '@/components/ui';
 import { money } from '@/lib/format';
 import type { Comparatif, Recommandation } from '../../../../../worker/src/modules/fournisseurs/comparateur';
 import { eur } from '../../data/helpers';
@@ -18,7 +18,7 @@ function Ecart({ cents, label }: { cents: number; label: string }) {
   const gain = cents >= 0;
   return (
     <div className="min-w-0">
-      <div className={`num text-[17px] font-semibold ${gain ? 'text-ok' : 'text-warn'}`}>
+      <div className={`num-halo text-[22px] ${gain ? 'text-deep-g' : 'text-deep-a'}`}>
         {gain ? '−' : '+'}
         {money(Math.abs(cents) / 100)}
       </div>
@@ -30,17 +30,15 @@ function Ecart({ cents, label }: { cents: number; label: string }) {
 export function CarteAttente({ d, comp }: { d: Demande; comp: Comparatif }) {
   const ouvertes = d.destinataires.filter((x) => x.statut === 'vue').length;
   return (
-    <Card className="p-5">
-      <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-sub text-ink-2">
-          <Clock className="h-[18px] w-[18px]" strokeWidth={1.75} />
-        </span>
+    <Card className="p-6">
+      <div className="flex items-start gap-4">
+        <IconTile icon={<Clock />} tone="violet" />
         <div className="min-w-0 flex-1">
-          <h2 className="text-[16px] font-semibold">En attente des premières réponses</h2>
+          <h2 className="text-[17px] font-semibold tracking-[-0.025em]">En attente des premières réponses</h2>
           <p className="mt-1 text-[13.5px] text-ink-2">
             {pluriel(comp.consultes, 'fournisseur a', 'fournisseurs ont')} reçu votre liste{ouvertes ? `, ${ouvertes} l’${ouvertes > 1 ? 'ont' : 'a'} déjà ouverte` : ''}. Le comparatif se remplit tout seul dès qu’un prix arrive.
           </p>
-          <Progress value={(comp.reponses / Math.max(1, comp.consultes)) * 100} tone="ok" className="mt-4" />
+          <Progress value={(comp.reponses / Math.max(1, comp.consultes)) * 100} tone="dawn" className="mt-4" />
         </div>
       </div>
     </Card>
@@ -57,11 +55,10 @@ export default function CarteConseil({ comp, fournisseurs, d, onCommander }: { c
   const delai = Math.max(...r.repartition.map((g) => comp.totaux.find((t) => t.destinataire_id === g.destinataire_id)?.delai_livraison_jours ?? 0));
 
   return (
-    <Card className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-vi-50/70 to-transparent" />
-      <div className="relative p-5 md:p-6">
-        <div className="text-[11.5px] font-semibold uppercase tracking-[0.06em] text-vi-700">Notre conseil</div>
-        <h2 className="mt-1.5 font-display text-[20px] font-semibold leading-tight tracking-[-0.02em] md:text-[22px]">
+    <Card className="halo-bg halo-clip relative overflow-hidden">
+      <div className="relative p-6 md:p-7">
+        <Badge tone="violet" size="md" icon={<Scale />}>Notre conseil</Badge>
+        <h2 className="mt-3 text-[22px] font-semibold leading-[1.1] tracking-[-0.035em] md:text-[26px]">
           {r.repartition.length === 1 ? `Tout commander chez ${r.repartition[0].fournisseur_nom}` : `Commander en ${r.repartition.length} fois pour payer moins cher`}
         </h2>
         <p className="mt-2 max-w-[60ch] text-[13.5px] leading-relaxed text-ink-2">{r.explication}</p>
@@ -69,7 +66,7 @@ export default function CarteConseil({ comp, fournisseurs, d, onCommander }: { c
         {r.repartition.length > 1 && (
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {r.repartition.map((g) => (
-              <li key={g.destinataire_id} className="flex items-center gap-3 rounded-[12px] border border-line bg-white px-3 py-2.5">
+              <li key={g.destinataire_id} className="row-card gap-3 px-3.5 py-3">
                 <FournisseurPastille f={f(g.destinataire_id)} size={32} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13.5px] font-medium">{g.fournisseur_nom}</div>
@@ -81,11 +78,11 @@ export default function CarteConseil({ comp, fournisseurs, d, onCommander }: { c
           </ul>
         )}
 
-        <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-4 sm:grid-cols-[auto_auto_auto_1fr]">
+        <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-4 rounded-card-sm bg-dawn-pale p-5 sm:grid-cols-[auto_auto_auto_1fr]">
           <div className="col-span-2 sm:col-span-1">
-            <div className="num font-display text-[28px] font-semibold leading-none tracking-[-0.02em]">
+            <div className="num-halo text-[38px] leading-none">
               {money(r.total_cents / 100)}
-              <span className="ml-1 text-[13px] font-medium text-ink-3">HT</span>
+              <span className="ml-1 text-[13px] font-medium tracking-normal text-ink-3">HT</span>
             </div>
             <div className="mt-1 text-[12px] text-ink-2">port compris</div>
           </div>
@@ -100,7 +97,7 @@ export default function CarteConseil({ comp, fournisseurs, d, onCommander }: { c
         </div>
 
         {attente.length > 0 && (
-          <p className="mt-4 rounded-[10px] bg-sub px-3 py-2 text-[12.5px] text-ink-2">
+          <p className="mt-4 rounded-card-sm bg-halo-track/70 px-4 py-2.5 text-[12.5px] text-ink-2">
             {attente.length === 1 ? `${fournisseurs.find((x) => x.id === attente[0].fournisseurId)?.nom ?? 'Un fournisseur'} n’a pas encore répondu.` : `${attente.length} fournisseurs n’ont pas encore répondu.`} Vous pouvez attendre ou commander dès maintenant.
           </p>
         )}
@@ -110,7 +107,7 @@ export default function CarteConseil({ comp, fournisseurs, d, onCommander }: { c
             {libelleCommande(r)}
           </Button>
           {alt && (
-            <button type="button" onClick={() => onCommander(alt)} className="group flex min-h-[44px] items-center justify-center gap-1.5 text-[13px] font-medium text-ink-2 hover:text-ink">
+            <button type="button" onClick={() => onCommander(alt)} className="group flex min-h-[44px] items-center justify-center gap-1.5 rounded-pill px-3 text-[13px] font-medium text-ink-2 transition-colors hover:bg-white/70 hover:text-ink">
               {alt.repartition.length === 1 ? `Ou tout chez ${alt.repartition[0].fournisseur_nom}` : `Ou répartir en ${alt.repartition.length} commandes`}
               <span className="num text-ink-3">
                 ({alt.total_cents >= r.total_cents ? '+' : '−'}

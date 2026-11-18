@@ -32,9 +32,9 @@ export function ConfirmerCommande({ r, d, fournisseurs, onClose, onConfirmer }: 
     >
       {r && (
         <div className="space-y-4">
-          <ul className="overflow-hidden rounded-[14px] border border-line">
+          <ul className="overflow-hidden rounded-field border border-halo-line">
             {r.repartition.map((g) => (
-              <li key={g.destinataire_id} className="flex items-center gap-3 border-b border-line px-3.5 py-3 last:border-b-0">
+              <li key={g.destinataire_id} className="flex items-center gap-3 border-b border-halo-line px-3.5 py-3 last:border-b-0">
                 <FournisseurPastille f={f(g.destinataire_id)} size={34} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[14px] font-medium">{g.fournisseur_nom}</div>
@@ -56,7 +56,7 @@ export function ConfirmerCommande({ r, d, fournisseurs, onClose, onConfirmer }: 
               </p>
             )}
           </div>
-          {r.repartition.length > 1 && <p className="rounded-[10px] bg-sub px-3 py-2 text-[12.5px] text-ink-2">Total {money(r.total_cents / 100)} HT pour l’ensemble.</p>}
+          {r.repartition.length > 1 && <p className="rounded-card-sm bg-halo-track/70 px-3.5 py-2.5 text-[12.5px] text-ink-2">Total {money(r.total_cents / 100)} HT pour l’ensemble.</p>}
         </div>
       )}
     </Sheet>
@@ -71,7 +71,7 @@ export function BonsCrees({ commandes, fournisseurs }: { commandes: Commande[]; 
       {commandes.map((c) => {
         const f = fournisseurs.find((x) => x.id === c.fournisseurId);
         return (
-          <button key={c.id} type="button" onClick={() => nav(`/app/fournisseurs/commandes/${c.id}`)} className="flex min-h-[60px] w-full items-center gap-3 border-b border-line px-4 py-2.5 text-left transition last:border-b-0 hover:bg-[#fafafc]">
+          <button key={c.id} type="button" onClick={() => nav(`/app/fournisseurs/commandes/${c.id}`)} className="flex min-h-[60px] w-full items-center gap-3 border-b border-halo-line px-4 py-2.5 text-left transition last:border-b-0 hover:bg-halo-hover">
             <FournisseurPastille f={f} size={34} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13.5px] font-medium">{f?.nom ?? 'Fournisseur'}</span>

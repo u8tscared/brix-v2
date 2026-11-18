@@ -1,8 +1,11 @@
 // Page publique d'une facture (/f/:jeton) : la lire, la télécharger, la régler en ligne ou par virement.
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Check, Copy, FileText, Landmark, Link2Off, ReceiptText } from 'lucide-react';
-import { cn, toast, Toaster } from '@/components/ui';
+import { Apple, Check, ChevronRight, Copy, CreditCard, FileText, Landmark, Link2Off, ReceiptText } from 'lucide-react';
+import type { MoyenPaiement } from '@/parcours/signature';
+import { Card, cn, IconTile, toast, Toaster } from '@/components/ui';
+import { HaloBackdrop } from '@/components/layout/HaloBackdrop';
+import { GrowBar } from '@/components/motion';
 import { dateFull, money, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { useBoite } from '@/emails/boite';
@@ -33,6 +36,7 @@ export default function FacturePublique() {
   const factures = useBrix((s) => s.factures);
   const [plein, setPlein] = useState(false);
   const [payer, setPayer] = useState(false);
+  const [moyen, setMoyen] = useState<MoyenPaiement>('apple');
   const { imprimer } = useImpression();
 
   useEffect(() => {
@@ -57,19 +61,19 @@ export default function FacturePublique() {
   const dejaRegle = devis ? factures.filter((x) => x.devisId === devis.id && x.id !== f.id && x.kind !== 'avoir').reduce((s, x) => s + x.paidAmount, 0) : 0;
 
   return (
-    <div className="bx-root relative min-h-dvh overflow-x-clip bg-page">
-      <div className="bx-sky bx-sky-top" />
+    <div className="bx-root relative isolate min-h-dvh overflow-x-clip">
+      <HaloBackdrop />
       <EnTete company={company} sous={`${TYPE[f.kind] ?? 'Facture'} ${f.number}`} onPdf={imprimer} />
       <main className="relative mx-auto max-w-[1160px] px-4 sm:px-6">
         <section className="bx-stagger max-w-[680px] pb-6 pt-8 sm:pt-12">
-          <div className={cn('inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12.5px] font-medium shadow-[0_0_0_1px_#ebe9f2]', payee ? 'bg-[#ecfdf3] text-[#15803d]' : retard ? 'bg-[#fff7ed] text-[#c2410c]' : 'bg-white/80 text-ink-2')}>
-            <span className={cn('h-2 w-2 rounded-full', payee ? 'bg-[#16a34a]' : retard ? 'bg-[#ea580c]' : 'bx-live bg-[#16a34a]')} />
+          <div className={cn('inline-flex h-8 items-center gap-2 rounded-full px-3.5 text-[12.5px] font-medium', payee ? 'tone-green' : retard ? 'tone-peach' : 'glass text-ink-2')}>
+            <span className={cn('h-2 w-2 rounded-full', payee ? 'bg-[#10b981]' : retard ? 'bg-[#fb923c]' : 'bx-live bg-[#16a34a]')} />
             {payee ? 'Réglée, merci' : retard ? `Échéance dépassée depuis le ${dateFull(f.dueDate)}` : `À régler avant le ${dateFull(f.dueDate)}`}
           </div>
-          <h1 className="mt-4 text-[34px] font-semibold leading-[1.05] tracking-[-0.04em] sm:text-[48px]">
+          <h1 className="title-halo mt-5 sm:text-[48px]">
             {payee ? `Merci ${civilite(client)}.` : `Bonjour ${civilite(client)},`}
             <br />
-            <span className="text-ink-2">{payee ? 'Cette facture est réglée.' : `voici votre ${(TYPE[f.kind] ?? 'facture').toLowerCase()}.`}</span>
+            <span className="text-halo-mute">{payee ? 'Cette facture est réglée.' : `voici votre ${(TYPE[f.kind] ?? 'facture').toLowerCase()}.`}</span>
           </h1>
           <p className="mt-3 text-[15px] text-ink-2">{f.title}</p>
         </section>
@@ -77,51 +81,67 @@ export default function FacturePublique() {
         <div className="grid gap-6 pb-10 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-10">
           <aside className="lg:order-2">
             <div className="space-y-4 lg:sticky lg:top-[92px]">
-              <div className="rounded-[26px] bg-white p-5 shadow-[0_0_0_1px_#ebe9f2,0_24px_60px_-34px_rgba(45,20,90,.35)] sm:p-6">
-                <div className="text-[12.5px] font-medium text-ink-3">{payee ? 'Montant réglé' : 'Reste à régler'}</div>
-                <div className="num mt-1 text-[44px] font-semibold leading-none tracking-[-0.04em]">
+              <Card className="p-5 sm:p-6">
+                <div className="label-halo">{payee ? 'Montant réglé' : 'Reste à régler'}</div>
+                <div className="num-halo mt-1.5 text-[46px] leading-none sm:text-[52px]">
                   <MontantAnime valeur={payee ? data.ttc : data.reste} format={(n) => money(n)} />
                 </div>
                 <div className="mt-2 text-[12.5px] text-ink-3">
                   {f.number} · émise le {dateFull(f.issueDate)}
                 </div>
                 {devis && (
-                  <div className="mt-5 space-y-2 border-t border-line pt-5 text-[13.5px]">
+                  <div className="mt-5 space-y-2 text-[13.5px]">
                     <Ligne l={`Devis ${devis.number}`} v={money(devisTtc)} />
                     <Ligne l="Déjà réglé" v={money(dejaRegle)} />
                     <Ligne l="Cette facture" v={money(data.ttc)} fort />
                     <div className="pt-1">
-                      <div className="h-2 overflow-hidden rounded-full bg-page">
-                        <div className="h-full rounded-full bg-[#16a34a] transition-[width] duration-1000" style={{ width: `${Math.min(100, ((dejaRegle + (payee ? data.ttc : 0)) / (devisTtc || 1)) * 100)}%` }} />
-                      </div>
+                      <GrowBar className="h-2" barClassName="bg-[#10b981]" value={Math.min(100, ((dejaRegle + (payee ? data.ttc : 0)) / (devisTtc || 1)) * 100)} />
                       <div className="mt-1.5 text-[11.5px] text-ink-3">{Math.round(((dejaRegle + (payee ? data.ttc : 0)) / (devisTtc || 1)) * 100)} % du chantier réglé</div>
                     </div>
                   </div>
                 )}
                 {!payee && (
                   <>
-                    <BoutonAube className="mt-6 w-full" onClick={() => setPayer(true)}>
+                    <div className="mt-6 flex gap-1.5" role="radiogroup" aria-label="Moyen de paiement">
+                      {(
+                        [
+                          ['apple', 'Apple Pay', Apple],
+                          ['carte', 'Carte', CreditCard],
+                          ['virement', 'Virement', Landmark],
+                        ] as const
+                      ).map(([k, l, I]) => {
+                        const on = moyen === k;
+                        return (
+                          <button key={k} role="radio" aria-checked={on} onClick={() => setMoyen(k)} className={cn('inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-pill px-2 text-[13px] font-medium transition duration-300 ease-spring', on ? 'bg-ink text-white shadow-ink' : 'bg-[#f3f1f8] text-ink-2 hover:bg-halo-track')}>
+                            <I className={cn('h-3.5 w-3.5', k === 'apple' && on && 'fill-white')} strokeWidth={k === 'apple' && on ? 0 : 1.9} />
+                            {l}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <BoutonAube className="mt-3 w-full" onClick={() => setPayer(true)}>
                       Payer {money(data.reste)}
                     </BoutonAube>
-                    <div className="mt-2 text-center text-[12.5px] text-ink-3">Carte, Apple Pay, virement instantané ou 3 fois</div>
+                    <div className="mt-2 text-center text-[12px] text-ink-3">Ou en 3 fois sans frais · paiement chiffré, 3D Secure</div>
                   </>
                 )}
-              </div>
+              </Card>
               {!payee && company.iban && <Virement iban={company.iban} titulaire={company.legalName || company.name} reference={f.number} />}
               {devis && (
-                <a href={lienPublic('devis', devis.id)} className="flex min-h-[56px] items-center gap-3 rounded-[22px] bg-white px-5 shadow-[0_0_0_1px_#ebe9f2] transition hover:shadow-[0_0_0_1px_#d9d5ea]">
-                  <FileText className="h-[18px] w-[18px] text-ink-2" strokeWidth={1.75} />
+                <a href={lienPublic('devis', devis.id)} className="row-card">
+                  <IconTile size="row" tone="violet" icon={<FileText strokeWidth={1.9} />} />
                   <span className="flex-1 text-[14px] font-medium">Revoir le devis signé {devis.number}</span>
+                  <ChevronRight className="h-4 w-4 text-[#b7b3c7]" />
                 </a>
               )}
             </div>
           </aside>
           <div className="min-w-0 lg:order-1">
-            <div className="mb-3 flex items-baseline justify-between px-1">
-              <h2 className="flex items-center gap-2 text-[18px] font-semibold tracking-[-0.025em]">
-                <ReceiptText className="h-[18px] w-[18px]" strokeWidth={1.75} /> {TYPE[f.kind] ?? 'Facture'}
+            <div className="mb-3 flex items-center justify-between px-1">
+              <h2 className="flex items-center gap-2.5 text-[19px] font-semibold tracking-[-0.03em]">
+                <IconTile size="sm" tone="mag" icon={<ReceiptText strokeWidth={1.9} />} /> {TYPE[f.kind] ?? 'Facture'}
               </h2>
-              <span className="text-[12.5px] text-ink-3">{f.einvoice.format === 'factur-x' ? 'Facture électronique Factur-X' : 'PDF conforme'}</span>
+              <span className="hidden truncate pl-2 text-[12.5px] text-ink-3 sm:block">{f.einvoice.format === 'factur-x' ? 'Facture électronique Factur-X' : 'PDF conforme'}</span>
             </div>
             <ApercuPapier onOuvrir={() => setPlein(true)} legende="Lire la facture en grand">
               {papier}
@@ -133,7 +153,7 @@ export default function FacturePublique() {
       <PleinEcran open={plein} onClose={() => setPlein(false)} titre={`${TYPE[f.kind] ?? 'Facture'} ${f.number}`} onImprimer={imprimer}>
         {papier}
       </PleinEcran>
-      <Paiement open={payer} onClose={() => setPayer(false)} montant={data.reste} titre={f.number} beneficiaire={company.name} onPayer={(m) => payerFacture(f.id, m)} />
+      <Paiement open={payer} onClose={() => setPayer(false)} moyenInitial={moyen} montant={data.reste} titre={f.number} beneficiaire={company.name} onPayer={(m) => payerFacture(f.id, m)} />
       <ZoneImpression>{papier}</ZoneImpression>
       <Toaster />
     </div>
@@ -162,9 +182,9 @@ function Virement({ iban, titulaire, reference }: { iban: string; titulaire: str
     setTimeout(() => setCopie(''), 1600);
   };
   return (
-    <div className="rounded-[22px] bg-white p-5 shadow-[0_0_0_1px_#ebe9f2]">
-      <div className="flex items-center gap-2 text-[14px] font-semibold">
-        <Landmark className="h-4 w-4" strokeWidth={1.75} /> Ou par virement classique
+    <Card className="p-5">
+      <div className="flex items-center gap-2.5 text-[14.5px] font-semibold tracking-[-0.02em]">
+        <IconTile size="sm" tone="green" icon={<Landmark strokeWidth={1.9} />} /> Ou par virement classique
       </div>
       <div className="mt-3 space-y-2">
         {(
@@ -173,28 +193,27 @@ function Virement({ iban, titulaire, reference }: { iban: string; titulaire: str
             ['ref', 'Référence à indiquer', reference],
           ] as const
         ).map(([k, l, v]) => (
-          <button key={k} onClick={() => copier(k, v)} className="flex w-full items-center gap-3 rounded-2xl bg-page px-4 py-2.5 text-left transition hover:bg-[#efedf7]">
+          <button key={k} onClick={() => copier(k, v)} className="flex w-full items-center gap-3 rounded-card-sm bg-halo-hover px-4 py-2.5 text-left transition hover:bg-halo-track">
             <span className="min-w-0 flex-1">
               <span className="block text-[11.5px] text-ink-3">{l}</span>
               <span className="bx-mono block truncate text-[13.5px] font-medium">{v}</span>
             </span>
-            {copie === k ? <Check className="h-4 w-4 text-[#16a34a]" /> : <Copy className="h-4 w-4 text-ink-3" />}
+            {copie === k ? <Check className="h-4 w-4 text-deep-g" /> : <Copy className="h-4 w-4 text-ink-3" />}
           </button>
         ))}
         <div className="px-1 text-[12px] text-ink-3">Bénéficiaire : {titulaire}</div>
       </div>
-    </div>
+    </Card>
   );
 }
 
 function Introuvable() {
   return (
-    <div className="bx-root grid min-h-dvh place-items-center bg-page px-6 text-center">
+    <div className="bx-root relative isolate grid min-h-dvh place-items-center px-6 text-center">
+      <HaloBackdrop />
       <div className="bx-rise max-w-[380px]">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-white shadow-[0_0_0_1px_#ebe9f2]">
-          <Link2Off className="h-6 w-6 text-ink-2" strokeWidth={1.75} />
-        </span>
-        <h1 className="mt-5 text-[24px] font-semibold tracking-[-0.03em]">Ce lien n’est plus valable</h1>
+        <IconTile size="xl" tone="neutral" className="mx-auto" icon={<Link2Off strokeWidth={1.75} />} />
+        <h1 className="mt-5 text-[26px] font-semibold tracking-[-0.04em]">Ce lien n’est plus valable</h1>
         <p className="mt-2 text-[14.5px] leading-relaxed text-ink-2">Demandez à votre artisan de vous renvoyer la facture.</p>
       </div>
     </div>

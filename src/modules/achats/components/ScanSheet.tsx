@@ -55,15 +55,17 @@ export function ScanSheet({ open, onClose }: { open: boolean; onClose: () => voi
         <Segmented<LocationKey> value={loc} onChange={setLoc} className="w-full" options={LOCATIONS.map((l) => ({ value: l.key, label: l.short }))} />
 
         {!a ? (
-          <button onClick={scan} disabled={scanning} className="relative flex h-52 w-full flex-col items-center justify-center overflow-hidden rounded-2xl bg-[#17171f] text-white">
-            <span className="absolute inset-8 rounded-xl border-2 border-white/25" />
+          <button onClick={scan} disabled={scanning} className="relative flex h-52 w-full flex-col items-center justify-center overflow-hidden rounded-card bg-night text-white shadow-[0_20px_40px_-20px_rgba(19,15,38,.6)]">
+            <span aria-hidden className="absolute -left-10 -top-16 h-40 w-40 rounded-full bg-[#7c3aed] opacity-30 blur-3xl" />
+            <span aria-hidden className="absolute -bottom-16 -right-10 h-40 w-40 rounded-full bg-[#fb923c] opacity-25 blur-3xl" />
+            <span className="absolute inset-8 rounded-[18px] border-2 border-white/25" />
             {scanning && <span className="absolute inset-x-10 top-1/2 h-0.5 animate-pulse bg-peach shadow-[0_0_12px_#fb923c]" />}
             {scanning ? <Loader2 className="h-7 w-7 animate-spin" /> : <ScanLine className="h-8 w-8" />}
             <span className="relative mt-2 text-[14px] font-medium">{scanning ? 'Lecture du code-barres…' : 'Toucher pour scanner'}</span>
             <span className="relative mt-0.5 text-[11.5px] text-white/50">Caméra simulée en démo</span>
           </button>
         ) : (
-          <div className="rounded-2xl border border-line p-4">
+          <div className="rounded-card-sm bg-white p-4 shadow-halo-sm">
             <div className="text-[11.5px] text-ink-3">{a.ref} · {a.barcode}</div>
             <div className="mt-0.5 text-[15px] font-semibold">{a.name}</div>
             <div className="mt-1 text-[12.5px] text-ink-2">Brix attend <span className="num font-medium text-ink">{a.qty[loc]} {a.unit}</span> dans le {LOCATIONS.find((l) => l.key === loc)!.short.toLowerCase()}.</div>
@@ -75,12 +77,12 @@ export function ScanSheet({ open, onClose }: { open: boolean; onClose: () => voi
         )}
 
         {done.length > 0 && (
-          <div className="divide-y divide-line rounded-xl border border-line">
+          <div className="divide-y divide-halo-line overflow-hidden rounded-card-sm bg-white shadow-halo-sm">
             {done.map((c) => {
               const art = articles.find((x) => x.id === c.id)!;
               const gap = c.counted - c.expected;
               return (
-                <div key={c.id} className="flex items-center gap-3 px-3 py-2.5 text-[13px]">
+                <div key={c.id} className="flex min-h-[48px] items-center gap-3 px-3.5 py-2.5 text-[13px]">
                   <span className="min-w-0 flex-1 truncate">{art.name}</span>
                   <span className="num text-ink-2">{c.counted} {art.unit}</span>
                   <Badge tone={gap === 0 ? 'ok' : 'warn'} className={cn(gap === 0 && 'px-1.5')}>{gap === 0 ? 'juste' : `${gap > 0 ? '+' : ''}${gap}`}</Badge>

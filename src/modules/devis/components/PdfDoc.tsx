@@ -21,7 +21,7 @@ export interface DevisDocProps {
 
 function Logo({ company, size = 44 }: { company: Company; size?: number }) {
   return (
-    <div className="grid shrink-0 place-items-center rounded-[10px] bg-[#15122a] font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.3 }}>
+    <div className="grid shrink-0 place-items-center rounded-[13px] bg-[#15122a] font-semibold text-white" style={{ width: size, height: size, fontSize: size * 0.3 }}>
       {company.logoInitials || company.name.slice(0, 2).toUpperCase()}
     </div>
   );
@@ -70,10 +70,12 @@ export function devisDoc({ d, client, company, signer }: DevisDocProps): DocSpec
       </div>
     ),
   });
+  // Petit filet Aube sous l'en-tête (seul accent de couleur du papier, comme la maquette Halo).
+  blocks.push({ key: 'dawn', gap: 16, node: <div className="h-[3px] w-[44px] rounded-full" style={{ background: 'linear-gradient(90deg,#6d28d9,#d946ef 62%,#fb923c)', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }} /> });
 
   blocks.push({
     key: 'parties',
-    gap: 26,
+    gap: 16,
     node: (
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-[8px] bg-[#f6f5fa] p-3.5">

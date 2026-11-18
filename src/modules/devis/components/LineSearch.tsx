@@ -1,6 +1,6 @@
 import { forwardRef, useMemo, useState } from 'react';
 import { BookOpen, Mic, PenLine, Plus } from 'lucide-react';
-import { cn } from '@/components/ui';
+import { IconTile, cn } from '@/components/ui';
 import { money, uid } from '@/lib/format';
 import type { DevisLigne } from '@/lib/types';
 import { LIBRARY, searchLibrary, TRADE_LABEL } from '../library';
@@ -30,8 +30,10 @@ export const LineSearch = forwardRef<HTMLInputElement, { vatRate: number; onAdd:
 
   return (
     <div className="relative">
-      <div className={cn('flex items-center gap-2 rounded-lg px-2 text-ink-3 transition', focus ? 'bg-white ring-1 ring-vi-200' : 'hover:bg-sub', big ? 'h-12' : 'h-10')}>
-        <Plus className="h-4 w-4 shrink-0" />
+      <div className={cn('flex items-center gap-2.5 rounded-card-sm px-3 text-ink-3 transition-[background,box-shadow] duration-300', focus ? 'bg-white shadow-[0_0_0_1.5px_#d9ccfb,0_10px_24px_-12px_rgba(60,30,120,.18)]' : 'bg-white/45 shadow-[inset_0_0_0_1.5px_#e6e0f3] hover:bg-white/80', big ? 'h-14' : 'h-12')}>
+        <span className={cn('grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full transition-colors', focus ? 'bg-pale-v text-deep-v' : 'bg-white text-ink-2 shadow-[0_0_0_1px_#ece8f6]')}>
+          <Plus className="h-3.5 w-3.5" strokeWidth={2.2} />
+        </span>
         <input
           ref={ref}
           value={q}
@@ -56,25 +58,25 @@ export const LineSearch = forwardRef<HTMLInputElement, { vatRate: number; onAdd:
               (e.target as HTMLInputElement).blur();
             }
           }}
-          placeholder={big ? 'Chercher un prix ou ajouter une ligne' : `Chercher parmi vos ${LIBRARY.length} prix (touche /) ou dicter à Bob`}
-          className="h-full min-w-0 flex-1 bg-transparent text-[13.5px] text-ink placeholder:text-ink-3 focus:outline-none"
+          placeholder={big ? 'Ajouter un ouvrage' : `Ajouter un ouvrage : cherchez parmi vos ${LIBRARY.length} prix (touche /)`}
+          className="h-full min-w-0 flex-1 bg-transparent text-[14px] text-ink placeholder:text-ink-2 focus:outline-none"
           aria-label="Ajouter une ligne depuis la bibliothèque"
         />
-        <button onClick={onVoice} className="grid h-8 w-8 shrink-0 place-items-center rounded-md text-ink-3 hover:bg-white hover:text-vi-700" aria-label="Dicter des lignes" type="button">
+        <button onClick={onVoice} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-3 transition hover:bg-pale-v hover:text-deep-v" aria-label="Dicter des lignes" type="button">
           <Mic className="h-4 w-4" />
         </button>
       </div>
       {focus && options > 0 && (
-        <div className="absolute inset-x-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-line bg-white shadow-pop">
+        <div className="absolute inset-x-0 top-full z-30 mt-2 animate-scale-in overflow-hidden rounded-card-sm bg-white p-1.5 shadow-[0_0_0_1px_#ece8f6,0_24px_48px_-16px_rgba(60,30,120,.28)]">
           {results.map((r, i) => (
             <button
               key={r.id}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => pick(i)}
               onMouseEnter={() => setSel(i)}
-              className={cn('flex w-full items-center gap-3 px-3 py-2.5 text-left', sel === i && 'bg-vi-50/70')}
+              className={cn('flex w-full items-center gap-3 rounded-[12px] px-2.5 py-2 text-left', sel === i && 'bg-halo-hover')}
             >
-              <BookOpen className="h-4 w-4 shrink-0 text-ink-3" />
+              <IconTile icon={<BookOpen />} tone="peach" size="sm" />
               <div className="min-w-0 flex-1">
                 <div className="truncate text-[13.5px]">
                   {parsed.qty !== 1 && <b className="num mr-1 font-semibold text-vi-700">{parsed.qty} ×</b>}
@@ -91,8 +93,8 @@ export const LineSearch = forwardRef<HTMLInputElement, { vatRate: number; onAdd:
             </button>
           ))}
           {q.trim() && (
-            <button onMouseDown={(e) => e.preventDefault()} onClick={() => pick(results.length)} onMouseEnter={() => setSel(results.length)} className={cn('flex w-full items-center gap-3 border-t border-line px-3 py-2.5 text-left text-[13px] text-ink-2', sel === results.length && 'bg-vi-50/70')}>
-              <PenLine className="h-4 w-4 shrink-0 text-ink-3" />
+            <button onMouseDown={(e) => e.preventDefault()} onClick={() => pick(results.length)} onMouseEnter={() => setSel(results.length)} className={cn('mt-1 flex w-full items-center gap-3 rounded-[12px] px-2.5 py-2 text-left text-[13px] text-ink-2', sel === results.length && 'bg-halo-hover')}>
+              <IconTile icon={<PenLine />} tone="blue" size="sm" />
               Ajouter « {parsed.term.trim()} » en ligne libre
             </button>
           )}

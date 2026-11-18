@@ -14,10 +14,10 @@ export function ScaledFrame({ width, height, url, children }: { width: number; h
   }, []);
   const scale = cw > 0 ? Math.min(1, cw / width) : 1;
   return (
-    <div className="overflow-hidden rounded-[14px] border border-line2 bg-white shadow-pop">
-      <div className="flex h-9 items-center gap-2 border-b border-line bg-sub px-3">
+    <div className="overflow-hidden rounded-card bg-white shadow-halo-lg">
+      <div className="flex h-10 items-center gap-2 border-b border-halo-line bg-halo-track/60 px-3.5">
         <span className="flex gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" /><i className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" /><i className="h-2.5 w-2.5 rounded-full bg-[#28c840]" /></span>
-        <span className="mx-auto flex h-6 min-w-0 max-w-[70%] items-center gap-1.5 rounded-md bg-white px-3 text-[11.5px] text-ink-2"><Lock className="h-3 w-3 shrink-0" /><span className="truncate">{url}</span></span>
+        <span className="mx-auto flex h-6 min-w-0 max-w-[70%] items-center gap-1.5 rounded-full bg-white px-3.5 text-[11.5px] text-ink-2 shadow-halo-sm"><Lock className="h-3 w-3 shrink-0" /><span className="truncate">{url}</span></span>
       </div>
       <div ref={ref} className="relative overflow-hidden" style={{ height }}>
         <div className="scrollbar-none overflow-y-auto" style={{ width, height: height / scale, transform: `scale(${scale})`, transformOrigin: 'top left' }}>

@@ -19,7 +19,7 @@ export function TeamAvatars({ team, size = 26, max = 4 }: { team: (Employee | un
       {list.slice(0, max).map((e, i) => (
         <Avatar key={e.id} initials={e.initials} color={e.color} size={size} ring className={i ? '-ml-1.5' : ''} />
       ))}
-      {list.length > max && <span className="-ml-1.5 grid place-items-center rounded-full bg-sub text-[10px] font-semibold text-ink-2 ring-2 ring-white" style={{ width: size, height: size }}>+{list.length - max}</span>}
+      {list.length > max && <span className="-ml-1.5 grid place-items-center rounded-full bg-halo-track text-[10px] font-semibold text-ink-2 ring-2 ring-white" style={{ width: size, height: size }}>+{list.length - max}</span>}
     </span>
   );
 }
@@ -53,3 +53,12 @@ export function Ring({ value, size = 44, stroke = 4, className }: { value: numbe
     </span>
   );
 }
+
+/** Barres dégradées Halo : la teinte dit si ça tient (vert), glisse (ambre), décroche (rose) ou avance (violet). */
+export const BAR = {
+  ok: 'bg-[linear-gradient(90deg,#6ee7b7,#10b981)]',
+  warn: 'bg-[linear-gradient(90deg,#fcd34d,#f59e0b)]',
+  bad: 'bg-[linear-gradient(90deg,#fb923c,#f43f5e)]',
+  vi: 'bg-[linear-gradient(90deg,#a78bfa,#6d28d9)]',
+  dawn: 'bg-[linear-gradient(90deg,#6d28d9,#d946ef_60%,#fb923c)]',
+} as const;

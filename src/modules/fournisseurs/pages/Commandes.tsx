@@ -1,8 +1,8 @@
 // Commandes fournisseurs : ce qui est en route, ce qui est arrivé. Une ligne = un bon de commande.
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, PackageOpen, Plus } from 'lucide-react';
-import { Button, Card, EmptyState, PageHeader, Segmented, cn } from '@/components/ui';
+import { ChevronRight, PackageCheck, PackageOpen, Plus } from 'lucide-react';
+import { Button, EmptyState, IconTile, PageHeader, Segmented, cn } from '@/components/ui';
 import { relative, todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { totalCommande, useAchats } from '../data/store';
@@ -27,7 +27,7 @@ function Piste({ c }: { c: Commande }) {
   if (r < 0) return null;
   return (
     <span className="mt-1.5 flex gap-[3px]" aria-hidden>
-      {[0, 1, 2, 3].map((i) => <i key={i} className={cn('h-1 w-4 rounded-full', i <= r ? (r === 3 ? 'bg-ok' : 'bg-ink') : 'bg-line2')} />)}
+      {[0, 1, 2, 3].map((i) => <i key={i} className={cn('h-1.5 w-4 rounded-full', i < r || r === 3 ? (i <= r ? 'bg-[#7fd8b4]' : 'bg-halo-track') : i === r ? 'bg-dawn' : 'bg-halo-track')} />)}
     </span>
   );
 }
@@ -52,14 +52,16 @@ export default function Commandes() {
   return (
     <div className="bx-stagger space-y-5">
       <PageHeader
+        icon={<IconTile icon={<PackageCheck />} dept="achats" size="xl" />}
         title="Commandes"
+        titleMuted="suivies comme un colis."
         subtitle="Suivez chaque commande comme un colis, de l’envoi jusqu’à la facture."
         actions={<Button variant="dawn" icon={<Plus className="h-4 w-4" />} onClick={() => setOuvrir(true)}>Nouvelle commande</Button>}
       />
 
       {commandes.length > 0 && (
         <Segmented
-          className="[&>button]:h-10 md:[&>button]:h-8"
+          className="[&>button]:h-10 md:[&>button]:h-9"
           value={filtre}
           onChange={setFiltre}
           options={[
@@ -78,8 +80,8 @@ export default function Commandes() {
           action={commandes.length === 0 && <Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setOuvrir(true)}>Passer une commande</Button>}
         />
       ) : (
-        <Card className="bx-stagger overflow-hidden">
-          <div className={cn('hidden border-b border-line bg-[#fbfbfd] px-4 py-2.5 text-[11.5px] font-medium text-ink-3', COLS)}>
+        <div className="bx-stagger space-y-2">
+          <div className={cn('hidden px-4 pb-1 text-[12px] font-medium text-ink-3', COLS)}>
             <span>Fournisseur</span>
             <span>Chantier</span>
             <span className="text-right">Total</span>
@@ -91,7 +93,7 @@ export default function Commandes() {
             const f = frn(c.fournisseurId);
             const ch = chantier(c.chantierId);
             return (
-              <button key={c.id} onClick={() => nav(`/app/fournisseurs/commandes/${c.id}`)} className={cn('group flex w-full items-center gap-3 border-b border-line px-4 py-3 text-left transition last:border-b-0 hover:bg-[#fafafc] md:items-center', COLS)}>
+              <button key={c.id} onClick={() => nav(`/app/fournisseurs/commandes/${c.id}`)} className={cn('row-card group w-full gap-3 text-left md:items-center', COLS)}>
                 {/* Colonne 1 : fournisseur et numéro (toujours visible) */}
                 <div className="flex min-w-0 flex-1 items-center gap-3">
                   <FournisseurPastille f={f} />
@@ -120,7 +122,7 @@ export default function Commandes() {
               </button>
             );
           })}
-        </Card>
+        </div>
       )}
 
       <NouvelleCommande open={ouvrir} onClose={() => setOuvrir(false)} />

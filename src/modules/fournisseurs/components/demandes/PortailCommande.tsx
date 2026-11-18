@@ -25,27 +25,26 @@ export default function PortailCommande({ c }: { c: Commande }) {
 
   return (
     <div className="space-y-5 lg:space-y-7">
-      <Bloc className="bx-rise relative overflow-hidden">
-        <div className="fx-grain pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+      <Bloc className="bx-rise halo-bg halo-clip relative overflow-hidden">
         <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
           <div className="min-w-0 space-y-5">
             <div>
-              <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#9898a8]">
-                <span className="inline-flex h-6 items-center rounded-full bg-[#130f26] px-2.5 text-[11.5px] font-semibold text-white">Bon de commande</span>
-                <span className="bx-mono">{c.numero}</span>
+              <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">
+                <span className="inline-flex h-[26px] items-center rounded-full bg-pale-v px-3 text-[12px] font-semibold text-deep-v">Bon de commande</span>
+                <span className="font-mono text-ink-2">{c.numero}</span>
               </div>
-              <h1 className="mt-3 text-[26px] font-semibold leading-[1.1] tracking-[-0.035em] sm:text-[32px]">
+              <h1 className="title-halo mt-3 text-ink">
                 {pluriel(c.lignes.length, 'article commandé', 'articles commandés')}
-                <span className="block text-[#9898a8]">par {e.entreprise}</span>
+                <span className="block text-halo-mute">par {e.entreprise}</span>
               </h1>
             </div>
             <Artisan e={e} chantier={chantier} />
             {c.message && <Mot texte={c.message} auteur={prenom} />}
           </div>
-          <div className="grid content-start gap-4 border-t border-[#ececf1] pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1">
-            <Fait icon={<CalendarClock {...I} />} label={c.statut === 'envoyee' ? 'Livraison souhaitée' : 'Livraison prévue'}>{c.livraisonPrevue ? dateLong(c.livraisonPrevue) : 'Dès que possible'}</Fait>
-            <Fait icon={<MapPin {...I} />} label={c.mode === 'retrait_agence' ? 'Retrait' : 'Livrer au'}>{c.mode === 'retrait_agence' ? 'Au comptoir de votre agence' : c.adresse ?? 'Adresse à confirmer'}</Fait>
-            {c.referenceFournisseur && <Fait icon={<Hash {...I} />} label="Votre référence"><span className="bx-mono">{c.referenceFournisseur}</span></Fait>}
+          <div className="grid content-start gap-4 border-t border-halo-line pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1">
+            <Fait icon={<CalendarClock {...I} />} ton="peche" label={c.statut === 'envoyee' ? 'Livraison souhaitée' : 'Livraison prévue'}>{c.livraisonPrevue ? dateLong(c.livraisonPrevue) : 'Dès que possible'}</Fait>
+            <Fait icon={<MapPin {...I} />} ton="bleu" label={c.mode === 'retrait_agence' ? 'Retrait' : 'Livrer au'}>{c.mode === 'retrait_agence' ? 'Au comptoir de votre agence' : c.adresse ?? 'Adresse à confirmer'}</Fait>
+            {c.referenceFournisseur && <Fait icon={<Hash {...I} />} ton="violet" label="Votre référence"><span className="font-mono">{c.referenceFournisseur}</span></Fait>}
           </div>
         </div>
       </Bloc>

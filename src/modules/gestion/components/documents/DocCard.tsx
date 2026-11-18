@@ -32,19 +32,19 @@ export function DocCard({ d, selecting, picked, fresh, fetching, onOpen, onDropF
       onDragLeave={() => setOver(false)}
       onDrop={(e) => { e.preventDefault(); setOver(false); const f = e.dataTransfer.files?.[0]; if (f) onDropFile(f); }}
       className={cn(
-        'group relative flex min-h-[78px] cursor-pointer items-center gap-3.5 rounded-[16px] bg-white px-4 py-3 text-left transition-[box-shadow,transform] duration-300 ease-out-quint',
-        over ? 'scale-[1.01] shadow-[0_0_0_2px_#4f46e5,0_12px_28px_-14px_rgba(79,70,229,.5)]' : picked ? 'shadow-[0_0_0_2px_var(--ink)]' : 'shadow-card hover:shadow-raise',
-        fresh && 'shadow-[0_0_0_2px_#16a34a,0_10px_24px_-14px_rgba(22,163,74,.6)]',
+        'group relative flex min-h-[80px] cursor-pointer items-center gap-3.5 rounded-card-sm bg-white px-4 py-3 text-left transition-[box-shadow,transform] duration-300 ease-out-quint hover:-translate-y-px',
+        over ? 'scale-[1.01] shadow-[0_0_0_1.5px_#a78bfa,0_12px_28px_-14px_rgba(109,40,217,.5)]' : picked ? 'shadow-[0_0_0_1.5px_#c4b5fd,0_10px_24px_-12px_rgba(109,40,217,.35)]' : 'shadow-halo-sm hover:shadow-[0_0_0_1px_#e3dcf3,0_10px_24px_-12px_rgba(60,30,120,.18)]',
+        fresh && 'shadow-[0_0_0_1.5px_#6ee7b7,0_10px_24px_-14px_rgba(16,185,129,.6)]',
       )}
     >
       {selecting ? (
-        <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 transition-all duration-300 ease-spring', picked ? 'scale-100 border-ink bg-ink text-white' : 'scale-90 border-line2 text-transparent')}>
+        <span className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 transition-all duration-300 ease-spring', picked ? 'scale-100 border-transparent bg-dawn text-white shadow-dawn' : 'scale-90 border-[#dcd5ee] text-transparent')}>
           <Check className="h-5 w-5" strokeWidth={2.4} />
         </span>
       ) : (
         <Ring key={d.expires} value={st.tone === 'bad' ? 100 : st.tone === 'neutral' ? 0 : st.pct} size={46} stroke={4} tone={TONE_RING[st.tone]} className={cn(st.tone === 'bad' && '[&_circle:last-child]:!stroke-[#dc2626]')}>
           {fetching ? (
-            <RefreshCw className="h-4 w-4 animate-spin text-[#4f46e5]" />
+            <RefreshCw className="h-4 w-4 animate-spin text-deep-v" />
           ) : st.tone === 'bad' ? (
             <AlertTriangle className="h-4 w-4 text-bad" />
           ) : st.tone === 'neutral' ? (
@@ -75,7 +75,7 @@ export function DocCard({ d, selecting, picked, fresh, fetching, onOpen, onDropF
           {over ? <><Upload className="h-3.5 w-3.5" />Déposer</> : <><FileText className="h-3.5 w-3.5" />Ouvrir</>}
         </span>
       )}
-      {over && <span className="pointer-events-none absolute inset-0 grid place-items-center rounded-[16px] bg-[#eef0fd]/90 text-[13px] font-semibold text-[#3730a3]"><span className="flex items-center gap-2"><Upload className="h-4 w-4" />Remplacer ce document</span></span>}
+      {over && <span className="pointer-events-none absolute inset-0 grid place-items-center rounded-card-sm bg-pale-v/90 text-[13px] font-semibold text-deep-v"><span className="flex items-center gap-2"><Upload className="h-4 w-4" />Remplacer ce document</span></span>}
     </div>
   );
 }

@@ -31,10 +31,10 @@ export default function Clim() {
       inputs={
         <>
           {rooms.map((r) => (
-            <div key={r.id} className="rounded-[12px] border border-line p-3">
+            <div key={r.id} className="rounded-card-sm bg-white p-3.5 shadow-halo-sm">
               <div className="mb-2 flex items-center gap-2">
                 <Input value={r.name} onChange={(e) => upd(r.id, { name: e.target.value })} className="h-9 flex-1 font-medium" aria-label="Pièce" />
-                <button onClick={() => setRooms((rs) => rs.filter((x) => x.id !== r.id))} className="grid h-9 w-9 place-items-center rounded-lg text-ink-3 hover:text-bad" aria-label="Retirer"><X className="h-4 w-4" /></button>
+                <button onClick={() => setRooms((rs) => rs.filter((x) => x.id !== r.id))} className="grid h-9 w-9 place-items-center rounded-full text-ink-3 transition-colors hover:bg-pale-r hover:text-deep-r" aria-label="Retirer"><X className="h-4 w-4" /></button>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <NumField label="Surface" value={r.surface} onChange={(v) => upd(r.id, { surface: v })} suffix="m²" />

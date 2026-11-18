@@ -107,10 +107,10 @@ export default function ImportTarif({ open, onClose, fournisseurInitial }: { ope
             onDragOver={(e) => { e.preventDefault(); setSurvol(true); }}
             onDragLeave={() => setSurvol(false)}
             onDrop={(e) => { e.preventDefault(); setSurvol(false); void charger(e.dataTransfer.files[0]); }}
-            className={cn('flex cursor-pointer flex-col items-center rounded-[14px] border-2 border-dashed px-5 py-7 text-center transition', survol ? 'border-vi-300 bg-vi-50' : 'border-line2 bg-[#fbfbfd] hover:border-ink-3')}
+            className={cn('flex cursor-pointer flex-col items-center rounded-field border-2 border-dashed px-5 py-7 text-center transition', survol ? 'border-vi-300 bg-vi-50' : 'border-[#e3ddf0] bg-[#fbfbfd] hover:border-ink-3')}
           >
             <input ref={input} type="file" accept=".csv,.txt,text/csv,.xlsx,.xls" className="sr-only" onChange={(e) => void charger(e.target.files?.[0])} />
-            <span className="grid h-11 w-11 place-items-center rounded-xl bg-white text-ink-2 shadow-card">{nomFichier ? <FileSpreadsheet className="h-5 w-5" /> : <Upload className="h-5 w-5" />}</span>
+            <span className="grid h-11 w-11 place-items-center rounded-tile bg-white text-ink-2 shadow-halo">{nomFichier ? <FileSpreadsheet className="h-5 w-5" /> : <Upload className="h-5 w-5" />}</span>
             <span className="mt-3 text-[14px] font-medium">{nomFichier ?? 'Déposez votre fichier CSV ici'}</span>
             <span className="mt-0.5 text-[12.5px] text-ink-3">{nomFichier ? 'Touchez pour en choisir un autre' : 'ou touchez pour le choisir'}</span>
           </label>
@@ -124,10 +124,10 @@ export default function ImportTarif({ open, onClose, fournisseurInitial }: { ope
           <button className="min-h-10 font-medium sm:min-h-0 text-ink-2 hover:underline" onClick={() => { setColler(true); setTexte(EXEMPLE); setNomFichier(null); }}>Essayer avec un exemple</button>
         </div>
 
-        {erreur && <div className="flex gap-2 rounded-[12px] border border-[#fde3b5] bg-warn-bg px-3.5 py-3 text-[13px] text-[#92400e]"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{erreur}</div>}
+        {erreur && <div className="flex gap-2 rounded-card-sm bg-pale-a px-4 py-3.5 text-[13px] text-deep-a"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />{erreur}</div>}
 
         {!analyse && !erreur && (
-          <p className="rounded-[12px] bg-sub px-3.5 py-3 text-[12.5px] leading-relaxed text-ink-2">
+          <p className="rounded-card-sm bg-halo-track/70 px-4 py-3.5 text-[12.5px] leading-relaxed text-ink-2">
             <span className="font-medium text-ink">Votre tarif est un fichier Excel ?</span> Ouvrez-le, puis <span className="font-medium">Fichier › Enregistrer sous</span>, choisissez le type <span className="font-medium">CSV</span>. L’import direct des fichiers Excel arrive bientôt.
           </p>
         )}
@@ -147,13 +147,13 @@ export default function ImportTarif({ open, onClose, fournisseurInitial }: { ope
             </div>
 
             {n > 0 && (
-              <div className="overflow-hidden rounded-[12px] border border-line">
-                <div className="flex items-center justify-between border-b border-line bg-[#fbfbfd] px-3.5 py-2 text-[12px] text-ink-3">
+              <div className="overflow-hidden rounded-card-sm bg-white shadow-halo-sm">
+                <div className="flex items-center justify-between border-b border-halo-line bg-[#fbfbfd] px-3.5 py-2 text-[12px] text-ink-3">
                   <span>Aperçu {Math.min(8, n)} sur {n}</span>
                   {analyse.format === 'fabdis' && <Badge tone="info">Format FAB-DIS</Badge>}
                 </div>
                 {analyse.lignes.slice(0, 8).map((l) => (
-                  <div key={l.reference} className="flex items-center gap-3 border-b border-line px-3.5 py-2 last:border-b-0">
+                  <div key={l.reference} className="flex items-center gap-3 border-b border-halo-line px-3.5 py-2 last:border-b-0">
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[13px]">{l.designation}</div>
                       <div className="truncate text-[11.5px] text-ink-3">{l.reference}{l.marque ? ` · ${l.marque}` : ''} · {l.unite}</div>
@@ -165,7 +165,7 @@ export default function ImportTarif({ open, onClose, fournisseurInitial }: { ope
             )}
 
             {analyse.rejets.length > 0 && (
-              <details className="rounded-[12px] border border-line px-3.5 py-2.5 text-[12.5px]">
+              <details className="rounded-card-sm bg-white shadow-halo-sm px-3.5 py-2.5 text-[12.5px]">
                 <summary className="cursor-pointer font-medium text-warn">{analyse.rejets.length} ligne{analyse.rejets.length > 1 ? 's' : ''} ignorée{analyse.rejets.length > 1 ? 's' : ''}</summary>
                 <ul className="mt-2 space-y-1 text-ink-2">
                   {analyse.rejets.slice(0, 12).map((r) => <li key={r.ligne}>Ligne {r.ligne} : {r.raison}</li>)}

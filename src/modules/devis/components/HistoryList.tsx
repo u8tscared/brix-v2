@@ -20,10 +20,10 @@ export function HistoryList({ d, client, meta, limit = 8 }: { d: Devis; client?:
   const ev = buildHistory(d, client, meta).slice(-limit);
   return (
     <ol className="relative space-y-3 pl-4">
-      <span className="absolute bottom-1.5 left-[3.5px] top-1.5 w-px bg-line" aria-hidden />
+      <span className="absolute bottom-1.5 left-[3.5px] top-1.5 w-px bg-[#ece8f6]" aria-hidden />
       {ev.map((e, i) => (
         <li key={e.id} className="relative">
-          <span className={cn('absolute -left-4 top-[5px] h-2 w-2 rounded-full border-[1.5px] bg-white', i === ev.length - 1 ? 'border-vi-700 bg-vi-700' : e.tone === 'client' ? 'border-ok' : e.tone === 'bob' ? 'border-vi-500' : 'border-ink-3')} />
+          <span className={cn('absolute -left-4 top-[5px] h-2 w-2 rounded-full border-[1.5px] bg-white', i === ev.length - 1 ? 'border-transparent [background:var(--dawn-d)] shadow-[0_0_0_3px_#fce8fd]' : e.tone === 'client' ? 'border-[#10b981]' : e.tone === 'bob' ? 'border-vi-500' : 'border-[#c9c4d9]')} />
           <div className="text-[12.5px] leading-snug text-ink">
             {e.tone === 'bob' && <b className="font-semibold">Bob · </b>}
             {e.text}

@@ -57,8 +57,8 @@ export function PostCard({ post }: { post: Post }) {
         {done ? (
           <>
             <p className="text-[13px] leading-relaxed text-ink-2">{post.text}</p>
-            <div className="flex items-center gap-3 border-t border-line pt-3 text-[12.5px] text-ink-2">
-              <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5 text-[#e11d48]" /><span className="num font-medium text-ink">{post.likes ?? 0}</span> j’aime</span>
+            <div className="flex items-center gap-3 border-t border-halo-line pt-3 text-[12.5px] text-ink-2">
+              <span className="flex items-center gap-1"><Heart className="h-3.5 w-3.5 fill-[#f43f5e] text-[#f43f5e]" /><span className="num font-medium text-ink">{post.likes ?? 0}</span> j’aime</span>
               <span className="flex -space-x-1">{NETWORKS.filter((n) => post.networks.includes(n.key)).map((n) => <span key={n.key} className="grid h-5 w-5 place-items-center rounded-full ring-2 ring-white" style={{ background: n.color }}><n.icon className="h-2.5 w-2.5 text-white" /></span>)}</span>
             </div>
           </>
@@ -74,8 +74,8 @@ export function PostCard({ post }: { post: Post }) {
                   key={n.key}
                   onClick={() => upsertPost({ ...post, networks: on ? post.networks.filter((x) => x !== n.key) : [...post.networks, n.key] })}
                   aria-pressed={on}
-                  className={cn('press flex h-9 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-[background,color,box-shadow] duration-200', on ? 'text-white' : 'bg-white text-ink-3 shadow-[0_0_0_1px_var(--line2)] hover:text-ink')}
-                  style={on ? { background: n.color } : undefined}
+                  className={cn('press flex h-9 items-center gap-1.5 rounded-full px-3 text-[12px] font-medium transition-[background,color,box-shadow] duration-300 ease-spring', on ? '' : 'bg-white text-ink-3 shadow-[0_0_0_1px_#ece8f6] hover:text-ink')}
+                  style={on ? { background: `${n.color}1a`, color: n.color, boxShadow: `0 0 0 1px ${n.color}33` } : undefined}
                 >
                   <n.icon className="h-3.5 w-3.5" strokeWidth={1.75} />{n.label}
                 </button>
@@ -85,7 +85,7 @@ export function PostCard({ post }: { post: Post }) {
         )}
         {!done &&
           (planning ? (
-            <div className="animate-[fade-up_.3s_var(--ease)_both] space-y-2 rounded-[12px] bg-[#f7f6fb] p-3">
+            <div className="animate-[fade-up_.3s_var(--ease)_both] space-y-2.5 rounded-card-sm bg-halo-track p-3.5">
               <div className="flex items-center justify-between">
                 <span className="text-[12.5px] font-medium text-ink-2">Quand publier ?</span>
                 <button onClick={() => setPlanning(false)} className="grid h-7 w-7 place-items-center rounded-full text-ink-3 hover:bg-white hover:text-ink" aria-label="Fermer"><X className="h-3.5 w-3.5" /></button>

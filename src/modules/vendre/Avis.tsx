@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { CheckCircle2, Send } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, cn, IconTile, PageHeader, Segmented, Select, Switch, toast } from '@/components/ui';
+import { CheckCircle2, MessageSquareQuote, Send } from 'lucide-react';
+import { Avatar, Badge, Button, Card, CardHeader, cn, IconTile, PageHeader, Segmented, Select, Switch, toast } from '@/components/ui';
 import { GrowBar } from '@/components/motion';
 import { KpiBand } from '@/modules/chantiers/components/common/KpiBand';
-import { dateShort, relative, todayISO } from '@/lib/format';
+import { dateShort, initials, relative, todayISO } from '@/lib/format';
+import { clientColor, clientInk } from './lib';
 import { useBrix } from '@/lib/store';
 import { ReviewCard, Stars } from './components/ReviewCard';
 import { sendReviewRequest } from './service';
@@ -35,7 +36,7 @@ export default function Avis() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Star" dept="vendre" size="lg" />} title="Avis clients" subtitle="Plus d'avis Google, c'est plus d'appels. Bob demande au bon moment et répond pour vous." />
+      <PageHeader icon={<IconTile name="Star" dept="vendre" size="lg" />} title="Avis clients" titleMuted="demandés au bon moment." subtitle="Plus d'avis Google, c'est plus d'appels. Bob demande au bon moment et répond pour vous." />
 
       <KpiBand
         hero={{
@@ -50,7 +51,7 @@ export default function Avis() {
                 {dist.map((d) => (
                   <div key={d.n} className="flex items-center gap-2 text-[11px] text-ink-3">
                     <span className="num w-2">{d.n}</span>
-                    <GrowBar value={(d.c / Math.max(1, reviews.length)) * 100} className="h-1 flex-1" barClassName="bg-[#f59e0b]" />
+                    <GrowBar value={(d.c / Math.max(1, reviews.length)) * 100} className="h-1.5 flex-1" barClassName="bg-[#fbbf24]" />
                     <span className="num w-3 text-right">{d.c}</span>
                   </div>
                 ))}
@@ -66,16 +67,16 @@ export default function Avis() {
       />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <Card className="min-w-0 self-start">
-          <CardHeader title="Avis reçus" action={<Segmented size="sm" value={filter} onChange={setFilter} options={[{ value: 'tous', label: 'Tous', count: reviews.length }, { value: 'sans', label: 'À répondre', count: unanswered }]} />} />
+        <Card className="min-w-0 self-start overflow-hidden">
+          <CardHeader icon={<IconTile icon={<MessageSquareQuote />} tone="amber" size="sm" />} title="Avis reçus" action={<Segmented size="sm" value={filter} onChange={setFilter} options={[{ value: 'tous', label: 'Tous', count: reviews.length }, { value: 'sans', label: 'À répondre', count: unanswered }]} />} />
           {list.map((r) => <ReviewCard key={r.id} r={r} />)}
-          {!list.length && <div className="px-4 py-12 text-center text-[13px] text-ink-3"><CheckCircle2 className="mx-auto mb-2 h-6 w-6 text-ok" strokeWidth={1.5} />Vous avez répondu à tous les avis.</div>}
+          {!list.length && <div className="flex flex-col items-center gap-3 px-4 py-12 text-center text-[13px] text-ink-3"><IconTile icon={<CheckCircle2 />} tone="green" size="lg" className="rounded-full" />Vous avez répondu à tous les avis.</div>}
         </Card>
 
         <div className="space-y-4">
           <Card>
-            <CardHeader title="Demande automatique" action={<Switch checked={v.autoReview.on} onChange={(on) => { v.setAutoReview({ on }); toast(on ? 'Bob demandera un avis à chaque fin de chantier' : 'Demande automatique coupée', on ? 'ok' : 'info'); }} label="Demande automatique" />} />
-            <div className={cn('space-y-3 p-4', !v.autoReview.on && 'opacity-50')}>
+            <CardHeader icon={<IconTile name="BellRing" tone="violet" size="sm" />} title="Demande automatique" action={<Switch checked={v.autoReview.on} onChange={(on) => { v.setAutoReview({ on }); toast(on ? 'Bob demandera un avis à chaque fin de chantier' : 'Demande automatique coupée', on ? 'ok' : 'info'); }} label="Demande automatique" />} />
+            <div className={cn('space-y-3 p-4 transition-opacity duration-300 md:p-5', !v.autoReview.on && 'opacity-50')}>
               <p className="text-[13px] text-ink-2">À la signature du PV de réception, Bob envoie au client un lien direct vers votre fiche Google.</p>
               <div className="grid grid-cols-2 gap-2">
                 <Select value={v.autoReview.delayDays} onChange={(e) => v.setAutoReview({ delayDays: Number(e.target.value) })} disabled={!v.autoReview.on} aria-label="Délai">
@@ -86,24 +87,25 @@ export default function Avis() {
                   <option value="mail">Par e-mail</option>
                 </Select>
               </div>
-              <div className="rounded-2xl rounded-bl-md bg-sub p-3 text-[12.5px] leading-relaxed text-ink-2">
+              <div className="rounded-[20px] rounded-bl-[6px] bg-pale-b p-3.5 text-[12.5px] leading-relaxed text-[#26407a]">
                 Bonjour Michel, merci pour votre confiance ! Si vous êtes satisfait, un petit avis nous aiderait beaucoup : g.page/{company.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z]+/g, '-')}/avis · {company.name}
               </div>
             </div>
           </Card>
 
           <Card>
-            <CardHeader title="Fins de chantier" meta="à solliciter" />
+            <CardHeader icon={<IconTile name="HardHat" tone="peach" size="sm" />} title="Fins de chantier" meta="à solliciter" />
             {ended.map((c) => {
               const req = v.reviewRequests.find((r) => r.chantierId === c.id);
               const cl = clients.find((x) => x.id === c.clientId);
               return (
-                <div key={c.id} className="flex min-h-[60px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0">
+                <div key={c.id} className="flex min-h-[64px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-b-0">
+                  {cl && <Avatar initials={initials(cl.name)} color={clientColor(cl.id)} fg={clientInk(cl.id)} size={34} />}
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13.5px] font-medium">{cl?.name ?? c.name}</div>
                     <div className="truncate text-[12px] text-ink-3">{req ? `Demandé ${relative(req.sentAt)}${req.opened ? ' · lien ouvert' : ''}` : `${c.name.split('·')[1]?.trim() ?? c.name} · fin ${dateShort(c.endDate)}`}</div>
                   </div>
-                  {req ? <Badge tone="ok">Envoyée</Badge> : <Button size="sm" icon={<Send className="h-3.5 w-3.5" />} loading={sending === c.id} onClick={() => request(c.id, c.clientId)}>Demander</Button>}
+                  {req ? <Badge tone="ok" dot>Envoyée</Badge> : <Button size="sm" icon={<Send className="h-3.5 w-3.5" />} loading={sending === c.id} onClick={() => request(c.id, c.clientId)}>Demander</Button>}
                 </div>
               );
             })}

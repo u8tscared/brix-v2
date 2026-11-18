@@ -118,25 +118,24 @@ export default function PortailDemande({ d, dest }: { d: Demande; dest: Destinat
   return (
     <div className="pb-36 lg:pb-0">
       {/* Qui demande, quoi, pour quand */}
-      <Bloc className="bx-rise relative overflow-hidden">
-        <div className="fx-grain pointer-events-none absolute inset-0 opacity-60" aria-hidden />
+      <Bloc className="bx-rise halo-bg halo-clip relative overflow-hidden">
         <div className="relative grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
           <div className="min-w-0 space-y-5">
             <div>
-              <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-[#9898a8]">
-                <span className="inline-flex h-6 items-center rounded-full bg-[#130f26] px-2.5 text-[11.5px] font-semibold text-white">Demande de prix</span>
-                <span className="bx-mono">{d.numero}</span>
+              <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">
+                <span className="inline-flex h-[26px] items-center rounded-full bg-pale-v px-3 text-[12px] font-semibold text-deep-v">Demande de prix</span>
+                <span className="font-mono text-ink-2">{d.numero}</span>
               </div>
-              <h1 className="mt-3 text-[26px] font-semibold leading-[1.1] tracking-[-0.035em] sm:text-[32px]">
+              <h1 className="title-halo mt-3 text-ink">
                 {pluriel(nb, 'article')} à chiffrer
-                <span className="block text-[#9898a8]">pour {e.entreprise}</span>
+                <span className="block text-halo-mute">pour {e.entreprise}</span>
               </h1>
-              <p className="mt-2 text-[14px] text-[#5f5f70]">{d.titre}</p>
+              <p className="mt-2.5 text-[14px] text-ink-2">{d.titre}</p>
             </div>
             <Artisan e={e} chantier={chantier} />
             {d.message && <Mot texte={d.message} auteur={`${prenom}, ${dateLong(d.createdAt.slice(0, 10))}`} />}
           </div>
-          <FaitsDemande dateLimite={d.dateLimite} livraison={d.livraisonSouhaitee} adresse={d.adresse} className="border-t border-[#ececf1] pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1" />
+          <FaitsDemande dateLimite={d.dateLimite} livraison={d.livraisonSouhaitee} adresse={d.adresse} className="border-t border-halo-line pt-5 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1" />
         </div>
       </Bloc>
 
@@ -147,18 +146,18 @@ export default function PortailDemande({ d, dest }: { d: Demande; dest: Destinat
           {etape === 1 && (
             <>
               <Bloc key="e1" className="bx-rise overflow-hidden">
-                <div className="flex items-end justify-between gap-3 border-b border-[#ececf1] px-4 py-4 sm:px-5">
+                <div className="flex items-end justify-between gap-3 border-b border-halo-line px-5 py-5 sm:px-6">
                   <div>
                     <h2 className="text-[17px] font-semibold tracking-[-0.02em]">Vos prix nets</h2>
-                    <p className="mt-0.5 text-[12.5px] text-[#9898a8]">Prix unitaire HT. La virgule marche, « Entrée » passe à la ligne suivante.</p>
+                    <p className="mt-0.5 text-[12.5px] text-ink-3">Prix unitaire HT. La virgule marche, « Entrée » passe à la ligne suivante.</p>
                   </div>
                 </div>
-                <ul className="divide-y divide-[#ececf1]">
+                <ul className="divide-y divide-halo-line">
                   {d.lignes.map((l, i) => <LigneSaisie key={l.id} l={l} index={i} v={lignes[l.id] ?? ligneVide()} onChange={majLigne} />)}
                 </ul>
               </Bloc>
               {restantes > 0 && t.chiffrees > 0 && (
-                <p className="bx-fade px-1 text-center text-[12.5px] text-[#9898a8]">{pluriel(restantes, 'article sans prix sera indiqué', 'articles sans prix seront indiqués')} « pas dispo ».</p>
+                <p className="bx-fade px-1 text-center text-[12.5px] text-ink-3">{pluriel(restantes, 'article sans prix sera indiqué', 'articles sans prix seront indiqués')} « pas dispo ».</p>
               )}
               <Decliner prenom={prenom} onDecliner={(m) => { decliner(dest.token, m); effacerBrouillon(dest.token); setMode('declinee'); window.scrollTo({ top: 0 }); }} />
             </>

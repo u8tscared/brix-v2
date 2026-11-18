@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Wrench } from 'lucide-react';
-import { Avatar, Badge, Card, CardHeader, EmptyState, Icon, Select } from '@/components/ui';
+import { Avatar, Badge, Card, CardHeader, EmptyState, Icon, IconTile, Select } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { dateFull, dateShort } from '@/lib/format';
 import { useChantiersLocal } from '../../store';
@@ -34,8 +34,8 @@ export function Carnet() {
           {eq.map((c) => {
             const st = contractState(c);
             return (
-              <div key={c.id} className="flex items-center gap-3 border-b border-line px-4 py-3 last:border-b-0">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sub text-ink-2"><Icon name={EQUIPMENT[c.equipment].icon} className="h-[18px] w-[18px]" /></span>
+              <div key={c.id} className="flex items-center gap-3 border-b border-halo-line px-4 py-3 last:border-b-0">
+                <IconTile tone="peach" icon={<Icon name={EQUIPMENT[c.equipment].icon} />} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-[13.5px] font-medium">{c.label}</div>
                   <div className="text-xs text-ink-3">{c.brand ? `${c.brand} · ` : ''}posé le {dateFull(c.installedAt)}</div>
@@ -57,8 +57,8 @@ export function Carnet() {
               const ct = contracts.find((c) => c.id === v.contractId);
               return (
                 <li key={v.id} className="relative flex gap-3 pb-4 last:pb-0">
-                  {i < hist.length - 1 && <span className="absolute left-[15px] top-8 h-[calc(100%-24px)] w-px bg-line" />}
-                  {emp ? <Avatar initials={emp.initials} color={emp.color} size={30} /> : <span className="grid h-[30px] w-[30px] place-items-center rounded-full bg-sub"><Wrench className="h-3.5 w-3.5" /></span>}
+                  {i < hist.length - 1 && <span className="absolute left-[15px] top-8 h-[calc(100%-24px)] w-px bg-halo-line" />}
+                  {emp ? <Avatar initials={emp.initials} color={emp.color} size={30} /> : <span className="grid h-[30px] w-[30px] place-items-center rounded-full bg-pale-p text-deep-p"><Wrench className="h-3.5 w-3.5" /></span>}
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2 text-[13px]">
                       <span className="font-medium">{v.kind === 'entretien' ? 'Entretien' : 'Dépannage'}</span>

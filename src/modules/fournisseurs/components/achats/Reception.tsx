@@ -53,13 +53,13 @@ export default function Reception({ commande, open, onClose }: { commande: Comma
           const q = recu[l.id] ?? 0;
           const complet = q >= l.quantite;
           return (
-            <li key={l.id} className={cn('rounded-[12px] border p-3 transition', complet ? 'border-line bg-white' : 'border-[#fde3b5] bg-warn-bg/50')}>
+            <li key={l.id} className={cn('rounded-card-sm border p-3.5 transition', complet ? 'border-halo-line bg-white' : 'border-[#fde3b5] bg-warn-bg/50')}>
               <div className="flex items-start gap-3">
                 <button
                   onClick={() => regler(l.id, complet ? 0 : l.quantite, l.quantite)}
                   aria-label={complet ? 'Marquer comme non reçu' : 'Tout reçu'}
                   aria-pressed={complet}
-                  className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-[10px] border-2 transition', complet ? 'border-ok bg-ok text-white' : 'border-line2 bg-white text-transparent hover:border-ink-3')}
+                  className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-[10px] border-2 transition', complet ? 'border-ok bg-ok text-white' : 'border-[#e3ddf0] bg-white text-transparent hover:border-ink-3')}
                 >
                   <Check className="h-5 w-5" strokeWidth={2.5} />
                 </button>
@@ -75,7 +75,7 @@ export default function Reception({ commande, open, onClose }: { commande: Comma
                 <span className={cn('text-xs font-medium', complet ? 'text-ok' : 'text-warn')}>
                   {complet ? 'Tout reçu' : q === 0 ? 'Rien reçu' : `Manque ${num(l.quantite - q)} ${l.unite}`}
                 </span>
-                <div className="flex items-center rounded-[10px] border border-line2 bg-white">
+                <div className="flex items-center rounded-field border border-[#e3ddf0] bg-white">
                   <button aria-label="Moins" onClick={() => regler(l.id, q - 1, l.quantite)} className="grid h-10 w-10 place-items-center text-ink-2 hover:text-ink"><Minus className="h-4 w-4" /></button>
                   <input
                     inputMode="decimal"
@@ -85,7 +85,7 @@ export default function Reception({ commande, open, onClose }: { commande: Comma
                       const n = Number(e.target.value.replace(',', '.'));
                       if (Number.isFinite(n)) regler(l.id, n, l.quantite);
                     }}
-                    className="num h-10 w-14 border-x border-line bg-transparent text-center text-[14px] focus:outline-none"
+                    className="num h-10 w-14 border-x border-halo-line bg-transparent text-center text-[14px] focus:outline-none"
                   />
                   <button aria-label="Plus" onClick={() => regler(l.id, q + 1, l.quantite)} className="grid h-10 w-10 place-items-center text-ink-2 hover:text-ink"><Plus className="h-4 w-4" /></button>
                 </div>
@@ -96,7 +96,7 @@ export default function Reception({ commande, open, onClose }: { commande: Comma
       </ul>
 
       {!tout && (
-        <div className="mt-4 flex gap-2.5 rounded-[12px] border border-[#fde3b5] bg-warn-bg px-3.5 py-3 text-[13px] text-[#92400e]">
+        <div className="mt-4 flex gap-2.5 rounded-card-sm bg-pale-a px-4 py-3.5 text-[13px] text-deep-a">
           <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
             <div className="font-medium">Il manque {manquants.length} article{manquants.length > 1 ? 's' : ''}</div>

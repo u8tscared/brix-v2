@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FileText, Link2Off, PenLine, XCircle } from 'lucide-react';
-import { toast, Toaster } from '@/components/ui';
+import { Card, IconTile, toast, Toaster } from '@/components/ui';
+import { HaloBackdrop } from '@/components/layout/HaloBackdrop';
 import { dateFull, money, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { useBoite } from '@/emails/boite';
@@ -11,20 +12,21 @@ import { PdfDoc } from '@/modules/devis/components/PdfDoc';
 import { useDevisMeta } from '@/modules/devis/store';
 import { useNotifs } from '@/modules/notifications/store';
 import { civilite, FORMULES, useDevisPublic, type Formule } from '@/parcours/documents';
-import { assurerDonnees, marquerOuvert, payerAcompte, poserQuestion, refuser, useParcours } from '@/parcours/signature';
+import { assurerDonnees, marquerOuvert, payerAcompte, poserQuestion, refuser, useParcours, type MoyenPaiement } from '@/parcours/signature';
 import { useSyncOnglets } from '@/parcours/sync';
 import '@/parcours/parcours.css';
 import { EnTete } from '../ui/EnTete';
 import { useImpression, ZoneImpression } from '../ui/Impression';
 import { Paiement } from '../ui/Paiement';
 import { PiedDePage } from '../ui/PiedDePage';
-import { BoutonAube, Confettis } from '../ui/primitives';
+import { BoutonAube } from '../ui/primitives';
 import { ApercuPapier, PleinEcran } from '../ui/Visionneuse';
 import { Contenu } from './parts/Contenu';
 import { Question, Refus } from './parts/Echanges';
 import { CarteArtisan, Ensuite } from './parts/Ensuite';
 import { EtatSigne } from './parts/EtatSigne';
 import { Recap } from './parts/Recap';
+import { Succes } from './parts/Succes';
 import { SignatureFlow } from './signature/SignatureFlow';
 
 // Preview vierge : la page publique charge la démo pour rester consultable.
@@ -44,6 +46,8 @@ export default function DevisPublic() {
   const [question, setQuestion] = useState(false);
   const [refus, setRefus] = useState(false);
   const [fete, setFete] = useState(false);
+  const [moyen, setMoyen] = useState<MoyenPaiement | undefined>();
+  const contenuRef = useRef<HTMLElement>(null);
   const { imprimer } = useImpression();
   const [ctaVisible, setCtaVisible] = useState(true);
   const recapRef = useRef<HTMLElement>(null);
@@ -81,27 +85,27 @@ export default function DevisPublic() {
   const papier = <PdfDoc d={devis} client={client} company={company} signer={signe ? preuve?.signataire ?? client?.name : undefined} />;
 
   return (
-    <div className="bx-root relative min-h-dvh overflow-x-clip bg-page">
-      <div className="bx-sky bx-sky-top" />
+    <div className="bx-root relative isolate min-h-dvh overflow-x-clip">
+      <HaloBackdrop />
       <EnTete company={company} sous={`Devis ${devis.number}`} onPdf={imprimer} />
 
       <main className="mx-auto max-w-[1160px] px-4 sm:px-6">
         {/* Accueil */}
         <section className="relative pb-6 pt-8 sm:pt-12">
           <div className="relative bx-stagger max-w-[680px]">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[12.5px] font-medium text-ink-2 shadow-[0_0_0_1px_#ebe9f2] backdrop-blur">
+            <div className="glass inline-flex h-8 items-center gap-2 rounded-full px-3.5 text-[12.5px] font-medium text-ink-2">
               {signe ? <span className="h-2 w-2 rounded-full bg-[#16a34a]" /> : refuse ? <span className="h-2 w-2 rounded-full bg-ink-3" /> : <span className="bx-live h-2 w-2 rounded-full bg-[#16a34a]" />}
               {signe ? `Signé le ${dateFull(devis.signedAt!.slice(0, 10))}` : refuse ? 'Devis décliné' : data.expireDans > 0 ? `En attente de votre signature · encore ${data.expireDans} jour${data.expireDans > 1 ? 's' : ''}` : 'Devis expiré'}
             </div>
-            <h1 className="mt-4 text-[34px] font-semibold leading-[1.05] tracking-[-0.04em] sm:text-[48px]">
+            <h1 className="title-halo mt-5 sm:text-[48px]">
               {signe ? 'Votre projet est lancé.' : `Bonjour ${prenom},`}
               <br />
-              <span className="text-ink-2">{signe ? devis.title : `voici votre devis.`}</span>
+              <span className="text-halo-mute">{signe ? devis.title : `voici votre devis.`}</span>
             </h1>
             {!signe && (
               <div className="mt-5 flex items-start gap-3">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-[12px] font-semibold text-white">{`${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`}</span>
-                <div className="rounded-[20px] rounded-tl-md bg-white px-4 py-3 text-[14.5px] leading-relaxed text-ink-2 shadow-[0_0_0_1px_#ebe9f2]">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-pale-v text-[12px] font-semibold text-deep-v">{`${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`}</span>
+                <div className="rounded-[20px] rounded-tl-md bg-white px-4 py-3 text-[14.5px] leading-relaxed text-ink-2 shadow-halo">
                   {mot}
                   <div className="mt-1.5 text-[12.5px] font-medium text-ink-3">
                     {user.firstName} {user.lastName}, {company.name}
@@ -115,17 +119,17 @@ export default function DevisPublic() {
         <div className="grid gap-6 pb-10 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-10">
           {/* Colonne décision (en premier sur téléphone) */}
           <aside ref={recapRef} className="lg:order-2">
-            <div className="space-y-4 lg:sticky lg:top-[92px]">
+            <div className="space-y-4 [@media(min-width:1024px)_and_(min-height:1060px)]:sticky [@media(min-width:1024px)_and_(min-height:1060px)]:top-[92px]">
               {signe ? (
                 <EtatSigne preuve={preuve} signataire={preuve?.signataire ?? client?.name ?? ''} signeLe={devis.signedAt!} acompte={devis.depositPercent ? acompte : 0} acomptePaye={acomptePaye} onPayer={() => setPayer(true)} onPdf={imprimer} />
               ) : refuse ? (
-                <div className="rounded-[26px] bg-white p-6 text-center shadow-[0_0_0_1px_#ebe9f2]">
-                  <XCircle className="mx-auto h-10 w-10 text-ink-3" strokeWidth={1.5} />
+                <Card className="p-6 text-center">
+                  <IconTile size="lg" tone="neutral" className="mx-auto" icon={<XCircle strokeWidth={1.75} />} />
                   <div className="mt-3 text-[18px] font-semibold">Vous avez décliné ce devis</div>
                   <p className="mt-1 text-[13.5px] text-ink-2">{user.firstName} a été prévenu. Un changement d’avis ? Appelez-le au {company.phone}.</p>
-                </div>
+                </Card>
               ) : (
-                <Recap data={data} formule={formule} onFormule={setFormule} onSigner={() => setSigner(true)} onQuestion={() => setQuestion(true)} onRefuser={() => setRefus(true)} />
+                <Recap data={data} formule={formule} onFormule={setFormule} onSigner={() => setSigner(true)} onQuestion={() => setQuestion(true)} onRefuser={() => setRefus(true)} onDetail={() => contenuRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} />
               )}
               <div className="hidden lg:block">
                 <CarteArtisan company={company} user={user} />
@@ -141,15 +145,15 @@ export default function DevisPublic() {
                 {papier}
               </ApercuPapier>
             </section>
-            <section>
+            <section ref={contenuRef} className="scroll-mt-24">
               <TitreSection titre="En clair, poste par poste" sous={facteur !== 1 ? `Prix de la formule ${formule.label}` : 'Prix hors taxes'} />
               <Contenu devis={devis} facteur={facteur} />
             </section>
             <section>
               <TitreSection titre={signe ? 'La suite' : 'Après votre signature'} />
-              <div className="rounded-[22px] bg-white p-5 shadow-[0_0_0_1px_#ebe9f2] sm:p-6">
+              <Card className="p-5 sm:p-6">
                 <Ensuite acompte={devis.depositPercent} etape={etape} />
-              </div>
+              </Card>
             </section>
             <div className="lg:hidden">
               <CarteArtisan company={company} user={user} />
@@ -162,13 +166,13 @@ export default function DevisPublic() {
 
       {/* Barre d'action collée en bas (téléphone) */}
       {!signe && !refuse && data.expireDans > 0 && (
-        <div className={`fixed inset-x-0 bottom-0 z-40 border-t border-line/80 bg-white/90 px-4 pb-[calc(12px+var(--safe-b))] pt-3 backdrop-blur-xl transition-transform duration-300 ease-[cubic-bezier(.2,.8,.2,1)] lg:hidden ${ctaVisible ? "translate-y-full" : "translate-y-0"}`}>
-          <div className="mx-auto flex max-w-[560px] items-center gap-3">
+        <div className={`fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(10px+var(--safe-b))] transition-[transform,opacity] duration-500 ease-spring lg:hidden ${ctaVisible ? 'pointer-events-none translate-y-[130%] opacity-0' : 'translate-y-0 opacity-100'}`} aria-hidden={ctaVisible}>
+          <div className="glass-strong mx-auto flex max-w-[560px] items-center gap-3 rounded-[24px] py-2 pl-5 pr-2">
             <div className="min-w-0 flex-1">
               <div className="text-[11.5px] text-ink-3">Total TTC</div>
-              <div className="num truncate text-[19px] font-semibold tracking-[-0.02em]">{money(ttc)}</div>
+              <div className="num-halo truncate text-[20px]">{money(ttc)}</div>
             </div>
-            <BoutonAube className="h-[52px] px-6" onClick={() => setSigner(true)} icone={<PenLine className="h-[18px] w-[18px]" strokeWidth={1.75} />}>
+            <BoutonAube tabIndex={ctaVisible ? -1 : 0} className="h-[48px] px-6" onClick={() => setSigner(true)} icone={<PenLine className="h-[18px] w-[18px]" strokeWidth={1.75} />}>
               Signer
             </BoutonAube>
           </div>
@@ -186,22 +190,36 @@ export default function DevisPublic() {
         onSigne={() => {
           setSigner(false);
           setFete(true);
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          toast('Devis signé. Une copie part dans votre boîte e-mail.');
+          window.scrollTo({ top: 0 });
         }}
       />
       <Paiement
         open={payer}
         onClose={() => setPayer(false)}
+        moyenInitial={moyen}
         montant={acompte}
         titre={`Acompte ${devis.depositPercent} % · ${devis.number}`}
         beneficiaire={company.name}
         onPayer={(m) => payerAcompte(devis.id, m)}
-        apres={<p className="rounded-2xl bg-page px-4 py-3 text-[13px] leading-relaxed text-ink-2">{user.firstName} vous propose une date de démarrage sous 48 heures. Vous suivrez le chantier depuis ce même lien.</p>}
+        apres={<p className="rounded-card-sm bg-halo-hover px-4 py-3 text-[13px] leading-relaxed text-ink-2">{user.firstName} vous propose une date de démarrage sous 48 heures. Vous suivrez le chantier depuis ce même lien.</p>}
       />
       <Question open={question} onClose={() => setQuestion(false)} prenom={user.firstName} onEnvoyer={(t) => poserQuestion(devis.id, t)} />
       <Refus open={refus} onClose={() => setRefus(false)} onRefuser={(m) => refuser(devis.id, m)} />
-      <Confettis actif={fete} />
+      <Succes
+        open={fete}
+        prenom={(preuve?.signataire ?? prenom).split(' ')[0]}
+        artisan={user.firstName}
+        acompte={devis.depositPercent && !acomptePaye ? acompte : 0}
+        onFermer={() => {
+          setFete(false);
+          toast('Devis signé. Une copie part dans votre boîte e-mail.');
+        }}
+        onPayer={(m) => {
+          setMoyen(m);
+          setFete(false);
+          setPayer(true);
+        }}
+      />
       <ZoneImpression>{papier}</ZoneImpression>
       <Toaster />
     </div>
@@ -211,7 +229,7 @@ export default function DevisPublic() {
 function TitreSection({ titre, sous }: { titre: string; sous?: string }) {
   return (
     <div className="mb-3 flex items-baseline justify-between gap-3 px-1">
-      <h2 className="text-[18px] font-semibold tracking-[-0.025em]">{titre}</h2>
+      <h2 className="text-[19px] font-semibold tracking-[-0.03em]">{titre}</h2>
       {sous && <span className="truncate text-[12.5px] text-ink-3">{sous}</span>}
     </div>
   );
@@ -219,12 +237,11 @@ function TitreSection({ titre, sous }: { titre: string; sous?: string }) {
 
 function Introuvable() {
   return (
-    <div className="bx-root grid min-h-dvh place-items-center bg-page px-6 text-center">
+    <div className="bx-root relative isolate grid min-h-dvh place-items-center px-6 text-center">
+      <HaloBackdrop />
       <div className="bx-rise max-w-[380px]">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-white shadow-[0_0_0_1px_#ebe9f2]">
-          <Link2Off className="h-6 w-6 text-ink-2" strokeWidth={1.75} />
-        </span>
-        <h1 className="mt-5 text-[24px] font-semibold tracking-[-0.03em]">Ce lien n’est plus valable</h1>
+        <IconTile size="xl" tone="neutral" className="mx-auto" icon={<Link2Off strokeWidth={1.75} />} />
+        <h1 className="mt-5 text-[26px] font-semibold tracking-[-0.04em]">Ce lien n’est plus valable</h1>
         <p className="mt-2 text-[14.5px] leading-relaxed text-ink-2">Le devis a peut-être été remplacé par une version plus récente. Demandez à votre artisan de vous renvoyer le lien.</p>
         <FileText className="mx-auto mt-8 h-5 w-5 text-ink-3" strokeWidth={1.5} />
       </div>

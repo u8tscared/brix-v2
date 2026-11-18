@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { Check, Copy, FolderLock, Link2, Share2, ShieldCheck, Upload, X } from 'lucide-react';
-import { Button, Card, IconTile, PageHeader, Select, Sheet, cn, toast } from '@/components/ui';
+import { Badge, Button, Card, IconTile, PageHeader, Select, Sheet, cn, toast } from '@/components/ui';
 import { AnimatedNumber, Ring, SuccessDot } from '@/components/motion';
+import { BobNote } from '@/modules/vendre/components/BobNote';
 import { DocCard } from './components/documents/DocCard';
 import { DocSheet } from './components/documents/DocSheet';
 import { GROUPS, TENDER, docState, guessDoc, lc, useDocs, type Doc } from './components/documents/store';
@@ -67,12 +68,13 @@ export default function Documents() {
       <PageHeader
         icon={<IconTile name="FolderLock" dept="gestion" size="lg" />}
         title="Documents"
+        titleMuted="prêts à partir en un lien."
         subtitle="Le coffre de l’entreprise : toujours à jour, prêt à envoyer en un lien."
         actions={
           selecting ? null : (
             <>
               <Button icon={<FolderLock />} onClick={() => { setSelecting(true); setPicked(TENDER); }}>Dossier appel d’offres</Button>
-              <Button variant="primary" icon={<Share2 />} onClick={() => setSelecting(true)}>Partager</Button>
+              <Button variant="dawn" icon={<Share2 />} onClick={() => setSelecting(true)}>Partager</Button>
             </>
           )
         }
@@ -80,23 +82,23 @@ export default function Documents() {
       <input ref={fileRef} type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ''; }} />
 
       <div className="grid gap-4 [&>*]:min-w-0 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-        <Card className="relative flex items-center gap-5 overflow-hidden p-5 md:p-6">
-          <div aria-hidden className="pointer-events-none absolute -left-12 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,#eef0fd,transparent)]" />
-          <Ring value={score} size={92} stroke={7} tone={expired.length ? 'warn' : 'ok'} className="relative">
+        <Card className="relative flex items-center gap-5 overflow-hidden p-5 md:gap-7 md:p-7">
+          <div aria-hidden className="pointer-events-none absolute -left-12 -top-16 h-60 w-60 rounded-full bg-[radial-gradient(closest-side,#f1dcfb,transparent)] opacity-70 blur-xl" />
+          <Ring value={score} size={112} stroke={10} tone={expired.length ? 'warn' : 'ok'} className="relative shrink-0">
             <span className="flex flex-col items-center leading-none">
-              <span className="text-[22px] font-semibold tracking-[-0.03em]"><AnimatedNumber value={score} />%</span>
+              <span className="num-halo text-[28px]"><AnimatedNumber value={score} />%</span>
               <span className="mt-0.5 text-[10px] font-medium text-ink-3">à jour</span>
             </span>
           </Ring>
           <div className="relative min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-[12.5px] font-medium text-ink-3"><ShieldCheck className="h-3.5 w-3.5" />Coffre-fort chiffré, hébergé en France</div>
-            <div className="mt-1 text-[18px] font-semibold leading-snug tracking-[-0.025em]">
+            <div className="mt-1.5 text-[20px] font-semibold leading-snug tracking-[-0.03em] md:text-[22px]">
               {expired.length ? `${expired.length} document${expired.length > 1 ? 's' : ''} à remplacer` : soon.length ? `${soon.length} document${soon.length > 1 ? 's' : ''} expire${soon.length > 1 ? 'nt' : ''} bientôt` : 'Tout est à jour'}
             </div>
-            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-ink-2">
-              <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-ok" /><span className="num font-semibold text-ink">{ok}</span> à jour</span>
-              <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-[#d97706]" /><span className="num font-semibold text-ink">{soon.length}</span> bientôt</span>
-              <span className="flex items-center gap-1.5"><i className="h-2 w-2 rounded-full bg-bad" /><span className="num font-semibold text-ink">{expired.length}</span> expiré{expired.length > 1 ? 's' : ''}</span>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <Badge size="md" tone="ok" dot><span className="num font-semibold">{ok}</span> à jour</Badge>
+              <Badge size="md" tone="warn" dot><span className="num font-semibold">{soon.length}</span> bientôt</Badge>
+              <Badge size="md" tone="bad" dot><span className="num font-semibold">{expired.length}</span> expiré{expired.length > 1 ? 's' : ''}</Badge>
             </div>
           </div>
         </Card>
@@ -106,9 +108,9 @@ export default function Documents() {
           onDragLeave={() => setOverZone(false)}
           onDrop={(e) => { e.preventDefault(); setOverZone(false); setTarget(null); onFile(e.dataTransfer.files?.[0]); }}
           onClick={(e) => { e.preventDefault(); setTarget(null); fileRef.current?.click(); }}
-          className={cn('group flex min-h-[132px] cursor-pointer flex-col items-center justify-center gap-2 rounded-[16px] border-2 border-dashed px-5 py-5 text-center transition-all duration-300 ease-out-quint', overZone ? 'scale-[1.01] border-[#4f46e5] bg-[#eef0fd]' : 'border-line2 bg-white/50 hover:border-ink-3 hover:bg-white')}
+          className={cn('group flex min-h-[132px] cursor-pointer flex-col items-center justify-center gap-2 rounded-card border-[1.5px] border-dashed px-5 py-5 text-center transition-all duration-300 ease-out-quint', overZone ? 'scale-[1.01] border-[#a78bfa] bg-pale-v' : 'glass border-[#d9cff0] hover:border-[#c4b5fd] hover:bg-white')}
         >
-          <span className={cn('grid h-11 w-11 place-items-center rounded-full bg-white shadow-card transition-transform duration-300 ease-spring', overZone ? '-translate-y-1 scale-110 text-[#4f46e5]' : 'text-ink-2 group-hover:-translate-y-0.5')}>
+          <span className={cn('grid h-12 w-12 place-items-center rounded-tile bg-pale-i text-deep-i transition-transform duration-300 ease-spring', overZone ? '-translate-y-1 scale-110' : 'group-hover:-translate-y-0.5')}>
             <Upload className="h-5 w-5" strokeWidth={1.75} />
           </span>
           <span className="text-[14px] font-semibold">{overZone ? 'Lâchez, on s’occupe du reste' : 'Glissez un document ici'}</span>
@@ -117,26 +119,23 @@ export default function Documents() {
       </div>
 
       {(expired.length > 0 || soon.some((d) => d.auto)) && !selecting && (
-        <div className="flex items-start gap-3 rounded-[16px] bg-night px-4 py-3.5 text-white shadow-ink md:px-5">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/10 text-[12px] font-semibold">B</span>
-          <p className="text-[13.5px] leading-relaxed text-white/90">
-            {expired.length > 0 && <>Ta {lc(expired[0].label)} a expiré : ne pose plus de borne avant de l’avoir renouvelée. </>}
-            {soon.some((d) => d.auto) && <>Je récupère moi-même l’{lc(soon.find((d) => d.auto)!.label)} le jour où elle expire, tu n’as rien à faire.</>}
-          </p>
-        </div>
+        <BobNote>
+          {expired.length > 0 && <>Ta {lc(expired[0].label)} a expiré : ne pose plus de borne avant de l’avoir renouvelée. </>}
+          {soon.some((d) => d.auto) && <>Je récupère moi-même l’{lc(soon.find((d) => d.auto)!.label)} le jour où elle expire, tu n’as rien à faire.</>}
+        </BobNote>
       )}
 
       {selecting && (
-        <div className="sticky top-2 z-20 flex animate-[toast-in_.4s_var(--spring)_both] items-center gap-2 rounded-[16px] bg-[#15122a] p-2 pl-4 text-white shadow-pop">
+        <div className="glass-strong sticky top-16 z-20 flex animate-[toast-in_.4s_var(--spring)_both] items-center gap-2 rounded-full p-1.5 pl-5 shadow-pop md:top-24">
           <span className="min-w-0 flex-1 text-[13.5px]"><span className="num font-semibold">{picked.length}</span> document{picked.length > 1 ? 's' : ''} sélectionné{picked.length > 1 ? 's' : ''}</span>
-          <Button variant="ghost" size="icon-sm" aria-label="Annuler" className="text-white/70 hover:bg-white/10 hover:text-white" onClick={stopSelecting}><X /></Button>
-          <Button variant="secondary" icon={<Link2 />} disabled={!picked.length} onClick={share}>Créer le lien</Button>
+          <Button variant="ghost" size="icon-sm" aria-label="Annuler" onClick={stopSelecting}><X /></Button>
+          <Button variant="dawn" icon={<Link2 />} disabled={!picked.length} onClick={share}>Créer le lien</Button>
         </div>
       )}
 
       {(Object.keys(GROUPS) as Doc['group'][]).map((g) => (
         <section key={g}>
-          <h2 className="eyebrow mb-2.5 px-1">{GROUPS[g]}</h2>
+          <h2 className="mb-3 px-1 text-[16px] font-semibold tracking-[-0.025em]">{GROUPS[g]}</h2>
           <div className="stagger-fast grid gap-3 [&>*]:min-w-0 md:grid-cols-2">
             {docs.filter((d) => d.group === g).map((d) => (
               <DocCard key={d.id} d={d} selecting={selecting} picked={picked.includes(d.id)} fresh={fresh === d.id} fetching={fetching === d.id} onOpen={() => setOpen(d)} onToggle={() => toggle(d.id)} onDropFile={(f) => apply(d.id, f.name)} />
@@ -179,7 +178,7 @@ export default function Documents() {
           <p className="mt-1 text-[13px] text-ink-2">{picked.length} document{picked.length > 1 ? 's' : ''} · valable 30 jours · consultations suivies</p>
         </div>
         <div className="mt-5 space-y-3">
-          <div className="flex items-center gap-2 rounded-[12px] bg-sub px-3 py-3 shadow-[inset_0_0_0_1px_var(--line)]">
+          <div className="flex items-center gap-2 rounded-full bg-halo-track px-4 py-3">
             <Link2 className="h-4 w-4 shrink-0 text-ink-3" />
             <span className="min-w-0 flex-1 truncate font-mono text-[13px]">{link}</span>
           </div>

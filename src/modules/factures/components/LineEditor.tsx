@@ -9,7 +9,7 @@ import type { DevisLigne } from '@/lib/types';
 const UNITS = ['u', 'h', 'm', 'm²', 'forfait', 'jour', 'kg', 'ens'];
 const RATES = [20, 10, 5.5, 0];
 
-const cell = 'h-10 w-full rounded-lg border border-transparent bg-transparent px-2 max-md:h-11 max-md:border-line2 max-md:bg-white text-[13.5px] transition hover:border-line2 focus:border-vi-300 focus:bg-white focus:outline-none focus:ring-4 focus:ring-vi-100';
+const cell = 'h-10 w-full rounded-[12px] border border-transparent bg-transparent px-2 max-md:h-11 max-md:border-halo-line max-md:bg-white text-[13.5px] transition hover:border-halo-line hover:bg-halo-hover focus:border-[#d9c9fb] focus:bg-white focus:outline-none focus:shadow-focus';
 
 export function LineEditor({ lines, onChange, readOnly, defaultVat, negativeNote }: { lines: DevisLigne[]; onChange: (l: DevisLigne[]) => void; readOnly?: boolean; defaultVat: number; negativeNote?: string }) {
   const patch = (id: string, p: Partial<DevisLigne>) => onChange(lines.map((l) => (l.id === id ? { ...l, ...p } : l)));
@@ -21,7 +21,7 @@ export function LineEditor({ lines, onChange, readOnly, defaultVat, negativeNote
 
   return (
     <div>
-      <div className="hidden grid-cols-[minmax(0,1fr)_64px_84px_104px_72px_104px_36px] gap-1.5 border-b border-line px-1 pb-2 text-[11.5px] font-medium text-ink-3 md:grid">
+      <div className="hidden grid-cols-[minmax(0,1fr)_64px_84px_104px_72px_104px_36px] gap-1.5 border-b border-halo-line px-1 pb-2 text-[11.5px] font-medium text-ink-3 md:grid">
         <span className="px-2">Désignation</span>
         <span className="px-2 text-right">Qté</span>
         <span className="px-2">Unité</span>
@@ -30,7 +30,7 @@ export function LineEditor({ lines, onChange, readOnly, defaultVat, negativeNote
         <span className="px-2 text-right">Total HT</span>
         <span />
       </div>
-      <div className="divide-y divide-line">
+      <div className="divide-y divide-halo-line">
         {lines.map((l) =>
           l.kind === 'section' ? (
             <div key={l.id} className="flex items-center gap-2 py-2">
@@ -66,7 +66,7 @@ export function LineEditor({ lines, onChange, readOnly, defaultVat, negativeNote
         )}
       </div>
       {!readOnly && (
-        <div className="mt-2 flex flex-wrap gap-2 border-t border-line pt-3">
+        <div className="mt-2 flex flex-wrap gap-2 border-t border-halo-line pt-3">
           <Button variant="secondary" size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => add('ouvrage')} className="max-md:h-11 max-md:flex-1">
             Ajouter une ligne
           </Button>
@@ -82,7 +82,7 @@ export function LineEditor({ lines, onChange, readOnly, defaultVat, negativeNote
 
 function DelBtn({ onClick }: { onClick: () => void }) {
   return (
-    <button onClick={onClick} aria-label="Supprimer la ligne" className="grid h-10 w-9 shrink-0 place-items-center rounded-lg text-ink-3 transition hover:bg-bad-bg hover:text-bad">
+    <button onClick={onClick} aria-label="Supprimer la ligne" className="grid h-10 w-9 shrink-0 place-items-center rounded-full text-ink-3 transition hover:bg-pale-r hover:text-deep-r">
       <Trash2 className="h-4 w-4" />
     </button>
   );
@@ -91,11 +91,11 @@ function DelBtn({ onClick }: { onClick: () => void }) {
 function ReadOnlyLines({ lines }: { lines: DevisLigne[] }) {
   return (
     <div>
-      <div className="mb-3 flex items-start gap-2 rounded-lg bg-sub px-3 py-2 text-[12.5px] text-ink-2">
+      <div className="mb-3 flex items-start gap-2 rounded-field bg-pale-n px-3.5 py-2.5 text-[12.5px] text-ink-2">
         <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         Facture émise : elle ne se modifie plus (c’est la loi). Pour corriger, créez un avoir depuis le menu.
       </div>
-      <div className="divide-y divide-line">
+      <div className="divide-y divide-halo-line">
         {lines.map((l) =>
           l.kind === 'section' ? (
             <div key={l.id} className="pb-1.5 pt-3 text-[13px] font-semibold">{l.designation}</div>

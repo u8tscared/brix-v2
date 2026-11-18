@@ -9,8 +9,8 @@ const FOUND = ['Fournisseur', 'Date', 'Montant TTC', 'TVA', 'Catégorie'];
 
 export function ReceiptScan({ preview, sample, reading, read, date }: { preview: string | null; sample?: ReceiptSample; reading: boolean; read: boolean; date: string }) {
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_132px] gap-4 rounded-[16px] bg-[#f3f1f8] p-3 sm:grid-cols-[minmax(0,1fr)_150px]">
-      <div className="relative h-[232px] overflow-hidden rounded-[12px] bg-[#e9e6f1]">
+    <div className="grid grid-cols-[minmax(0,1fr)_132px] gap-4 rounded-card bg-dawn-pale p-3 shadow-halo-sm sm:grid-cols-[minmax(0,1fr)_150px]">
+      <div className="relative h-[232px] overflow-hidden rounded-card-sm bg-[#efeaf8]">
         {preview ? (
           <img src={preview} alt="Ticket" className="h-full w-full object-contain" />
         ) : (
@@ -32,7 +32,7 @@ export function ReceiptScan({ preview, sample, reading, read, date }: { preview:
         <li className="mb-1 text-[11.5px] font-semibold uppercase tracking-[.08em] text-ink-3">{reading ? 'Bob lit…' : read ? 'Lu' : 'À lire'}</li>
         {FOUND.map((f, i) => (
           <li key={f} className="flex items-center gap-2 text-[12.5px]">
-            <span className={cn('grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full transition-colors duration-300', read ? 'bg-ok text-white' : 'bg-white shadow-[inset_0_0_0_1px_var(--line2)]')} style={{ transitionDelay: read ? `${i * 140}ms` : '0ms' }}>
+            <span className={cn('grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full transition-colors duration-300', read ? 'bg-[#10b981] text-white' : 'bg-white shadow-[inset_0_0_0_1.5px_#e3dcf3]')} style={{ transitionDelay: read ? `${i * 140}ms` : '0ms' }}>
               {read && <DrawCheck className="h-3 w-3" delay={i * 140 + 80} strokeWidth={3} />}
               {reading && <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-vi-400" style={{ animationDelay: `${i * 0.15}s` }} />}
             </span>

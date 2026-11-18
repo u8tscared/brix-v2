@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarCheck, Check, Copy, Link2, MessageSquare, QrCode } from 'lucide-react';
+import { CalendarCheck, CalendarClock, Check, ClipboardList, Clock, Copy, Link2, MapPin, MessageSquare, QrCode } from 'lucide-react';
 import { Badge, Button, Card, CardHeader, cn, IconTile, PageHeader, Select, Switch, toast } from '@/components/ui';
 import { capitalize, dateLong, todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
@@ -43,19 +43,20 @@ export default function RendezVous() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="CalendarCheck" dept="vendre" size="lg" />} title="Rendez-vous en ligne" subtitle="Vos clients réservent une visite tout seuls, uniquement sur vos créneaux libres." actions={<Button className="xl:hidden" icon={<CalendarCheck className="h-4 w-4" />} onClick={() => setPreview((v) => !v)}>{preview ? 'Masquer l\'aperçu' : 'Voir la page client'}</Button>} />
+      <PageHeader icon={<IconTile name="CalendarCheck" dept="vendre" size="lg" />} title="Rendez-vous en ligne" titleMuted="sans un coup de fil." subtitle="Vos clients réservent une visite tout seuls, uniquement sur vos créneaux libres." actions={<Button className="xl:hidden" icon={<CalendarCheck className="h-4 w-4" />} onClick={() => setPreview((v) => !v)}>{preview ? 'Masquer l\'aperçu' : 'Voir la page client'}</Button>} />
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_380px]">
         <div className="min-w-0 space-y-4">
-          <Card className="overflow-hidden">
-            <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:p-5">
+          <Card tone="mist" className="relative overflow-hidden">
+            <div aria-hidden className="pointer-events-none absolute -left-10 -top-20 h-52 w-72 rounded-full bg-[radial-gradient(closest-side,#efe3fd,transparent)] opacity-90 blur-xl" />
+            <div className="relative flex flex-col gap-4 p-5 md:flex-row md:items-center md:p-6">
               <div className="min-w-0 flex-1">
-                <div className="text-[12px] font-medium text-ink-3">Votre lien de réservation</div>
-                <div className="mt-1 flex items-center gap-2">
-                  <Link2 className="h-4 w-4 shrink-0 text-ink-3" />
-                  <span className="truncate font-display text-[18px] font-semibold md:text-[20px]">{link}</span>
+                <div className="label-halo">Votre lien de réservation</div>
+                <div className="mt-1.5 flex items-center gap-2.5">
+                  <IconTile icon={<Link2 />} tone="violet" size="sm" className="rounded-full" />
+                  <span className="truncate text-[20px] font-semibold tracking-[-0.035em] md:text-[24px]">{link}</span>
                 </div>
-                <div className="mt-1 text-[12.5px] text-ink-2"><b className="num text-ink">{rdv.bookings}</b> visites réservées en ligne ce mois-ci, sans un seul coup de fil.</div>
+                <div className="mt-2.5 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-2"><Badge size="md" tone="ok" dot><b className="num">{rdv.bookings}</b>&nbsp;visites ce mois-ci</Badge>réservées en ligne, sans un seul coup de fil.</div>
               </div>
               <div className="grid grid-cols-3 gap-2 md:flex">
                 <Button variant="dawn" icon={<Copy className="h-4 w-4" />} onClick={copy} className="col-span-3 justify-center md:col-span-1">Copier le lien</Button>
@@ -68,9 +69,9 @@ export default function RendezVous() {
           {preview && <div className="xl:hidden"><BookingPreview /></div>}
 
           <Card>
-            <CardHeader title="Types de visite" meta="ce que le client peut réserver" />
+            <CardHeader icon={<IconTile icon={<ClipboardList />} tone="violet" size="sm" />} title="Types de visite" meta="réservables en ligne" />
             {rdv.types.map((t) => (
-              <div key={t.id} className="flex min-h-[60px] items-center gap-3 border-b border-line px-4 py-2 last:border-b-0">
+              <div key={t.id} className="flex min-h-[64px] items-center gap-3 border-b border-halo-line px-4 py-2 transition-colors last:border-b-0 hover:bg-halo-hover md:px-5">
                 <div className="min-w-0 flex-1">
                   <div className={cn('text-[13.5px] font-medium', !t.on && 'text-ink-3')}>{t.label}</div>
                   <div className="text-[12px] text-ink-3">{t.price}</div>
@@ -86,13 +87,13 @@ export default function RendezVous() {
           </Card>
 
           <Card>
-            <CardHeader title="Quand peut-on réserver ?" />
-            <div className="space-y-4 p-4">
+            <CardHeader icon={<IconTile icon={<Clock />} tone="peach" size="sm" />} title="Quand peut-on réserver ?" />
+            <div className="space-y-5 p-4 md:p-5">
               <div className="grid max-w-md grid-cols-7 gap-1.5">
                 {DAYS.map((d) => {
                   const on = rdv.days.includes(d);
                   return (
-                    <button key={d} onClick={() => setRdv({ days: on ? rdv.days.filter((x) => x !== d) : [...rdv.days, d] })} className={cn('h-11 w-full rounded-xl border text-[13px] font-medium transition', on ? 'border-ink bg-ink text-white' : 'border-line bg-white text-ink-2')}>
+                    <button key={d} onClick={() => setRdv({ days: on ? rdv.days.filter((x) => x !== d) : [...rdv.days, d] })} aria-pressed={on} className={cn('h-11 w-full rounded-full text-[13px] font-medium transition-[background,color,box-shadow,transform] duration-300 ease-spring active:scale-95', on ? 'bg-pale-v text-deep-v shadow-[0_0_0_1px_#e4d8fd]' : 'bg-halo-track text-ink-3 hover:text-ink-2')}>
                       {DAY_LABEL[d]}
                     </button>
                   );
@@ -109,11 +110,11 @@ export default function RendezVous() {
 
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
-              <CardHeader title="Agenda relié" meta="pour ne jamais être réservé deux fois" />
+              <CardHeader icon={<IconTile icon={<CalendarClock />} tone="blue" size="sm" />} title="Agenda relié" meta="jamais réservé deux fois" />
               {AGENDAS.map((a) => {
                 const on = rdv.agenda === a.name;
                 return (
-                  <div key={a.name} className="flex min-h-[58px] items-center gap-3 border-b border-line px-4 last:border-b-0">
+                  <div key={a.name} className="flex min-h-[62px] items-center gap-3 border-b border-halo-line px-4 last:border-b-0 md:px-5">
                     <div className="min-w-0 flex-1">
                       <div className="text-[13.5px] font-medium">{a.name}</div>
                       <div className="text-[12px] text-ink-3">{on ? 'Synchronisé il y a 2 min' : a.sub}</div>
@@ -125,11 +126,11 @@ export default function RendezVous() {
               })}
             </Card>
             <Card>
-              <CardHeader title="Prochaines visites" meta={`${upcoming.length}`} />
+              <CardHeader icon={<IconTile icon={<MapPin />} tone="green" size="sm" />} title="Prochaines visites" meta={`${upcoming.length}`} />
               {upcoming.map((e) => (
-                <div key={e.id} className="flex min-h-[58px] items-center gap-3 border-b border-line px-4 last:border-b-0">
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sub text-center leading-none">
-                    <span className="num text-[14px] font-semibold">{new Date(e.date + 'T12:00').getDate()}</span>
+                <div key={e.id} className="flex min-h-[62px] items-center gap-3 border-b border-halo-line px-4 last:border-b-0 md:px-5">
+                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-tile bg-pale-p text-center leading-none text-deep-p">
+                    <span className="num text-[15px] font-semibold">{new Date(e.date + 'T12:00').getDate()}</span>
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13.5px] font-medium">{e.title}</div>

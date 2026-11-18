@@ -116,7 +116,7 @@ export default function FicheFournisseur({ open, onClose, fournisseur }: { open:
               {[...ENSEIGNES.map((e) => ({ cle: e.cle, nom: e.nom })), { cle: '', nom: 'Autre fournisseur' }].map((e) => {
                 const actif = form.enseigne === e.cle;
                 return (
-                  <button key={e.cle || 'autre'} onClick={() => choisirEnseigne(e.cle)} aria-pressed={actif} className={cn('flex h-12 items-center gap-2 rounded-[10px] border px-2.5 text-left text-[12.5px] font-medium transition', actif ? 'border-ink bg-white ring-2 ring-ink/10' : 'border-line bg-white hover:border-line2 hover:bg-sub')}>
+                  <button key={e.cle || 'autre'} onClick={() => choisirEnseigne(e.cle)} aria-pressed={actif} className={cn('flex h-12 items-center gap-2 rounded-card-sm border px-3 text-left text-[12.5px] font-medium transition', actif ? 'border-ink bg-white ring-2 ring-ink/10' : 'border-halo-line bg-white hover:border-[#e3ddf0] hover:bg-halo-hover')}>
                     <FournisseurPastille f={{ nom: e.nom, enseigne: e.cle }} size={26} />
                     <span className="min-w-0 flex-1 truncate">{e.nom}</span>
                     {actif && <Check className="h-3.5 w-3.5 shrink-0" />}
@@ -152,7 +152,7 @@ export default function FicheFournisseur({ open, onClose, fournisseur }: { open:
             {METIERS.map((m) => {
               const on = form.metiers.includes(m.cle);
               return (
-                <button key={m.cle} onClick={() => set({ metiers: on ? form.metiers.filter((x) => x !== m.cle) : [...form.metiers, m.cle] })} aria-pressed={on} className={cn('h-10 rounded-full border px-3 text-[12.5px] font-medium transition sm:h-9', on ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2 hover:text-ink')}>
+                <button key={m.cle} onClick={() => set({ metiers: on ? form.metiers.filter((x) => x !== m.cle) : [...form.metiers, m.cle] })} aria-pressed={on} className={cn('h-10 rounded-full border px-3 text-[12.5px] font-medium transition sm:h-9', on ? 'border-ink bg-ink text-white' : 'border-[#e3ddf0] bg-white text-ink-2 hover:text-ink')}>
                   {m.label}
                 </button>
               );
@@ -160,7 +160,7 @@ export default function FicheFournisseur({ open, onClose, fournisseur }: { open:
           </div>
         </div>
 
-        <div className="rounded-[14px] border border-line bg-[#fbfbfd] p-4">
+        <div className="rounded-field border border-halo-line bg-[#fbfbfd] p-4">
           <div className="flex items-center gap-2 text-[13.5px] font-semibold"><Plug className="h-4 w-4 text-ink-3" />Relier à son logiciel</div>
           {live?.connecteur === 'api_brix' ? (
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[13px]">

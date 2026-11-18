@@ -42,10 +42,10 @@ export default function Peinture() {
       inputs={
         <>
           {rooms.map((r) => (
-            <div key={r.id} className="rounded-[12px] border border-line p-3">
+            <div key={r.id} className="rounded-card-sm bg-white p-3.5 shadow-halo-sm">
               <div className="mb-2 flex items-center gap-2">
                 <Input value={r.name} onChange={(e) => upd(r.id, { name: e.target.value })} className="h-9 flex-1 font-medium" aria-label="Nom de la pièce" />
-                <button onClick={() => setRooms((rs) => rs.filter((x) => x.id !== r.id))} className="grid h-9 w-9 place-items-center rounded-lg text-ink-3 hover:text-bad" aria-label="Retirer"><X className="h-4 w-4" /></button>
+                <button onClick={() => setRooms((rs) => rs.filter((x) => x.id !== r.id))} className="grid h-9 w-9 place-items-center rounded-full text-ink-3 transition-colors hover:bg-pale-r hover:text-deep-r" aria-label="Retirer"><X className="h-4 w-4" /></button>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <NumField label="Longueur" value={r.l} onChange={(v) => upd(r.id, { l: v })} suffix="m" />
@@ -61,7 +61,7 @@ export default function Peinture() {
           <Choice label="Couches de finition" value={coats} onChange={setCoats} options={[1, 2, 3].map((c) => ({ value: c, label: `${c} couche${c > 1 ? 's' : ''}` }))} />
           <div className="grid grid-cols-2 items-end gap-3">
             <NumField label="Rendement de la peinture" value={yieldWall} onChange={setYield} suffix="m²/L" hint="Voir le pot : 10 à 12 en général" min={4} />
-            <label className="flex min-h-[44px] items-center justify-between gap-2 rounded-[10px] border border-line px-3"><span className="text-[13px]">Sous-couche</span><Switch checked={primer} onChange={setPrimer} label="Sous-couche" /></label>
+            <label className="flex min-h-[44px] items-center justify-between gap-2 rounded-card-sm bg-white px-3.5 shadow-halo-sm"><span className="text-[13px]">Sous-couche</span><Switch checked={primer} onChange={setPrimer} label="Sous-couche" /></label>
           </div>
         </>
       }

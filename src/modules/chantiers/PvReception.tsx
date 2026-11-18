@@ -58,7 +58,7 @@ export default function PvReception() {
           <EmptyState icon={<ClipboardCheck />} title="Aucun chantier à réceptionner" text="Le PV se prépare à la fin d’un chantier en cours." />
         ) : (
           <section className="space-y-3">
-            <h2 className="eyebrow">Quel chantier réceptionnez-vous ?</h2>
+            <h2 className="label-halo">Quel chantier réceptionnez-vous ?</h2>
             <PvChooser chantiers={ready} pvs={pvs} onPick={(id) => setParams({ chantier: id })} />
           </section>
         )}
@@ -143,10 +143,10 @@ export default function PvReception() {
         </div>
 
         <Card className="h-fit">
-          <CardHeader icon={<ShieldCheck className="h-4 w-4 text-ink-2" />} title="Garanties" meta={`à partir du ${dateFull(pv.date)}`} />
+          <CardHeader icon={<IconTile size="sm" tone="green" icon={<ShieldCheck />} />} title="Garanties" meta={`à partir du ${dateFull(pv.date)}`} />
           {guarantees(pv.date).map((g, i) => (
-            <div key={g.label} className="flex gap-3 border-b border-line px-4 py-3 last:border-b-0">
-              <span className={cn('num grid h-10 w-12 shrink-0 place-items-center whitespace-nowrap rounded-xl text-[12.5px] font-semibold', i === 2 ? 'bg-ink text-white' : 'bg-sub')}>{g.years} an{g.years > 1 ? 's' : ''}</span>
+            <div key={g.label} className="flex gap-3 border-b border-halo-line px-4 py-3.5 last:border-b-0">
+              <span className={cn('num grid h-11 w-[52px] shrink-0 place-items-center whitespace-nowrap rounded-[14px] text-[12.5px] font-semibold', ['tone-green', 'tone-blue', 'tone-violet'][i] ?? 'tone-neutral')}>{g.years} an{g.years > 1 ? 's' : ''}</span>
               <div className="min-w-0">
                 <div className="text-[13.5px] font-medium">{g.label}</div>
                 <div className="text-xs text-ink-2">Jusqu’au {dateFull(g.until)}</div>
@@ -154,12 +154,12 @@ export default function PvReception() {
               </div>
             </div>
           ))}
-          <p className="border-t border-line px-4 py-3 text-xs text-ink-3">Brix vous rappellera la fin de la garantie de parfait achèvement un mois avant.</p>
+          <p className="border-t border-halo-line px-4 py-3 text-xs text-ink-3">Brix vous rappellera la fin de la garantie de parfait achèvement un mois avant.</p>
         </Card>
       </div>
 
       <Sheet open={preview} onClose={() => setPreview(false)} width={800} title="Aperçu du PV" footer={<><Button variant="ghost" onClick={() => setPreview(false)}>Fermer</Button><Button variant="primary" icon={<Printer className="h-4 w-4" />} onClick={() => window.print()}>Imprimer ou PDF</Button></>}>
-        <div className="rounded-xl border border-line">
+        <div className="overflow-hidden rounded-card-sm shadow-halo-sm">
           <PvDocument pv={pv} ch={ch} client={client} company={company} />
         </div>
       </Sheet>

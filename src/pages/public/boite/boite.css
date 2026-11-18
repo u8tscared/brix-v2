@@ -11,8 +11,8 @@
 /* Ligne de la liste : sélection avec filet d'encre à gauche */
 .boite-ligne { transition: background-color .2s ease, box-shadow .25s ease, transform .15s ease; }
 .boite-ligne:active { transform: scale(.992); }
-.boite-ligne::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: #130f26; transform: scaleY(0); opacity: 0; transition: transform .3s var(--ease), opacity .2s ease; }
-.boite-ligne-active { box-shadow: 0 1px 2px rgba(19,15,38,.05), 0 0 0 1px #ececf1, 0 10px 24px -18px rgba(45,20,90,.35); }
+.boite-ligne::before { content: ''; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px; background: linear-gradient(180deg, #6d28d9, #d946ef 62%, #fb923c); transform: scaleY(0); opacity: 0; transition: transform .3s var(--ease), opacity .2s ease; }
+.boite-ligne-active { box-shadow: 0 1px 2px rgba(60,30,120,.05), 0 0 0 1px #f0edf7, 0 12px 30px -16px rgba(60,30,120,.25); }
 .boite-ligne-active::before { transform: scaleY(1); opacity: 1; }
 
 /* Arrivée d'un nouvel e-mail : il glisse depuis le haut, la ligne se déplie, un halo passe */
@@ -42,7 +42,7 @@
 
 /* Galerie : cartes qui se soulèvent, miniature qui défile un peu au survol */
 .boite-carte { transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
-.boite-carte:hover { transform: translateY(-3px); box-shadow: 0 0 0 1px #ececf1, 0 24px 40px -24px rgba(45,20,90,.35); }
+.boite-carte:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(60,30,120,.05), 0 22px 48px -16px rgba(60,30,120,.22); }
 .boite-carte-mini iframe { transition: margin-top 1.2s var(--ease); margin-top: 0; }
 .boite-carte:hover .boite-carte-mini iframe { margin-top: -40px; }
 

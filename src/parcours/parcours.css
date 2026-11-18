@@ -43,13 +43,10 @@
 @keyframes bx-ring { from { transform: scale(.6); opacity: .7; } to { transform: scale(1.9); opacity: 0; } }
 .bx-ring { animation: bx-ring 1.4s cubic-bezier(.2,.8,.2,1) infinite; }
 
-/* Bouton principal Aube : lueur et reflet au survol */
-.bx-btn-dawn { position: relative; overflow: hidden; background: linear-gradient(110deg, #6d28d9 0%, #c026d3 55%, #f97316 100%); background-size: 160% 100%; background-position: 0% 0; transition: background-position .6s cubic-bezier(.2,.8,.2,1), transform .15s ease, box-shadow .3s ease; box-shadow: 0 10px 24px -10px rgba(192,38,211,.6), inset 0 1px 0 rgba(255,255,255,.25); }
-.bx-btn-dawn:hover { background-position: 100% 0; box-shadow: 0 14px 30px -10px rgba(192,38,211,.7), inset 0 1px 0 rgba(255,255,255,.3); }
-.bx-btn-dawn:active { transform: scale(.985); }
-.bx-btn-dawn::after { content: ''; position: absolute; top: 0; bottom: 0; width: 60px; left: -80px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transform: skewX(-20deg); }
-.bx-btn-dawn:hover::after { animation: bx-shine .9s ease; }
-@keyframes bx-shine { from { left: -80px; } to { left: 110%; } }
+/* Bouton principal Aube (Halo) : pilule dégradée avec lueur, se soulève au survol */
+.bx-btn-dawn { position: relative; overflow: hidden; background: linear-gradient(100deg, #6d28d9 0%, #d946ef 58%, #fb923c 100%); transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, opacity .2s; box-shadow: 0 8px 22px -8px rgba(217,70,239,.6), inset 0 1px 0 rgba(255,255,255,.25); }
+.bx-btn-dawn:not(:disabled):hover { transform: translateY(-1px) scale(1.015); box-shadow: 0 14px 30px -10px rgba(217,70,239,.7), inset 0 1px 0 rgba(255,255,255,.25); }
+.bx-btn-dawn:not(:disabled):active { transform: scale(.985); }
 
 /* Point « en direct » */
 @keyframes bx-live { 0% { box-shadow: 0 0 0 0 rgba(22,163,74,.45); } 100% { box-shadow: 0 0 0 7px rgba(22,163,74,0); } }
@@ -85,3 +82,31 @@
 .bx-bell { animation: bx-bell .8s ease; transform-origin: 50% 10%; }
 @keyframes bx-banner { from { opacity: 0; transform: translateY(-120%) scale(.96); } to { opacity: 1; transform: none; } }
 .bx-banner { animation: bx-banner .55s cubic-bezier(.2,.9,.25,1.15) both; }
+
+/* ───────── Halo : pages client ───────── */
+/* Glisser pour signer */
+.bx-swipe { position: relative; height: 60px; border-radius: 999px; background: #f2eefb; box-shadow: inset 0 0 0 1px #ebe5f8; overflow: hidden; display: flex; align-items: center; justify-content: center; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.bx-swipe-fill { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: linear-gradient(100deg, #6d28d9 0%, #d946ef 58%, #fb923c 100%); box-shadow: 0 8px 22px -8px rgba(217,70,239,.6); }
+.bx-swipe-label { position: relative; padding-left: 56px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; color: #6d5a9c; white-space: nowrap; transition: opacity .2s; }
+.bx-swipe-knob { position: absolute; z-index: 2; top: 5px; left: 5px; width: 50px; height: 50px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 4px 14px rgba(60,30,120,.25); cursor: grab; touch-action: none; }
+.bx-swipe-knob:active { cursor: grabbing; }
+.bx-swipe-knob:focus-visible { outline: 2px solid #d946ef; outline-offset: 3px; }
+.bx-swipe-knob:disabled { cursor: not-allowed; }
+.bx-shine-text { background: linear-gradient(90deg, #6d5a9c 0%, #6d5a9c 40%, #fff 50%, #6d5a9c 60%, #6d5a9c 100%); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: bx-shimmer 3s linear infinite; }
+@keyframes bx-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* Succès : anneaux concentriques, coche qui se dessine */
+@keyframes bx-pop-spring { 0% { opacity: 0; transform: scale(.6); } 100% { opacity: 1; transform: none; } }
+@keyframes bx-ripple { 0% { transform: scale(.85); opacity: 0; } 30% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+.bx-success { position: relative; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.6); box-shadow: 0 0 0 14px rgba(255,255,255,.35), 0 0 0 30px rgba(255,255,255,.18); animation: bx-pop-spring .7s .15s cubic-bezier(.34,1.56,.64,1) both; }
+.bx-success::before, .bx-success::after { content: ''; position: absolute; inset: -46px; border-radius: 50%; border: 1px solid rgba(217,70,239,.14); animation: bx-ripple 1s .35s cubic-bezier(.22,1,.36,1) both; }
+.bx-success::after { inset: -78px; border-color: rgba(109,40,217,.08); animation-delay: .5s; }
+.bx-success-core { display: grid; place-items: center; border-radius: 50%; background: linear-gradient(135deg, #6d28d9 0%, #d946ef 62%, #fb923c 100%); box-shadow: 0 14px 30px -10px rgba(217,70,239,.8), inset 0 1px 0 rgba(255,255,255,.3); }
+.bx-success-core.ok { background: linear-gradient(150deg, #10b981, #0f8a5f); box-shadow: 0 14px 30px -10px rgba(15,138,95,.6), inset 0 1px 0 rgba(255,255,255,.3); }
+.bx-success .bx-draw { animation-delay: .7s; animation-duration: .55s; }
+.bx-dawn-sky { background: radial-gradient(90% 60% at 50% 26%, #f6d2f8 0%, #ece4fe 45%, #f7f5fc 85%) #f7f5fc; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bx-shine-text { animation: none; color: #6d5a9c; background: none; }
+  .bx-success, .bx-success::before, .bx-success::after { animation: none !important; }
+}

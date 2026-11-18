@@ -33,7 +33,7 @@ export function ReservesEditor({ reserves, onChange, disabled }: { reserves: Res
         }}
       />
       {reserves.map((r, i) => (
-        <div key={r.id} className="flex gap-2.5 rounded-xl border border-line bg-white p-2.5">
+        <div key={r.id} className="flex gap-2.5 rounded-card-sm border border-halo-line bg-white p-2.5">
           <button
             type="button"
             disabled={disabled}
@@ -41,7 +41,7 @@ export function ReservesEditor({ reserves, onChange, disabled }: { reserves: Res
               target.current = r.id;
               input.current?.click();
             }}
-            className="relative grid h-[88px] w-[88px] shrink-0 place-items-center overflow-hidden rounded-lg border border-dashed border-line2 bg-sub text-ink-3"
+            className="relative grid h-[88px] w-[88px] shrink-0 place-items-center overflow-hidden rounded-lg border border-dashed border-line2 bg-halo-track text-ink-3"
             aria-label="Ajouter une photo de la réserve"
           >
             {r.photo ? <img src={r.photo} alt="" className="h-full w-full object-cover" /> : <span className="flex flex-col items-center gap-1 text-[11px]"><Camera className="h-5 w-5" />Photo</span>}
@@ -70,7 +70,7 @@ export function ReservesEditor({ reserves, onChange, disabled }: { reserves: Res
           <Button className="w-full justify-center" icon={<Plus className="h-4 w-4" />} onClick={() => add()}>Ajouter une réserve</Button>
           <div className="flex flex-wrap gap-1.5">
             {SUGGESTIONS.filter((s) => !reserves.some((r) => r.text === s)).slice(0, 4).map((s) => (
-              <button key={s} onClick={() => add(s)} className="h-9 rounded-full border border-line2 bg-white px-3 text-[12.5px] text-ink-2 hover:text-ink">+ {s}</button>
+              <button key={s} onClick={() => add(s)} className="h-9 rounded-full border border-halo-line bg-white px-3 text-[12.5px] text-ink-2 hover:text-ink">+ {s}</button>
             ))}
           </div>
         </>

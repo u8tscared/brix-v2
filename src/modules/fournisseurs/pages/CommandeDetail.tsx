@@ -1,15 +1,15 @@
 // Détail d'une commande, suivi façon colis : où en est-elle, que dois-je faire maintenant.
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Ban, ExternalLink, FileDown, MessageSquareDiff, PackageCheck, PackageSearch, Phone, Receipt, Send } from 'lucide-react';
-import { Badge, Button, Card, CardHeader, EmptyState, Progress, Sheet, cn, toast } from '@/components/ui';
+import { ArrowLeft, Ban, ExternalLink, FileDown, MessageSquareDiff, Package, PackageCheck, PackageSearch, Phone, Receipt, Send } from 'lucide-react';
+import { Badge, Button, Card, CardHeader, EmptyState, IconTile, Progress, Sheet, cn, toast } from '@/components/ui';
 import { dateShort, money, num, relative, todayISO } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { transitionAutorisee } from '../../../../worker/src/modules/fournisseurs/cycle-commande';
 import { lienPortail } from '../data/helpers';
 import { totalCommande, useAchats } from '../data/store';
 import type { Commande } from '../data/types';
-import { BadgeCommande, BandeauDemo, Montant } from '../components/ui';
+import { BadgeCommande, BandeauDemo, FournisseurPastille, Montant } from '../components/ui';
 import { telechargerEdi } from '../components/achats/commun';
 import Frise from '../components/achats/Frise';
 import CommandeInfos from '../components/achats/CommandeInfos';
@@ -58,19 +58,22 @@ export default function CommandeDetail() {
   return (
     <div className="bx-stagger space-y-5">
       <div className="space-y-3">
-        <Link to="/app/fournisseurs/commandes" className="inline-flex h-10 items-center md:h-9 gap-1.5 text-[13px] font-medium text-ink-2 hover:text-ink">
-          <ArrowLeft className="h-4 w-4" /> Commandes
+        <Link to="/app/fournisseurs/commandes" className="group -ml-1 inline-flex h-10 items-center gap-1.5 rounded-pill px-3 text-[13px] font-medium text-ink-2 transition-[background,color,box-shadow] duration-300 hover:bg-white hover:text-ink hover:shadow-pill md:h-9">
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" /> Commandes
         </Link>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0">
-            <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-ink-3">
-              <span className="bx-mono">{c.numero}</span>·<span>créée le {dateShort(c.createdAt)}</span>
+            <div className="mb-2 flex flex-wrap items-center gap-2 text-[12.5px] text-ink-3">
+              <span className="font-mono text-ink-2">{c.numero}</span>·<span>créée le {dateShort(c.createdAt)}</span>
             </div>
-            <h1 className="text-[26px] font-semibold leading-tight tracking-[-0.03em] md:text-[30px]">{f?.nom ?? 'Commande'}</h1>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-4">
+              <FournisseurPastille f={f} size={56} />
+              <h1 className="title-halo min-w-0 text-ink">{f?.nom ?? 'Commande'}</h1>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <BadgeCommande s={c.statut} />
               {retard && <Badge tone="bad">Livraison en retard</Badge>}
-              <span className="num text-[13.5px] text-ink-2">{money(total + c.port)} HT</span>
+              <span className="num-halo text-[15px] text-ink">{money(total + c.port)} <span className="text-[12px] font-medium tracking-normal text-ink-3">HT</span></span>
             </div>
           </div>
           {principale && <div className="[&>button]:w-full [&>button]:justify-center sm:[&>button]:w-auto">{principale}</div>}
@@ -78,7 +81,7 @@ export default function CommandeDetail() {
       </div>
 
       {c.statut !== 'annulee' && (
-        <Card className="px-3 py-5 md:px-6">
+        <Card className="halo-bg halo-clip relative overflow-hidden px-3 py-6 md:px-8 md:py-7">
           <Frise statut={c.statut} sousTitres={{ 1: c.prepareeLe ? 'Préparée' : c.referenceFournisseur ? `réf. ${c.referenceFournisseur}` : undefined, 2: c.suivi }} />
           <p className={cn('mx-auto mt-5 max-w-xl text-center text-[13.5px]', retard ? 'text-bad' : 'text-ink-2')}>
             {retard ? `La livraison était prévue ${relative(c.livraisonPrevue!)}. Appelez ${f?.nom ?? 'le fournisseur'} pour savoir où elle en est.` : message(c, f?.nom ?? 'Le fournisseur')}
@@ -88,13 +91,13 @@ export default function CommandeDetail() {
       {c.statut === 'annulee' && <Card className="p-4 text-[13.5px] text-ink-2">{message(c, '')}</Card>}
 
       {c.proposition && c.statut === 'envoyee' && (
-        <Card className="bx-pop flex flex-col gap-3 border-[#fde3b5] bg-warn-bg/60 p-4 sm:flex-row sm:items-center">
-          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[12px] bg-white text-warn"><MessageSquareDiff className="h-[18px] w-[18px]" strokeWidth={1.75} /></span>
+        <Card className="bx-pop flex flex-col gap-3 bg-[linear-gradient(135deg,#fffaf0,#fff)] p-5 sm:flex-row sm:items-center">
+          <IconTile icon={<MessageSquareDiff />} tone="amber" />
           <div className="min-w-0 flex-1">
             <div className="text-[14px] font-semibold">{f?.nom ?? 'Le fournisseur'} propose une modification</div>
             <div className="text-[13px] text-ink-2">« {c.proposition.texte} »{c.proposition.livraison ? ` · livraison possible le ${dateShort(c.proposition.livraison)}` : ''}</div>
           </div>
-          {f?.telephone && <a href={`tel:${f.telephone.replace(/\s/g, '')}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-[10px] border border-line2 bg-white px-4 text-[13.5px] font-medium hover:bg-sub"><Phone className="h-4 w-4" strokeWidth={1.75} />Appeler {f.contact?.split(' ')[0] ?? ''}</a>}
+          {f?.telephone && <a href={`tel:${f.telephone.replace(/\s/g, '')}`} className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-white px-4 text-[13.5px] font-medium shadow-[0_1px_2px_rgba(60,30,120,.08),0_0_0_1px_#ece8f6] transition hover:-translate-y-px"><Phone className="h-4 w-4" strokeWidth={1.75} />Appeler {f.contact?.split(' ')[0] ?? ''}</a>}
         </Card>
       )}
 
@@ -102,16 +105,20 @@ export default function CommandeDetail() {
         <div className="min-w-0 space-y-5">
           <Card>
             <CardHeader title="Articles" meta={`${c.lignes.length}`} />
+            <div className="space-y-2 p-3">
             {c.lignes.map((l) => {
               const pct = l.quantite ? (Math.min(l.quantiteLivree, l.quantite) / l.quantite) * 100 : 0;
               const suivi = c.statut !== 'brouillon' && c.statut !== 'annulee';
               return (
-                <div key={l.id} className="flex flex-col gap-2 border-b border-line px-4 py-3 last:border-b-0 sm:flex-row sm:items-center sm:gap-4">
+                <div key={l.id} className="row-card flex-col items-stretch gap-2 px-3.5 py-3 sm:flex-row sm:items-center sm:gap-4">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <IconTile size="row" icon={<Package />} tone={pct >= 100 ? 'green' : 'peach'} />
                   <div className="min-w-0 flex-1">
                     <div className="text-[13.5px] font-medium leading-snug">{l.designation}</div>
                     <div className="mt-0.5 text-xs text-ink-3">
                       {l.reference && <>{l.reference} · </>}<span className="num">{num(l.quantite)}</span> {l.unite} × <span className="num">{money(l.prix)}</span>
                     </div>
+                  </div>
                   </div>
                   <div className="flex items-center gap-4">
                     {suivi && (
@@ -128,10 +135,11 @@ export default function CommandeDetail() {
                 </div>
               );
             })}
-            <dl className="space-y-1.5 border-t border-line bg-[#fbfbfd] px-4 py-3 text-[13.5px]">
+            </div>
+            <dl className="mx-3 mb-3 space-y-1.5 rounded-card-sm bg-dawn-pale px-5 py-4 text-[13.5px]">
               <div className="flex justify-between"><dt className="text-ink-2">Articles</dt><dd className="num">{money(total)}</dd></div>
               <div className="flex justify-between"><dt className="text-ink-2">Frais de port</dt><dd className="num">{c.port ? money(c.port) : <span className="text-ok">Offerts</span>}</dd></div>
-              <div className="flex justify-between pt-1 text-[15px] font-semibold"><dt>Total HT</dt><dd className="num">{money(total + c.port)}</dd></div>
+              <div className="flex items-end justify-between pt-1.5"><dt className="font-semibold">Total HT</dt><dd className="num-halo text-[26px] leading-none">{money(total + c.port)}</dd></div>
               {c.factureId && c.ecartFacture != null && (
                 <div className={cn('flex justify-between pt-1 text-[13px]', Math.abs(c.ecartFacture) > 1 ? 'text-warn' : 'text-ok')}>
                   <dt>Facture du fournisseur</dt>
@@ -143,11 +151,11 @@ export default function CommandeDetail() {
 
           <Card>
             <CardHeader title="Historique" />
-            <ol className="px-4 py-3">
+            <ol className="px-5 py-4">
               {c.journal.map((e, i) => (
                 <li key={i} className="relative flex gap-3 pb-3.5 last:pb-0">
-                  {i < c.journal.length - 1 && <span className="absolute left-[4px] top-3 h-full w-px bg-line2" />}
-                  <span className={cn('relative mt-1.5 h-[9px] w-[9px] shrink-0 rounded-full border-2 border-white', i === 0 ? 'bg-ink' : e.acteur === 'fournisseur' ? 'bg-ok' : 'bg-line2', i === 0 && 'fx-ping')} />
+                  {i < c.journal.length - 1 && <span className="absolute left-[4px] top-3 h-full w-px bg-[#e3ddf0]" />}
+                  <span className={cn('relative mt-1.5 h-[9px] w-[9px] shrink-0 rounded-full border-2 border-white', i === 0 ? 'bg-vi-600' : e.acteur === 'fournisseur' ? 'bg-[#10b981]' : 'bg-[#d6cfe8]', i === 0 && 'fx-ping')} />
                   <div className="min-w-0">
                     <div className="text-[13px]">{e.texte}</div>
                     <div className="text-[11.5px] text-ink-3">
@@ -173,7 +181,7 @@ export default function CommandeDetail() {
               </Button>
             )}
             {peutAnnuler && (
-              <button className="flex h-10 w-full items-center gap-2 rounded-[10px] px-4 text-sm font-medium text-bad transition hover:bg-bad-bg" onClick={() => setSheet('annuler')}>
+              <button className="flex h-10 w-full items-center gap-2 rounded-pill px-4 text-sm font-medium text-deep-r transition hover:bg-pale-r" onClick={() => setSheet('annuler')}>
                 <Ban className="h-4 w-4" /> Annuler la commande
               </button>
             )}

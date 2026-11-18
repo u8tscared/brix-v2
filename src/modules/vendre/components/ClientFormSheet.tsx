@@ -52,14 +52,14 @@ export function ClientFormSheet({ open, onClose, initial, onSaved }: { open: boo
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-2">
           {([['particulier', 'Particulier', User], ['pro', 'Professionnel', Building2]] as const).map(([k, label, I]) => (
-            <button key={k} onClick={() => set({ kind: k })} className={cn('flex h-12 items-center justify-center gap-2 rounded-xl border text-[13.5px] font-medium transition', c.kind === k ? 'border-ink bg-ink text-white' : 'border-line bg-white text-ink-2 hover:text-ink')}>
+            <button key={k} onClick={() => set({ kind: k })} aria-pressed={c.kind === k} className={cn('flex h-12 items-center justify-center gap-2 rounded-full text-[13.5px] font-medium transition-[background,color,box-shadow] duration-300 ease-spring', c.kind === k ? 'bg-white text-ink shadow-[0_0_0_1.5px_#c9b5f7,0_8px_20px_-10px_rgba(109,40,217,.45)]' : 'bg-halo-track text-ink-2 hover:text-ink')}>
               <I className="h-4 w-4" strokeWidth={1.75} /> {label}
             </button>
           ))}
         </div>
 
         {c.kind === 'pro' && !initial && (
-          <div className="rounded-xl bg-sub p-3">
+          <div className="rounded-card-sm bg-dawn-pale p-3.5">
             <div className="text-[12.5px] font-medium text-ink-2">Retrouver l'entreprise</div>
             <div className="mt-2 flex gap-2">
               <Input className="flex-1" icon={<Search />} value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && search()} placeholder="SIRET ou nom (ex. Bellecour)" />

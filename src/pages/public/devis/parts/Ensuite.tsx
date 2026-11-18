@@ -1,6 +1,6 @@
 // « Et après ? » : les étapes qui suivent la signature, et l'artisan qui s'engage.
 import { BadgeCheck, CalendarCheck2, CreditCard, HardHat, PenLine, ShieldCheck } from 'lucide-react';
-import { cn } from '@/components/ui';
+import { Card, cn } from '@/components/ui';
 import type { Company, User } from '@/lib/types';
 import { PastilleArtisan } from '../../ui/primitives';
 
@@ -20,10 +20,10 @@ export function Ensuite({ acompte, etape }: { acompte: number; etape: number }) 
         const actif = i === etape;
         return (
           <li key={e.t} className="relative flex gap-4 pb-4 last:pb-0">
-            {i < etapes.length - 1 && <span className={cn('absolute left-[19px] top-11 h-[calc(100%-36px)] w-0.5 rounded-full transition-colors duration-700', fait ? 'bg-[#16a34a]' : 'bg-line')} />}
-            <span className={cn('relative grid h-10 w-10 shrink-0 place-items-center rounded-2xl transition-all duration-500', fait ? 'bg-[#16a34a] text-white' : actif ? 'bg-ink text-white shadow-[0_8px_20px_-10px_rgba(21,18,42,.8)]' : 'bg-page text-ink-3')}>
-              {fait ? <BadgeCheck className="h-[18px] w-[18px]" strokeWidth={1.9} /> : <e.I className="h-[18px] w-[18px]" strokeWidth={1.75} />}
-              {actif && <span className="bx-ring absolute inset-0 rounded-2xl bg-ink/20" />}
+            {i < etapes.length - 1 && <span className={cn('absolute left-[19px] top-11 h-[calc(100%-36px)] w-[1.5px] rounded-full transition-colors duration-700', fait ? 'bg-[#bfe8d6]' : 'bg-[#ece8f6]')} />}
+            <span className={cn('relative grid h-10 w-10 shrink-0 place-items-center rounded-tile transition-all duration-500 ease-spring', fait ? 'bg-pale-g text-deep-g' : actif ? 'bg-dawn-diag text-white shadow-[0_6px_16px_-6px_rgba(217,70,239,.6),inset_0_1px_0_rgba(255,255,255,.25)]' : 'bg-[#f3f1f8] text-ink-3')}>
+              {fait ? <BadgeCheck className="h-[18px] w-[18px]" strokeWidth={1.9} /> : <e.I className="h-[18px] w-[18px]" strokeWidth={1.9} />}
+              {actif && <span className="bx-ring absolute inset-0 rounded-tile bg-[#d946ef]/20" />}
             </span>
             <span className="pt-1.5">
               <span className={cn('block text-[14.5px] font-semibold', !fait && !actif && 'text-ink-2')}>{e.t}</span>
@@ -39,11 +39,11 @@ export function Ensuite({ acompte, etape }: { acompte: number; etape: number }) 
 export function CarteArtisan({ company, user }: { company: Company; user: User }) {
   const garanties = [company.rge && 'Qualifié RGE', company.decennale && 'Garantie décennale', 'Devis détaillé et chiffré'].filter(Boolean) as string[];
   return (
-    <div className="rounded-[22px] bg-white p-5 shadow-[0_0_0_1px_#ebe9f2]">
+    <Card className="p-5">
       <div className="flex items-center gap-3.5">
         <PastilleArtisan initiales={`${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`} taille={52} />
         <div className="min-w-0">
-          <div className="text-[16px] font-semibold">
+          <div className="text-[16px] font-semibold tracking-[-0.02em]">
             {user.firstName} {user.lastName}
           </div>
           <div className="text-[13px] text-ink-3">
@@ -54,11 +54,11 @@ export function CarteArtisan({ company, user }: { company: Company; user: User }
       <ul className="mt-4 space-y-2">
         {garanties.map((g) => (
           <li key={g} className="flex items-center gap-2.5 text-[13.5px] text-ink-2">
-            <ShieldCheck className="h-4 w-4 text-[#16a34a]" strokeWidth={1.9} />
+            <span className="grid h-6 w-6 place-items-center rounded-[8px] bg-pale-g text-deep-g"><ShieldCheck className="h-3.5 w-3.5" strokeWidth={2} /></span>
             {g}
           </li>
         ))}
       </ul>
-    </div>
+    </Card>
   );
 }

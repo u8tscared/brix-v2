@@ -86,7 +86,7 @@ function PhotoAddSheet({ chantierId, src, presetTag, onClose }: { chantierId: st
   return (
     <Sheet open={!!src} onClose={onClose} title="Ranger la photo" subtitle="Brix propose une légende, modifiez-la si besoin." width={520} footer={<><Button variant="ghost" onClick={onClose}>Annuler</Button><Button variant="primary" onClick={save}>Enregistrer</Button></>}>
       <div className="space-y-4">
-        <div className="aspect-[4/3] overflow-hidden rounded-xl bg-sub">{src && <PhotoArt art="mur" phase={phase} seed="new" src={src} alt="Aperçu" />}</div>
+        <div className="aspect-[4/3] overflow-hidden rounded-card-sm bg-halo-track">{src && <PhotoArt art="mur" phase={phase} seed="new" src={src} alt="Aperçu" />}</div>
         <Segmented value={phase} onChange={setPhase} options={(['avant', 'pendant', 'apres'] as Phase[]).map((p) => ({ value: p, label: PHASE_LABEL[p] }))} />
         <Field label="Pièce">
           <Select value={room} onChange={(e) => setRoom(e.target.value)}>
@@ -97,7 +97,7 @@ function PhotoAddSheet({ chantierId, src, presetTag, onClose }: { chantierId: st
           <span className="mb-1.5 block text-[12.5px] font-medium text-ink-2">La photo montre</span>
           <div className="flex flex-wrap gap-2">
             {subjects.map((s) => (
-              <button key={s.tag} type="button" onClick={() => setTag(s.tag)} className={cn('h-10 rounded-full border px-3.5 text-[13px] transition', tag === s.tag ? 'border-ink bg-ink text-white' : 'border-line2 bg-white hover:bg-sub')}>
+              <button key={s.tag} type="button" onClick={() => setTag(s.tag)} className={cn('h-10 rounded-full border px-3.5 text-[13px] transition', tag === s.tag ? 'border-ink bg-ink text-white' : 'border-halo-line bg-white hover:bg-halo-track')}>
                 {s.label}
               </button>
             ))}

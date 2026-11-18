@@ -32,7 +32,7 @@ export function MoreMenu({ items, className }: { items: MenuItem[]; className?: 
         <Ellipsis className="h-4 w-4" />
       </Button>
       {open && (
-        <div className="absolute right-0 top-[calc(100%+6px)] z-50 w-60 animate-scale-in rounded-xl border border-line bg-white p-1 shadow-pop">
+        <div role="menu" className="glass-strong absolute right-0 top-[calc(100%+8px)] z-50 w-64 origin-top-right animate-scale-in rounded-card-sm p-1.5 shadow-halo-lg">
           {items
             .filter((i) => !i.hidden)
             .map((i) => (
@@ -42,7 +42,8 @@ export function MoreMenu({ items, className }: { items: MenuItem[]; className?: 
                   setOpen(false);
                   i.onClick();
                 }}
-                className={cn('flex h-11 w-full items-center gap-2.5 rounded-lg px-3 text-left text-[13.5px] transition hover:bg-sub [&_svg]:h-4 [&_svg]:w-4', i.danger ? 'text-bad' : 'text-ink')}
+                role="menuitem"
+                className={cn('flex h-11 w-full items-center gap-2.5 rounded-[12px] px-3 text-left text-[13.5px] transition hover:bg-white/90 hover:shadow-halo-sm [&_svg]:h-4 [&_svg]:w-4', i.danger ? 'text-deep-r' : 'text-ink')}
               >
                 <span className={i.danger ? '' : 'text-ink-2'}>{i.icon}</span>
                 {i.label}

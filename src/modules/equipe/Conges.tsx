@@ -87,7 +87,7 @@ export default function Conges() {
             <section className="space-y-3">
               <SectionHead title="À valider" meta={pending.length ? `${pending.length} demande${pending.length > 1 ? 's' : ''}` : undefined} />
               {pending.length === 0 ? (
-                <Card className="flex items-center gap-3 p-5 text-[13.5px] text-ink-2"><SuccessDot size={22} />Rien à valider. Tout le monde sait quand il part.</Card>
+                <Card tone="mist" className="flex items-center gap-3 p-5 text-[13.5px] text-ink-2"><SuccessDot size={22} />Rien à valider. Tout le monde sait quand il part.</Card>
               ) : (
                 <div className="stagger space-y-3">
                   {pending.map((l) => {
@@ -101,7 +101,7 @@ export default function Conges() {
                             <div className="text-[14.5px]"><span className="font-semibold">{e.firstName}</span> <span className="text-ink-2">· {LEAVE_TYPES[l.type].label.toLowerCase()}</span></div>
                             <div className="mt-1.5 flex flex-wrap items-center gap-2">
                               <DateChip iso={l.from} />
-                              {l.to !== l.from && <><span className="h-px w-3 bg-line2" /><DateChip iso={l.to} /></>}
+                              {l.to !== l.from && <><span className="h-px w-3 bg-[#dcd6ec]" /><DateChip iso={l.to} /></>}
                               <span className="num ml-1 text-[13px] font-semibold">{l.days} j</span>
                             </div>
                             <div className="mt-1.5 text-[12.5px] text-ink-3">{l.note && `« ${l.note} » · `}demandé {relative(l.createdAt)}</div>
@@ -133,12 +133,12 @@ export default function Conges() {
             <div className="hidden md:block"><LeaveCalendar employees={staff} leaves={leaves} focus={[...pending].sort((a, b) => b.days - a.days)[0]?.from ?? upcoming[0]?.from} /></div>
 
             <Card className="md:hidden">
-              <CardHeader title="Prochaines absences" />
+              <CardHeader icon={<IconTile size="sm" tone="peach" name="CalendarRange" />} title="Prochaines absences" />
               {upcoming.length === 0 && <div className="px-4 py-6 text-center text-[13px] text-ink-3">Personne d’absent prochainement.</div>}
               {upcoming.map((l) => {
                 const e = empOf(l.employeeId);
                 return (
-                  <div key={l.id} className="flex min-h-[56px] items-center gap-3 border-b border-line px-4 py-2 last:border-0">
+                  <div key={l.id} className="flex min-h-[56px] items-center gap-3 border-b border-halo-line px-4 py-2 last:border-0">
                     <Avatar initials={e.initials} color={e.color} size={30} />
                     <div className="min-w-0 flex-1">
                       <div className="text-[13.5px] font-medium">{e.firstName} · {period(l)}</div>
@@ -152,24 +152,24 @@ export default function Conges() {
           </div>
 
           <Card>
-            <CardHeader title="Soldes de congés payés" meta="en jours ouvrables" />
+            <CardHeader icon={<IconTile size="sm" dept="equipe" name="Palmtree" />} title="Soldes de congés payés" meta="en jours ouvrables" />
             {staff.map((e) => {
               const acquired = Math.min(30, monthsAcquired * 2.5);
               const pendingDays = pending.filter((l) => l.employeeId === e.id && l.type === 'cp').reduce((s, l) => s + l.days, 0);
               return (
-                <div key={e.id} className="border-b border-line px-4 py-3 last:border-0">
+                <div key={e.id} className="border-b border-halo-line px-4 py-3 last:border-0">
                   <div className="flex items-center gap-2.5">
-                    <Avatar initials={e.initials} color={e.color} size={28} />
+                    <Avatar initials={e.initials} color={e.color} size={32} />
                     <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">{e.firstName} {e.lastName}</span>
-                    <span className="num text-[16px] font-semibold">{num(e.leaveBalance, 1)} j</span>
+                    <span className="num-halo text-[20px]">{num(e.leaveBalance, 1)} j</span>
                   </div>
-                  <GrowBar value={(e.leaveBalance / 30) * 100} className="mt-2.5" barClassName={e.leaveBalance < 5 ? 'bg-[#f59e0b]' : 'bg-[#0891b2]'} />
+                  <GrowBar value={(e.leaveBalance / 30) * 100} barClassName={e.leaveBalance < 5 ? 'bg-[linear-gradient(90deg,#fcd34d,#f59e0b)]' : 'bg-[linear-gradient(90deg,#93c5fd,#2f5fd0)]'} className="mt-2.5 h-2" />
                   <div className="num mt-1.5 text-[11.5px] text-ink-3">{num(acquired, 1)} j en cours d’acquisition{pendingDays ? ` · ${pendingDays} j demandés` : ''}</div>
                 </div>
               );
             })}
-            <div className="m-3 flex gap-3 rounded-[12px] bg-sub/70 p-3">
-              <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-ink-3" />
+            <div className="m-3 flex gap-3 rounded-card-sm bg-dawn-pale p-3.5">
+              <IconTile size="sm" tone="indigo" icon={<Landmark />} />
               <p className="text-[12px] leading-relaxed text-ink-2"><span className="font-medium text-ink">Dans le BTP, la caisse paie les congés.</span> La CIBTP verse l’indemnité au salarié, vous cotisez déjà chaque mois dans la paie. 2,5 jours par mois, du 1er avril au 31 mars.</p>
             </div>
           </Card>
@@ -184,7 +184,7 @@ export default function Conges() {
 function DateChip({ iso }: { iso: string }) {
   const d = new Date(iso + 'T12:00:00');
   return (
-    <span className="inline-flex h-7 items-center gap-1.5 rounded-[8px] bg-[#e8f7fa] px-2 text-[12.5px] text-[#0e7490] shadow-[inset_0_0_0_1px_#c5e9f0]">
+    <span className="tone-blue inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[12.5px]">
       <span className="text-[10.5px] font-medium uppercase">{d.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '')}</span>
       <span className="font-semibold">{d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }).replace('.', '')}</span>
     </span>

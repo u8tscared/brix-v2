@@ -3,9 +3,9 @@ import { Button, Tip, cn } from '@/components/ui';
 import { money } from '@/lib/format';
 import type { Client, Facture, FactureStatus } from '@/lib/types';
 import type { Amounts } from '../../lib/model';
-import { DueText, EDot, KindBadge, StatusBadge } from '../bits';
+import { DueText, EDot, KindBadge, KindTile, StatusBadge } from '../bits';
 
-export const ROW_GRID = 'grid-cols-[150px_minmax(0,1fr)_140px_116px_116px_132px_150px]';
+export const ROW_GRID = 'grid-cols-[minmax(0,1fr)_132px_120px_104px_112px_134px_142px]';
 
 export type RowAction = 'send' | 'pay' | 'remind';
 
@@ -32,8 +32,8 @@ function Progress({ a }: { a: Amounts }) {
   const pct = a.net > 0 ? Math.round(((a.net - a.remaining) / a.net) * 100) : 0;
   if (pct <= 0 || pct >= 100) return null;
   return (
-    <div className="mt-1 ml-auto h-1 w-16 overflow-hidden rounded-full bg-sub">
-      <div className="h-full rounded-full bg-ok transition-[width] duration-700 ease-out-quint" style={{ width: `${pct}%` }} />
+    <div className="mt-1 ml-auto h-1 w-16 overflow-hidden rounded-full bg-halo-track">
+      <div className="h-full rounded-full bg-[#10b981] transition-[width] duration-700 ease-out-quint" style={{ width: `${pct}%` }} />
     </div>
   );
 }
@@ -41,28 +41,31 @@ function Progress({ a }: { a: Amounts }) {
 export function FactureRow({ f, client, a, st, due, onOpen, onPreview, onAction }: FactureItemProps) {
   const act = rowAction(f, st, a.remaining);
   return (
-    <div onClick={onOpen} className={cn('group grid min-h-[62px] cursor-pointer items-center gap-4 border-b border-line px-5 py-2.5 transition-colors duration-150 last:border-b-0 hover:bg-[#faf9fd]', ROW_GRID)}>
+    <div onClick={onOpen} className={cn('row-card group grid min-h-[66px] cursor-pointer gap-4 py-3', ROW_GRID)}>
+      <div className="flex min-w-0 items-center gap-3">
+        <KindTile kind={f.kind} />
+        <div className="min-w-0">
+          <div className="truncate text-[14px] font-semibold tracking-[-0.015em]">{client?.name ?? <span className="text-ink-3">Client à choisir</span>}</div>
+          <div className="truncate text-[12.5px] text-ink-3">{f.title || 'Sans titre'}</div>
+        </div>
+      </div>
       <div className="min-w-0">
         <KindBadge kind={f.kind} />
         <div className="mt-1 font-mono text-[11.5px] text-ink-3">{f.number}</div>
       </div>
-      <div className="min-w-0">
-        <div className="truncate text-[14px] font-semibold tracking-[-0.01em]">{client?.name ?? <span className="text-ink-3">Client à choisir</span>}</div>
-        <div className="truncate text-[12.5px] text-ink-3">{f.title || 'Sans titre'}</div>
-      </div>
       <DueText {...due} />
       <div className="num text-right text-[13.5px] text-ink-2">{money(a.ttc * a.sign)}</div>
       <div className="text-right">
-        <div className={cn('num text-[14px]', a.remaining > 0 ? cn('font-semibold', st === 'en_retard' && 'text-bad') : 'text-ink-3')}>{a.remaining > 0 ? money(a.remaining) : '·'}</div>
+        <div className={cn('num text-[14px]', a.remaining > 0 ? cn('font-semibold', st === 'en_retard' && 'text-deep-r') : 'text-ink-3')}>{a.remaining > 0 ? money(a.remaining) : '·'}</div>
         <Progress a={a} />
       </div>
       <div className="flex min-w-0 items-center gap-2">
-        <StatusBadge status={st} />
+        <StatusBadge status={st} size="sm" />
         <EDot status={f.einvoice.status} b2c={client?.kind !== 'pro'} />
       </div>
       <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
         <Tip label="Aperçu plein écran">
-          <button onClick={onPreview} aria-label="Aperçu plein écran" className="grid h-8 w-8 place-items-center rounded-[9px] text-ink-3 opacity-60 transition hover:bg-sub hover:text-ink group-hover:opacity-100">
+          <button onClick={onPreview} aria-label="Aperçu plein écran" className="grid h-8 w-8 place-items-center rounded-full text-ink-3 opacity-60 transition hover:bg-halo-hover hover:text-ink group-hover:opacity-100">
             <Expand className="h-4 w-4" strokeWidth={1.75} />
           </button>
         </Tip>
@@ -79,14 +82,15 @@ export function FactureRow({ f, client, a, st, due, onOpen, onPreview, onAction 
 export function FactureCard({ f, client, a, st, due, onOpen, onPreview, onAction }: FactureItemProps) {
   const act = rowAction(f, st, a.remaining);
   return (
-    <div onClick={onOpen} className="cursor-pointer rounded-[16px] bg-white p-4 shadow-card transition active:scale-[.99]">
+    <div onClick={onOpen} className="lift-sm cursor-pointer rounded-card-sm bg-white p-4 shadow-halo-sm transition active:scale-[.99]">
       <div className="flex items-start gap-3">
+        <KindTile kind={f.kind} />
         <div className="min-w-0 flex-1">
           <div className="truncate text-[15px] font-semibold tracking-[-0.01em]">{client?.name ?? 'Client à choisir'}</div>
           <div className="mt-0.5 truncate text-[13px] text-ink-2">{f.title || 'Sans titre'}</div>
         </div>
         <div className="text-right">
-          <div className={cn('num text-[17px] font-semibold tracking-[-0.02em]', st === 'en_retard' && 'text-bad')}>{money(a.remaining > 0 ? a.remaining : a.ttc * a.sign)}</div>
+          <div className={cn('num-halo text-[19px]', st === 'en_retard' && 'text-deep-r')}>{money(a.remaining > 0 ? a.remaining : a.ttc * a.sign)}</div>
           <div className="text-[11.5px] text-ink-3">{a.remaining > 0 && a.remaining < a.net ? `reste sur ${money(a.net)}` : a.remaining > 0 ? 'à payer' : f.kind === 'avoir' ? 'avoir' : 'réglée'}</div>
         </div>
       </div>
@@ -97,10 +101,10 @@ export function FactureCard({ f, client, a, st, due, onOpen, onPreview, onAction
           <StatusBadge status={st} />
         </span>
       </div>
-      <div className="mt-3 flex items-center gap-2 border-t border-line pt-3" onClick={(e) => e.stopPropagation()}>
+      <div className="mt-3 flex items-center gap-2 border-t border-halo-line pt-3" onClick={(e) => e.stopPropagation()}>
         <DueText {...due} />
         <EDot status={f.einvoice.status} b2c={client?.kind !== 'pro'} />
-        <button onClick={onPreview} aria-label="Aperçu plein écran" className="ml-auto grid h-10 w-10 place-items-center rounded-[10px] text-ink-2 transition active:bg-sub">
+        <button onClick={onPreview} aria-label="Aperçu plein écran" className="ml-auto grid h-10 w-10 place-items-center rounded-full text-ink-2 transition active:bg-halo-hover">
           <Expand className="h-[18px] w-[18px]" strokeWidth={1.75} />
         </button>
         {act && (

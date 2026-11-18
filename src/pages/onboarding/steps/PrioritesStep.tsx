@@ -22,7 +22,7 @@ export function PrioritesStep({ d, set }: StepProps) {
   return (
     <>
       <StepHeader kicker="Étape 3 sur 5" title="Qu'est-ce qui compte le plus pour vous ?" lead="Choisissez jusqu'à trois priorités, dans l'ordre. Votre cockpit les met en avant et Bob s'en occupe en premier." />
-      <div className="mb-3 flex items-center justify-between text-[12.5px] text-[#9898a8]">
+      <div className="mb-3 flex items-center justify-between text-[12.5px] text-ink-3">
         <span>Touchez dans l'ordre d'importance</span>
         <span className="num" aria-live="polite">{d.priorities.length} sur {MAX}</span>
       </div>
@@ -40,12 +40,12 @@ export function PrioritesStep({ d, set }: StepProps) {
               className="ob-card ob-rise flex min-h-[68px] items-center gap-3.5 px-4 py-3 pr-12"
               style={{ animationDelay: `${i * 35}ms` }}
             >
-              <span className="ob-tile" style={{ width: 40, height: 40, borderRadius: 12, background: on ? '#130f26' : '#f4f3fa', color: on ? '#fff' : '#130f26' }}>
+              <span className="ob-tile" style={{ width: 40, height: 40, borderRadius: 12, background: on ? 'var(--ob-dawn)' : '#f1eafe', color: on ? '#fff' : '#6d28d9', boxShadow: on ? '0 6px 16px -6px rgba(217,70,239,.6)' : 'none' }}>
                 <Ico name={p.icon} className="h-[19px] w-[19px]" />
               </span>
               <span className="min-w-0">
                 <span className="block text-[14.5px] font-semibold tracking-[-0.01em]">{p.label}</span>
-                {sub && <span className="mt-0.5 block truncate text-[12.5px] text-[#9898a8]">{sub}</span>}
+                {sub && <span className="mt-0.5 block truncate text-[12.5px] text-ink-3">{sub}</span>}
               </span>
               {on && (
                 <CheckDot mid>

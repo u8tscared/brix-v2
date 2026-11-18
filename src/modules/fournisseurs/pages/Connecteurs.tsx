@@ -1,8 +1,8 @@
 // « Connexions » : la vitrine honnête des extensions fournisseurs. Ce qui marche, ce qui dépend des enseignes.
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Code2, FileSpreadsheet, FileText, Mail, MousePointerClick, Receipt, Reply, Send, Webhook } from 'lucide-react';
-import { Badge, Button, Card, PageHeader } from '@/components/ui';
+import { ArrowRight, Cable, Check, Code2, FileSpreadsheet, FileText, Mail, MousePointerClick, Receipt, Reply, Send, Webhook } from 'lucide-react';
+import { Badge, Button, Card, IconTile, PageHeader } from '@/components/ui';
 import { CONNECTEURS, type ConnecteurDef } from '../../../../worker/src/modules/fournisseurs/connecteurs/registre';
 import { useAchats } from '../data/store';
 import { FournisseurPastille } from '../components/ui';
@@ -43,13 +43,13 @@ const texte = (c: ConnecteurDef) => ({ nom: TEXTES[c.cle]?.nom ?? c.nom, descrip
 
 const Puces = ({ c }: { c: ConnecteurDef }) => (
   <div className="flex flex-wrap gap-1">
-    {c.capacites.map((k) => <span key={k} className="rounded-full bg-sub px-2 py-0.5 text-[11px] font-medium text-ink-2">{CAPACITES[k]}</span>)}
+    {c.capacites.map((k) => <span key={k} className="rounded-full bg-pale-n px-2.5 py-1 text-[11.5px] font-medium text-ink-2">{CAPACITES[k]}</span>)}
   </div>
 );
 
 const Titre = ({ titre, texte }: { titre: string; texte: string }) => (
   <div className="mb-3">
-    <h2 className="text-[16px] font-semibold">{titre}</h2>
+    <h2 className="text-[19px] font-semibold tracking-[-0.03em]">{titre}</h2>
     <p className="mt-0.5 text-[13px] text-ink-2">{texte}</p>
   </div>
 );
@@ -66,10 +66,10 @@ export default function Connecteurs() {
 
   return (
     <div className="bx-stagger space-y-8">
-      <PageHeader title="Connexions" subtitle="Brix marche dès aujourd’hui avec tous vos fournisseurs, par e-mail et lien sécurisé. Les connexions directes arrivent enseigne par enseigne." />
+      <PageHeader icon={<IconTile icon={<Cable />} dept="achats" size="xl" />} title="Connexions" titleMuted="compatible avec tous vos fournisseurs." subtitle="Brix marche dès aujourd’hui avec tous vos fournisseurs, par e-mail et lien sécurisé. Les connexions directes arrivent enseigne par enseigne." />
 
-      <Card className="p-5 md:p-6">
-        <div className="text-[13px] font-medium text-ink-2">Comment ça marche, aujourd’hui, avec n’importe quel fournisseur</div>
+      <Card className="halo-bg halo-clip relative overflow-hidden p-6 md:p-7">
+        <div className="label-halo">Comment ça marche, aujourd’hui, avec n’importe quel fournisseur</div>
         <ol className="mt-4 grid gap-4 md:grid-cols-3 md:gap-6">
           {[
             { icon: <Send />, t: 'Brix envoie un e-mail', d: 'Votre demande de prix ou votre commande part au comptoir, avec un lien personnel et sécurisé.' },
@@ -77,7 +77,7 @@ export default function Connecteurs() {
             { icon: <Reply />, t: 'Tout revient dans Brix', d: 'Comparatif des prix, suivi de livraison et historique se mettent à jour tout seuls.' },
           ].map((e, i) => (
             <li key={i} className="flex gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-vi-50 text-vi-700 [&_svg]:h-[18px] [&_svg]:w-[18px]">{e.icon}</span>
+              <IconTile icon={e.icon} tone={(['violet', 'mag', 'green'] as const)[i]} />
               <div>
                 <div className="text-[14px] font-semibold"><span className="num mr-1 text-ink-3">{i + 1}.</span>{e.t}</div>
                 <p className="mt-0.5 text-[12.5px] leading-relaxed text-ink-2">{e.d}</p>
@@ -91,12 +91,12 @@ export default function Connecteurs() {
         <Titre titre="Disponible maintenant" texte="Rien à demander à personne : c’est déjà actif sur votre compte." />
         <div className="grid gap-3 lg:grid-cols-3">
           {dispo.map((c) => (
-            <Card key={c.cle} className="flex min-w-0 flex-col p-4">
+            <Card key={c.cle} className="flex min-w-0 flex-col p-5">
               <div className="flex items-start justify-between gap-2">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-sub text-ink-2 [&_svg]:h-[18px] [&_svg]:w-[18px]">{ICONES[c.cle] ?? <Code2 />}</span>
+                <IconTile icon={ICONES[c.cle] ?? <Code2 />} tone={c.cle === 'email' ? 'violet' : c.cle === 'fichier_tarif' ? 'peach' : 'blue'} />
                 <Badge tone="ok" dot>Disponible</Badge>
               </div>
-              <div className="mt-3 text-[14.5px] font-semibold">{texte(c).nom}</div>
+              <div className="mt-4 text-[15px] font-semibold tracking-[-0.02em]">{texte(c).nom}</div>
               <p className="mt-1 flex-1 text-[12.5px] leading-relaxed text-ink-2">{texte(c).description}</p>
               <div className="mt-3"><Puces c={c} /></div>
               {ACTIONS[c.cle] && (
@@ -111,8 +111,8 @@ export default function Connecteurs() {
         <Titre titre="Connexions directes aux enseignes" texte="Prix nets en temps réel, commande en un clic, suivi automatique. Elles s’ouvrent quand chaque enseigne donne son accord ; en attendant, tout fonctionne par e-mail." />
         <div className="mb-3 grid gap-3 md:grid-cols-2">
           {formats.map((c) => (
-            <Card key={c.cle} className="flex min-w-0 gap-3 p-4">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-sub text-ink-2 [&_svg]:h-[18px] [&_svg]:w-[18px]">{ICONES[c.cle] ?? <Code2 />}</span>
+            <Card key={c.cle} className="flex min-w-0 gap-3.5 p-5">
+              <IconTile icon={ICONES[c.cle] ?? <Code2 />} tone="neutral" />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[14px] font-semibold">{texte(c).nom}</span>
@@ -124,7 +124,7 @@ export default function Connecteurs() {
             </Card>
           ))}
         </div>
-        <div className="mb-3 flex items-start gap-2.5 rounded-[12px] border border-[#c9f0d6] bg-ok-bg px-3.5 py-3 text-[13px] text-[#166534]">
+        <div className="mb-3 flex items-start gap-2.5 rounded-card-sm bg-pale-g px-4 py-3.5 text-[13px] text-deep-g">
           <Check className="mt-0.5 h-4 w-4 shrink-0" />
           <span><span className="font-medium">Déjà possible avec toutes ces enseignes :</span> demandes de prix et commandes par e-mail au comptoir de votre agence, import de vos prix nets.</span>
         </div>
@@ -132,7 +132,7 @@ export default function Connecteurs() {
           {enseignes.map((c) => {
             const court = c.description.split(' Dès aujourd')[0];
             return (
-              <Card key={c.cle} className="flex min-w-0 flex-col p-4">
+              <Card key={c.cle} className="flex min-w-0 flex-col p-5">
                 <div className="flex items-center gap-3">
                   <FournisseurPastille f={{ nom: c.nom, enseigne: c.cle }} size={40} />
                   <div className="min-w-0 flex-1">
@@ -142,7 +142,7 @@ export default function Connecteurs() {
                   {utilisees.has(c.cle) && <Badge tone="violet" className="shrink-0">Le vôtre</Badge>}
                 </div>
                 <div className="mt-3 flex-1"><Puces c={c} /></div>
-                <p className="mt-3 border-t border-line pt-2.5 text-[11.5px] leading-snug text-ink-3">
+                <p className="mt-3 border-t border-halo-line pt-2.5 text-[11.5px] leading-snug text-ink-3">
                   <span className="font-medium text-ink-2">Sur accord de l’enseigne.</span> Une convention reste à signer avec {c.nom} ; en attendant, tout passe par e-mail.
                 </p>
               </Card>
@@ -160,15 +160,15 @@ export default function Connecteurs() {
         </section>
       )}
 
-      <div className="overflow-hidden rounded-[14px] bg-ink text-white">
-        <div className="grid gap-6 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:p-7">
+      <Card tone="dawn" className="overflow-hidden">
+        <div className="grid gap-6 p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:p-8">
           <div>
-            <div className="text-[12px] font-medium text-white/60">Vous êtes fournisseur ?</div>
-            <h2 className="mt-1 font-display text-[22px] font-semibold leading-tight tracking-[-0.02em]">Recevez les demandes des artisans directement dans votre logiciel</h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-white/70">
+            <div className="label-halo">Vous êtes fournisseur ?</div>
+            <h2 className="mt-1.5 text-[24px] font-semibold leading-[1.1] tracking-[-0.035em]">Recevez les demandes des artisans directement dans votre logiciel</h2>
+            <p className="mt-2.5 text-[13.5px] leading-relaxed text-ink-2">
               Brix envoie demandes de prix et commandes à votre logiciel, en temps réel. Il répond tout seul : prix, confirmation, expédition, tarifs et factures. Transmettez cette page à votre service informatique.
             </p>
-            <a href="/api/public/v1/openapi.json" target="_blank" rel="noreferrer" className="mt-4 inline-flex h-10 items-center gap-2 rounded-[10px] bg-white px-4 text-[13.5px] font-medium text-ink transition hover:bg-white/90">
+            <a href="/api/public/v1/openapi.json" target="_blank" rel="noreferrer" className="mt-5 inline-flex h-[42px] items-center gap-2 rounded-pill bg-ink px-5 text-[13.5px] font-semibold text-white shadow-ink transition hover:-translate-y-px">
               Lire la documentation <ArrowRight className="h-4 w-4" />
             </a>
           </div>
@@ -178,14 +178,14 @@ export default function Connecteurs() {
               { t: 'Envois sécurisés', d: 'Chaque envoi est signé : vous vérifiez qu’il vient bien de Brix.' },
               { t: 'Code partenaire', d: 'Vous donnez un code BRX-XXXX-XXXX à vos clients artisans : leurs demandes arrivent chez vous, sans ressaisie.' },
             ].map((x) => (
-              <li key={x.t} className="flex gap-3 rounded-[12px] border border-white/10 bg-white/[.04] p-3">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-white/60" />
-                <div><div className="font-medium">{x.t}</div><div className="mt-0.5 text-[12.5px] text-white/60">{x.d}</div></div>
+              <li key={x.t} className="flex gap-3 rounded-card-sm bg-white/80 p-4 shadow-halo-sm">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-pale-g text-deep-g"><Check className="h-3.5 w-3.5" strokeWidth={2.4} /></span>
+                <div><div className="font-medium">{x.t}</div><div className="mt-0.5 text-[12.5px] text-ink-2">{x.d}</div></div>
               </li>
             ))}
           </ul>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

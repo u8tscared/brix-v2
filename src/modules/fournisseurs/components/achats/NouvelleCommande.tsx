@@ -99,7 +99,7 @@ export default function NouvelleCommande({ open, onClose }: { open: boolean; onC
           <datalist id="articles-commande">{articles.map((a) => <option key={a.id} value={a.designation} />)}</datalist>
           <div className="space-y-2.5">
             {lignes.map((l, i) => (
-              <div key={i} className="rounded-[12px] border border-line bg-[#fbfbfd] p-2.5">
+              <div key={i} className="rounded-card-sm bg-halo-track/60 p-3">
                 <div className="flex gap-2">
                   <Input list="articles-commande" placeholder="Désignation, ex. disjoncteur 16 A" value={l.designation} onChange={(e) => choisirDesignation(i, e.target.value)} className="min-w-0 flex-1" aria-label="Désignation" />
                   {lignes.length > 1 && (

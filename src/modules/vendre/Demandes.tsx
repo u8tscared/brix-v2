@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Inbox, Plus } from 'lucide-react';
-import { Button, cn, EmptyState, IconTile, PageHeader, Segmented, toast } from '@/components/ui';
+import { Button, cn, EmptyState, HALO_TONE, IconTile, PageHeader, Segmented, toast, type HaloTone } from '@/components/ui';
 import { KpiBand } from '@/modules/chantiers/components/common/KpiBand';
 import { useLeadActions } from './components/useLeadActions';
 import { money } from '@/lib/format';
@@ -9,11 +9,11 @@ import type { Lead } from '@/lib/types';
 import { LeadCard } from './components/LeadCard';
 import { LeadSheet } from './components/LeadSheet';
 import { NewLeadSheet } from './components/NewLeadSheet';
-import { LEAD_FLOW, LEAD_SOURCE, LEAD_STATUS } from './lib';
+import { LEAD_FLOW, LEAD_SOURCE, LEAD_SOURCE_TONE, LEAD_STATUS } from './lib';
 
 type Filter = 'actives' | Lead['status'];
 
-const STAGE_DOT: Record<Lead['status'], string> = { nouveau: '#c026d3', qualifie: '#7c3aed', rdv: '#d97706', devis: '#4f46e5', gagne: '#16a34a', perdu: '#9794aa' };
+const STAGE_DOT: Record<Lead['status'], string> = { nouveau: '#d946ef', qualifie: '#7c3aed', rdv: '#fb923c', devis: '#3b82f6', gagne: '#10b981', perdu: '#9794aa' };
 
 export default function Demandes() {
   const leads = useBrix((s) => s.leads);
@@ -52,6 +52,7 @@ export default function Demandes() {
       <PageHeader
         icon={<IconTile name="Inbox" dept="vendre" size="lg" />}
         title="Demandes"
+        titleMuted="triées par Bob."
         subtitle="Site, téléphone, WhatsApp, plateformes : tout arrive ici, Bob trie et estime."
         actions={<Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>Nouvelle demande</Button>}
       />
@@ -66,15 +67,15 @@ export default function Demandes() {
       />
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 scrollbar-none md:mx-0 md:px-0">
+        <div className="-mx-4 -my-2 flex gap-2 overflow-x-auto px-4 py-2 scrollbar-none md:mx-0 md:px-0">
           <SourceChip active={source === 'all'} onClick={() => setSource('all')} label="Toutes" count={leads.length} />
           {sources.map((k) => {
             const S = LEAD_SOURCE[k];
-            return <SourceChip key={k} active={source === k} onClick={() => setSource(k)} label={S.label} icon={<S.icon className="h-3.5 w-3.5" strokeWidth={1.75} />} count={leads.filter((l) => l.source === k).length} />;
+            return <SourceChip key={k} active={source === k} onClick={() => setSource(k)} label={S.label} tone={LEAD_SOURCE_TONE[k]} icon={<S.icon className="h-3.5 w-3.5" strokeWidth={1.9} />} count={leads.filter((l) => l.source === k).length} />;
           })}
         </div>
         <div className="flex-1" />
-        <button onClick={() => setShowLost((v) => !v)} className="hidden h-8 rounded-lg px-2.5 text-[12.5px] font-medium text-ink-2 hover:bg-white hover:text-ink lg:block">
+        <button onClick={() => setShowLost((v) => !v)} className="hidden h-9 rounded-full px-3.5 text-[12.5px] font-medium text-ink-2 transition-colors hover:bg-white hover:text-ink hover:shadow-pill lg:block">
           {showLost ? 'Masquer les perdues' : 'Voir les perdues'}
         </button>
       </div>
@@ -106,17 +107,17 @@ export default function Demandes() {
               const items = visible.filter((l) => l.status === st);
               const sum = items.reduce((a, l) => a + (l.estimate ?? 0), 0);
               return (
-                <div key={st} className="flex min-w-0 flex-col rounded-[16px] bg-[#efedf6] p-2">
-                  <div className="flex items-center gap-2 px-1.5 pb-2.5 pt-1">
-                    <i className="h-2 w-2 rounded-full" style={{ background: STAGE_DOT[st] }} />
-                    <span className="truncate text-[13px] font-semibold">{LEAD_STATUS[st].label}</span>
-                    <span className="text-[12px] text-ink-3">{items.length}</span>
+                <div key={st} className="flex min-w-0 flex-col rounded-card bg-white/40 p-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,.7)] backdrop-blur-sm">
+                  <div className="flex items-center gap-2 px-2 pb-2.5 pt-1.5">
+                    <i className="h-2 w-2 shrink-0 rounded-full" style={{ background: STAGE_DOT[st], boxShadow: `0 0 0 3px ${STAGE_DOT[st]}22` }} />
+                    <span className="truncate text-[13px] font-semibold tracking-[-0.01em]">{LEAD_STATUS[st].label}</span>
+                    <span className="num inline-grid h-5 min-w-5 place-items-center rounded-full bg-white px-1.5 text-[11px] font-medium text-ink-2 shadow-halo-sm">{items.length}</span>
                     <div className="flex-1" />
-                    {sum > 0 && <span className="num hidden text-[11.5px] text-ink-3 xl:inline">{money(sum, true)}</span>}
+                    {sum > 0 && <span className="num hidden whitespace-nowrap text-[11.5px] text-ink-3 2xl:inline">{money(sum, true)}</span>}
                   </div>
                   <div className="stagger-fast flex flex-col gap-2">
                     {items.map((l) => <LeadCard key={l.id} lead={l} compact highlight={moved === l.id} onOpen={() => setOpenId(l.id)} onDevis={() => prepareDevis(l)} onAdvance={nextOf(l) ? () => advance(l) : undefined} nextLabel={nextOf(l) ? LEAD_STATUS[nextOf(l)].label : undefined} />)}
-                    {!items.length && <div className="rounded-[12px] border border-dashed border-[#d6d3e2] px-3 py-6 text-center text-[12px] text-ink-3">{LEAD_STATUS[st].hint}</div>}
+                    {!items.length && <div className="rounded-card-sm border-[1.5px] border-dashed border-[#e0d8f0] px-3 py-6 text-center text-[12px] text-ink-3">{LEAD_STATUS[st].hint}</div>}
                   </div>
                 </div>
               );
@@ -131,12 +132,16 @@ export default function Demandes() {
   );
 }
 
-function SourceChip({ active, onClick, label, icon, count }: { active: boolean; onClick: () => void; label: string; icon?: React.ReactNode; count: number }) {
+function SourceChip({ active, onClick, label, icon, tone, count }: { active: boolean; onClick: () => void; label: string; icon?: React.ReactNode; tone?: HaloTone; count: number }) {
   return (
-    <button onClick={onClick} className={cn('flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 text-[12.5px] font-medium transition', active ? 'border-ink bg-ink text-white' : 'border-line bg-white text-ink-2 hover:text-ink')}>
-      {icon}
+    <button
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn('flex h-10 shrink-0 items-center gap-2 rounded-full pr-3.5 text-[12.5px] font-medium transition-[background,box-shadow,color,transform] duration-300 ease-spring active:scale-95', icon ? 'pl-1.5' : 'pl-3.5', active ? 'bg-ink text-white shadow-ink' : 'bg-white text-ink-2 shadow-halo-sm hover:-translate-y-px hover:text-ink')}
+    >
+      {icon && tone && <span className="grid h-7 w-7 place-items-center rounded-full" style={{ background: HALO_TONE[tone].bg, color: HALO_TONE[tone].fg }}>{icon}</span>}
       {label}
-      <span className={cn('text-[11px]', active ? 'text-white/70' : 'text-ink-3')}>{count}</span>
+      <span className={cn('num text-[11px]', active ? 'text-white/60' : 'text-ink-3')}>{count}</span>
     </button>
   );
 }

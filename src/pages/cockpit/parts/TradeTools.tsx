@@ -20,7 +20,7 @@ export function TradeTools() {
       </div>
       <div className="stagger-fast grid grid-cols-4 gap-2">
         {tools.map((t) => (
-          <button key={t.key} onClick={() => navigate(t.to)} className="press flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-[16px] bg-white px-1 py-3 text-center text-[11.5px] font-medium leading-tight shadow-card">
+          <button key={t.key} onClick={() => navigate(t.to)} className="press flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-card-sm bg-white px-1 py-3 text-center text-[11.5px] font-medium leading-tight shadow-halo-sm">
             <IconTile name={t.icon} dept={t.dept} size="sm" />
             <span className="line-clamp-2">{t.name}</span>
           </button>

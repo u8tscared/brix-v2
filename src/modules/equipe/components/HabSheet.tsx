@@ -25,7 +25,7 @@ export function HabSheet({ open, onClose, employees }: { open: boolean; onClose:
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Obtenue le"><Input type="date" value={obtained} onChange={(e) => setObtained(e.target.value)} /></Field>
-          <Field label="Échéance calculée"><Input type="date" value={expires} readOnly className="bg-sub" /></Field>
+          <Field label="Échéance calculée"><Input type="date" value={expires} readOnly className="bg-halo-track" /></Field>
         </div>
         <Field label="Organisme"><Input value={organisme} onChange={(e) => setOrganisme(e.target.value)} placeholder="Ex. APAVE, Bureau Veritas…" /></Field>
         <p className="text-[12px] text-ink-3">Pour une habilitation électrique, l’employeur délivre aussi le titre signé : Brix le génère depuis la fiche du salarié.</p>

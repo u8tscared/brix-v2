@@ -14,14 +14,14 @@ export function PreviewMenu({ d, max = 99 }: { d: Draft; max?: number }) {
   let shown = 0;
   return (
     <nav aria-hidden className="space-y-0.5 text-[11.5px]">
-      <div className="flex h-7 items-center gap-2 rounded-lg bg-[#f4f3fa] px-2 font-medium">
+      <div className="flex h-7 items-center gap-2 rounded-lg bg-[#f3f1f8] px-2 font-medium">
         <LayoutDashboard className="h-3.5 w-3.5" strokeWidth={1.75} /> Cockpit
       </div>
       {t && (
         <div key={t.key}>
-          <div className="px-2 pb-1 pt-3 text-[9.5px] font-medium uppercase tracking-[.06em] text-[#9898a8]">{t.plural}</div>
+          <div className="px-2 pb-1 pt-3 text-[9.5px] font-medium uppercase tracking-[.06em] text-ink-3">{t.plural}</div>
           {t.tools.slice(0, 2).map((x) => (
-            <div key={x.key} className="ob-rise flex h-7 items-center gap-2 px-2 text-[#5f5f70]" style={{ animationDelay: `${i++ * 45}ms` }}>
+            <div key={x.key} className="ob-rise flex h-7 items-center gap-2 px-2 text-ink-2" style={{ animationDelay: `${i++ * 45}ms` }}>
               <span className="grid h-[18px] w-[18px] place-items-center rounded-[5px]" style={{ background: TONE.metier.bg, color: TONE.metier.fg }}>
                 <Ico name="Ruler" className="h-[11px] w-[11px]" />
               </span>
@@ -38,9 +38,9 @@ export function PreviewMenu({ d, max = 99 }: { d: Draft; max?: number }) {
         const tone = TONE[dep.key];
         return (
           <div key={dep.key}>
-            <div className="px-2 pb-1 pt-3 text-[9.5px] font-medium uppercase tracking-[.06em] text-[#9898a8]">{dep.name}</div>
+            <div className="px-2 pb-1 pt-3 text-[9.5px] font-medium uppercase tracking-[.06em] text-ink-3">{dep.name}</div>
             {mods.map((m) => (
-              <div key={m.key} className="ob-rise flex h-7 items-center gap-2 px-2 text-[#5f5f70]" style={{ animationDelay: `${Math.min(i++, 14) * 40}ms` }}>
+              <div key={m.key} className="ob-rise flex h-7 items-center gap-2 px-2 text-ink-2" style={{ animationDelay: `${Math.min(i++, 14) * 40}ms` }}>
                 <span className="grid h-[18px] w-[18px] shrink-0 place-items-center rounded-[5px]" style={{ background: tone.bg, color: tone.fg }}>
                   <Ico name={m.icon} className="h-[11px] w-[11px]" />
                 </span>
@@ -62,35 +62,35 @@ export function PreviewDevis({ d, lines = 4, compact }: { d: Draft; lines?: numb
   const tva = (ht * p.tva) / 100;
   const I = TRADE_ICON[key];
   return (
-    <div className="rounded-[14px] bg-white p-3.5 shadow-[0_0_0_1px_#ececf1]">
+    <div className="rounded-[14px] bg-white p-3.5 shadow-halo-sm">
       <div className="flex items-start gap-2.5">
-        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-[#130f26] text-white">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] bg-dawn-diag text-white">
           <I className="h-4 w-4" strokeWidth={1.75} />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5 text-[10.5px] text-[#9898a8]">
+          <div className="flex items-center gap-1.5 text-[10.5px] text-ink-3">
             <span className="bx-mono">D-2026-001</span> · {p.client}
           </div>
           <div key={key} className="ob-rise truncate text-[13px] font-semibold tracking-[-0.01em]">{p.titre}</div>
         </div>
-        <span className="rounded-full bg-[#f4f3fa] px-2 py-0.5 text-[10px] font-medium text-[#5f5f70]">Brouillon</span>
+        <span className="rounded-full bg-[#f3f1f8] px-2 py-0.5 text-[10px] font-medium text-ink-2">Brouillon</span>
       </div>
       <div key={`l${key}`} className="ob-cascade mt-3 divide-y divide-[#f0eff5] border-t border-[#f0eff5]">
         {p.lignes.slice(0, lines).map((l, i) => (
           <div key={l.l} className="flex items-baseline gap-2 py-[7px] text-[11.5px]" style={{ ['--i' as string]: i }}>
-            <span className="min-w-0 flex-1 truncate text-[#130f26]">{l.l}</span>
-            {!compact && <span className="num shrink-0 text-[#9898a8]">{String(l.q).replace('.', ',')} {l.u}</span>}
+            <span className="min-w-0 flex-1 truncate text-ink">{l.l}</span>
+            {!compact && <span className="num shrink-0 text-ink-3">{String(l.q).replace('.', ',')} {l.u}</span>}
             <span className="num w-[64px] shrink-0 text-right font-medium">{eur(l.q * l.pu)}</span>
           </div>
         ))}
       </div>
-      <div className="mt-1 flex items-end justify-between border-t border-[#ececf1] pt-2.5">
-        <div className="text-[10.5px] leading-relaxed text-[#9898a8]">
+      <div className="mt-1 flex items-end justify-between border-t border-[#f0edf7] pt-2.5">
+        <div className="text-[10.5px] leading-relaxed text-ink-3">
           <div className="num">Total HT {eur(ht)}</div>
           <div className="num">TVA {String(p.tva).replace('.', ',')} % {eur(tva)}</div>
         </div>
         <div className="text-right">
-          <div className="text-[10px] text-[#9898a8]">Total TTC</div>
+          <div className="text-[10px] text-ink-3">Total TTC</div>
           <div className="text-[17px] font-semibold tracking-[-0.03em]"><CountUp value={ht + tva} format={(n) => eur(n)} /></div>
         </div>
       </div>
@@ -105,7 +105,7 @@ export function PreviewVocab({ d }: { d: Draft }) {
   return (
     <div key={key + extra.join()} className="ob-cascade flex flex-wrap gap-1.5">
       {[...PROFILS[key].vocab.slice(0, 4), ...extra].map((w, i) => (
-        <span key={w} className="rounded-full bg-white px-2.5 py-1 text-[10.5px] font-medium text-[#5f5f70] shadow-[0_0_0_1px_#ececf1]" style={{ ['--i' as string]: i }}>{w}</span>
+        <span key={w} className="rounded-full bg-white px-2.5 py-1 text-[10.5px] font-medium text-ink-2 shadow-halo-sm" style={{ ['--i' as string]: i }}>{w}</span>
       ))}
     </div>
   );
@@ -129,10 +129,10 @@ export function PreviewKpis({ d }: { d: Draft }) {
   return (
     <div className="grid grid-cols-3 gap-2">
       {keys.map((k, i) => (
-        <div key={k} className="ob-rise rounded-[12px] bg-white p-2.5 shadow-[0_0_0_1px_#ececf1] transition-opacity duration-500" style={{ animationDelay: `${i * 60}ms`, opacity: d.priorities.includes(k) ? 1 : 0.55 }}>
-          <div className="truncate text-[10px] text-[#9898a8]">{KPI[k].l}</div>
+        <div key={k} className="ob-rise rounded-[12px] bg-white p-2.5 shadow-halo-sm transition-opacity duration-500" style={{ animationDelay: `${i * 60}ms`, opacity: d.priorities.includes(k) ? 1 : 0.55 }}>
+          <div className="truncate text-[10px] text-ink-3">{KPI[k].l}</div>
           <div className="num mt-0.5 truncate text-[15px] font-semibold tracking-[-0.03em]">{KPI[k].v}</div>
-          <div className="truncate text-[10px] text-[#9898a8]">{KPI[k].s}</div>
+          <div className="truncate text-[10px] text-ink-3">{KPI[k].s}</div>
         </div>
       ))}
     </div>
@@ -153,7 +153,7 @@ export function TeamDots({ d }: { d: Draft }) {
           {i === 0 ? init : others[i - 1]}
         </span>
       ))}
-      {more > 0 && <span className="num ml-1.5 text-[10.5px] font-medium text-[#5f5f70]">+{more}</span>}
+      {more > 0 && <span className="num ml-1.5 text-[10.5px] font-medium text-ink-2">+{more}</span>}
     </div>
   );
 }
@@ -167,7 +167,7 @@ export function PreviewChips({ d }: { d: Draft }) {
       {mods.map((m, i) => {
         const t = TONE[m.dept];
         return (
-          <span key={m.key} className="ob-rise inline-flex h-7 items-center gap-1.5 rounded-full bg-white pl-1 pr-2.5 text-[11.5px] font-medium text-[#5f5f70] shadow-[0_0_0_1px_#ececf1]" style={{ animationDelay: `${Math.min(i, 12) * 35}ms` }}>
+          <span key={m.key} className="ob-rise inline-flex h-7 items-center gap-1.5 rounded-full bg-white pl-1 pr-2.5 text-[11.5px] font-medium text-ink-2 shadow-halo-sm" style={{ animationDelay: `${Math.min(i, 12) * 35}ms` }}>
             <span className="grid h-5 w-5 place-items-center rounded-full" style={{ background: t.bg, color: t.fg }}><Ico name={m.icon} className="h-3 w-3" /></span>
             {m.name}
           </span>

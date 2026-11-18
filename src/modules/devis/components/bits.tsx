@@ -46,17 +46,17 @@ export function Menu({ trigger, items, align = 'right', className }: { trigger: 
     <div ref={ref} className={cn('relative', className)}>
       {trigger({ open, toggle: () => setOpen((o) => !o) })}
       {open && (
-        <div className={cn('absolute top-full z-[60] mt-1.5 min-w-[220px] animate-scale-in rounded-xl border border-line bg-white p-1 shadow-pop', align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left')} role="menu">
+        <div className={cn('absolute top-full z-[60] mt-1.5 min-w-[220px] animate-scale-in rounded-[18px] bg-white p-1.5 shadow-[0_0_0_1px_#ece8f6,0_24px_48px_-16px_rgba(60,30,120,.28)]', align === 'right' ? 'right-0 origin-top-right' : 'left-0 origin-top-left')} role="menu">
           {items.map((it, i) => (
             <div key={i}>
-              {it.divider && <div className="my-1 h-px bg-line" />}
+              {it.divider && <div className="my-1 h-px bg-[#f2eff8]" />}
               <button
                 role="menuitem"
                 onClick={() => {
                   setOpen(false);
                   it.onClick();
                 }}
-                className={cn('flex h-10 w-full items-center gap-2.5 rounded-lg px-2.5 text-left text-[13.5px] transition hover:bg-sub md:h-9 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0', it.danger ? 'text-bad' : 'text-ink [&_svg]:text-ink-2')}
+                className={cn('flex h-10 w-full items-center gap-2.5 rounded-[12px] px-2.5 text-left text-[13.5px] transition hover:bg-halo-hover md:h-9 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0', it.danger ? 'text-bad' : 'text-ink [&_svg]:text-ink-2')}
               >
                 {it.icon}
                 <span className="flex-1 whitespace-nowrap">{it.label}</span>
@@ -104,7 +104,7 @@ export function NumInput({ value, onChange, className, step = 1, ariaLabel, deci
         }
       }}
       onChange={(e) => setTxt(e.target.value)}
-      className={cn('num h-8 w-full rounded-md border border-transparent bg-transparent px-1.5 text-right text-[13.5px] transition hover:border-line2 focus:border-vi-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-vi-100', className)}
+      className={cn('num h-8 w-full rounded-[10px] border border-transparent bg-transparent px-1.5 text-right text-[13.5px] transition hover:border-[#ece8f6] focus:border-vi-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-vi-100', className)}
     />
   );
 }

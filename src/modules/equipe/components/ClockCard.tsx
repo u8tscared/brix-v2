@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Coffee, Loader2, MapPin, Play, Square } from 'lucide-react';
 import { Avatar, Badge, Card, cn, toast } from '@/components/ui';
-import { DrawCheck, LiveDot } from '@/components/motion';
+import { DrawCheck, LiveDot, Ring } from '@/components/motion';
 import { useBrix } from '@/lib/store';
 import { todayISO } from '@/lib/format';
 import { hhmm, toMin } from '../data';
 import { locate } from '../service';
 import { useEquipe } from '../store';
 import { nowHHMM, punchFor } from '../lib/timesheet';
-import { ToneRing, useNow } from '@/modules/finance/components/kit';
+import { useNow } from '@/modules/finance/components/kit';
 
 const DAY_TARGET_H = 7;
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -75,14 +75,24 @@ export function ClockCard() {
     togglePause(emp.id, nowHHMM());
   };
 
+  const onSite = employees.filter((e) => punchFor(e, today, edits, live)?.inProgress).length;
+
   return (
     <Card className="overflow-hidden">
-      <div ref={chips} className="flex gap-2 overflow-x-auto border-b border-line px-4 py-3 scrollbar-none" role="radiogroup" aria-label="Pointer pour">
+      <div className="flex items-center justify-between gap-2 px-5 pt-4">
+        <span className="tone-green inline-flex h-[26px] items-center gap-1.5 rounded-full px-2.5 text-[12.5px] font-medium">
+          <LiveDot />En direct
+        </span>
+        <span className="num text-[12.5px] text-ink-2">
+          <b className="font-semibold text-ink">{onSite}</b> sur {employees.length} au travail · {pad(now.getHours())} h {pad(now.getMinutes())}
+        </span>
+      </div>
+      <div ref={chips} className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-none [mask-image:linear-gradient(90deg,transparent,#000_14px,#000_calc(100%-14px),transparent)]" role="radiogroup" aria-label="Pointer pour">
         {employees.map((e) => {
           const pe = punchFor(e, today, edits, live);
           const on = e.id === who;
           return (
-            <button key={e.id} role="radio" aria-checked={on} onClick={() => setWho(e.id)} className={cn('press flex h-10 shrink-0 items-center gap-2 rounded-full pl-1 pr-3 text-[13px] font-medium transition-[background,box-shadow,color] duration-200', on ? 'bg-ink text-white shadow-ink' : 'bg-sub text-ink-2 hover:text-ink')}>
+            <button key={e.id} role="radio" aria-checked={on} onClick={() => setWho(e.id)} className={cn('press flex h-10 shrink-0 items-center gap-2 rounded-full pl-1 pr-3 text-[13px] font-medium transition-[background,box-shadow,color] duration-200', on ? 'bg-ink text-white shadow-ink' : 'bg-white text-ink-2 shadow-halo-sm hover:text-ink')}>
               <span className="relative">
                 <Avatar initials={e.initials} color={e.color} size={32} className={cn(on && 'ring-2 ring-white/20')} />
                 {pe?.inProgress && <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#22c55e] ring-2 ring-white" />}
@@ -93,9 +103,9 @@ export function ClockCard() {
         })}
       </div>
 
-      <div className="flex flex-col items-center px-5 pb-5 pt-6">
+      <div className="flex flex-col items-center px-5 pb-5 pt-3">
         <div className="relative grid h-[208px] w-[208px] place-items-center">
-          <ToneRing value={progress} tone={done ? 'ok' : 'teal'} size={208} stroke={6} className="absolute inset-0" />
+          <Ring value={progress} tone={done ? 'ok' : 'dawn'} size={208} stroke={7} className="absolute inset-0" />
           {!working && !done && !busy && <span aria-hidden className="absolute inset-[10px] rounded-full bg-[#22c55e]/10" />}
           <button
             onClick={working ? leave : arrive}
@@ -103,7 +113,7 @@ export function ClockCard() {
             aria-label={working ? 'Pointer le départ' : 'Pointer l’arrivée'}
             className={cn(
               'relative grid h-[172px] w-[172px] place-items-center rounded-full text-white transition-[transform,background,box-shadow] duration-300 ease-out-quint active:scale-[.96] disabled:active:scale-100',
-              done ? 'bg-ok-bg text-ok' : working ? 'bg-night shadow-[0_18px_40px_-16px_rgba(19,15,38,.6)]' : 'bg-[linear-gradient(160deg,#22c55e,#15803d)] shadow-[0_18px_40px_-14px_rgba(21,128,61,.7),inset_0_1px_0_rgba(255,255,255,.3)] hover:shadow-[0_22px_44px_-14px_rgba(21,128,61,.8),inset_0_1px_0_rgba(255,255,255,.3)]',
+              done ? 'bg-ok-bg text-ok' : working ? 'bg-[linear-gradient(160deg,#2c2456,#15122a)] shadow-[0_18px_40px_-16px_rgba(45,30,110,.6),inset_0_1px_0_rgba(255,255,255,.12)]' : 'bg-[linear-gradient(160deg,#22c55e,#15803d)] shadow-[0_18px_40px_-14px_rgba(21,128,61,.7),inset_0_1px_0_rgba(255,255,255,.3)] hover:shadow-[0_22px_44px_-14px_rgba(21,128,61,.8),inset_0_1px_0_rgba(255,255,255,.3)]',
             )}
           >
             {confirm ? (
@@ -135,11 +145,11 @@ export function ClockCard() {
         </div>
 
         <div className="mt-4 flex w-full items-center gap-2">
-          <button onClick={pause} disabled={!working} className={cn('press flex h-12 shrink-0 items-center gap-2 rounded-[14px] px-4 text-[13.5px] font-medium transition disabled:opacity-40', paused ? 'bg-[#e8f7fa] text-[#0e7490] shadow-[inset_0_0_0_1px_#c5e9f0]' : 'bg-white shadow-[0_0_0_1px_var(--line2)] hover:bg-sub')}>
+          <button onClick={pause} disabled={!working} className={cn('press flex h-12 shrink-0 items-center gap-2 rounded-pill px-4 text-[13.5px] font-medium transition disabled:opacity-40', paused ? 'tone-cyan' : 'bg-white shadow-[0_1px_2px_rgba(60,30,120,.08),0_0_0_1px_#ece8f6] hover:bg-halo-hover')}>
             <Coffee className="h-4 w-4" />{paused ? 'Reprendre' : 'Pause'}
           </button>
-          <div className="flex min-h-[48px] min-w-0 flex-1 items-center gap-2 rounded-[14px] bg-sub px-3 text-[12.5px] text-ink-2">
-            <MapPin className="h-4 w-4 shrink-0 text-ink-3" />
+          <div className="flex min-h-[48px] min-w-0 flex-1 items-center gap-2 rounded-pill bg-halo-hover pl-1.5 pr-3 text-[12.5px] text-ink-2">
+            <span className="tone-peach grid h-9 w-9 shrink-0 place-items-center rounded-full"><MapPin className="h-4 w-4" /></span>
             <span className="truncate">{chantier ? <span className="font-medium text-ink">{chantier.name}</span> : planned ? `Prévu : ${planned.title}` : 'Aucun chantier prévu'}</span>
             {chantier && working && <Badge tone="ok" className="ml-auto">Sur place</Badge>}
           </div>

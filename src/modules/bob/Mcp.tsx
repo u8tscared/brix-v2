@@ -43,7 +43,7 @@ export default function Mcp() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Plug" dept="bob" size="lg" solid />} kicker="Bob" title="Brix AI MCP" subtitle="Interrogez Brix depuis Claude, ChatGPT ou tout assistant compatible MCP. Vous gardez la main sur ce qu’il peut lire." actions={<Badge tone={nbAcces ? 'ok' : 'neutral'} dot>{nbAcces ? `${nbAcces} accès actif${nbAcces > 1 ? 's' : ''}` : 'Pas encore connecté'}</Badge>} />
+      <PageHeader icon={<IconTile name="Plug" tone="violet" size="lg" />} kicker="Bob" title="Brix AI MCP" subtitle="Interrogez Brix depuis Claude, ChatGPT ou tout assistant compatible MCP. Vous gardez la main sur ce qu’il peut lire." actions={<Badge tone={nbAcces ? 'ok' : 'neutral'} dot>{nbAcces ? `${nbAcces} accès actif${nbAcces > 1 ? 's' : ''}` : 'Pas encore connecté'}</Badge>} />
       <BobNav />
 
       {!included && (

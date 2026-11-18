@@ -8,7 +8,7 @@ import type { Employee, PlanningEvent } from '@/lib/types';
 import { hoursOf } from '../../lib/metrics';
 import { isOutdoor, isRainy, weatherFor } from '../../lib/weather';
 import { WeatherIcon } from '../common/bits';
-import { KIND_STYLE, personTone } from './kinds';
+import { KIND_STYLE, personColor, personTone } from './kinds';
 import { fromMin, nowMin, sortByStart, toMin } from './utils';
 import type { SlotDraft } from './SlotSheet';
 
@@ -26,8 +26,8 @@ interface Drag {
 export function NowLine() {
   return (
     <div className="relative my-0.5 flex h-2 items-center" aria-label={`Maintenant, ${fromMin(nowMin())}`}>
-      <i className="absolute -left-1 h-2 w-2 rounded-full bg-bad" />
-      <i className="h-[2px] w-full rounded bg-bad" />
+      <i className="absolute -left-1 h-2.5 w-2.5 rounded-full bg-[#d946ef] shadow-[0_0_0_3px_rgba(217,70,239,.18)]" />
+      <i className="h-[2px] w-full rounded bg-[linear-gradient(90deg,#d946ef,#fb923c)]" />
     </div>
   );
 }
@@ -77,17 +77,17 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
   const cols = `var(--namecol) repeat(${days.length}, minmax(0, 1fr))`;
 
   return (
-    <div className={cn('overflow-hidden rounded-[18px] bg-white shadow-card', drag && 'select-none')}>
+    <div className={cn('overflow-hidden rounded-card bg-white shadow-halo', drag && 'select-none')}>
       <div className="grid [--namecol:150px] xl:[--namecol:200px]" style={{ gridTemplateColumns: cols }}>
         {/* En-tête : jours et météo */}
-        <div className="border-b border-line bg-[#fbfbfd]" />
+        <div className="border-b border-halo-line" />
         {days.map((d) => {
           const w = weatherFor(d);
           const isToday = d === today;
           return (
-            <div key={d} className={cn('flex items-center justify-between gap-1 border-b border-l border-line px-2.5 py-2', isToday ? 'bg-vi-50/60' : 'bg-[#fbfbfd]')}>
+            <div key={d} className={cn('flex items-center justify-between gap-1 border-b border-l border-halo-line px-3 py-2.5', isToday && 'bg-pale-v/60')}>
               <div className="min-w-0">
-                <div className={cn('text-[12.5px] font-semibold', isToday && 'text-vi-700')}>
+                <div className={cn('flex items-center gap-1.5 text-[13px] font-semibold tracking-[-0.01em]', isToday && 'text-deep-v')}>
                   {capitalize(new Date(d + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', ''))} {new Date(d + 'T12:00').getDate()}
                 </div>
                 <div className="hidden truncate text-[11px] text-ink-3 xl:block">{isToday ? "Aujourd'hui" : w.label}</div>
@@ -105,8 +105,8 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
           const total = mine.reduce((s, e) => s + (e.kind === 'absence' ? 0 : hoursOf(e)), 0);
           return (
             <Fragment key={p.id}>
-              <div className="flex items-center gap-2.5 border-b border-line px-3 py-2.5">
-                <Avatar initials={p.initials} color={p.color} size={32} />
+              <div className="flex items-center gap-2.5 border-b border-halo-line px-3 py-2.5">
+                <Avatar initials={p.initials} color={p.color} size={34} />
                 <div className="min-w-0">
                   <div className="truncate text-[13.5px] font-medium">{p.firstName}<span className="hidden xl:inline"> {p.lastName}</span></div>
                   <div className="truncate text-[11.5px] text-ink-3">
@@ -130,7 +130,7 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
                         onSlot({ employeeId: p.id, date: d, start, end });
                       }
                     }}
-                    className={cn('group relative min-h-[104px] cursor-cell space-y-1 border-b border-l border-line p-1.5 transition-colors', isToday && 'bg-vi-50/30', isTarget && 'bg-vi-50 shadow-[inset_0_0_0_2px_#b9a2f5]')}
+                    className={cn('group relative min-h-[104px] cursor-cell space-y-1 border-b border-l border-halo-line p-1.5 transition-colors', isToday && 'bg-pale-v/30', isTarget && 'bg-pale-v shadow-[inset_0_0_0_2px_#c4b0f7]')}
                   >
                     {list.map((e, i) => {
                       const conflict = conflicts.has(e.id);
@@ -144,14 +144,14 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
                             style={personTone(p.color, e.kind)}
                             title={`${e.title} · ${e.start} – ${e.end}${conflict ? ' · conflit d’horaires' : ''}`}
                             className={cn(
-                              'relative cursor-grab touch-none rounded-[8px] py-1.5 pl-2 pr-1.5 text-left transition duration-200 ease-out-quint hover:-translate-y-px hover:shadow-raise active:cursor-grabbing',
+                              'relative cursor-grab touch-none rounded-[14px] py-1.5 pl-2.5 pr-2 text-left transition duration-300 ease-spring hover:-translate-y-px hover:shadow-raise active:cursor-grabbing',
                               conflict && 'ring-2 ring-bad',
                               past && 'opacity-55',
                               drag?.id === e.id && drag.moving && 'opacity-30',
                             )}
                           >
                             <div className="num flex items-center gap-1 text-[10.5px] text-ink-2">
-                              {e.kind !== 'chantier' && <i className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: KIND_STYLE[e.kind].dot }} title={KIND_STYLE[e.kind].label} />}
+                              <i className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: e.kind === 'chantier' ? personColor(p.color) : KIND_STYLE[e.kind].dot }} title={KIND_STYLE[e.kind].label} />
                               {e.start}–{e.end}
                               {conflict && <AlertTriangle className="ml-auto h-3 w-3 text-bad" />}
                               {rain && <CloudRain className={cn('h-3 w-3 text-[#3b82f6]', !conflict && 'ml-auto')} />}
@@ -162,7 +162,7 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
                       );
                     })}
                     {isToday && list.length > 0 && nowIdx === -1 && <NowLine />}
-                    <span className="pointer-events-none absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-md text-ink-3 opacity-0 transition group-hover:opacity-100">
+                    <span className="pointer-events-none absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-white text-ink-3 shadow-pill opacity-0 transition group-hover:opacity-100">
                       <Plus className="h-3.5 w-3.5" />
                     </span>
                   </div>
@@ -174,7 +174,7 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
       </div>
 
       {drag?.moving && dragged && (
-        <div className="pointer-events-none fixed z-[95] rotate-[1.5deg] scale-[1.04] rounded-[8px] py-1.5 pl-2 pr-1.5 shadow-pop" style={{ left: drag.x - drag.ox, top: drag.y - drag.oy, width: drag.w, ...personTone(people.find((x) => x.id === dragged.employeeId)?.color ?? '#7c3aed', dragged.kind), background: '#fff' }}>
+        <div className="pointer-events-none fixed z-[95] rotate-[1.5deg] scale-[1.04] rounded-[14px] py-1.5 pl-2.5 pr-2 shadow-pop" style={{ left: drag.x - drag.ox, top: drag.y - drag.oy, width: drag.w, ...personTone(people.find((x) => x.id === dragged.employeeId)?.color ?? '#7c3aed', dragged.kind), background: '#fff' }}>
           <div className="num text-[10.5px] text-ink-2">{dragged.start}–{dragged.end}</div>
           <div className="truncate text-[12px] font-medium">{dragged.title}</div>
         </div>

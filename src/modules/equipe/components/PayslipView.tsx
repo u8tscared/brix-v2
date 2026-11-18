@@ -15,7 +15,7 @@ export const PRINT_CSS = `@media print { body * { visibility: hidden !important;
 
 function Tr({ label, base, rs, ms, rp, mp, strong, sub, className }: { label: ReactNode; base?: string; rs?: string; ms?: string; rp?: string; mp?: string; strong?: boolean; sub?: boolean; className?: string }) {
   return (
-    <tr className={cn('border-b border-line/70', strong && 'bg-[#fafafc] font-semibold', className)}>
+    <tr className={cn('border-b border-halo-line/70', strong && 'bg-halo-hover font-semibold', className)}>
       <td className={cn('py-1.5 pr-2', sub ? 'pl-5 text-ink-2' : 'pl-3')}>{label}</td>
       <td className="num hidden whitespace-nowrap px-2 text-right text-ink-2 sm:table-cell">{base}</td>
       <td className="num whitespace-nowrap px-2 text-right text-ink-2">{rs}</td>
@@ -38,14 +38,14 @@ export function PayslipView({ row, period }: { row: PayrollRow; period: { label:
     <div className="payslip-print text-[12px] text-ink">
       <style>{PRINT_CSS}</style>
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border border-line p-3">
+        <div className="rounded-card-sm border border-halo-line p-3">
           <div className="text-[10.5px] font-medium uppercase tracking-wide text-ink-3">Employeur</div>
           <div className="mt-1 text-[13px] font-semibold">{company.legalName || company.name}</div>
           <div className="text-ink-2">{company.address}, {company.city}</div>
           <div className="text-ink-2">SIRET {company.siret} · NAF 4321A</div>
           <div className="text-ink-2">Convention : Ouvriers du bâtiment jusqu’à 10 salariés (IDCC 1596)</div>
         </div>
-        <div className="rounded-xl border border-line p-3">
+        <div className="rounded-card-sm border border-halo-line p-3">
           <div className="text-[10.5px] font-medium uppercase tracking-wide text-ink-3">Salarié</div>
           <div className="mt-1 text-[13px] font-semibold">{emp.firstName} {emp.lastName.toUpperCase()}</div>
           <div className="text-ink-2">{roleName(roleFromStore(emp.role))} · {emp.contract}</div>
@@ -58,10 +58,10 @@ export function PayslipView({ row, period }: { row: PayrollRow; period: { label:
         <span>Paiement le {dateFull(period.payDate)} par virement</span>
       </div>
 
-      <div className="mt-3 overflow-hidden rounded-xl border border-line">
+      <div className="mt-3 overflow-hidden rounded-card-sm border border-halo-line">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-line bg-sub text-[10.5px] font-medium text-ink-2">
+            <tr className="border-b border-halo-line bg-halo-track text-[10.5px] font-medium text-ink-2">
               <th className="py-2 pl-3 text-left font-medium">Élément</th>
               <th className="hidden px-2 text-right font-medium sm:table-cell">Base</th>
               <th className="px-2 text-right font-medium">Taux</th>
@@ -99,14 +99,14 @@ export function PayslipView({ row, period }: { row: PayrollRow; period: { label:
       </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr]">
-        <div className="space-y-1.5 rounded-xl border border-line p-3 text-ink-2">
+        <div className="space-y-1.5 rounded-card-sm border border-halo-line p-3 text-ink-2">
           <div className="flex justify-between"><span>Montant net social</span><span className="num text-ink">{money(slip.netSocial)}</span></div>
           <div className="flex justify-between"><span>Net à payer avant impôt</span><span className="num text-ink">{money(slip.netAvantImpot)}</span></div>
           <div className="flex justify-between"><span>Net imposable</span><span className="num text-ink">{money(slip.netImposable)}</span></div>
           <div className="flex justify-between"><span>Impôt sur le revenu ({slip.pasNeutral ? 'taux neutre' : 'taux transmis'} {num(slip.pasRate, 1)} %)</span><span className="num text-ink">−{money(slip.pas)}</span></div>
           {slip.overtimePay > 0 && <div className="flex justify-between"><span>Heures sup (exonérées d’impôt jusqu’à 7 500 € par an)</span><span className="num">{money(slip.overtimePay)}</span></div>}
         </div>
-        <div className="flex flex-col justify-between rounded-xl bg-ink p-4 text-white">
+        <div className="flex flex-col justify-between rounded-card-sm bg-ink p-4 text-white">
           <div>
             <div className="text-[12px] text-white/70">Net payé au salarié</div>
             <div className="num font-display text-[30px] font-semibold leading-tight">{money(slip.netAPayer)}</div>

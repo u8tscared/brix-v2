@@ -20,7 +20,7 @@ export const STATUS_DOT: Record<ChantierStatus, string> = {
 /** Couverture : dernière photo du chantier, sinon une trame chaude à la couleur du département. */
 function Cover({ v, photo }: { v: ChantierView; photo?: ChantierPhoto }) {
   return (
-    <div className="relative h-[118px] overflow-hidden bg-[#fff1e7]">
+    <div className="relative m-1.5 mb-0 h-[124px] overflow-hidden rounded-[17px] bg-[#fff1e7]">
       {photo ? (
         <PhotoArt art={photo.art} phase={photo.phase} seed={photo.id + 'cv'} src={photo.src} className="transition-transform duration-700 ease-out-quint group-hover:scale-[1.04]" />
       ) : (
@@ -36,12 +36,12 @@ function Cover({ v, photo }: { v: ChantierView; photo?: ChantierPhoto }) {
         </svg>
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-[#130f26]/55 via-[#130f26]/5 to-transparent" />
-      <span className="absolute left-3 top-3 inline-flex h-[22px] items-center gap-1.5 rounded-full bg-white/90 px-2 text-[11.5px] font-medium text-ink shadow-xs backdrop-blur">
+      <span className="absolute left-3 top-3 inline-flex h-[22px] items-center gap-1.5 rounded-full bg-white/85 px-2.5 text-[11.5px] font-medium text-ink shadow-pill backdrop-blur-md">
         <i className="h-1.5 w-1.5 rounded-full" style={{ background: STATUS_DOT[v.ch.status] }} />
         {CHANTIER_STATUS[v.ch.status].label}
       </span>
       {v.ch.pinned && (
-        <span className="absolute right-3 top-3 grid h-[22px] w-[22px] place-items-center rounded-full bg-white/90 text-vi-700 shadow-xs">
+        <span className="absolute right-3 top-3 grid h-[22px] w-[22px] place-items-center rounded-full bg-white/90 text-deep-v shadow-xs">
           <Pin className="h-3 w-3" />
         </span>
       )}
@@ -56,7 +56,8 @@ function Cover({ v, photo }: { v: ChantierView; photo?: ChantierPhoto }) {
 function Margin({ v }: { v: ChantierView }) {
   const d = v.m.marginDelta;
   const tone = d < -6 ? 'text-bad' : d < -2 ? 'text-warn' : 'text-ok';
-  const bar = d < -6 ? 'bg-bad' : d < -2 ? 'bg-warn' : 'bg-ok';
+  // Barre dégradée Halo : la teinte dit si la marge tient (vert), glisse (ambre) ou décroche (rose).
+  const bar = d < -6 ? 'linear-gradient(90deg,#fb923c,#f43f5e)' : d < -2 ? 'linear-gradient(90deg,#fcd34d,#f59e0b)' : 'linear-gradient(90deg,#6ee7b7,#10b981)';
   const scale = 60;
   return (
     <div className="min-w-0 flex-1">
@@ -64,9 +65,9 @@ function Margin({ v }: { v: ChantierView }) {
         Marge <span className={cn('num text-[14px] font-semibold', tone)}>{Math.round(v.m.realMarginRate)} %</span>
         <span className="num">/ {Math.round(v.m.plannedMarginRate)} % prévu</span>
       </div>
-      <div className="relative mt-1.5 h-1.5 overflow-hidden rounded-full bg-sub">
-        <div className={cn('h-full origin-left animate-grow rounded-full', bar)} style={{ width: `${Math.max(3, Math.min(100, (v.m.realMarginRate / scale) * 100))}%` }} />
-        <i className="absolute inset-y-0 w-[2px] bg-ink/70" style={{ left: `${Math.min(99, (v.m.plannedMarginRate / scale) * 100)}%` }} />
+      <div className="relative mt-2 h-2 overflow-hidden rounded-full bg-halo-track">
+        <div className="h-full origin-left animate-grow rounded-full" style={{ background: bar, width: `${Math.max(3, Math.min(100, (v.m.realMarginRate / scale) * 100))}%` }} />
+        <i className="absolute inset-y-0 w-[2px] rounded-full bg-ink/60" style={{ left: `${Math.min(99, (v.m.plannedMarginRate / scale) * 100)}%` }} />
       </div>
     </div>
   );
@@ -86,27 +87,27 @@ export function ChantierCards({ rows }: { rows: ChantierView[] }) {
         const done = v.ch.status === 'termine';
         const left = v.m.daysLeft;
         return (
-          <button key={v.ch.id} onClick={() => navigate(`/app/chantiers/${v.ch.id}`)} className="group lift press relative flex flex-col overflow-hidden rounded-[18px] bg-white text-left shadow-card">
+          <button key={v.ch.id} onClick={() => navigate(`/app/chantiers/${v.ch.id}`)} className="group lift press relative flex flex-col overflow-hidden rounded-card bg-white text-left shadow-halo focus-visible:outline-none focus-visible:shadow-focus">
             <Cover v={v} photo={cover(v.ch.id)} />
             <div className="relative flex flex-1 flex-col p-4 pt-3.5">
-              <span className="absolute -top-8 right-3.5 rounded-full bg-white p-1 shadow-raise">
+              <span className="absolute -top-8 right-3.5 rounded-full bg-white p-1 shadow-halo-lg">
                 <Ring value={v.ch.progress} size={52} stroke={4} tone={done ? 'ok' : 'dawn'}>
                   <span className="text-[12px] font-semibold tracking-[-0.02em]">{v.ch.progress}<span className="text-[9px] text-ink-3"> %</span></span>
                 </Ring>
               </span>
               <div className="pr-16">
-                <div className="truncate text-[15.5px] font-semibold tracking-[-0.02em]">{v.ch.name}</div>
+                <div className="truncate text-[16px] font-semibold tracking-[-0.025em]">{v.ch.name}</div>
                 <div className="mt-0.5 truncate text-[12.5px] text-ink-3">{v.client?.name ?? 'Client'}</div>
               </div>
               <div className="mt-4 flex items-end gap-4">
                 <Margin v={v} />
                 <TeamAvatars team={v.team} size={26} max={3} />
               </div>
-              <div className="mt-4 flex items-center gap-2 border-t border-line pt-3 text-[12.5px]">
+              <div className="mt-4 flex items-center gap-2 border-t border-halo-line pt-3 text-[12.5px]">
                 {warn ? <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-warn" /> : <CalendarClock className="h-3.5 w-3.5 shrink-0 text-ink-3" />}
                 <span className={cn('min-w-0 flex-1 truncate', warn ? 'text-warn' : 'text-ink-2')}>{v.ch.nextStep}</span>
                 {!done && v.ch.status !== 'a_planifier' && (
-                  <span className={cn('num shrink-0 rounded-full px-1.5 py-0.5 text-[11px] font-semibold', left < 0 ? 'bg-bad-bg text-bad' : left <= 3 ? 'bg-warn-bg text-warn' : 'bg-sub text-ink-2')}>
+                  <span className={cn('num inline-flex h-[22px] shrink-0 items-center rounded-full px-2 text-[11px] font-semibold', left < 0 ? 'tone-rose' : left <= 3 ? 'tone-amber' : 'tone-neutral')}>
                     {left < 0 ? `+${-left} j` : left === 0 ? "aujourd'hui" : `J-${left}`}
                   </span>
                 )}

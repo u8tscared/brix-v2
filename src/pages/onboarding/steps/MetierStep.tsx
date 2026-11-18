@@ -1,9 +1,10 @@
 import { Check } from 'lucide-react';
 import { TRADES, TRADE_BY_KEY } from '@/lib/catalog';
 import type { TradeKey } from '@/lib/types';
-import { TRADE_ICON } from '@/pages/onboarding/icons';
+import { HALO_TONE } from '@/components/ui';
+import { TRADE_ICON, TRADE_TONE } from '@/pages/onboarding/icons';
 import { PROFILS } from '@/pages/onboarding/metiers';
-import { CheckDot, StepHeader } from '@/pages/onboarding/ui';
+import { StepHeader } from '@/pages/onboarding/ui';
 import type { StepProps } from './types';
 
 const MAX_SEC = 2;
@@ -28,15 +29,16 @@ export function MetierStep({ d, set, fromSite }: StepProps & { fromSite?: boolea
         lead="Brix installe les calculs, les ouvrages, les prix et les modèles de devis de votre métier. Vous faites aussi autre chose ? Ajoutez jusqu'à deux métiers secondaires."
       />
       {fromSite && d.trade && (
-        <div className="ob-rise mb-4 flex items-center gap-2 rounded-xl bg-white px-3.5 py-2.5 text-[13px] text-[#5f5f70] shadow-[0_0_0_1px_#ececf1]">
-          <Check className="h-4 w-4 text-[#16a34a]" strokeWidth={2} aria-hidden /> Prérempli depuis le site&nbsp;: <b className="font-medium text-[#130f26]">{TRADE_BY_KEY[d.trade].name}</b>
+        <div className="chip tone-green ob-rise mb-4 h-8 px-3 text-[13px]">
+          <Check strokeWidth={2} aria-hidden /> Prérempli depuis le site&nbsp;: <b className="font-semibold">{TRADE_BY_KEY[d.trade].name}</b>
         </div>
       )}
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3" role="group" aria-label="Métiers">
+      <div className="flex flex-wrap gap-2.5" role="group" aria-label="Métiers">
         {TRADES.map((t, i) => {
           const I = TRADE_ICON[t.key];
           const main = d.trade === t.key;
           const sec = d.secondary.includes(t.key);
+          const tone = HALO_TONE[TRADE_TONE[t.key]];
           return (
             <button
               key={t.key}
@@ -44,30 +46,28 @@ export function MetierStep({ d, set, fromSite }: StepProps & { fromSite?: boolea
               aria-pressed={main || sec}
               data-sec={sec}
               onClick={() => pick(t.key)}
-              className="ob-card ob-rise flex min-h-[112px] flex-col items-start p-3.5"
+              className="ob-chip ob-rise"
               style={{ animationDelay: `${i * 22}ms` }}
+              title={PROFILS[t.key].vocab.slice(0, 3).join(', ')}
               aria-label={`${t.name}${main ? ', métier principal' : sec ? ', métier secondaire' : ''}`}
             >
-              <span
-                className="ob-tile"
-                style={{ width: 40, height: 40, borderRadius: 12, background: main ? '#130f26' : sec ? '#f3edff' : '#f4f3fa', color: main ? '#fff' : sec ? '#6d28d9' : '#130f26' }}
-              >
-                <I className="h-[19px] w-[19px]" strokeWidth={1.75} aria-hidden />
+              <span className="ob-tile" style={main ? { background: 'var(--ob-dawn)', color: '#fff', boxShadow: '0 6px 16px -6px rgba(217,70,239,.6), inset 0 1px 0 rgba(255,255,255,.25)' } : { background: tone.bg, color: tone.fg }}>
+                <I className="h-[18px] w-[18px]" strokeWidth={1.9} aria-hidden />
               </span>
-              <span className="mt-auto pt-3 text-[14px] font-semibold leading-tight tracking-[-0.01em]">{t.name}</span>
-              <span className="mt-1 line-clamp-1 text-[12px] text-[#9898a8]">
-                {main ? 'Métier principal' : sec ? 'Métier secondaire' : PROFILS[t.key].vocab.slice(0, 2).join(', ')}
+              <span className="flex flex-col leading-tight">
+                <span className="text-[14.5px] font-semibold tracking-[-0.015em]">{t.name}</span>
+                {(main || sec) && <span className="text-[11.5px] font-medium text-ink-3">{main ? 'Principal' : 'En plus'}</span>}
               </span>
               {(main || sec) && (
-                <CheckDot>
-                  {sec ? <span className="text-[10px] font-semibold">+</span> : undefined}
-                </CheckDot>
+                <span className={`ob-chip-mark ${sec ? 'sec' : ''}`} aria-hidden>
+                  {sec ? '+' : <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6.2 5 8.6l4.6-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                </span>
               )}
             </button>
           );
         })}
       </div>
-      <p className="mt-4 min-h-[20px] text-[13px] text-[#5f5f70]" aria-live="polite">
+      <p className="mt-5 min-h-[20px] text-[13px] text-ink-2" aria-live="polite">
         {d.trade && !d.secondary.length && 'Touchez un autre métier pour l\'ajouter en secondaire.'}
         {d.secondary.length > 0 && `Principal : ${TRADE_BY_KEY[d.trade!].name}. En plus : ${d.secondary.map((k) => TRADE_BY_KEY[k].name).join(', ')}.`}
       </p>

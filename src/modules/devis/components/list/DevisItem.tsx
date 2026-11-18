@@ -60,7 +60,7 @@ export function DevisRow({ d, client, ttc, score, meta, onOpen, onPreview, onRem
   const act = activityText(d, meta);
   const st = DEVIS_STATUS[d.status];
   return (
-    <div onClick={onOpen} className={cn('group grid cursor-pointer items-center gap-4 border-b border-line px-5 py-3 transition-colors duration-150 last:border-b-0 hover:bg-[#faf9fd]', ROW_GRID)}>
+    <div onClick={onOpen} className={cn('group grid cursor-pointer items-center gap-4 rounded-card-sm bg-white px-5 py-3 shadow-halo-sm transition-[box-shadow,transform] duration-300 ease-out-quint hover:-translate-y-px hover:shadow-[0_0_0_1px_#e3dcf3,0_10px_24px_-12px_rgba(60,30,120,.18)]', ROW_GRID)}>
       <Proba d={d} score={score} />
       <div className="min-w-0">
         <div className="truncate text-[14px] font-semibold tracking-[-0.01em]">{client?.name ?? <span className="text-ink-3">Client à choisir</span>}</div>
@@ -72,7 +72,7 @@ export function DevisRow({ d, client, ttc, score, meta, onOpen, onPreview, onRem
         <Badge tone={st.tone} dot pulse={act.hot}>
           {d.status === 'vu' ? 'Vu' : st.label}
         </Badge>
-        <div className={cn('mt-1 flex min-w-0 items-center gap-1 text-[12.5px]', act.hot ? 'font-medium text-vi-700' : 'text-ink-2')}>
+        <div className={cn('mt-1 flex min-w-0 items-center gap-1 text-[12.5px]', act.hot ? 'font-medium text-deep-m' : 'text-ink-2')}>
           {act.hot && <Eye className="h-3.5 w-3.5 shrink-0" />}
           <span className="truncate">{act.text}</span>
         </div>
@@ -86,7 +86,7 @@ export function DevisRow({ d, client, ttc, score, meta, onOpen, onPreview, onRem
               onPreview();
             }}
             aria-label={`Aperçu du devis ${d.number}`}
-            className="grid h-8 w-8 place-items-center rounded-[9px] text-ink-3 opacity-0 transition hover:bg-white hover:text-ink hover:shadow-card focus:opacity-100 group-hover:opacity-100"
+            className="grid h-9 w-9 place-items-center rounded-full text-ink-3 opacity-0 transition hover:bg-halo-hover hover:text-ink focus:opacity-100 group-hover:opacity-100"
           >
             <Expand className="h-4 w-4" />
           </button>
@@ -119,25 +119,25 @@ export function DevisCard({ d, client, ttc, score, meta, onOpen, onPreview, onRe
   const act = activityText(d, meta);
   const st = DEVIS_STATUS[d.status];
   return (
-    <div onClick={onOpen} className="cursor-pointer rounded-[18px] bg-white p-4 shadow-card transition active:scale-[.985]">
+    <div onClick={onOpen} className="cursor-pointer rounded-card bg-white p-4 shadow-halo transition active:scale-[.985]">
       <div className="flex items-start gap-3">
-        <Avatar initials={initials(client?.name ?? '?')} size={40} color="#f3edff" fg="#6d28d9" />
+        <Avatar initials={initials(client?.name ?? '?')} size={42} />
         <div className="min-w-0 flex-1">
           <div className="truncate text-[15px] font-semibold tracking-[-0.01em]">{client?.name ?? 'Client à choisir'}</div>
           <div className="truncate text-[12.5px] text-ink-3">{d.title}</div>
         </div>
         <div className="text-right">
-          <div className="num text-[15.5px] font-semibold tracking-[-0.015em]">{money(ttc)}</div>
+          <div className="num text-[16px] font-semibold tracking-[-0.02em]">{money(ttc)}</div>
           <div className="font-mono text-[11px] text-ink-3">{d.number}</div>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-3 border-t border-line pt-3">
+      <div className="mt-3 flex items-center gap-3 border-t border-[#f2eff8] pt-3">
         <Proba d={d} score={score} size={36} />
         <div className="min-w-0 flex-1">
           <Badge tone={st.tone} dot pulse={act.hot}>
             {d.status === 'vu' ? 'Vu' : st.label}
           </Badge>
-          <div className={cn('mt-0.5 truncate text-[12.5px]', act.hot ? 'font-medium text-vi-700' : 'text-ink-2')}>{act.text}</div>
+          <div className={cn('mt-0.5 truncate text-[12.5px]', act.hot ? 'font-medium text-deep-m' : 'text-ink-2')}>{act.text}</div>
         </div>
         <Button
           size="icon"

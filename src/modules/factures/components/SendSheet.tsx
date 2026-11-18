@@ -2,8 +2,8 @@
 // (aperçu du mail, pièce jointe, lien de paiement, plateforme agréée). Confirmation animée.
 
 import { useEffect, useState } from 'react';
-import { ArrowRight, Send } from 'lucide-react';
-import { Button, Field, Input, Sheet, Switch, Textarea, toast } from '@/components/ui';
+import { ArrowRight, Link2, Send, ShieldCheck } from 'lucide-react';
+import { Button, Field, IconTile, Input, Sheet, Switch, Textarea, toast } from '@/components/ui';
 import { dateFull, money } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Facture } from '@/lib/types';
@@ -112,9 +112,10 @@ export function SendSheet({ f, open, onClose, missing, checks, onPreview }: { f:
                 <Field label="Message">
                   <Textarea value={msg} onChange={(e) => setMsg(e.target.value)} className="min-h-[170px]" />
                 </Field>
-                <div className="divide-y divide-line rounded-[14px] bg-white shadow-[inset_0_0_0_1px_var(--line)]">
+                <div className="space-y-2">
                   {f.kind !== 'avoir' && (
-                    <label className="flex items-center gap-3 p-3.5">
+                    <label className="row-card cursor-pointer gap-3">
+                      <IconTile icon={<Link2 />} tone="violet" size="row" />
                       <div className="min-w-0 flex-1">
                         <div className="text-[13.5px] font-medium">Joindre un lien de paiement</div>
                         <div className="text-[12px] text-ink-2">Carte, Apple Pay, virement instantané, 3 fois. Payé en moyenne 9 jours plus tôt.</div>
@@ -123,7 +124,8 @@ export function SendSheet({ f, open, onClose, missing, checks, onPreview }: { f:
                     </label>
                   )}
                   {pro && (
-                    <label className="flex items-center gap-3 p-3.5">
+                    <label className="row-card cursor-pointer gap-3">
+                      <IconTile icon={<ShieldCheck />} tone="green" size="row" />
                       <div className="min-w-0 flex-1">
                         <div className="text-[13.5px] font-medium">Déposer sur la plateforme agréée</div>
                         <div className="text-[12px] text-ink-2">Facture électronique via {PLATFORMS[fx.platform ?? 'superpdp'].name}. Obligatoire entre pros dès le 1er septembre 2027, possible dès aujourd’hui.</div>
@@ -145,11 +147,11 @@ export function SendSheet({ f, open, onClose, missing, checks, onPreview }: { f:
                   onAttachment={onPreview}
                 />
                 {checks && (
-                  <button onClick={onPreview} className="flex w-full items-center gap-3 rounded-[14px] bg-white p-3 text-left shadow-card transition hover:shadow-raise">
+                  <button onClick={onPreview} className="row-card w-full gap-3 text-left">
                     <div className="min-w-0 flex-1">
                       <CheckSummary items={checks} compact />
                     </div>
-                    <span className="shrink-0 text-[12.5px] font-medium text-vi-700">Voir la facture</span>
+                    <span className="shrink-0 rounded-full bg-pale-v px-3 py-1.5 text-[12.5px] font-medium text-deep-v">Voir la facture</span>
                   </button>
                 )}
                 {checks?.some((c) => c.state !== 'ok') && (
@@ -167,8 +169,8 @@ export function SendSheet({ f, open, onClose, missing, checks, onPreview }: { f:
                   </ul>
                 )}
                 {blocked && (
-                  <div className="rounded-[12px] bg-bad-bg p-3 text-[12.5px] shadow-[inset_0_0_0_1px_#fbd0d0]">
-                    <div className="font-semibold text-bad">Il manque des informations pour la plateforme agréée</div>
+                  <div className="rounded-card-sm bg-pale-r p-3.5 text-[12.5px] text-deep-r">
+                    <div className="font-semibold">Il manque des informations pour la plateforme agréée</div>
                     {missing.join(' · ')}
                   </div>
                 )}

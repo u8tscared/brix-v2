@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { CheckCircle2, Search, XCircle } from 'lucide-react';
-import { Button, Card, CardHeader, Input, cn } from '@/components/ui';
+import { Button, Card, CardHeader, IconTile, Input, cn } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { sirenOf } from '../../lib/model';
 import { lookupDirectory, type DirectoryResult } from '../../service';
@@ -44,7 +44,7 @@ export function Annuaire() {
         </form>
         <div className="flex flex-wrap gap-2">
           {clients.map((c) => (
-            <button key={c.id} onClick={() => search(sirenOf(c.siret))} className="h-9 rounded-full border border-line2 bg-white px-3 text-[12.5px] font-medium text-ink-2 transition hover:bg-sub hover:text-ink">
+            <button key={c.id} onClick={() => search(sirenOf(c.siret))} className="h-9 rounded-full bg-white px-3.5 text-[12.5px] font-medium text-ink-2 shadow-[0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:-translate-y-px hover:text-ink">
               {c.name}
             </button>
           ))}
@@ -52,9 +52,9 @@ export function Annuaire() {
 
         {res === null && <p className="text-[13px] text-ink-2">Saisissez un SIREN de 9 chiffres (il figure sur le Kbis ou les factures du client).</p>}
         {res && (
-          <div className={cn('animate-fade-up rounded-xl border p-4', res.reachable ? 'border-[#c9f0d6] bg-ok-bg' : 'border-[#fde3b5] bg-warn-bg')}>
+          <div className={cn('animate-fade-up rounded-card-sm p-4', res.reachable ? 'bg-pale-g' : 'bg-pale-a')}>
             <div className="flex items-start gap-3">
-              {res.reachable ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-ok" /> : <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-warn" />}
+              {res.reachable ? <IconTile icon={<CheckCircle2 />} tone="green" solid size="sm" /> : <IconTile icon={<XCircle />} tone="amber" solid size="sm" />}
               <div className="min-w-0">
                 <div className="text-[14px] font-semibold">{res.name}</div>
                 <div className="text-[12.5px] text-ink-2">

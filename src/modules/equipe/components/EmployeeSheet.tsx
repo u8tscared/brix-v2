@@ -52,25 +52,25 @@ export function EmployeeSheet({ emp, onClose }: { emp: Employee | null; onClose:
     >
       <div className="space-y-5">
         <div className="grid grid-cols-3 gap-2">
-          <a href={`tel:${emp.phone.replace(/\s/g, '')}`} className="flex h-16 flex-col items-center justify-center gap-1 rounded-xl border border-line text-[12.5px] font-medium hover:bg-sub"><Phone className="h-4 w-4" />Appeler</a>
-          <button onClick={() => nav('/app/pointage')} className="flex h-16 flex-col items-center justify-center gap-1 rounded-xl border border-line text-[12.5px] font-medium hover:bg-sub"><Clock3 className="h-4 w-4" />Ses heures</button>
-          <button onClick={() => nav(isBoss ? '/app/conges' : '/app/paie')} className="flex h-16 flex-col items-center justify-center gap-1 rounded-xl border border-line text-[12.5px] font-medium hover:bg-sub">{isBoss ? <CalendarDays className="h-4 w-4" /> : <FileSpreadsheet className="h-4 w-4" />}{isBoss ? 'Congés' : 'Bulletin'}</button>
+          <a href={`tel:${emp.phone.replace(/\s/g, '')}`} className="flex h-16 flex-col items-center justify-center gap-1 rounded-card-sm border border-halo-line text-[12.5px] font-medium hover:bg-halo-track"><Phone className="h-4 w-4" />Appeler</a>
+          <button onClick={() => nav('/app/pointage')} className="flex h-16 flex-col items-center justify-center gap-1 rounded-card-sm border border-halo-line text-[12.5px] font-medium hover:bg-halo-track"><Clock3 className="h-4 w-4" />Ses heures</button>
+          <button onClick={() => nav(isBoss ? '/app/conges' : '/app/paie')} className="flex h-16 flex-col items-center justify-center gap-1 rounded-card-sm border border-halo-line text-[12.5px] font-medium hover:bg-halo-track">{isBoss ? <CalendarDays className="h-4 w-4" /> : <FileSpreadsheet className="h-4 w-4" />}{isBoss ? 'Congés' : 'Bulletin'}</button>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl bg-sub p-3">
+          <div className="rounded-card-sm bg-halo-track p-3">
             <div className="text-xs text-ink-2">Coût horaire chargé</div>
             <div className="num mt-0.5 text-[20px] font-semibold">{isBoss ? '—' : money(emp.hourlyCost)}</div>
             <div className="text-[11.5px] text-ink-3">utilisé pour la marge des devis</div>
           </div>
-          <div className="rounded-xl bg-sub p-3">
+          <div className="rounded-card-sm bg-halo-track p-3">
             <div className="text-xs text-ink-2">Solde de congés</div>
             <div className="num mt-0.5 text-[20px] font-semibold">{isBoss ? '—' : `${num(emp.leaveBalance, 1)} j`}</div>
             <div className="text-[11.5px] text-ink-3">payés par la caisse CIBTP</div>
           </div>
         </div>
 
-        <dl className="divide-y divide-line rounded-xl border border-line">
+        <dl className="divide-y divide-halo-line rounded-card-sm border border-halo-line">
           {info.map(([k, v]) => (
             <div key={k} className="flex flex-col gap-0.5 px-3 py-2.5 sm:flex-row sm:gap-3">
               <dt className="w-44 shrink-0 text-[12.5px] text-ink-3">{k}</dt>

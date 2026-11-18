@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Camera, Check, Download, PenLine, Receipt, ScanLine, Wallet } from 'lucide-react';
+import { CalendarDays, Camera, Check, Download, PenLine, Percent, Receipt, ScanLine, Wallet } from 'lucide-react';
 import { Avatar, Badge, Button, Card, cn, EmptyState, IconTile, PageHeader, Segmented, toast } from '@/components/ui';
 import { SuccessDot } from '@/components/motion';
 import { dateShort, money, todayISO } from '@/lib/format';
@@ -63,7 +63,9 @@ export default function NotesDeFrais() {
     <div className="space-y-6">
       <PageHeader
         icon={<IconTile name="ScanLine" dept="facturer" size="lg" />}
+        kicker="Facturer et encaisser"
         title="Notes de frais"
+        titleMuted="une photo, c'est rangé."
         subtitle="Une photo du ticket, Bob lit le montant et la TVA, vous validez."
         actions={
           <>
@@ -77,10 +79,11 @@ export default function NotesDeFrais() {
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Card className="grid grid-cols-2 overflow-hidden">
-          <div className="col-span-2 flex flex-wrap items-end justify-between gap-4 border-b border-line p-5 md:p-6">
+          <div className="col-span-2 flex flex-wrap items-end justify-between gap-4 border-b border-halo-line p-5 md:p-7">
             <div>
-              <Label>À valider</Label>
-              <BigMoney value={todo.reduce((a, e) => a + e.amountTtc, 0)} cents className="mt-3 block text-[38px] md:text-[42px]" />
+              <IconTile icon={<Receipt />} tone="peach" />
+              <Label className="mt-4">À valider</Label>
+              <BigMoney value={todo.reduce((a, e) => a + e.amountTtc, 0)} cents className="mt-1.5 block text-[40px] md:text-[48px]" />
               <div className="mt-2 flex items-center gap-2 text-[12.5px] text-ink-2">
                 {todoPeople.length > 0 && (
                   <span className="flex -space-x-1.5">{todoPeople.map((p) => <Avatar key={p!.id} initials={p!.initials} color={p!.color} size={20} ring />)}</span>
@@ -90,14 +93,14 @@ export default function NotesDeFrais() {
             </div>
             {todo.length > 0 && <Button variant="primary" icon={<Check />} onClick={validateAll}>Tout valider</Button>}
           </div>
-          <div className="border-r border-line p-4 md:p-5">
-            <Label>Ce mois-ci</Label>
-            <BigMoney value={month.reduce((a, e) => a + e.amountTtc, 0)} cents className="mt-2.5 block text-[22px]" />
+          <div className="border-r border-halo-line p-4 md:p-5">
+            <Label><IconTile icon={<CalendarDays />} tone="violet" size="xs" />Ce mois-ci</Label>
+            <BigMoney value={month.reduce((a, e) => a + e.amountTtc, 0)} cents className="mt-2.5 block text-[26px]" />
             <div className="mt-1.5 text-[12px] text-ink-3">{month.length} dépense{month.length > 1 ? 's' : ''} · {toRefund.length} à rembourser</div>
           </div>
           <div className="p-4 md:p-5">
-            <Label>TVA récupérable</Label>
-            <BigMoney value={vat} cents className="mt-2.5 block text-[22px] text-ok" />
+            <Label><IconTile icon={<Percent />} tone="green" size="xs" />TVA récupérable</Label>
+            <BigMoney value={vat} cents className="mt-2.5 block text-[26px] text-deep-g" />
             <div className="mt-1.5 text-[12px] text-ink-3">déduite toute seule</div>
           </div>
         </Card>
@@ -107,15 +110,15 @@ export default function NotesDeFrais() {
           onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
           onDragLeave={() => setDrag(false)}
           onDrop={(e) => { e.preventDefault(); setDrag(false); pick(e.dataTransfer.files?.[0]); }}
-          className={cn('group relative hidden flex-col items-center justify-center gap-3 overflow-hidden rounded-[16px] border-[1.5px] border-dashed p-6 text-center transition-colors duration-300 lg:flex', drag ? 'border-vi-400 bg-vi-50' : 'border-line2 bg-white/50 hover:border-vi-300 hover:bg-white')}
+          className={cn('group relative isolate hidden flex-col items-center justify-center gap-3 overflow-hidden rounded-card border-[1.5px] border-dashed p-6 text-center transition-[background,border-color,transform] duration-300 lg:flex', drag ? 'border-[#c9b2fb] bg-pale-v' : 'glass border-[#ddd3f3] hover:-translate-y-0.5 hover:border-[#c9b2fb] hover:bg-white/90')}
         >
-          <span className="relative grid h-14 w-12 place-items-center rounded-[6px] bg-white shadow-lift transition-transform duration-500 ease-out-quint group-hover:-translate-y-1 group-hover:rotate-[-4deg]">
+          <span className="relative grid h-14 w-12 place-items-center rounded-[8px] bg-white shadow-halo-lg transition-transform duration-500 ease-out-quint group-hover:-translate-y-1 group-hover:rotate-[-4deg]">
             <Receipt className="h-5 w-5 text-ink-3" strokeWidth={1.75} />
-            <span className="absolute inset-x-1.5 top-1/2 h-[2px] rounded-full bg-vi-500 opacity-0 shadow-[0_0_10px_#8b5cf6] transition-opacity duration-300 group-hover:opacity-100" />
+            <span className="absolute inset-x-1.5 top-1/2 h-[2px] rounded-full bg-[#d946ef] opacity-0 shadow-[0_0_10px_#d946ef] transition-opacity duration-300 group-hover:opacity-100" />
           </span>
           <div>
             <div className="text-[14px] font-semibold">{drag ? 'Lâchez, Bob s’en occupe' : 'Glissez la photo d’un ticket ici'}</div>
-            <div className="mt-1 text-[12.5px] text-ink-2">ou <span className="font-medium text-vi-700 underline-offset-4 group-hover:underline">essayez avec un ticket d’exemple</span></div>
+            <div className="mt-1 text-[12.5px] text-ink-2">ou <span className="font-medium text-deep-v underline-offset-4 group-hover:underline">essayez avec un ticket d’exemple</span></div>
           </div>
         </button>
       </div>
@@ -129,19 +132,19 @@ export default function NotesDeFrais() {
       ) : !list.length ? (
         <EmptyState icon={<Check />} title="Rien ici" text={filter === 'a_valider' ? 'Toutes les notes sont validées.' : 'Aucune note dans cette catégorie.'} />
       ) : (
-        <Card className="overflow-hidden">
-          <div key={filter} className="stagger-fast">
+        <div>
+          <div key={filter} className="stagger-fast space-y-2">
             {list.map((e) => {
               const who = emp(e.employeeId);
               const c = ch(e.chantierId);
               const done = flash[e.id];
               return (
-                <div key={e.id} onClick={() => { setFile(null); setSample(undefined); setSheet({ open: true, initial: e }); }} className={cn('group flex min-h-[72px] cursor-pointer items-center gap-3 border-b border-line px-4 py-3 transition-colors last:border-b-0 hover:bg-[#faf9fd] md:px-5', done && 'bg-ok-bg/50')}>
+                <div key={e.id} onClick={() => { setFile(null); setSample(undefined); setSheet({ open: true, initial: e }); }} className={cn('row-card group min-h-[72px] cursor-pointer gap-3 py-3 md:px-5', done && 'shadow-[0_0_0_1.5px_#b7ebd3,0_10px_28px_-12px_rgba(16,185,129,.35)]')}>
                   <Thumb src={photos[e.id]} amount={e.amountTtc} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="truncate text-[14px] font-medium">{e.supplier}</span>
-                      <span className="num shrink-0 text-[14px] font-semibold sm:hidden">{money(e.amountTtc)}</span>
+                      <span className="num-halo shrink-0 text-[16px] sm:hidden">{money(e.amountTtc)}</span>
                     </div>
                     <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[12px] text-ink-3">
                       {who && <Avatar initials={who.initials} color={who.color} size={16} />}
@@ -152,9 +155,9 @@ export default function NotesDeFrais() {
                       <Action e={e} done={done} onSet={setStatus} />
                     </div>
                   </div>
-                  <div className="hidden sm:block"><Badge tone={STATUS[e.status].tone} dot>{STATUS[e.status].label}</Badge></div>
+                  <div className="hidden sm:block"><Badge tone={STATUS[e.status].tone} size="md" dot>{STATUS[e.status].label}</Badge></div>
                   <div className="hidden w-24 shrink-0 text-right sm:block">
-                    <div className="num text-[14px] font-semibold">{money(e.amountTtc)}</div>
+                    <div className="num-halo text-[16px]">{money(e.amountTtc)}</div>
                     <div className="num text-[11.5px] text-ink-3">TVA {money(e.vat)}</div>
                   </div>
                   <div className="hidden w-[118px] shrink-0 justify-end sm:flex" onClick={(ev) => ev.stopPropagation()}>
@@ -164,7 +167,7 @@ export default function NotesDeFrais() {
               );
             })}
           </div>
-        </Card>
+        </div>
       )}
 
       <p className="flex items-center gap-2 text-[12px] text-ink-3"><ScanLine className="h-3.5 w-3.5" />Vos salariés envoient leurs tickets depuis l’app ouvrier, ils arrivent ici à valider.</p>
@@ -178,14 +181,14 @@ function Action({ e, done, onSet }: { e: Expense; done?: boolean; onSet: (e: Exp
   if (done) return <SuccessDot size={24} />;
   if (e.status === 'a_valider') return <Button size="sm" variant="primary" icon={<Check />} onClick={() => onSet(e, 'validee')}>Valider</Button>;
   if (e.status === 'validee') return <Button size="sm" icon={<Wallet />} onClick={() => onSet(e, 'remboursee')}>Rembourser</Button>;
-  return <Check className="mr-2 h-4 w-4 text-ok" />;
+  return <Check className="mr-2 h-4 w-4 text-deep-g" />;
 }
 
 /** Vignette du ticket : la photo si on l'a, sinon un petit ticket dessiné. */
 function Thumb({ src, amount }: { src?: string; amount: number }) {
-  if (src) return <img src={src} alt="" className="h-12 w-10 shrink-0 rounded-[6px] object-cover shadow-card" />;
+  if (src) return <img src={src} alt="" className="h-12 w-10 shrink-0 rounded-[6px] object-cover shadow-halo" />;
   return (
-    <span className="relative flex h-12 w-10 shrink-0 rotate-[-3deg] flex-col gap-[3px] rounded-[4px] bg-white px-1.5 pt-1.5 shadow-[0_0_0_1px_var(--line2),0_3px_6px_-3px_rgba(19,15,38,.2)] transition-transform duration-300 group-hover:rotate-0">
+    <span className="relative flex h-12 w-10 shrink-0 rotate-[-3deg] flex-col gap-[3px] rounded-[4px] bg-white px-1.5 pt-1.5 shadow-[0_0_0_1px_#ece8f6,0_4px_10px_-4px_rgba(60,30,120,.22)] transition-transform duration-300 group-hover:rotate-0">
       <i className="h-[2px] w-5 rounded-full bg-ink-3/50" />
       <i className="h-[2px] w-4 rounded-full bg-line2" />
       <i className="h-[2px] w-6 rounded-full bg-line2" />

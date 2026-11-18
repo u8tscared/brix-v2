@@ -2,21 +2,27 @@
 // Elles s'appuient sur le kit UI et le motion design communs, sans les modifier.
 import { useEffect, useState, type ReactNode } from 'react';
 import { AnimatedNumber, useInView } from '@/components/motion';
-import { BobWave } from '@/components/layout/BobWave';
+import { BrandTile } from '@/components/brand/Logo';
 import { cn } from '@/components/ui';
 import { money } from '@/lib/format';
 
-/** Bob prend la parole : marque nuit + texte au tutoiement + actions éventuelles. */
+/** Bob prend la parole : carte claire qui rosit, logo B, texte au tutoiement + actions éventuelles. Calme, jamais d'étincelles. */
 export function BobSays({ children, actions, tone = 'calm', className, title = 'Bob' }: { children: ReactNode; actions?: ReactNode; tone?: 'calm' | 'warn'; className?: string; title?: ReactNode }) {
   return (
-    <div className={cn('relative flex flex-col gap-3 overflow-hidden rounded-[16px] bg-white p-4 shadow-card sm:flex-row sm:items-center md:px-5', tone === 'warn' && 'shadow-[0_0_0_1px_#fde3b0,0_1px_2px_rgba(19,15,38,.04)]', className)}>
-      {tone === 'warn' && <span aria-hidden className="absolute inset-y-0 left-0 w-[3px] bg-[#f59e0b]" />}
+    <div
+      className={cn(
+        'relative flex flex-col gap-3 overflow-hidden rounded-card p-4 shadow-halo sm:flex-row sm:items-center md:px-5 md:py-[18px]',
+        tone === 'warn' ? 'bg-[linear-gradient(160deg,#fff_40%,#fff6e6)]' : 'bg-[linear-gradient(160deg,#fff_40%,#fdf3fb)]',
+        className,
+      )}
+    >
       <div className="flex min-w-0 flex-1 items-start gap-3">
-        <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-[10px] bg-night text-white shadow-ink">
-          <BobWave active className="h-3.5" />
-        </span>
+        <BrandTile size={32} className="mt-0.5 shrink-0" />
         <div className="min-w-0 flex-1">
-          <div className="text-[11.5px] font-semibold uppercase tracking-[.08em] text-ink-3">{title}</div>
+          <div className="flex items-center gap-2 text-[13px] font-semibold tracking-[-0.01em] text-ink">
+            {title}
+            {tone === 'warn' && <span className="chip tone-amber !h-[22px] !text-[11.5px]">À surveiller</span>}
+          </div>
           <div className="mt-0.5 text-[14px] leading-relaxed text-ink">{children}</div>
         </div>
       </div>
@@ -31,14 +37,14 @@ export function BigMoney({ value, className, dawn, signed, cents }: { value: num
     <AnimatedNumber
       value={value}
       format={(n) => `${signed && n > 0 ? '+' : ''}${money(n, !cents)}`}
-      className={cn('font-semibold leading-none tracking-[-0.045em]', dawn && 'dawn-text', className)}
+      className={cn('num-halo leading-none', dawn && 'dawn-text', className)}
     />
   );
 }
 
 /** Ligne de libellé discret au-dessus d'un chiffre. */
 export function Label({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('flex items-center gap-1.5 text-[12.5px] font-medium text-ink-2', className)}>{children}</div>;
+  return <div className={cn('flex items-center gap-1.5 text-[13px] font-medium text-ink-2', className)}>{children}</div>;
 }
 
 const RING_COLOR = { ok: '#16a34a', warn: '#d97706', bad: '#dc2626', ink: 'var(--ink)', vi: '#6d28d9', teal: '#0891b2' } as const;
@@ -71,7 +77,7 @@ export function ToneRing({ value, tone = 'ink', size = 40, stroke = 4, children,
   return (
     <span ref={ref} className={cn('relative inline-grid shrink-0 place-items-center', className)} style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--line)" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f1edf9" strokeWidth={stroke} />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={RING_COLOR[tone]} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={seen ? c * (1 - pct / 100) : c} style={{ transition: 'stroke-dashoffset 1.1s var(--ease) .1s' }} />
       </svg>
       {children && <span className="absolute inset-0 grid place-items-center">{children}</span>}
@@ -97,7 +103,7 @@ export function SectionHead({ title, meta, action, className }: { title: ReactNo
   return (
     <div className={cn('flex min-h-[32px] items-end justify-between gap-3', className)}>
       <div className="flex min-w-0 items-baseline gap-2">
-        <h2 className="text-[15.5px] font-semibold tracking-[-0.02em]">{title}</h2>
+        <h2 className="text-[16px] font-semibold tracking-[-0.025em]">{title}</h2>
         {meta && <span className="truncate text-[12.5px] text-ink-3">{meta}</span>}
       </div>
       {action}

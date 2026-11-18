@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { Check, FileUp, Smartphone } from 'lucide-react';
-import { Button, cn, Sheet, toast } from '@/components/ui';
+import { Badge, Button, cn, IconTile, Sheet, toast } from '@/components/ui';
 import { todayISO, uid } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import type { Client } from '@/lib/types';
@@ -8,7 +8,7 @@ import { isProName } from '../lib';
 import { importFromProvider, parseContacts } from '../service';
 
 const GoogleMark = () => (
-  <span className="grid h-5 w-5 place-items-center rounded-full border border-line2 text-[11px] font-bold text-brand">G</span>
+  <span className="grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[11px] bg-pale-b text-[13px] font-bold text-deep-b">G</span>
 );
 
 export function ImportSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -60,18 +60,18 @@ export function ImportSheet({ open, onClose }: { open: boolean; onClose: () => v
     >
       {!rows.length ? (
         <div className="space-y-2.5">
-          <button onClick={() => provider('iphone')} className="flex min-h-[60px] w-full items-center gap-3 rounded-xl border border-line px-4 text-left hover:bg-sub">
-            <Smartphone className="h-5 w-5 text-ink-2" strokeWidth={1.75} />
+          <button onClick={() => provider('iphone')} className="row-card min-h-[64px] w-full text-left">
+            <IconTile icon={<Smartphone />} tone="neutral" size="row" />
             <span className="flex-1"><span className="block text-[14px] font-medium">Contacts de l'iPhone</span><span className="text-xs text-ink-3">Choisissez qui importer, rien d'autre n'est lu</span></span>
             {busy === 'iphone' && <span className="text-xs text-ink-3">Lecture…</span>}
           </button>
-          <button onClick={() => provider('google')} className="flex min-h-[60px] w-full items-center gap-3 rounded-xl border border-line px-4 text-left hover:bg-sub">
+          <button onClick={() => provider('google')} className="row-card min-h-[64px] w-full text-left">
             <GoogleMark />
             <span className="flex-1"><span className="block text-[14px] font-medium">Contacts Google</span><span className="text-xs text-ink-3">Gmail et téléphones Android</span></span>
             {busy === 'google' && <span className="text-xs text-ink-3">Connexion…</span>}
           </button>
-          <button onClick={() => fileRef.current?.click()} className="flex min-h-[96px] w-full flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-line2 bg-sub/60 px-4 text-center hover:bg-sub">
-            <FileUp className="h-5 w-5 text-ink-2" strokeWidth={1.75} />
+          <button onClick={() => fileRef.current?.click()} className="group flex min-h-[110px] w-full flex-col items-center justify-center gap-1.5 rounded-card border-[1.5px] border-dashed border-[#d9cff0] bg-white/60 px-4 text-center transition-colors hover:border-[#c4b5fd] hover:bg-white">
+            <IconTile icon={<FileUp />} tone="violet" size="md" className="transition-transform duration-300 ease-spring group-hover:-translate-y-0.5" />
             <span className="text-[14px] font-medium">Fichier CSV, Excel enregistré en CSV ou vCard</span>
             <span className="text-xs text-ink-3">Export d'Obat, Tolteck, Batappli, EBP… Les colonnes sont reconnues toutes seules.</span>
           </button>
@@ -80,15 +80,15 @@ export function ImportSheet({ open, onClose }: { open: boolean; onClose: () => v
       ) : (
         <div>
           <div className="mb-2 text-xs text-ink-3">{rows.length} contacts trouvés dans {from}</div>
-          <div className="overflow-hidden rounded-xl border border-line">
+          <div className="overflow-hidden rounded-card-sm bg-white shadow-halo-sm">
             {rows.map((r, i) => (
-              <button key={i} onClick={() => setRows((x) => x.map((y, j) => (j === i ? { ...y, pick: !y.pick } : y)))} className="flex min-h-[56px] w-full items-center gap-3 border-b border-line px-3 text-left last:border-b-0 hover:bg-sub">
-                <span className={cn('grid h-5 w-5 shrink-0 place-items-center rounded-md border', r.pick ? 'border-ink bg-ink text-white' : 'border-line2')}>{r.pick && <Check className="h-3.5 w-3.5" />}</span>
+              <button key={i} onClick={() => setRows((x) => x.map((y, j) => (j === i ? { ...y, pick: !y.pick } : y)))} className="flex min-h-[56px] w-full items-center gap-3 border-b border-halo-line px-3.5 text-left transition-colors last:border-b-0 hover:bg-halo-hover">
+                <span className={cn('grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full border-[1.5px] transition-all duration-300 ease-spring', r.pick ? 'scale-100 border-transparent bg-deep-v text-white' : 'scale-90 border-[#dcd5ee]')}>{r.pick && <Check className="h-3.5 w-3.5" />}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13.5px] font-medium">{r.name}</span>
                   <span className="block truncate text-xs text-ink-3">{[r.phone, r.email, r.city].filter(Boolean).join(' · ') || 'Pas de coordonnées'}</span>
                 </span>
-                {r.dup && <span className="text-[11.5px] text-warn">Déjà client</span>}
+                {r.dup && <Badge tone="warn">Déjà client</Badge>}
               </button>
             ))}
           </div>

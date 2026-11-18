@@ -38,12 +38,12 @@ export default function Secretaire() {
   return (
     <div className="space-y-6">
       <PageHeader
-        icon={<IconTile name="PhoneCall" dept="bob" size="lg" solid />}
+        icon={<IconTile name="PhoneCall" tone="blue" size="lg" />}
         kicker="Bob"
         title="Secrétaire téléphonique"
         subtitle="Quand tu ne peux pas décrocher, Bob répond, comprend la demande et prend les rendez-vous."
         actions={
-          <span className={cn('inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium shadow-card', sec.enabled ? 'bg-white text-ink' : 'bg-sub text-ink-3')}>
+          <span className={cn('inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium', sec.enabled ? 'glass text-ink' : 'bg-halo-track text-ink-3')}>
             {sec.enabled ? <LiveDot /> : <span className="h-2 w-2 rounded-full bg-ink-3" />}
             {sec.enabled ? <>Bob décroche au <span className="num">{BOB_LINE}</span></> : 'Secrétaire coupée'}
           </span>
@@ -53,7 +53,7 @@ export default function Secretaire() {
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.5fr_1fr]">
         <div className="space-y-5">
-          <Card className="grid grid-cols-3 divide-x divide-line">
+          <Card className="grid grid-cols-3 divide-x divide-halo-line">
             <Kpi label="Appels traités" value={23} sub="ce mois" />
             <Kpi label="Rendez-vous pris" value={7} sub="sans toi" />
             <Kpi label="À rappeler" value={todo} sub={todo ? 'maintenant' : 'tout est fait'} strong={todo > 0} />
@@ -65,9 +65,9 @@ export default function Secretaire() {
               const isOpen = open === c.id;
               const done = callsDone[c.id];
               return (
-                <div key={c.id} className="border-b border-line last:border-b-0">
-                  <button onClick={() => setOpen(isOpen ? null : c.id)} className="flex w-full items-start gap-3 px-4 py-3.5 text-left hover:bg-[#fafafc]">
-                    <span className={cn('relative mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors', done ? 'bg-ok-bg text-ok' : c.urgency === 'urgent' ? 'bg-bad-bg text-bad' : 'bg-sub text-ink-2')}>
+                <div key={c.id} className="border-b border-halo-line last:border-b-0">
+                  <button onClick={() => setOpen(isOpen ? null : c.id)} className="flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-halo-hover">
+                    <span className={cn('relative mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full transition-colors', done ? 'bg-ok-bg text-ok' : c.urgency === 'urgent' ? 'bg-pale-r text-deep-r' : 'bg-pale-b text-deep-b')}>
                       {done ? <SuccessDot size={20} /> : <Phone className="h-4 w-4" strokeWidth={1.75} />}
                       {!done && c.urgency === 'urgent' && <span className="absolute inset-0 animate-ping2 rounded-full ring-2 ring-[#ef444466]" aria-hidden />}
                     </span>
@@ -89,13 +89,13 @@ export default function Secretaire() {
                   </button>
                   {isOpen && (
                     <div className="animate-fade-up space-y-3 px-4 pb-4 sm:pl-16">
-                      <div className="rounded-[12px] bg-sub p-3">
+                      <div className="rounded-card-sm bg-halo-hover p-3">
                         <div className="mb-2 text-[11.5px] font-medium text-ink-3">Transcription · {c.duration}</div>
                         <div className="space-y-2">
                           <div className="stagger-fast space-y-2">
                           {c.transcript.map((t, i) => (
                             <div key={i} className={cn('flex', t.who === 'client' && 'justify-end')}>
-                              <div className={cn('max-w-[88%] rounded-[12px] px-3 py-2 text-[13px] leading-snug', t.who === 'bob' ? 'bg-white text-ink' : 'bg-ink text-white')}>
+                              <div className={cn('max-w-[88%] rounded-[16px] px-3 py-2 text-[13px] leading-snug', t.who === 'bob' ? 'bg-white text-ink shadow-halo-sm' : 'bg-ink text-white')}>
                                 {t.text}
                               </div>
                             </div>
@@ -105,7 +105,7 @@ export default function Secretaire() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {c.phone !== 'Masqué' && (
-                          <a href={`tel:${c.phone.replace(/\s/g, '')}`} className="inline-flex h-10 items-center gap-2 rounded-[10px] bg-ink px-4 text-sm font-medium text-white">
+                          <a href={`tel:${c.phone.replace(/\s/g, '')}`} className="inline-flex h-10 items-center gap-2 rounded-full bg-ink px-4 text-sm font-medium text-white shadow-ink">
                             <Phone className="h-4 w-4" /> Rappeler
                           </a>
                         )}
@@ -166,7 +166,7 @@ export default function Secretaire() {
                   {[2, 3, 4, 5, 6].map((n) => <option key={n} value={n}>{n} sonneries (environ {n * 5} secondes)</option>)}
                 </Select>
               </Field>
-              <div className="rounded-[12px] border border-line bg-sub p-3">
+              <div className="rounded-card-sm bg-halo-hover p-3">
                 <div className="text-[12px] text-ink-2">Sur ton portable, compose ce code puis appuie sur Appeler :</div>
                 <div className="mt-1 flex items-center gap-2">
                   <code className="num min-w-0 flex-1 truncate font-mono text-[15px] font-semibold">{forwardCode}</code>

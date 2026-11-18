@@ -31,15 +31,15 @@ export default function IntegrationsTab() {
       </p>
       {cats.map((cat) => (
         <section key={cat}>
-          <h3 className="eyebrow mb-2 px-1">{cat}</h3>
+          <h3 className="mb-2.5 px-1 text-[14.5px] font-semibold tracking-[-0.02em]">{cat}</h3>
           <Card className="overflow-hidden">
             {INTEGRATIONS.filter((i) => i.category === cat).map((i) => {
               const on = connected[i.key];
               return (
-                <div key={i.key} className="flex items-center gap-3.5 border-b border-line px-4 py-3.5 last:border-b-0 md:px-5">
-                  <span className={cn('relative grid h-10 w-10 shrink-0 place-items-center rounded-[11px] text-[13px] font-bold text-white transition-[filter,opacity] duration-300', !on && 'opacity-90 saturate-[.7]')} style={{ background: i.color, boxShadow: `inset 0 1px 0 rgba(255,255,255,.25), 0 4px 10px -5px ${i.color}` }}>
+                <div key={i.key} className="flex items-center gap-3.5 border-b border-halo-line px-4 py-3.5 transition-colors last:border-b-0 hover:bg-halo-hover md:px-5">
+                  <span className={cn('relative grid h-10 w-10 shrink-0 place-items-center rounded-tile text-[13px] font-bold text-white transition-[filter,opacity] duration-300', !on && 'opacity-90 saturate-[.7]')} style={{ background: i.color, boxShadow: `inset 0 1px 0 rgba(255,255,255,.25), 0 4px 10px -5px ${i.color}` }}>
                     {i.initials}
-                    {on && <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 animate-pop rounded-full bg-[#22c55e] ring-2 ring-white" />}
+                    {on && <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 animate-pop rounded-full bg-[#10b981] ring-2 ring-white" />}
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="text-[14px] font-semibold tracking-[-0.01em]">{i.name}</div>
@@ -57,13 +57,13 @@ export default function IntegrationsTab() {
           </Card>
         </section>
       ))}
-      <Link to="/app/bob/mcp" className="lift group flex items-center gap-3.5 rounded-[16px] bg-white p-4 shadow-card md:px-5">
+      <Link to="/app/bob/mcp" className="lift group flex items-center gap-3.5 rounded-card bg-white p-4 shadow-halo md:px-5">
         <IconTile name="Plug" dept="bob" size="md" />
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-semibold">Assistants IA (Claude, ChatGPT)</div>
           <p className="text-[12.5px] text-ink-2">Pilotez Brix depuis votre assistant avec Brix AI MCP.</p>
         </div>
-        <ArrowRight className="h-4 w-4 text-ink-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-ink" />
+        <ArrowRight className="h-4 w-4 shrink-0 text-ink-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-ink" />
       </Link>
     </div>
   );

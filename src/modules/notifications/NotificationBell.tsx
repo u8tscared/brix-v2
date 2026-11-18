@@ -20,7 +20,7 @@ import '@/parcours/parcours.css';
 function Icone({ n, taille = 40 }: { n: Notif; taille?: number }) {
   const a = APPARENCE[n.type];
   return (
-    <span className="grid shrink-0 place-items-center rounded-[12px]" style={{ width: taille, height: taille, background: a.fond, color: a.encre }}>
+    <span className="grid shrink-0 place-items-center rounded-tile" style={{ width: taille, height: taille, background: a.fond, color: a.encre }}>
       <a.I className="h-[18px] w-[18px]" strokeWidth={1.9} />
     </span>
   );
@@ -28,7 +28,7 @@ function Icone({ n, taille = 40 }: { n: Notif; taille?: number }) {
 
 function Ligne({ n, onClick }: { n: Notif; onClick: () => void }) {
   return (
-    <button onClick={onClick} className="group relative flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-page">
+    <button onClick={onClick} className="group relative flex w-full items-start gap-3 rounded-card-sm px-3 py-3 text-left transition duration-300 ease-out-quint hover:bg-white hover:shadow-halo-sm">
       <Icone n={n} />
       <span className="min-w-0 flex-1">
         <span className="flex items-start gap-2">
@@ -37,7 +37,7 @@ function Ligne({ n, onClick }: { n: Notif; onClick: () => void }) {
         </span>
         {n.texte && <span className="mt-0.5 block truncate text-[12.5px] text-ink-3">{n.texte}</span>}
       </span>
-      {!n.lu && <span className="absolute right-3 top-[38px] h-2 w-2 rounded-full bg-[#d946ef]" />}
+      {!n.lu && <span className="absolute right-3 top-[38px] h-2 w-2 rounded-full bg-[#d946ef] shadow-[0_0_0_3px_rgba(217,70,239,.15)]" />}
     </button>
   );
 }
@@ -49,25 +49,27 @@ function Panneau({ onClose, onAller }: { onClose: () => void; onAller: (n: Notif
   const liste = filtre === 'tout' ? items : items.filter((n) => !n.lu);
   const nonLues = items.filter((n) => !n.lu).length;
   return (
-    <div className="bx-root flex h-full flex-col">
+    <div className="bx-root relative isolate flex h-full flex-col">
+      <div aria-hidden className="pointer-events-none absolute -right-20 -top-28 -z-10 h-56 w-80 rounded-full bg-[radial-gradient(closest-side,#efc9f7,transparent)] opacity-70 blur-2xl" />
+      <div aria-hidden className="pointer-events-none absolute -top-24 left-0 -z-10 h-44 w-64 rounded-full bg-[radial-gradient(closest-side,#d6c6fd,transparent)] opacity-60 blur-2xl" />
       <div className="flex items-center gap-2 px-4 pb-2 pt-4">
         {vue === 'reglages' && (
-          <button onClick={() => setVue('liste')} className="grid h-9 w-9 place-items-center rounded-full hover:bg-page" aria-label="Retour">
+          <button onClick={() => setVue('liste')} className="grid h-9 w-9 place-items-center rounded-full transition hover:bg-white hover:shadow-pill" aria-label="Retour">
             <ArrowLeft className="h-4 w-4" />
           </button>
         )}
-        <h2 className="flex-1 text-[17px] font-semibold tracking-[-0.02em]">{vue === 'liste' ? 'Notifications' : 'Réglages'}</h2>
+        <h2 className="flex-1 text-[20px] font-semibold tracking-[-0.035em]">{vue === 'liste' ? 'Notifications' : 'Réglages'}</h2>
         {vue === 'liste' && nonLues > 0 && (
-          <button onClick={toutLire} className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium text-ink-2 hover:bg-page hover:text-ink">
+          <button onClick={toutLire} className="inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[12.5px] font-medium text-ink-2 transition hover:bg-white hover:text-ink hover:shadow-pill">
             <CheckCheck className="h-4 w-4" /> Tout lu
           </button>
         )}
         {vue === 'liste' && (
-          <button onClick={() => setVue('reglages')} className="grid h-9 w-9 place-items-center rounded-full text-ink-2 hover:bg-page hover:text-ink" aria-label="Réglages des notifications">
+          <button onClick={() => setVue('reglages')} className="grid h-9 w-9 place-items-center rounded-full text-ink-2 transition hover:bg-white hover:text-ink hover:shadow-pill" aria-label="Réglages des notifications">
             <Settings2 className="h-4 w-4" strokeWidth={1.75} />
           </button>
         )}
-        <button onClick={onClose} className="grid h-9 w-9 place-items-center rounded-full text-ink-2 hover:bg-page hover:text-ink md:hidden" aria-label="Fermer">
+        <button onClick={onClose} className="grid h-10 w-10 place-items-center rounded-full bg-white/80 text-ink-2 shadow-pill transition hover:text-ink md:hidden" aria-label="Fermer">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -77,14 +79,14 @@ function Panneau({ onClose, onAller }: { onClose: () => void; onAller: (n: Notif
         </div>
       ) : (
         <>
-          <div className="flex gap-1 px-4 pb-2">
+          <div className="mx-4 mb-2 flex w-fit gap-1 rounded-full bg-halo-track/80 p-1">
             {(
               [
                 ['tout', 'Toutes'],
                 ['non_lu', `Non lues${nonLues ? ` · ${nonLues}` : ''}`],
               ] as const
             ).map(([k, l]) => (
-              <button key={k} onClick={() => setFiltre(k)} className={cn('h-8 rounded-full px-3 text-[12.5px] font-medium transition', filtre === k ? 'bg-ink text-white' : 'text-ink-2 hover:bg-page')}>
+              <button key={k} onClick={() => setFiltre(k)} aria-pressed={filtre === k} className={cn('h-8 rounded-full px-3.5 text-[12.5px] font-medium transition duration-300 ease-spring', filtre === k ? 'bg-white text-ink shadow-pill' : 'text-ink-2 hover:text-ink')}>
                 {l}
               </button>
             ))}
@@ -92,10 +94,10 @@ function Panneau({ onClose, onAller }: { onClose: () => void; onAller: (n: Notif
           <div className="min-h-0 flex-1 overflow-y-auto px-1.5 pb-3">
             {liste.length === 0 ? (
               <div className="grid place-items-center px-6 py-14 text-center">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-page">
-                  <BellOff className="h-5 w-5 text-ink-3" strokeWidth={1.75} />
+                <span className="grid h-14 w-14 animate-float place-items-center rounded-[18px] bg-white text-deep-v shadow-halo-lg">
+                  <BellOff className="h-6 w-6" strokeWidth={1.75} />
                 </span>
-                <div className="mt-3 text-[14px] font-semibold">Tout est calme</div>
+                <div className="mt-4 text-[16px] font-semibold tracking-[-0.025em]">Tout est calme</div>
                 <p className="mt-1 max-w-[260px] text-[12.5px] leading-relaxed text-ink-3">Vous serez prévenu dès qu’un client ouvre, signe ou paie, ou qu’un fournisseur répond.</p>
               </div>
             ) : (
@@ -109,7 +111,7 @@ function Panneau({ onClose, onAller }: { onClose: () => void; onAller: (n: Notif
               ))
             )}
           </div>
-          <a href={lienPublic('boite')} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 border-t border-line text-[12.5px] font-medium text-ink-2 hover:bg-page hover:text-ink">
+          <a href={lienPublic('boite')} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 border-t border-white/70 text-[12.5px] font-medium text-ink-2 transition hover:bg-white/70 hover:text-ink">
             <Inbox className="h-4 w-4" strokeWidth={1.75} /> Voir les e-mails envoyés par Brix
           </a>
         </>
@@ -127,9 +129,9 @@ function Banniere({ n, onAller, onFermer }: { n: Notif; onAller: () => void; onF
   const fort = n.type === 'devis_signe' || n.type === 'paiement_recu';
   return createPortal(
     <div className="bx-root pointer-events-none fixed inset-x-0 top-0 z-[90] flex justify-center px-3 pt-[calc(10px+var(--safe-t))]">
-      <div role="status" className="bx-banner pointer-events-auto flex w-full max-w-[420px] items-center gap-3 rounded-[22px] bg-[#15122a]/95 p-2.5 pr-3 text-white shadow-[0_24px_60px_-20px_rgba(21,18,42,.7)] backdrop-blur-xl">
+      <div role="status" className="bx-banner glass-strong pointer-events-auto flex w-full max-w-[420px] items-center gap-3 rounded-card p-2.5 pr-3 text-ink shadow-[inset_0_0_0_1px_rgba(255,255,255,.9),0_24px_60px_-20px_rgba(60,30,120,.45)]">
         <button onClick={onAller} className="flex min-w-0 flex-1 items-center gap-3 text-left">
-          <span className={cn('relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px]', fort ? 'bx-dawn' : 'bg-white/10')}>
+          <span className={cn('relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px]', fort ? 'bx-dawn text-white' : 'bg-pale-v text-deep-v')}>
             {(() => {
               const I = APPARENCE[n.type].I;
               return <I className="h-5 w-5" strokeWidth={1.9} />;
@@ -138,10 +140,10 @@ function Banniere({ n, onAller, onFermer }: { n: Notif; onAller: () => void; onF
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-[14px] font-semibold">{n.titre}</span>
-            <span className="block truncate text-[12.5px] text-white/65">{n.montant ? `${money(n.montant)} · ` : ''}{n.texte}</span>
+            <span className="block truncate text-[12.5px] text-ink-2">{n.montant ? `${money(n.montant)} · ` : ''}{n.texte}</span>
           </span>
         </button>
-        <button onClick={onFermer} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-white/60 hover:bg-white/10 hover:text-white" aria-label="Fermer">
+        <button onClick={onFermer} className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-3 transition hover:bg-white hover:text-ink" aria-label="Fermer">
           <X className="h-4 w-4" />
         </button>
       </div>
@@ -201,28 +203,29 @@ export function NotificationBell({ variant = 'desktop' }: { variant?: 'desktop' 
         onClick={() => setOpen((o) => !o)}
         className={cn(
           'group relative grid place-items-center text-ink-2 transition hover:text-ink',
-          variant === 'desktop' ? 'h-9 w-9 rounded-[10px] bg-white shadow-card hover:shadow-raise' : 'h-11 w-11 rounded-full',
+          variant === 'desktop' ? 'h-9 w-9 rounded-full hover:bg-white hover:shadow-pill' : 'h-11 w-11 rounded-full',
+          open && variant === 'desktop' && 'bg-white text-ink shadow-pill',
         )}
         aria-label={`Notifications${nonLues ? `, ${nonLues} non lues` : ''}`}
         aria-expanded={open}
       >
         <Bell className={cn(variant === 'desktop' ? 'h-4 w-4' : 'h-[18px] w-[18px]', secoue && 'bx-bell')} strokeWidth={1.75} />
         {nonLues > 0 && (
-          <span key={nonLues} className="bx-pop absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#d946ef] px-1 text-[10.5px] font-semibold text-white ring-2 ring-white">
+          <span key={nonLues} className="bx-pop absolute -right-1 -top-1 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-dawn px-1 text-[10.5px] font-semibold text-white shadow-[0_4px_10px_-3px_rgba(217,70,239,.6)] ring-2 ring-white">
             {nonLues > 9 ? '9+' : nonLues}
           </span>
         )}
       </button>
 
       {open && variant === 'desktop' && (
-        <div className="bx-pop absolute right-0 top-11 z-50 h-[560px] max-h-[calc(100dvh-90px)] w-[400px] origin-top-right overflow-hidden rounded-[22px] bg-white shadow-[0_0_0_1px_rgba(21,18,42,.06),0_30px_70px_-24px_rgba(30,15,70,.4)]">
+        <div role="dialog" aria-label="Notifications" className="bx-pop absolute right-0 top-12 bg-[rgba(252,251,255,.96)] backdrop-blur-2xl z-50 h-[560px] max-h-[calc(100dvh-90px)] w-[400px] origin-top-right overflow-hidden rounded-[26px] shadow-[inset_0_0_0_1px_rgba(255,255,255,.9),0_30px_70px_-24px_rgba(60,30,120,.38)]">
           <Panneau onClose={() => setOpen(false)} onAller={aller} />
         </div>
       )}
       {open &&
         variant === 'mobile' &&
         createPortal(
-          <div className="fixed inset-0 z-[80] flex flex-col bg-white pt-safe">
+          <div role="dialog" aria-label="Notifications" className="fixed inset-0 z-[80] flex flex-col bg-[#f7f5fc] pt-safe">
             <div className="bx-rise min-h-0 flex-1">
               <Panneau onClose={() => setOpen(false)} onAller={aller} />
             </div>

@@ -74,7 +74,7 @@ export function LineSheet({ line, onClose, h }: { line?: DevisLigne; onClose: ()
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {UNITS.map((u) => (
-                  <button key={u} onClick={() => set({ unit: u })} className={`h-9 min-w-[44px] rounded-lg border px-2.5 text-[13px] ${l.unit === u ? 'border-ink bg-ink text-white' : 'border-line2 bg-white text-ink-2'}`}>
+                  <button key={u} onClick={() => set({ unit: u })} className={`h-10 min-w-[44px] rounded-full px-3 text-[13px] transition duration-300 ease-spring ${l.unit === u ? 'bg-ink text-white shadow-ink' : 'bg-white text-ink-2 shadow-[0_0_0_1px_#ece8f6]'}`}>
                     {u}
                   </button>
                 ))}
@@ -82,12 +82,12 @@ export function LineSheet({ line, onClose, h }: { line?: DevisLigne; onClose: ()
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Prix unitaire HT">
-                <div className="rounded-[10px] border border-line2">
+                <div className="rounded-field bg-white shadow-[0_0_0_1px_#ece8f6]">
                   <NumInput value={l.unitPriceHt} onChange={(v) => set({ unitPriceHt: v, source: l.source === 'bibliotheque' ? 'manuel' : l.source })} ariaLabel="Prix unitaire HT" className="h-11 text-[15px]" />
                 </div>
               </Field>
               <Field label="Coût d'achat HT" hint={l.unitPriceHt ? `Marge ${pct(margin)}` : undefined}>
-                <div className="rounded-[10px] border border-line2">
+                <div className="rounded-field bg-white shadow-[0_0_0_1px_#ece8f6]">
                   <NumInput value={l.unitCostHt} onChange={(v) => set({ unitCostHt: v })} ariaLabel="Coût d'achat HT" className="h-11 text-[15px]" />
                 </div>
               </Field>
@@ -96,9 +96,9 @@ export function LineSheet({ line, onClose, h }: { line?: DevisLigne; onClose: ()
               <span className="mb-1.5 block text-[12.5px] font-medium text-ink-2">TVA</span>
               <Segmented value={String(l.vatRate)} onChange={(v) => set({ vatRate: Number(v) })} options={VAT_RATES.map((r) => ({ value: String(r), label: `${num(r, 1)} %` }))} />
             </div>
-            <div className="flex items-center justify-between rounded-xl bg-sub px-4 py-3">
+            <div className="flex items-center justify-between rounded-card-sm bg-dawn-pale px-4 py-3.5">
               <span className="text-[13px] text-ink-2">Total de la ligne</span>
-              <span className="num text-[18px] font-semibold">{money(l.quantity * l.unitPriceHt)} HT</span>
+              <span className="num-halo text-[20px]">{money(l.quantity * l.unitPriceHt)} HT</span>
             </div>
           </>
         )}

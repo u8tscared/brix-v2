@@ -1,9 +1,11 @@
 import { useParams } from 'react-router-dom';
 import { CalendarDays, MapPin } from 'lucide-react';
+import { HaloBackdrop } from '@/components/layout/HaloBackdrop';
+import { Ring } from '@/components/motion';
 import '@/parcours/parcours.css';
 import { EnTete } from './ui/EnTete';
 import { LogoIcon } from '@/components/brand/Logo';
-import { Avatar, Toaster } from '@/components/ui';
+import { Avatar, Card, Toaster } from '@/components/ui';
 import { dateLong } from '@/lib/format';
 import { Chat, Review } from '@/modules/visibilite/portal/Chat';
 import { usePortalData } from '@/modules/visibilite/portal/data';
@@ -21,33 +23,43 @@ export default function ClientPortal() {
   const civ = d.client.kind === 'particulier' ? first : d.client.contact ?? d.client.name;
 
   return (
-    <div className="bx-root relative min-h-dvh overflow-x-clip bg-page">
-      <div className="bx-sky bx-sky-top" />
+    <div className="bx-root relative isolate min-h-dvh overflow-x-clip">
+      <HaloBackdrop />
       <EnTete company={d.company} sous="Votre espace chantier" />
 
-      <main className="bx-stagger relative mx-auto max-w-[560px] space-y-3.5 px-4 pb-[calc(32px+var(--safe-b))] pt-5">
-        <div className="px-1">
-          <h1 className="text-[32px] font-semibold leading-tight tracking-[-0.04em]">Bonjour {civ}</h1>
+      <main className="bx-stagger relative mx-auto max-w-[560px] space-y-3.5 px-4 pb-[calc(32px+var(--safe-b))] pt-7">
+        <div className="px-1 pb-1">
+          <h1 className="title-halo">
+            Bonjour {civ},
+            <br />
+            <span className="text-halo-mute">votre chantier avance.</span>
+          </h1>
           {settings.welcome && (
             <div className="mt-3 flex items-start gap-2.5">
-              {boss && <Avatar initials={boss.initials} color="#1F389D" size={32} />}
-              <p className="rounded-[18px] rounded-tl-md bg-white px-3.5 py-2.5 text-[14px] leading-relaxed text-ink-2 shadow-[0_0_0_1px_#ececf1]">{settings.welcome}</p>
+              {boss && <Avatar initials={boss.initials} size={32} />}
+              <p className="rounded-[18px] rounded-tl-md bg-white px-3.5 py-2.5 text-[14px] leading-relaxed text-ink-2 shadow-halo">{settings.welcome}</p>
             </div>
           )}
         </div>
 
-        <PCard>
-          <div className="text-[12.5px] font-medium text-ink-3">{d.chantier.name.split('·')[0].trim()}</div>
-          <div className="mt-1 flex items-end justify-between gap-3">
-            <span className="num font-display text-[52px] font-semibold leading-none tracking-[-0.03em] dawn-text">{d.chantier.progress} %</span>
-            <span className="pb-1.5 text-right text-[12.5px] text-ink-2">des travaux<br />réalisés</span>
+        <Card className="p-5 sm:p-6">
+          <div className="flex items-center gap-5 sm:gap-7">
+            <Ring value={d.chantier.progress} size={124} stroke={11} tone="dawn">
+              <span className="flex flex-col items-center">
+                <span className="num-halo text-[28px] leading-none">{d.chantier.progress} %</span>
+                <span className="mt-1 text-[11.5px] font-medium text-ink-3">réalisés</span>
+              </span>
+            </Ring>
+            <div className="min-w-0 flex-1">
+              <div className="label-halo">{d.chantier.name.split('·')[0].trim()}</div>
+              <div className="mt-1 text-[22px] font-semibold leading-tight tracking-[-0.035em]">{d.chantier.progress >= 100 ? 'Travaux terminés' : d.chantier.progress >= 50 ? 'Plus de la moitié faite' : 'Le chantier est lancé'}</div>
+              <div className="mt-3 space-y-1.5 text-[13px]">
+                <div className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-deep-p" strokeWidth={1.9} /><span className="text-ink-2">{d.chantier.address}, {d.chantier.city}</span></div>
+                <div className="flex items-start gap-2"><CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-deep-v" strokeWidth={1.9} /><span className="text-ink-2">Fin prévue {dateLong(d.chantier.endDate)}</span></div>
+              </div>
+            </div>
           </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-sub"><div className="h-full rounded-full bg-ink transition-[width] duration-1000" style={{ width: `${d.chantier.progress}%` }} /></div>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-[13px]">
-            <div className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ink-3" strokeWidth={1.75} /><span className="text-ink-2">{d.chantier.address}, {d.chantier.city}</span></div>
-            <div className="flex items-start gap-2"><CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-ink-3" strokeWidth={1.75} /><span className="text-ink-2">Fin prévue {dateLong(d.chantier.endDate)}</span></div>
-          </div>
-        </PCard>
+        </Card>
 
         {settings.nextVisit && (
           <PCard title="Prochain passage">
@@ -87,7 +99,7 @@ export default function ClientPortal() {
 
         <footer className="flex flex-col items-center gap-1.5 pb-2 pt-4 text-center text-[11.5px] text-ink-3">
           <span>{d.company.legalName} · SIRET {d.company.siret}</span>
-          <span className="flex items-center gap-1.5">Espace sécurisé par <LogoIcon className="h-4 w-4" /> Brix</span>
+          <span className="glass mt-2 inline-flex items-center gap-1.5 rounded-full px-3.5 py-2">Espace sécurisé par <LogoIcon className="h-4 w-4" /> <b className="font-semibold text-ink">Brix</b></span>
         </footer>
       </main>
       <Toaster />

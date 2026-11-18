@@ -34,7 +34,7 @@ export function invoiceDoc({ f, company, client, extra, devis, chantier, origina
     node: (
       <div className="flex items-start justify-between gap-6">
         <div className="flex items-start gap-3.5">
-          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-[10px] bg-[#15122a] text-[13px] font-semibold text-white">{company.logoInitials || company.name.slice(0, 2).toUpperCase()}</div>
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-[13px] bg-[#15122a] text-[13px] font-semibold text-white">{company.logoInitials || company.name.slice(0, 2).toUpperCase()}</div>
           <div>
             <div className="text-[15px] font-semibold tracking-[-0.01em]">{company.name}</div>
             <div className={`mt-0.5 text-[10.5px] leading-[1.55] ${MUTED}`}>
@@ -64,8 +64,14 @@ export function invoiceDoc({ f, company, client, extra, devis, chantier, origina
   });
 
   blocks.push({
+    key: 'dawn',
+    gap: 16,
+    node: <div className="h-[3px] w-[44px] rounded-full" style={{ background: 'linear-gradient(90deg,#6d28d9,#d946ef 62%,#fb923c)', WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }} />,
+  });
+
+  blocks.push({
     key: 'parties',
-    gap: 26,
+    gap: 16,
     node: (
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-[8px] bg-[#f6f5fa] p-3.5">

@@ -14,7 +14,7 @@ export function Suggestions({ items, onPick, className = '' }: { items: string[]
   return (
     <div className={`stagger-fast flex flex-wrap gap-1.5 ${className}`}>
       {items.map((s) => (
-        <button key={s} type="button" onClick={() => onPick(s)} className="group flex min-h-[36px] items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-left text-[12.5px] text-ink-2 shadow-[0_0_0_1px_var(--line2)] transition hover:text-ink hover:shadow-[0_0_0_1px_#cfc4f5,0_4px_12px_-6px_rgba(109,40,217,.35)] active:scale-[.98]">
+        <button key={s} type="button" onClick={() => onPick(s)} className="group flex min-h-[36px] items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-left text-[12.5px] text-ink-2 shadow-halo-sm transition duration-300 ease-spring hover:-translate-y-px hover:text-ink hover:shadow-[0_0_0_1px_#e9b8f5,0_8px_20px_-10px_rgba(217,70,239,.35)] active:scale-[.98]">
           {s}
           <ArrowUpRight className="h-3 w-3 shrink-0 text-ink-3 transition group-hover:text-vi-700" />
         </button>
@@ -31,7 +31,7 @@ function BobMessage({ m, last, thinking, onAction, onOpen, onPick }: { m: ChatMe
       <div className="min-w-0 flex-1 space-y-2.5">
         <p className="text-[14px] leading-relaxed text-ink">
           {ready ? m.text : <Typewriter text={m.text} speed={12} onDone={() => { typed.add(m.id); setReady(true); }} />}
-          {!ready && <i className="ml-0.5 inline-block h-[15px] w-[2px] translate-y-[2px] animate-pulse bg-vi-600" aria-hidden />}
+          {!ready && <i className="ml-0.5 inline-block h-[15px] w-[2px] translate-y-[2px] animate-pulse bg-[#d946ef]" aria-hidden />}
         </p>
         {ready && (
           <div className="stagger space-y-2.5">
@@ -71,7 +71,7 @@ export function ChatThread({ messages, thinking, onAction, onOpen, onPick }: {
       {messages.map((m) =>
         m.role === 'user' ? (
           <div key={m.id} className="flex justify-end">
-            <div className="max-w-[85%] origin-bottom-right animate-[scale-in_.25s_var(--ease)_both] rounded-[18px] rounded-br-[6px] bg-ink px-3.5 py-2.5 text-[14px] leading-snug text-white shadow-ink">{m.text}</div>
+            <div className="max-w-[85%] origin-bottom-right animate-[scale-in_.25s_var(--ease)_both] rounded-[20px] rounded-br-[6px] bg-ink px-4 py-2.5 text-[14px] leading-snug text-white shadow-ink">{m.text}</div>
           </div>
         ) : (
           <BobMessage key={m.id} m={m} last={m === lastBob} thinking={thinking} onAction={onAction} onOpen={onOpen} onPick={onPick} />

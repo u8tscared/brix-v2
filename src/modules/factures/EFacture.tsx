@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
-import { IconTile, PageHeader, UnderlineTabs } from '@/components/ui';
+import { ArrowUpRight, FileDown, Inbox as Inbox_, Send, TriangleAlert } from 'lucide-react';
+import { IconTile, PageHeader, UnderlineTabs, type HaloTone } from '@/components/ui';
 import { AnimatedNumber } from '@/components/motion';
 import { useBrix } from '@/lib/store';
 import { Annuaire } from './components/efacture/Annuaire';
@@ -21,7 +21,7 @@ export default function EFacture() {
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={<IconTile name="ShieldCheck" dept="facturer" size="lg" />} title="Facture électronique" subtitle="La réforme 2026-2027, gérée pour vous de bout en bout." />
+      <PageHeader icon={<IconTile name="ShieldCheck" dept="facturer" size="lg" />} kicker="Facturer et encaisser" title="Facture électronique" titleMuted="tout est prêt, rien à apprendre." subtitle="La réforme 2026-2027, gérée pour vous de bout en bout." />
       <UnderlineTabs
         value={tab}
         onChange={setTab}
@@ -38,10 +38,10 @@ export default function EFacture() {
         <div className="space-y-5">
           <Countdown />
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <QuickStat label="Factures envoyées par la plateforme" value={sent} onClick={() => setTab('journal')} />
-            <QuickStat label="Factures fournisseurs à valider" value={todo} onClick={() => setTab('recues')} />
-            <QuickStat label="Factures fournisseurs reçues ce mois" value={SUPPLIER_INVOICES.length} onClick={() => setTab('recues')} />
-            <QuickStat label="Rejets ou litiges" value={factures.filter((f) => f.einvoice.status === 'refusee' || f.einvoice.status === 'litige').length} onClick={() => setTab('journal')} />
+            <QuickStat icon={<Send />} tone="violet" label="Factures envoyées par la plateforme" value={sent} onClick={() => setTab('journal')} />
+            <QuickStat icon={<Inbox_ />} tone="peach" label="Factures fournisseurs à valider" value={todo} onClick={() => setTab('recues')} />
+            <QuickStat icon={<FileDown />} tone="blue" label="Factures fournisseurs reçues ce mois" value={SUPPLIER_INVOICES.length} onClick={() => setTab('recues')} />
+            <QuickStat icon={<TriangleAlert />} tone="rose" label="Rejets ou litiges" value={factures.filter((f) => f.einvoice.status === 'refusee' || f.einvoice.status === 'litige').length} onClick={() => setTab('journal')} />
           </div>
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
             <Checklist />
@@ -60,14 +60,15 @@ export default function EFacture() {
   );
 }
 
-function QuickStat({ label, value, onClick }: { label: string; value: number; onClick: () => void }) {
+function QuickStat({ icon, tone, label, value, onClick }: { icon: React.ReactNode; tone: HaloTone; label: string; value: number; onClick: () => void }) {
   return (
-    <button className="group rounded-[16px] bg-white p-4 text-left shadow-card transition duration-200 hover:-translate-y-px hover:shadow-raise" onClick={onClick}>
-      <div className="num text-[26px] font-semibold tracking-[-0.03em]"><AnimatedNumber value={value} duration={600} /></div>
-      <div className="mt-1 flex items-end justify-between gap-2 text-[12.5px] leading-snug text-ink-2">
-        {label}
-        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-3 transition group-hover:translate-x-0.5" />
+    <button className="lift group flex flex-col rounded-card bg-white p-4 text-left shadow-halo md:p-5" onClick={onClick}>
+      <div className="flex w-full items-start">
+        <IconTile icon={icon} tone={tone} />
+        <ArrowUpRight className="ml-auto h-4 w-4 text-[#b7b3c7] transition duration-300 ease-spring group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink" />
       </div>
+      <div className="num-halo mt-4 text-[30px]"><AnimatedNumber value={value} duration={600} /></div>
+      <div className="mt-1 text-[12.5px] leading-snug text-ink-2">{label}</div>
     </button>
   );
 }

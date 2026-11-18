@@ -19,11 +19,11 @@ export function ModulesStep({ d, set, touched, onReset }: StepProps & { touched:
     <>
       <StepHeader kicker="Étape 4 sur 5" title="Votre Brix, sur mesure" lead="On a coché ce qui vous sert dès demain. Retirez ou ajoutez librement : un outil s'active en un geste, à tout moment." />
 
-      <div className="mb-6 flex items-center gap-4 rounded-[20px] bg-white p-4 shadow-[0_0_0_1px_#ececf1]">
+      <div className="mb-6 flex items-center gap-4 rounded-[20px] bg-white p-4 shadow-halo-sm">
         <div className="text-[34px] font-semibold leading-none tracking-[-0.04em]"><CountUp value={d.enabled.length} /></div>
-        <div className="min-w-0 flex-1 text-[13px] leading-snug text-[#5f5f70]">
+        <div className="min-w-0 flex-1 text-[13px] leading-snug text-ink-2">
           outils dans votre menu<br />
-          Offre <b className="font-semibold text-[#130f26]">{offer.name}</b>, 14 jours d'essai complet
+          Offre <b className="font-semibold text-ink">{offer.name}</b>, 14 jours d'essai complet
         </div>
         {touched && (
           <button type="button" onClick={onReset} className="ob-btn ob-btn-ghost h-11 gap-1.5 px-3 text-[13px]" title="Revenir à la sélection conseillée">
@@ -43,10 +43,10 @@ export function ModulesStep({ d, set, touched, onReset }: StepProps & { touched:
               <div className="mb-2.5 flex items-center gap-2 px-1">
                 <DI className="h-4 w-4" style={{ color: TONE[dep.key].fg }} strokeWidth={1.75} aria-hidden />
                 <h2 id={`ob-d-${dep.key}`} className="text-[14px] font-semibold tracking-[-0.01em]">{dep.name}</h2>
-                <span className="text-[12.5px] text-[#9898a8]">{dep.tagline}</span>
-                <span className="num ml-auto text-[12px] text-[#9898a8]">{n}/{mods.length}</span>
+                <span className="text-[12.5px] text-ink-3">{dep.tagline}</span>
+                <span className="num ml-auto text-[12px] text-ink-3">{n}/{mods.length}</span>
               </div>
-              <div className="overflow-hidden rounded-[18px] bg-white shadow-[0_0_0_1px_#ececf1]">
+              <div className="overflow-hidden rounded-card bg-white shadow-halo-sm">
                 {mods.map((m) => {
                   const on = d.enabled.includes(m.key);
                   const fits = sizeAtLeast(size, m.minSize);
@@ -54,7 +54,7 @@ export function ModulesStep({ d, set, touched, onReset }: StepProps & { touched:
                     <div
                       key={m.key}
                       onClick={() => !m.core && flip(m.key, !on)}
-                      className={`flex min-h-[64px] items-center gap-3 border-b border-[#ececf1] px-4 py-3 last:border-0 ${m.core ? '' : 'cursor-pointer hover:bg-[#fbfbfd]'}`}
+                      className={`flex min-h-[64px] items-center gap-3 border-b border-[#f0edf7] px-4 py-3 last:border-0 ${m.core ? '' : 'cursor-pointer hover:bg-[#fbfbfd]'}`}
                     >
                       <span style={{ opacity: on ? 1 : 0.55, filter: on ? 'none' : 'grayscale(1)', transition: 'opacity .3s, filter .3s' }}>
                         <Tile dept={dep.key} name={m.icon} size={34} />
@@ -62,13 +62,13 @@ export function ModulesStep({ d, set, touched, onReset }: StepProps & { touched:
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-1.5 text-[14px] font-semibold tracking-[-0.01em]">
                           {m.name}
-                          {m.isNew && <span className="rounded-md bg-[#f4f3fa] px-1.5 py-0.5 text-[10.5px] font-medium text-[#5f5f70]">Nouveau</span>}
+                          {m.isNew && <span className="rounded-md bg-[#f3f1f8] px-1.5 py-0.5 text-[10.5px] font-medium text-ink-2">Nouveau</span>}
                           {!planIncludes(plan, m.plan) && <span className="rounded-md bg-[#fff1e7] px-1.5 py-0.5 text-[10.5px] font-medium text-[#c2410c]">Offre {OFFERS.find((o) => o.key === m.plan)!.name}</span>}
                         </span>
-                        <span className="mt-0.5 block text-[12.5px] leading-snug text-[#9898a8]">{fits ? m.short : 'Utile à partir de 2 personnes.'}</span>
+                        <span className="mt-0.5 block text-[12.5px] leading-snug text-ink-3">{fits ? m.short : 'Utile à partir de 2 personnes.'}</span>
                       </span>
                       {m.core ? (
-                        <span className="inline-flex items-center gap-1 text-[12px] text-[#9898a8]"><Lock className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden /> Inclus</span>
+                        <span className="inline-flex items-center gap-1 text-[12px] text-ink-3"><Lock className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden /> Inclus</span>
                       ) : (
                         <Toggle on={on} onChange={(v) => flip(m.key, v)} label={m.name} />
                       )}

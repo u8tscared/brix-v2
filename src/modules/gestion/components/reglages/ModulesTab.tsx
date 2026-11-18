@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Lock, Plus, Search } from 'lucide-react';
-import { Badge, Button, Card, IconTile, Input, Segmented, Switch, cn, toast, DEPT_TONE } from '@/components/ui';
+import { Badge, Button, Card, EmptyState, IconTile, Input, Segmented, Switch, cn, toast, DEPT_TONE } from '@/components/ui';
 import { AnimatedNumber, DrawCheck, Ring } from '@/components/motion';
 import { useBrix } from '@/lib/store';
 import { DEPARTMENTS, MODULES, OFFERS, SIZES, TRADE_BY_KEY, planIncludes, recommendModules, sizeAtLeast, type ModuleDef } from '@/lib/catalog';
@@ -50,13 +50,13 @@ export default function ModulesTab() {
   return (
     <div className="grid items-start gap-6 2xl:grid-cols-[minmax(0,1fr)_250px]">
       <div className="min-w-0 space-y-6">
-        <Card className="relative flex flex-wrap items-center gap-4 overflow-hidden p-4 sm:flex-nowrap sm:p-5">
-          <div aria-hidden className="pointer-events-none absolute -left-10 -top-16 h-48 w-48 rounded-full bg-[radial-gradient(closest-side,#eef0fd,transparent)]" />
-          <Ring value={(activeCount / MODULES.length) * 100} size={64} stroke={6} tone="dawn" className="relative">
-            <span className="text-[15px] font-semibold"><AnimatedNumber value={activeCount} /></span>
+        <Card tone="mist" className="relative flex flex-wrap items-center gap-5 overflow-hidden p-5 sm:flex-nowrap sm:p-6">
+          <div aria-hidden className="pointer-events-none absolute -left-10 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,#f1dcfb,transparent)] opacity-80 blur-xl" />
+          <Ring value={(activeCount / MODULES.length) * 100} size={84} stroke={8} tone="dawn" className="relative">
+            <span className="num-halo text-[24px]"><AnimatedNumber value={activeCount} /></span>
           </Ring>
           <div className="relative min-w-0 flex-1 basis-[200px]">
-            <div className="text-[16px] font-semibold tracking-[-0.02em]">Votre boîte à outils</div>
+            <div className="text-[18px] font-semibold tracking-[-0.03em]">Votre boîte à outils</div>
             <p className="mt-0.5 text-[13px] leading-relaxed text-ink-2">
               {activeCount} modules actifs sur {MODULES.length}. Activez seulement ce qui vous sert : le menu reste simple. Rien n’est perdu quand vous rangez un module.
             </p>
@@ -71,7 +71,7 @@ export default function ModulesTab() {
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center">
           <Input icon={<Search />} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Chercher un module" className="md:max-w-[260px]" />
-          <Segmented value={filter} onChange={setFilter} options={[{ value: 'all', label: 'Tous', count: counts.all }, { value: 'reco', label: 'Conseillés', count: counts.reco }, { value: 'on', label: 'Actifs', count: counts.on }, { value: 'new', label: 'Nouveaux', count: counts.new }]} />
+          <div className="-mx-4 overflow-x-auto px-4 scrollbar-none md:mx-0 md:px-0"><Segmented value={filter} onChange={setFilter} options={[{ value: 'all', label: 'Tous', count: counts.all }, { value: 'reco', label: 'Conseillés', count: counts.reco }, { value: 'on', label: 'Actifs', count: counts.on }, { value: 'new', label: 'Nouveaux', count: counts.new }]} /></div>
         </div>
 
         {DEPARTMENTS.map((d) => {
@@ -80,14 +80,14 @@ export default function ModulesTab() {
           const on = MODULES.filter((m) => m.dept === d.key && isOn(m)).length;
           const total = MODULES.filter((m) => m.dept === d.key).length;
           return (
-            <section key={`${d.key}-${filter}-${q}`} className="animate-[fade-up_.45s_var(--ease)_both]">
+            <section key={`${d.key}-${filter}-${q}`} className="animate-[fade-up_.45s_var(--ease)_both] pt-2">
               <div className="mb-3 flex items-center gap-2.5">
-                <IconTile name={d.icon} dept={d.key} size="sm" />
+                <IconTile name={d.icon} dept={d.key} size="md" />
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-[14.5px] font-semibold tracking-[-0.015em]">{d.name}</h3>
-                  <div className="truncate text-[12px] text-ink-3">{d.tagline}</div>
+                  <h3 className="text-[16px] font-semibold tracking-[-0.025em]">{d.name}</h3>
+                  <div className="truncate text-[12.5px] text-ink-3">{d.tagline}</div>
                 </div>
-                <span className="num text-[12px] font-medium text-ink-3">{on}/{total}</span>
+                <span className="num inline-flex h-[26px] items-center rounded-full px-2.5 text-[12.5px] font-medium" style={{ background: DEPT_TONE[d.key].bg, color: DEPT_TONE[d.key].fg }}>{on}/{total}</span>
               </div>
               <div className="stagger-fast grid gap-3 [&>*]:min-w-0 md:grid-cols-2">
                 {mods.map((m) => (
@@ -98,11 +98,7 @@ export default function ModulesTab() {
           );
         })}
         {DEPARTMENTS.every((d) => !MODULES.some((m) => m.dept === d.key && visible(m))) && (
-          <Card className="px-6 py-12 text-center">
-            <div className="text-[15px] font-semibold">Aucun module ne correspond</div>
-            <p className="mt-1 text-[13px] text-ink-2">Essayez un autre mot.</p>
-            <Button className="mt-4" onClick={() => { setQ(''); setFilter('all'); }}>Tout afficher</Button>
-          </Card>
+          <EmptyState icon={<Search />} title="Aucun module ne correspond" text="Essayez un autre mot." action={<Button onClick={() => { setQ(''); setFilter('all'); }}>Tout afficher</Button>} />
         )}
       </div>
 
@@ -117,17 +113,17 @@ function ModuleCard({ m, on, fresh, reco, allowed, small, onToggle, onUnlock }: 
   const offer = OFFERS.find((o) => o.key === m.plan)!;
   return (
     <div
-      className={cn('group relative flex h-full flex-col rounded-[16px] bg-white p-4 transition-[box-shadow,transform] duration-300 ease-out-quint', on ? 'shadow-[0_0_0_1px_var(--line2),0_6px_18px_-12px_rgba(19,15,38,.25)]' : 'shadow-card hover:shadow-raise')}
-      style={fresh ? { boxShadow: `0 0 0 2px ${t.solid}, 0 10px 24px -14px ${t.fg}` } : undefined}
+      className={cn('group relative flex h-full flex-col overflow-hidden rounded-card-sm p-4 transition-[box-shadow,transform,background] duration-[450ms] ease-out-quint hover:-translate-y-0.5', on ? 'bg-white shadow-halo hover:shadow-halo-lg' : 'bg-white/70 shadow-halo-sm hover:bg-white hover:shadow-halo')}
+      style={fresh ? { boxShadow: `0 0 0 1.5px ${t.ring}, 0 12px 30px -12px ${t.solid}88` } : on ? { boxShadow: `0 0 0 1px ${t.ring}, 0 1px 2px rgba(60,30,120,.04), 0 12px 32px -16px ${t.solid}55` } : undefined}
     >
       <div className="flex items-start gap-3">
         <span key={String(on)} className={cn(on && 'animate-pop')}>
-          <IconTile name={m.icon} dept={m.dept} size="md" solid={on} className={cn(!on && 'opacity-80 grayscale-[.35]')} />
+          <IconTile name={m.icon} dept={m.dept} size="md" className={cn('transition-[filter,opacity] duration-300', !on && 'opacity-70 grayscale-[.6]')} />
         </span>
         <div className="min-w-0 flex-1 pt-0.5">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[14px] font-semibold tracking-[-0.015em]">{m.name}</span>
-            {m.isNew && <span className="rounded-full px-1.5 py-px text-[10.5px] font-semibold uppercase tracking-[.06em]" style={{ background: t.bg, color: t.fg }}>Nouveau</span>}
+            {m.isNew && <span className="inline-flex h-[20px] items-center rounded-full px-2 text-[11px] font-medium" style={{ background: t.bg, color: t.fg }}>Nouveau</span>}
           </div>
           <p className="mt-1 text-[12.5px] leading-snug text-ink-2">{m.short}</p>
         </div>
@@ -137,7 +133,7 @@ function ModuleCard({ m, on, fresh, reco, allowed, small, onToggle, onUnlock }: 
           ) : allowed ? (
             <Switch checked={on} onChange={onToggle} label={m.name} />
           ) : (
-            <button onClick={onUnlock} aria-label={`Débloquer ${m.name}`} className="press grid h-9 w-9 place-items-center rounded-full bg-sub text-ink-2 transition-colors hover:bg-ink hover:text-white">
+            <button onClick={onUnlock} aria-label={`Débloquer ${m.name}`} className="press grid h-9 w-9 place-items-center rounded-full bg-pale-n text-ink-2 transition-colors duration-300 hover:bg-ink hover:text-white">
               <Lock className="h-4 w-4" />
             </button>
           )}

@@ -18,10 +18,10 @@ export function NumField({ label, value, onChange, suffix, hint, min = 0, max, s
   const bump = (d: number) => onChange(clamp(Math.round((value + d) * 100) / 100));
   return (
     <label className={cn('block min-w-0', className)}>
-      <span className="mb-1.5 block truncate text-[12.5px] font-medium text-ink-2">{label}</span>
-      <span className="group/num relative flex h-11 items-center rounded-[11px] border border-line2 bg-white shadow-xs transition-[border-color,box-shadow] duration-200 focus-within:border-vi-400 focus-within:shadow-focus hover:border-[#cfcbdd]">
+      <span className="mb-1.5 block truncate text-[13px] font-medium text-ink-2">{label}</span>
+      <span className="group/num relative flex h-11 items-center rounded-field border border-halo-line bg-white transition-[border-color,box-shadow] duration-200 focus-within:border-vi-300 focus-within:shadow-focus hover:border-[#ddd5f0]">
         {step && (
-          <button type="button" tabIndex={-1} aria-label="Moins" onClick={() => bump(-step)} className="press grid h-full w-9 shrink-0 place-items-center rounded-l-[11px] text-ink-3 transition-colors hover:bg-sub hover:text-ink">
+          <button type="button" tabIndex={-1} aria-label="Moins" onClick={() => bump(-step)} className="press grid h-full w-10 shrink-0 place-items-center rounded-l-field text-ink-3 transition-colors hover:bg-halo-hover hover:text-ink">
             <Minus className="h-3.5 w-3.5" />
           </button>
         )}
@@ -40,7 +40,7 @@ export function NumField({ label, value, onChange, suffix, hint, min = 0, max, s
         />
         {suffix && <span className={cn('pointer-events-none shrink-0 text-[12.5px] text-ink-3', step ? 'pr-1' : 'pr-3')}>{suffix}</span>}
         {step && (
-          <button type="button" tabIndex={-1} aria-label="Plus" onClick={() => bump(step)} className="press grid h-full w-9 shrink-0 place-items-center rounded-r-[11px] text-ink-3 transition-colors hover:bg-sub hover:text-ink">
+          <button type="button" tabIndex={-1} aria-label="Plus" onClick={() => bump(step)} className="press grid h-full w-10 shrink-0 place-items-center rounded-r-field text-ink-3 transition-colors hover:bg-halo-hover hover:text-ink">
             <Plus className="h-3.5 w-3.5" />
           </button>
         )}
@@ -66,12 +66,12 @@ export function Choice<T extends string | number>({ label, value, onChange, opti
   }, [value, options.length]);
   return (
     <div className="min-w-0">
-      <div className="mb-1.5 text-[12.5px] font-medium text-ink-2">{label}</div>
-      <div ref={wrap} role="radiogroup" className="relative flex flex-wrap gap-1 rounded-[12px] bg-[#f1eff6] p-1">
+      <div className="mb-1.5 text-[13px] font-medium text-ink-2">{label}</div>
+      <div ref={wrap} role="radiogroup" className="relative flex flex-wrap gap-1 rounded-[22px] bg-halo-track p-1">
         {box && (
           <span
             aria-hidden
-            className="absolute rounded-[9px] bg-white shadow-[0_1px_2px_rgba(19,15,38,.1),0_0_0_1px_rgba(19,15,38,.05)] transition-all duration-300 ease-out-quint"
+            className="absolute rounded-pill bg-white shadow-pill transition-all duration-[420ms] ease-spring"
             style={{ left: box.l, top: box.t, width: box.w, height: box.h }}
           />
         )}
@@ -83,7 +83,7 @@ export function Choice<T extends string | number>({ label, value, onChange, opti
             role="radio"
             aria-checked={value === o.value}
             onClick={() => onChange(o.value)}
-            className={cn('relative z-[1] min-h-[38px] flex-auto rounded-[9px] px-3 text-[13px] font-medium transition-colors duration-200', value === o.value ? 'text-ink' : 'text-ink-2 hover:text-ink')}
+            className={cn('relative z-[1] min-h-[38px] flex-auto rounded-pill px-3.5 text-[13px] font-medium transition-colors duration-200', value === o.value ? 'text-ink' : 'text-ink-2 hover:text-ink')}
           >
             {o.label}
           </button>
@@ -97,7 +97,7 @@ export function Choice<T extends string | number>({ label, value, onChange, opti
 /** Interrupteur présenté comme une ligne (étiquette + aide). */
 export function ToggleRow({ label, hint, children }: { label: ReactNode; hint?: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex min-h-[48px] items-center justify-between gap-3 rounded-[11px] border border-line2 bg-white px-3 py-2">
+    <div className="flex min-h-[52px] items-center justify-between gap-3 rounded-card-sm bg-white px-4 py-2 shadow-halo-sm">
       <span className="min-w-0">
         <span className="block text-[13px] font-medium">{label}</span>
         {hint && <span className="block text-[11.5px] text-ink-3">{hint}</span>}
@@ -111,14 +111,14 @@ export function ToggleRow({ label, hint, children }: { label: ReactNode; hint?: 
 export function ResultRow({ label, value, sub, tone, strong }: { label: ReactNode; value: ReactNode; sub?: ReactNode; tone?: 'ok' | 'warn' | 'bad'; strong?: boolean }) {
   const key = typeof value === 'string' || typeof value === 'number' ? String(value) : undefined;
   return (
-    <div className="flex items-baseline justify-between gap-3 border-b border-line py-2.5 last:border-b-0">
+    <div className="flex items-baseline justify-between gap-3 border-b border-halo-line py-3 last:border-b-0">
       <div className="min-w-0">
         <div className="text-[13px] text-ink-2">{label}</div>
         {sub && <div className="text-[11.5px] text-ink-3">{sub}</div>}
       </div>
       <div
         key={key}
-        className={cn('num shrink-0 animate-[fade-up_.35s_var(--ease)_both] text-right text-[14px]', strong ? 'font-semibold' : 'font-medium', tone === 'ok' && 'text-ok', tone === 'warn' && 'text-warn', tone === 'bad' && 'text-bad')}
+        className={cn('num shrink-0 animate-[fade-up_.35s_var(--ease)_both] text-right tracking-[-0.01em]', strong ? 'text-[16px] font-semibold' : 'text-[14px] font-medium', tone === 'ok' && 'text-ok', tone === 'warn' && 'text-warn', tone === 'bad' && 'text-bad')}
       >
         {value}
       </div>
@@ -129,7 +129,7 @@ export function ResultRow({ label, value, sub, tone, strong }: { label: ReactNod
 export function Note({ tone = 'info', children }: { tone?: 'info' | 'warn' | 'ok'; children: ReactNode }) {
   const I = tone === 'warn' ? AlertTriangle : tone === 'ok' ? CheckCircle2 : Info;
   return (
-    <div className={cn('flex animate-[fade-up_.35s_var(--ease)_both] gap-2 rounded-[11px] px-3 py-2.5 text-[12.5px] leading-snug', tone === 'warn' ? 'bg-warn-bg text-[#8a4b05]' : tone === 'ok' ? 'bg-ok-bg text-[#0f6b33]' : 'bg-[#f3f0fb] text-[#4c3a8f]')}>
+    <div className={cn('flex animate-[fade-up_.35s_var(--ease)_both] gap-2.5 rounded-card-sm px-3.5 py-3 text-[12.5px] leading-snug', tone === 'warn' ? 'bg-pale-a text-deep-a' : tone === 'ok' ? 'bg-pale-g text-deep-g' : 'bg-pale-v text-deep-v')}>
       <I className="mt-px h-3.5 w-3.5 shrink-0" strokeWidth={2} />
       <span>{children}</span>
     </div>
@@ -154,7 +154,7 @@ export function Gauge({ label, value, max, limit, format = (v) => num(v, 1), uni
           {limit !== undefined && <span className="font-normal text-ink-3"> / {format(limit)}{unit}</span>}
         </span>
       </div>
-      <div className="relative h-2 rounded-full bg-[#eeecf4]">
+      <div className="relative h-2 rounded-full bg-halo-track">
         <div className={cn('absolute inset-y-0 left-0 rounded-full transition-[width,background-color] duration-700 ease-out-quint', color)} style={{ width: `${pctV}%` }} />
         {limit !== undefined && <span aria-hidden className="absolute -top-1 h-4 w-[2px] rounded-full bg-[#15122a]/70" style={{ left: `calc(${Math.min(100, (limit / max) * 100)}% - 1px)` }} />}
       </div>
@@ -165,9 +165,9 @@ export function Gauge({ label, value, max, limit, format = (v) => num(v, 1), uni
 /** Petite case de chiffre secondaire (3 par ligne sous le résultat principal). */
 export function MiniStat({ label, value, sub }: { label: ReactNode; value: ReactNode; sub?: ReactNode }) {
   return (
-    <div className="min-w-0 rounded-[12px] bg-[#f7f6fb] px-3 py-2.5">
+    <div className="min-w-0 rounded-card-sm bg-white px-3.5 py-3 shadow-halo-sm">
       <div className="truncate text-[11.5px] font-medium text-ink-3">{label}</div>
-      <div key={String(value)} className="num mt-0.5 animate-[fade-up_.35s_var(--ease)_both] truncate text-[16px] font-semibold tracking-[-0.02em]">{value}</div>
+      <div key={String(value)} className="num-halo mt-1 animate-[fade-up_.35s_var(--ease)_both] truncate text-[19px]">{value}</div>
       {sub && <div className="truncate text-[11px] text-ink-3">{sub}</div>}
     </div>
   );

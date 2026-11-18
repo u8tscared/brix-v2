@@ -30,14 +30,14 @@ export function RelanceTimeline({ late }: { late: Facture[] }) {
   return (
     <Card className="overflow-hidden">
       <div className="flex flex-wrap items-baseline justify-between gap-2 px-4 pt-4 md:px-5">
-        <h2 className="text-[14.5px] font-semibold tracking-[-0.015em]">Comment Bob relance</h2>
-        <span className={cn('text-[12.5px]', fx.relanceAuto ? 'text-ok' : 'text-ink-3')}>{fx.relanceAuto ? 'Automatique, tous les jours à 9 h' : 'En pause : rien ne part sans vous'}</span>
+        <h2 className="text-[16px] font-semibold tracking-[-0.025em]">Comment Bob relance</h2>
+        <span className={cn('chip', fx.relanceAuto ? 'tone-green' : 'tone-neutral')}>{fx.relanceAuto ? 'Automatique, tous les jours à 9 h' : 'En pause : rien ne part sans vous'}</span>
       </div>
 
       {/* Ordinateur : frise horizontale */}
       <div ref={ref} className={cn('relative mx-5 mb-5 mt-12 hidden h-[150px] md:block', !fx.relanceAuto && 'opacity-60 grayscale')}>
-        <div className="absolute inset-x-0 top-[18px] h-[3px] rounded-full bg-sub" />
-        <div className="absolute left-[7%] top-[18px] h-[3px] rounded-full bg-[linear-gradient(90deg,#c4b5fd,#f59e0b,#dc2626)] transition-[width] duration-[1400ms] ease-out-quint" style={{ width: seen ? '93%' : '0%' }} />
+        <div className="absolute inset-x-0 top-[18px] h-[3px] rounded-full bg-halo-track" />
+        <div className="absolute left-[7%] top-[18px] h-[3px] rounded-full bg-[linear-gradient(90deg,#c4b5fd,#e9b8f5_45%,#fdba74_75%,#f43f5e)] transition-[width] duration-[1400ms] ease-out-quint" style={{ width: seen ? '93%' : '0%' }} />
         <Node left={`${nx(0)}%`} icon={<CalendarClock className="h-4 w-4" />} day="Échéance" title="Le client devait payer" text="Rien ne part avant." delay={0} seen={seen}  />
         {steps.map((st, i) => {
           const I = ICON[st.channel];
@@ -59,7 +59,7 @@ export function RelanceTimeline({ late }: { late: Facture[] }) {
       </div>
 
       {/* Téléphone : frise verticale */}
-      <ol className={cn('relative mx-4 mb-4 mt-4 space-y-4 border-l-2 border-sub pl-5 md:hidden', !fx.relanceAuto && 'opacity-60')}>
+      <ol className={cn('relative mx-4 mb-4 mt-4 space-y-4 border-l-2 border-halo-line pl-5 md:hidden', !fx.relanceAuto && 'opacity-60')}>
         <MobileNode icon={<CalendarClock className="h-3.5 w-3.5" />} day="Échéance" title="Le client devait payer" text="Rien ne part avant." />
         {steps.map((st) => {
           const I = ICON[st.channel];
@@ -78,7 +78,7 @@ export function RelanceTimeline({ late }: { late: Facture[] }) {
 function Node({ left, icon, day, title, text, delay, seen, first, manual }: { left: string; icon: React.ReactNode; day: string; title: string; text: string; delay: number; seen: boolean; first?: boolean; manual?: boolean }) {
   return (
     <div className={cn('absolute top-0 w-[150px] transition-[opacity,transform] duration-500 ease-out-quint', first ? '' : '-translate-x-1/2')} style={{ left, opacity: seen ? 1 : 0, transform: `${first ? '' : 'translateX(-50%) '}translateY(${seen ? 0 : 6}px)`, transitionDelay: `${delay}ms` }}>
-      <span className={cn('relative grid h-10 w-10 place-items-center rounded-full bg-white text-ink-2 shadow-[0_0_0_1px_var(--line2),0_4px_10px_-4px_rgba(19,15,38,.15)]', !first && 'mx-auto', manual && 'text-bad')}>{icon}</span>
+      <span className={cn('relative grid h-10 w-10 place-items-center rounded-tile bg-white text-deep-v shadow-halo', !first && 'mx-auto', manual && 'bg-pale-r text-deep-r')}>{icon}</span>
       <div className={cn('mt-2.5', !first && 'text-center')}>
         <div className="num text-[11.5px] font-semibold text-ink-3">{day}</div>
         <div className="text-[13px] font-medium leading-tight">{title}</div>
@@ -91,13 +91,13 @@ function Node({ left, icon, day, title, text, delay, seen, first, manual }: { le
 function MobileNode({ icon, day, title, text, who = [] }: { icon: React.ReactNode; day: string; title: string; text: string; who?: string[] }) {
   return (
     <li className="relative">
-      <span className="absolute -left-[33px] top-0 grid h-6 w-6 place-items-center rounded-full bg-white text-ink-2 shadow-[0_0_0_1px_var(--line2)]">{icon}</span>
+      <span className="absolute -left-[33px] top-0 grid h-6 w-6 place-items-center rounded-full bg-white text-deep-v shadow-halo-sm">{icon}</span>
       <div className="flex items-baseline gap-2">
         <span className="num text-[11.5px] font-semibold text-ink-3">{day}</span>
         <span className="text-[13.5px] font-medium">{title}</span>
       </div>
       <div className="text-[12px] text-ink-3">{text}</div>
-      {who.length > 0 && <div className="mt-1 text-[12px] font-medium text-warn">En ce moment : {who.join(', ')}</div>}
+      {who.length > 0 && <div className="mt-1 text-[12px] font-medium text-deep-a">En ce moment : {who.join(', ')}</div>}
     </li>
   );
 }
