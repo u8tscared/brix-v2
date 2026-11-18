@@ -3,7 +3,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 
 const root = __dirname;
-const ALL_PAGES = ['index', 'fonctionnalites', 'tarifs', 'ia', 'brix-ai', 'fournisseurs', 'comparatif', 'demarrer', 'legal'];
+const ALL_PAGES = ['index', 'fonctionnalites', 'tarifs', 'ia', 'brix-ai', 'fournisseurs', 'comparatif', 'demarrer', 'legal', 'connecteur-ia'];
 const PAGES = process.env.PAGES ? process.env.PAGES.split(',') : ALL_PAGES;
 
 /* ---------- Partials : <!--@include nom--> ---------- */
@@ -60,6 +60,7 @@ const APP = {
   ],
 };
 function seoHead(html, page) {
+  if (/rel="canonical"/.test(html)) return ''; // page alias (ex. connecteur-ia) : elle porte déjà sa canonique
   const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || 'Brix';
   const desc = (html.match(/<meta name="description" content="([^"]*)"/) || [])[1] || '';
   const url = pageUrl(page), img = `${SITE_URL}/og/brix.png`;

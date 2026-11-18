@@ -43,19 +43,19 @@ export function initNight() {
 const CONVO = [
   {
     q: 'Qui ne m’a pas encore payé ce mois-ci ?',
-    tool: 'brix · impayes',
+    tool: 'brix · lister_impayes',
     a: 'Trois factures sont en attente, pour 6 820 € au total :',
     t: [['M. Garnier · F-0312', '2 340 €'], ['Mme Lefèvre · F-0315', '3 500 €'], ['SCI Les Tilleuls · F-0309', '980 €']],
     end: 'Bob a déjà programmé les relances de demain matin.',
   },
   {
     q: 'Quel chantier m’a le moins rapporté cette année ?',
-    tool: 'brix · chantiers',
+    tool: 'brix · lister_chantiers',
     a: 'La rénovation Roux : 11 % de marge, contre 27 % en moyenne. Les achats ont dépassé le devis de 1 240 €, surtout sur le carrelage.',
   },
   {
     q: 'Combien j’ai facturé ce trimestre ?',
-    tool: 'brix · chiffre_affaires',
+    tool: 'brix · calculer_chiffre_affaires',
     a: '48 300 € HT facturés depuis le 1er octobre, 12 % de plus que l’an dernier sur la même période.',
     t: [['Encaissé', '41 480 €'], ['Reste à encaisser', '6 820 €']],
   },

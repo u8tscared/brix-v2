@@ -70,3 +70,7 @@
   .bai-ctas .btn { flex: 1 1 100% }
 }
 .bai-top .psat .tile-b svg { width: 18px; height: 18px; fill: #fff }
+.tg-fine { margin-top: 16px }
+.tg-fine .mono, .acts-l .mono { font-size: 12px; color: var(--faint) }
+.acts-l .mono { display: block; margin-top: 1px }
+.tcell .mono { overflow-wrap: anywhere }

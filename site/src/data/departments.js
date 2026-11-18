@@ -127,7 +127,7 @@ export const DEPARTMENTS = [
       { name: 'Agent de nuit', icon: 'moon-star', plan: 'equipe', tag: 'only', desc: 'Bob prépare les relances et les devis la nuit. Vous validez en un geste au réveil.' },
       { name: 'Secrétaire téléphonique', icon: 'phone-incoming', plan: 'equipe', tag: 'new', desc: "Bob répond aux appels manqués, qualifie la demande et prend rendez-vous." },
       { name: 'Dictée dans votre langue', icon: 'languages', plan: 'pro', desc: 'Dictez en portugais, en arabe ou en turc. Le devis sort en français.' },
-      { name: 'Brix AI MCP', icon: 'plug-zap', plan: 'equipe', tag: 'only', desc: 'Pilotez Brix depuis Claude ou ChatGPT : il lit vos chiffres et prépare devis et relances, avec votre accord.' },
+      { name: 'Brix AI MCP', icon: 'plug-zap', plan: 'equipe', tag: 'only', desc: 'Interrogez Brix depuis Claude ou ChatGPT, et préparez des brouillons.' },
     ],
   },
   {

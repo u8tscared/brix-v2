@@ -6,26 +6,26 @@ import { wait, onView } from '../subpage.js';
 const QUESTIONS = [
   {
     q: 'Qui ne m’a pas encore payé ce mois-ci ?',
-    tool: 'brix · impayes', res: '3 factures',
+    tool: 'brix · lister_impayes', res: '3 factures',
     a: 'Trois factures sont en attente, pour 6 820 € au total :',
     t: [['M. Garnier · F-0312', '2 340 €'], ['Mme Lefèvre · F-0315', '3 500 €'], ['SCI Les Tilleuls · F-0309', '980 €']],
     end: 'La plus ancienne date de 41 jours. Vous voulez que Bob prépare une relance ?',
   },
   {
     q: 'Quel chantier m’a le moins rapporté cette année ?',
-    tool: 'brix · chantiers', res: '38 chantiers',
+    tool: 'brix · lister_chantiers', res: '38 chantiers',
     a: 'La rénovation Roux : 11 % de marge, contre 27 % en moyenne sur vos chantiers. Les achats ont dépassé le devis de 1 240 €, surtout sur le carrelage.',
   },
   {
     q: 'Où acheter mes tubes PER de 16 le moins cher ?',
-    tool: 'brix · prix_materiaux', res: '3 fournisseurs',
+    tool: 'brix · comparer_prix_materiaux', res: '3 fournisseurs',
     a: 'Le meilleur prix dans vos catalogues fournisseurs :',
     t: [['Comptoir Rhône Élec', '0,62 € / m'], ['Négoce Gerland', '0,68 € / m'], ['Dépôt Lyon Sud', '0,71 € / m']],
     end: 'Le prix chez Négoce Gerland a augmenté de 6 % ce mois-ci.',
   },
   {
     q: 'Combien de devis signés ce trimestre, et pour quel montant ?',
-    tool: 'brix · chiffre_affaires', res: '23 devis',
+    tool: 'brix · calculer_chiffre_affaires', res: '23 devis',
     a: '14 devis signés depuis le 1er octobre, pour 48 300 € HT. Votre taux de signature est de 61 %, sur 23 devis envoyés.',
   },
 ];
