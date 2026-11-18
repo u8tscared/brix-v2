@@ -24,3 +24,9 @@ Contrôles : `npx tsc -b`, `npm test`, `npx vite build`. Captures Playwright (`r
 - **Ne fais aucun commit git.** Plusieurs agents peuvent travailler dans ce dossier ; ne touche qu'à ton lot.
 - Pour lancer un serveur, utilise le port indiqué dans ta mission.
 - Rapport final court : fichiers modifiés, ce qui a changé, ce qui reste.
+
+## Phase écrans (après le socle)
+Le socle Halo est posé et commité : lis `docs/design-system.md` (section « Recettes d'écran » et la liste des nouvelles classes/props), puis regarde `src/components/ui`, `src/components/layout/HaloBackdrop.tsx`.
+Règles écrans : pas de `bg-page` ni de fond opaque pleine largeur (ça cache le halo, utiliser `glass`) ; remplacer les `rounded-[16px]`, `shadow-card`, `bg-sub`, `bg-[#f4f3f8]` codés en dur par `<Card>`, `rounded-card`, tons pâles ; `variant="dawn"` une seule fois par écran sur l'action principale ; pastilles `IconTile` colorées ; grands chiffres `num-halo` ; listes en `row-card` ; bannières sombres de Bob adoucies (Bob = assistant calme, logo B, jamais d'étincelles).
+Ne modifie pas `src/components/*`, `src/lib/*`, `src/modules/registry.tsx`, `tailwind.config.js`, `src/index.css` : si tu as besoin d'un ajout au socle, crée un composant local dans ton module ou note-le dans ton rapport.
+Build sans gêner les autres : `npx vite build --outDir /tmp/<lot>-dist` ; serveur : `npx vite --port <ton port>`. Avant de rendre : `npx tsc -b` sans erreur sur tes fichiers.
