@@ -36,6 +36,9 @@ function initNav() {
   const solid = () => { nav.classList.toggle('solid', !hero || scrollY > hero.offsetHeight - 120); nav.classList.toggle('over', scrollY > 24); };
   addEventListener('scroll', solid, { passive: true });
   solid();
+  // la nav se cache en descendant, revient dès qu'on remonte
+  let lastY = scrollY;
+  addEventListener('scroll', () => { const y = scrollY; if (!nav.classList.contains('open') && !$('.dd.on', nav)) nav.classList.toggle('hide', y > 400 && y > lastY + 4); if (y < lastY - 4 || y < 400) nav.classList.remove('hide'); lastY = y; }, { passive: true });
 
   // méga-menu : survol sur ordinateur, clic partout, Échap pour fermer
   const dd = $('.dd', nav);
@@ -120,6 +123,23 @@ export function mesh(canvas, palette) {
   draw(5200);
 }
 
+/* ---------- Aura : le halo Aube tourne avec le défilement et suit un peu la souris ---------- */
+function initAura() {
+  const aura = $('.aura');
+  if (!aura || reduce) return;
+  const root = aura.style;
+  let target = 0, cur = 0, ax = 0, ay = 0, tx = 0, ty = 0, raf = 0;
+  const tick = () => {
+    cur += (target - cur) * 0.08; ax += (tx - ax) * 0.05; ay += (ty - ay) * 0.05;
+    root.setProperty('--rot', cur.toFixed(2)); root.setProperty('--ax', ax.toFixed(1)); root.setProperty('--ay', ay.toFixed(1));
+    raf = Math.abs(target - cur) > 0.05 || Math.abs(tx - ax) > 0.2 || Math.abs(ty - ay) > 0.2 ? requestAnimationFrame(tick) : 0;
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', () => { target = scrollY * 0.045; kick(); }, { passive: true });
+  if (fine) addEventListener('pointermove', (e) => { tx = (e.clientX / innerWidth - 0.5) * 60; ty = (e.clientY / innerHeight - 0.5) * 40; kick(); }, { passive: true });
+  target = scrollY * 0.045; kick();
+}
+
 /* ---------- Apparitions ---------- */
 function initReveals() {
   if (reduce) return;
@@ -185,6 +205,7 @@ export function boot(pageInit) {
   // liens vers l'app : « /app/… » pointe vers l'URL configurée (VITE_APP_URL au build)
   if (APP_URL !== '/app') $$('a[href^="/app/"]').forEach((a) => { a.href = APP_URL + a.getAttribute('href').slice(4); if (/^https?:/.test(APP_URL)) { a.target = '_blank'; a.rel = 'noopener'; } });
   initNav();
+  initAura();
   $$('canvas.mesh').forEach((c) => mesh(c));
   if (pageInit) pageInit();
   initReveals();

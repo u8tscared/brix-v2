@@ -116,3 +116,81 @@ canvas.mesh { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 
 .logo .name { font-family: var(--display); font-weight: 700; font-size: 21px; letter-spacing: -.045em; line-height: 1 }
 .logo:hover .tile { animation: tilebob .7s var(--spring) }
 @keyframes tilebob { 40% { transform: rotate(-8deg) scale(1.06) } }
+
+/* =========================================================================
+   HALO · système visuel V3 (18/11/2026)
+   Fond nacré, halo Aube diffus qui tourne avec le défilement, cartes très
+   arrondies qui flottent, ombres teintées violet, pastilles colorées par domaine,
+   boutons en pilule. Même thème Aube, même logo, même Geist, mêmes icônes Lucide.
+   ========================================================================= */
+:root {
+  --paper: #f8f6fd; --paper-2: #f3f0fb; --paper-3: #ece8f7; --tile: #f1edfb; --card: #ffffff;
+  --line: #ece8f5; --line-2: #e0daf0;
+  --r: 14px; --r-lg: 22px; --r-xl: 28px; --r-2xl: 34px;
+  --sh-1: 0 1px 2px rgba(60, 30, 120, .05);
+  --sh-2: 0 1px 2px rgba(60, 30, 120, .04), 0 12px 36px -14px rgba(60, 30, 120, .16);
+  --sh-3: 0 2px 4px rgba(60, 30, 120, .05), 0 28px 60px -22px rgba(60, 30, 120, .28);
+  --sh-dawn: 0 10px 28px -10px rgba(217, 70, 239, .55), inset 0 1px 0 rgba(255, 255, 255, .28);
+  --glass: rgba(255, 255, 255, .7);
+  --dawn-d: linear-gradient(135deg, #6d28d9 0%, #d946ef 62%, #fb923c 100%);
+  /* pastilles par domaine (fond pâle + encre franche) */
+  --t-v-bg: #f1eafe; --t-v: #6d28d9;
+  --t-m-bg: #fce8fd; --t-m: #a21caf;
+  --t-p-bg: #fff0e4; --t-p: #c2410c;
+  --t-g-bg: #e5f6ef; --t-g: #047857;
+  --t-b-bg: #e8effe; --t-b: #3b5bdb;
+  --t-s-bg: #e3f4fb; --t-s: #0369a1;
+  --t-r-bg: #feeaef; --t-r: #be123c;
+  --t-i-bg: #ecebfd; --t-i: #4f46e5;
+  --nav-h: 76px;
+}
+body { background: var(--paper) }
+
+/* Aura : le halo Aube fixé derrière tout le site. Il tourne doucement avec le défilement
+   (--rot piloté par core.js) et suit un peu la souris (--ax, --ay). */
+.aura { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict }
+.aura i { position: absolute; left: 50%; top: 50%; width: 140vmax; height: 140vmax; margin: -70vmax 0 0 -70vmax; border-radius: 50%; will-change: transform;
+  transform: translate3d(calc(var(--ax, 0) * 1px), calc(var(--ay, 0) * 1px), 0) rotate(calc(var(--rot, 0) * 1deg)) }
+.aura i:nth-child(1) { background: radial-gradient(18% 14% at 62% 22%, rgba(233, 184, 245, .55), transparent 70%), radial-gradient(16% 13% at 30% 30%, rgba(199, 180, 251, .5), transparent 70%) }
+.aura i:nth-child(2) { background: radial-gradient(15% 12% at 72% 62%, rgba(255, 211, 176, .42), transparent 70%), radial-gradient(14% 12% at 26% 70%, rgba(214, 198, 253, .38), transparent 70%); transform: translate3d(calc(var(--ax, 0) * -1.4px), calc(var(--ay, 0) * -1.4px), 0) rotate(calc(var(--rot, 0) * -0.7deg)) }
+.aura i:nth-child(3) { width: 90vmax; height: 90vmax; margin: -45vmax 0 0 -45vmax; background: conic-gradient(from 0deg, rgba(109, 40, 217, .07), rgba(217, 70, 239, .09), rgba(251, 146, 60, .07), rgba(109, 40, 217, .07)); filter: blur(60px); opacity: .9; transform: rotate(calc(var(--rot, 0) * 2deg)) }
+.aura::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 40%, transparent 50%, rgba(248, 246, 253, .65)) }
+
+/* Typo Halo : titres un peu plus pleins, seconde moitié grisée */
+.h2 { letter-spacing: -.048em; font-weight: 620 }
+.grad { color: #a7a2bf }
+.dawn-t { background: var(--dawn); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: dawnshift 8s ease-in-out infinite alternate }
+@keyframes dawnshift { to { background-position: 100% 0 } }
+
+/* Sur-titre : pilule de verre */
+.eyebrow { height: 32px; padding: 0 13px 0 11px; border-radius: 999px; background: var(--glass); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .06), 0 6px 18px -8px rgba(60, 30, 120, .16); backdrop-filter: blur(14px) saturate(1.5); -webkit-backdrop-filter: blur(14px) saturate(1.5); font-size: 13.5px }
+.eyebrow .i { color: #c026d3 }
+
+/* Boutons : pilules */
+.btn { border-radius: 999px; font-weight: 550; padding: 0 20px }
+.btn.sm { border-radius: 999px; padding: 0 15px }
+.btn.lg { border-radius: 999px; height: 52px; padding: 0 26px; font-size: 15.5px }
+.btn.dawn { box-shadow: var(--sh-dawn); transition: background-position .6s var(--ease), box-shadow .35s, transform .35s var(--spring) }
+.btn.dawn:hover { transform: translateY(-1px) scale(1.02); box-shadow: 0 16px 34px -12px rgba(217, 70, 239, .7), inset 0 1px 0 rgba(255, 255, 255, .3) }
+.btn.dark, .btn.white { transition: background .2s, box-shadow .3s, transform .35s var(--spring) }
+.btn.dark:hover, .btn.white:hover { transform: translateY(-1px) }
+.btn.line, .btn.glass { background: rgba(255, 255, 255, .82); box-shadow: 0 0 0 1px var(--line-2), 0 1px 2px rgba(60, 30, 120, .06); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px) }
+.btn.line:hover, .btn.glass:hover { background: #fff; box-shadow: 0 0 0 1px #d3cbe9, 0 8px 20px -10px rgba(60, 30, 120, .25); transform: translateY(-1px) }
+
+/* Badges : pilules */
+.badge { border-radius: 999px; padding: 3px 10px }
+.badge.v { background: var(--t-v-bg); color: var(--t-v) }
+
+/* Cartes : flottent sur le nacré */
+.card { border-radius: var(--r-lg); box-shadow: var(--sh-2); transition: transform .5s var(--ease), box-shadow .5s var(--ease) }
+.card.lift:hover, a.card:hover { transform: translateY(-4px); box-shadow: var(--sh-3) }
+.glass { background: var(--glass); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .05), 0 10px 30px -12px rgba(60, 30, 120, .16) }
+
+/* Tuiles d'icônes : retour des pastilles par domaine (violet par défaut) */
+.ic, .dp-ic, .ft-ic, .fn-i, .mi2 { background: var(--t-v-bg) !important; color: var(--t-v) !important; box-shadow: none; border-radius: 13px }
+.tone-v { --tb: var(--t-v-bg); --tc: var(--t-v) } .tone-m { --tb: var(--t-m-bg); --tc: var(--t-m) } .tone-p { --tb: var(--t-p-bg); --tc: var(--t-p) } .tone-g { --tb: var(--t-g-bg); --tc: var(--t-g) }
+.tone-b { --tb: var(--t-b-bg); --tc: var(--t-b) } .tone-s { --tb: var(--t-s-bg); --tc: var(--t-s) } .tone-r { --tb: var(--t-r-bg); --tc: var(--t-r) } .tone-i { --tb: var(--t-i-bg); --tc: var(--t-i) }
+[class*="tone-"].ic, [class*="tone-"] > .ic, .ic[class*="tone-"] { background: var(--tb) !important; color: var(--tc) !important }
+
+/* Logo : la tuile garde son reflet */
+.logo .tile { border-radius: 29% }
