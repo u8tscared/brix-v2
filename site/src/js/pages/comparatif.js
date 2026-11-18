@@ -17,7 +17,7 @@ const BETTER = [
   { icon: 'receipt-euro', t: 'Un prix lisible, sans formation payante', d: 'Quatre offres affichées en clair. Pas de revendeur, pas de journée de formation facturée, pas de frais d’installation. L’import est offert.', href: 'tarifs.html' },
 ];
 const ONLY = [
-  { icon: 'plug-zap', t: 'Brix AI MCP', d: 'Parlez à votre entreprise depuis Claude, ChatGPT ou Le Chat. L’assistant lit vos chiffres Brix pour répondre. Lecture seule, coupure en un geste.', href: 'ia.html#mcp' },
+  { icon: 'plug-zap', t: 'Brix AI MCP', d: 'Parlez à votre entreprise depuis Claude, ChatGPT ou Le Chat. Interrogez Brix depuis votre assistant, et préparez des brouillons. Coupure en un geste.', href: 'brix-ai.html' },
   { icon: 'moon-star', t: 'Bob qui agit, et travaille la nuit', d: 'Bob ne fait pas que répondre : il prépare les relances et les devis pendant la nuit. Au réveil, vous validez en un geste.', href: 'ia.html' },
   { icon: 'sliders-horizontal', t: 'Le logiciel réglé sur votre métier', d: "Dites si vous êtes électricien, couvreur ou plaquiste, seul ou à vingt. Brix se configure tout seul et n’affiche que ce qui vous sert.", href: 'demarrer.html' },
   { icon: 'messages-square', t: 'Demandes de prix à plusieurs fournisseurs', d: 'Une demande part chez plusieurs négoces, les réponses arrivent ligne par ligne, vous gardez le meilleur prix et le meilleur délai. Vos fournisseurs répondent depuis leur portail.', href: 'fournisseurs.html' },

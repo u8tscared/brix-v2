@@ -1,0 +1,13 @@
+{
+  "name": "Brix",
+  "short_name": "Brix",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f5fb",
+  "theme_color": "#f6f5fb",
+  "icons": [
+    { "src": "logos/brix-app-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "logos/brix-app-icon.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

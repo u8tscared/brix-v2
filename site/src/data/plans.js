@@ -4,13 +4,13 @@ export const PLAN_LIST = [
     id: 'start', name: 'Start', monthly: 0, for: 'Pour démarrer seul, sans rien payer.',
     cta: 'Commencer gratuitement', ctaHref: 'demarrer.html?offre=start',
     lead: 'Gratuit pour toujours',
-    items: ['5 devis et 5 factures par mois', 'Facture électronique conforme', 'Signature électronique', 'Clients et chantiers illimités', 'Prise de cotes, photos, documents', 'Export vers votre comptable'],
+    items: ['5 devis et 5 factures par mois', 'Facture électronique conforme', 'Signature électronique', 'Clients et chantiers illimités', 'Photos, rapports et documents', 'Export vers votre comptable'],
   },
   {
     id: 'pro', name: 'Pro', monthly: 29.99, for: "Pour l’artisan seul qui veut tout.",
     cta: 'Essayer Pro', ctaHref: 'demarrer.html?offre=pro',
     lead: 'Tout Start, sans limite, plus :',
-    items: ['Bob inclus (quota mensuel), devis photo et vidéo', 'Relances, paiement en ligne et Tap to Pay', 'Demandes de prix et commandes fournisseurs', 'Rentabilité par chantier en direct', 'Outils de votre métier', 'Site vitrine et avis Google'],
+    items: ['Bob inclus (quota mensuel), devis photo et vidéo', 'Relances, paiement en ligne et Tap to Pay', 'Demandes de prix et commandes fournisseurs', 'Rentabilité par chantier en direct', 'Prise de cotes, stock et outils de votre métier', 'Site vitrine et avis Google'],
     note: '1 utilisateur · Brix AI MCP en option à 9 € par mois',
   },
   {
