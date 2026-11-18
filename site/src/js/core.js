@@ -62,6 +62,23 @@ function initNav() {
     document.addEventListener('click', (e) => { if (!dd.contains(e.target)) set(false); });
   }
 
+  // téléphone : bouton d'essai collé en bas une fois le haut de page passé, caché près du pied de page
+  const mcta = $('[data-mcta]');
+  if (mcta) {
+    if (/demarrer/.test(page)) mcta.remove();
+    else {
+      const foot = $('.foot');
+      const upd = () => {
+        const on = scrollY > innerHeight * 0.9 && (!foot || foot.getBoundingClientRect().top > innerHeight) && !nav.classList.contains('open');
+        mcta.classList.toggle('on', on);
+        mcta.tabIndex = on ? 0 : -1;
+        mcta.setAttribute('aria-hidden', !on);
+      };
+      addEventListener('scroll', upd, { passive: true });
+      upd();
+    }
+  }
+
   // tiroir mobile
   const burger = $('.burger', nav), drawer = $('#drawer');
   if (burger && drawer) {

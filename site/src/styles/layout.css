@@ -96,3 +96,11 @@
   a.link, button.link { min-height: 44px; border-bottom: 0; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 5px }
   .logo { min-height: 44px; display: inline-flex; align-items: center }
 }
+
+/* Bouton d'essai collé en bas, téléphones seulement */
+.mcta { display: none }
+@media (max-width: 520px) {
+  .mcta { display: flex; justify-content: center; position: fixed; z-index: 40; left: 16px; right: 16px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); min-height: 52px; transform: translateY(140%); opacity: 0; transition: transform .5s var(--ease), opacity .3s; pointer-events: none }
+  .mcta.on { transform: none; opacity: 1; pointer-events: auto }
+}
+@media (prefers-reduced-motion: reduce) { .mcta { transition: none } }
