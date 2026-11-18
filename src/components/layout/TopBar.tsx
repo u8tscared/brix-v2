@@ -48,12 +48,12 @@ function QuickCreate() {
   }, []);
   return (
     <div ref={ref} className="relative">
-      <button onClick={() => setOpen((o) => !o)} className="group flex h-9 items-center gap-1.5 rounded-[10px] bg-ink pl-2.5 pr-3 text-[13px] font-medium text-white shadow-ink transition hover:bg-[#241f3f] active:scale-[.97]">
+      <button onClick={() => setOpen((o) => !o)} className="group flex h-10 items-center gap-1.5 rounded-full bg-ink pl-3 pr-4 text-[13.5px] font-medium text-white shadow-ink transition duration-300 ease-spring hover:-translate-y-px hover:bg-[#241f3f] active:scale-[.97]" aria-expanded={open}>
         <Plus className={cn('h-4 w-4 transition-transform duration-300 ease-out-quint', open && 'rotate-45')} />
         Créer
       </button>
       {mounted && (
-        <div className={cn('absolute right-0 top-[calc(100%+8px)] z-50 w-[248px] origin-top-right rounded-[14px] bg-white p-1.5 shadow-pop', closing ? 'animate-[scale-out_.16s_var(--ease)_both]' : 'animate-[scale-in_.22s_var(--ease)_both]')}>
+        <div className={cn('glass-strong absolute right-0 top-[calc(100%+10px)] z-50 w-[260px] origin-top-right rounded-[22px] p-2 shadow-pop', closing ? 'animate-[scale-out_.16s_var(--ease)_both]' : 'animate-[scale-in_.22s_var(--ease)_both]')}>
           {CREATE.map((c, i) => (
             <button
               key={c.label}
@@ -61,7 +61,7 @@ function QuickCreate() {
                 setOpen(false);
                 navigate(c.to);
               }}
-              className="flex h-11 w-full animate-[fade-up_.3s_var(--ease)_both] items-center gap-3 rounded-[10px] px-2 text-left text-[13.5px] font-medium transition hover:bg-sub"
+              className="flex h-12 w-full animate-[fade-up_.3s_var(--ease)_both] items-center gap-3 rounded-[16px] px-2 text-left text-[13.5px] font-medium transition hover:bg-white"
               style={{ animationDelay: `${i * 30}ms` }}
             >
               <IconTile icon={<c.icon />} dept={c.dept} size="sm" />
@@ -69,13 +69,13 @@ function QuickCreate() {
               {c.hint && <Kbd>{c.hint}</Kbd>}
             </button>
           ))}
-          <div className="my-1 h-px bg-line" />
+          <div className="mx-2 my-1 h-px bg-[#ece8f6]" />
           <button
             onClick={() => {
               setOpen(false);
               ui.askBob('', true);
             }}
-            className="flex h-11 w-full items-center gap-3 rounded-[10px] px-2 text-left text-[13.5px] font-medium transition hover:bg-sub"
+            className="flex h-12 w-full items-center gap-3 rounded-[16px] px-2 text-left text-[13.5px] font-medium transition hover:bg-white"
           >
             <IconTile icon={<Mic />} dept="bob" size="sm" solid />
             <span className="flex-1">Dicter à Bob</span>
@@ -95,12 +95,14 @@ export function TopBar({ notifications }: { notifications?: React.ReactNode }) {
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const f = () => setScrolled(window.scrollY > 4);
+    const f = () => setScrolled(window.scrollY > 8);
     window.addEventListener('scroll', f, { passive: true });
     return () => window.removeEventListener('scroll', f);
   }, []);
   return (
-    <header className={cn('sticky top-0 z-30 flex h-14 items-center gap-3 px-7 transition-[background,box-shadow] duration-300', scrolled ? 'bg-page/80 shadow-[0_1px_0_var(--line)] backdrop-blur-xl' : 'bg-transparent')}>
+    <header className="sticky top-0 z-30 mx-auto w-full max-w-[1320px] px-8 pt-3 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-3 before:bg-gradient-to-b before:from-[#f7f5fc] before:to-[#f7f5fc]/0 before:content-['']">
+      {/* Halo : barre du haut en pilule de verre qui flotte ; plus nette quand le contenu défile dessous. */}
+      <div className={cn('flex h-14 items-center gap-2.5 rounded-full pl-5 pr-2 transition-[background,box-shadow] duration-300', scrolled ? 'glass-strong' : 'glass')}>
       <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px]" aria-label="Fil d'Ariane">
         {!mod ? (
           <span className="font-medium text-ink">{pathname.startsWith('/app/reglages') ? 'Réglages' : "Aujourd'hui"}</span>
@@ -128,7 +130,7 @@ export function TopBar({ notifications }: { notifications?: React.ReactNode }) {
           </>
         )}
       </nav>
-      <button onClick={() => ui.set({ palette: true })} className="group flex h-9 w-[220px] items-center gap-2 rounded-[10px] bg-white px-2.5 text-[13px] text-ink-3 shadow-card transition hover:shadow-raise max-xl:w-9 max-xl:justify-center max-xl:px-0" aria-label="Rechercher">
+      <button onClick={() => ui.set({ palette: true })} className="group flex h-10 w-[232px] items-center gap-2 rounded-full bg-white/75 px-3.5 text-[13px] text-ink-3 shadow-[inset_0_0_0_1px_rgba(236,232,246,.9)] transition hover:bg-white max-xl:w-10 max-xl:justify-center max-xl:px-0" aria-label="Rechercher">
         <Search className="h-4 w-4 shrink-0" />
         <span className="flex-1 text-left max-xl:hidden">Rechercher</span>
         <span className="max-xl:hidden">
@@ -137,6 +139,7 @@ export function TopBar({ notifications }: { notifications?: React.ReactNode }) {
       </button>
       {notifications ?? <NotificationBell />}
       <QuickCreate />
+      </div>
     </header>
   );
 }

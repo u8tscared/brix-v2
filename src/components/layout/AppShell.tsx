@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { BrandTile } from '@/components/brand/Logo';
 import { Avatar, Skeleton, Toaster } from '@/components/ui';
 import BobPanel from '@/modules/bob/BobPanel';
@@ -13,18 +13,19 @@ import { useMediaQuery } from './useMediaQuery';
 import { GuidedTour } from './GuidedTour';
 import { TopBar } from './TopBar';
 import { NotificationBell } from '@/modules/notifications';
+import { HaloBackdrop } from './HaloBackdrop';
 
 export function PageLoader() {
   return (
     <div className="space-y-4 py-2">
-      <Skeleton className="h-9 w-64" />
-      <Skeleton className="h-4 w-80" />
-      <div className="grid gap-3 pt-2 md:grid-cols-3">
-        <Skeleton className="h-28 rounded-[16px]" />
-        <Skeleton className="h-28 rounded-[16px]" />
-        <Skeleton className="h-28 rounded-[16px]" />
+      <Skeleton className="h-4 w-40 rounded-full" />
+      <Skeleton className="h-11 w-72 rounded-full" />
+      <div className="grid gap-4 pt-2 md:grid-cols-3">
+        <Skeleton className="h-32 rounded-card" />
+        <Skeleton className="h-32 rounded-card" />
+        <Skeleton className="h-32 rounded-card" />
       </div>
-      <Skeleton className="h-72 rounded-[16px]" />
+      <Skeleton className="h-72 rounded-card" />
     </div>
   );
 }
@@ -54,28 +55,32 @@ export default function AppShell() {
   }, [pathname]);
 
   return (
-    <div className="flex min-h-dvh bg-page">
+    <div className="relative isolate flex min-h-dvh">
+      {/* Halo Aube fixé derrière toutes les pages, tourne avec le défilement. */}
+      <HaloBackdrop />
       {isTablet && <Sidebar forceCollapsed={!isDesktop || fullBleed} />}
       <div className="flex min-w-0 flex-1 flex-col">
         {!isTablet && (
-          <header className={`sticky top-0 z-30 flex h-[58px] items-center gap-2.5 px-4 pt-safe transition-[background,box-shadow] duration-300 ${scrolled ? 'bg-page/80 shadow-[0_1px_0_var(--line)] backdrop-blur-xl' : 'bg-page'}`}>
-            <button onClick={() => navigate('/app')} aria-label="Accueil" className="active:scale-95">
-              <BrandTile size={30} />
-            </button>
-            <span className="min-w-0 flex-1 truncate text-[15px] font-semibold tracking-[-0.02em]">{s.company.name}</span>
-            <button onClick={() => ui.set({ palette: true })} className="grid h-10 w-10 place-items-center rounded-full bg-white text-ink-2 shadow-card active:scale-95" aria-label="Rechercher">
-              <Search className="h-[18px] w-[18px]" />
-            </button>
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-white shadow-card">
-              <NotificationBell variant="mobile" />
-            </span>
-            <button onClick={() => navigate('/app/reglages')} aria-label="Mon compte" className="active:scale-95">
-              <Avatar initials={`${s.user.firstName[0] ?? ''}${s.user.lastName[0] ?? ''}`} color="#e9e4fb" fg="#4c1d95" size={38} />
-            </button>
+          <header className="sticky top-0 z-30 px-2.5 pt-safe">
+            <div className={`flex h-14 items-center gap-2 rounded-[22px] px-1.5 transition-[background,box-shadow,backdrop-filter,margin] duration-300 ${scrolled ? 'glass mt-1.5 !h-[50px]' : 'mt-0 bg-transparent'}`}>
+              <button onClick={() => navigate('/app')} aria-label="Accueil" className="grid h-10 w-10 place-items-center active:scale-95">
+                <BrandTile size={30} />
+              </button>
+              <span className="min-w-0 flex-1 truncate text-[15px] font-semibold tracking-[-0.025em]">{s.company.name}</span>
+              <button onClick={() => ui.set({ palette: true })} className="grid h-10 w-10 place-items-center rounded-full bg-white/80 text-ink-2 shadow-pill active:scale-95" aria-label="Rechercher">
+                <Search className="h-[18px] w-[18px]" />
+              </button>
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-white/80 shadow-pill">
+                <NotificationBell variant="mobile" />
+              </span>
+              <button onClick={() => navigate('/app/reglages')} aria-label="Mon compte" className="active:scale-95">
+                <Avatar initials={`${s.user.firstName[0] ?? ''}${s.user.lastName[0] ?? ''}`} dawn size={38} />
+              </button>
+            </div>
           </header>
         )}
         {isTablet && !fullBleed && <TopBar />}
-        <main className={fullBleed ? 'min-w-0 flex-1 pb-[calc(84px+var(--safe-b))] md:pb-0' : 'mx-auto w-full min-w-0 max-w-[1320px] flex-1 px-4 pb-[calc(104px+var(--safe-b))] pt-3 md:px-7 md:pb-12 md:pt-2'}>
+        <main className={fullBleed ? 'min-w-0 flex-1 pb-[calc(96px+var(--safe-b))] md:pb-0' : 'mx-auto w-full min-w-0 max-w-[1320px] flex-1 px-4 pb-[calc(112px+var(--safe-b))] pt-3 md:px-8 md:pb-14 md:pt-4'}>
           <Suspense fallback={<PageLoader />}>
             {/* La clé relance l'animation d'entrée à chaque changement de page. */}
             <div key={pathname.split('/').slice(0, 4).join('/')} className="animate-page-in">

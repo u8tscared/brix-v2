@@ -2,10 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Direction artistique « Aube » V3 — Geist, encre violet nuit, filets fins.
-   Le dégradé d'aube reste rare : une fois par écran, sur ce qui compte. */
+/* Direction artistique « Halo » (famille Aube) — fond nacré, halos Aube diffus,
+   cartes blanches 22 px qui flottent, ombres teintées violet, pilules, verre.
+   Le dégradé Aube plein reste rare : une fois par écran, sur ce qui compte. */
 :root {
-  --page: #f6f5fb;
+  --page: #f7f5fc;
   --surface: #ffffff;
   --side: #f6f5fb;
   --sub: #f4f3f8;
@@ -16,6 +17,11 @@
   --ink3: #9794aa;
   --brand: #6d28d9;
   --dawn: linear-gradient(100deg, #6d28d9 0%, #d946ef 58%, #fb923c 100%);
+  --dawn-d: linear-gradient(135deg, #6d28d9 0%, #d946ef 62%, #fb923c 100%);
+  --glass: rgba(255, 255, 255, .72);
+  --sh-halo: 0 0 0 1px rgba(60,30,120,.035), 0 1px 2px rgba(60,30,120,.04), 0 12px 36px -14px rgba(60,30,120,.14);
+  --sh-halo-lg: 0 0 0 1px rgba(60,30,120,.04), 0 2px 4px rgba(60,30,120,.05), 0 22px 48px -16px rgba(60,30,120,.22);
+  --sh-glass: inset 0 0 0 1px rgba(255,255,255,.9), 0 1px 2px rgba(60,30,120,.05), 0 10px 30px -12px rgba(60,30,120,.16);
   --ease: cubic-bezier(.22, 1, .36, 1);
   --spring: cubic-bezier(.34, 1.56, .64, 1);
   --safe-b: env(safe-area-inset-bottom, 0px);
@@ -35,26 +41,72 @@
   }
   h1, h2, h3, h4 { @apply font-display; letter-spacing: -0.028em; }
   button { -webkit-user-select: none; user-select: none; }
-  :focus-visible { outline: 2px solid #8b5cf6; outline-offset: 2px; border-radius: 8px; }
+  :focus-visible { outline: 2px solid #b67cf5; outline-offset: 2px; border-radius: 10px; }
   ::selection { background: #ebe2fe; }
   input[type='number']::-webkit-inner-spin-button { opacity: .4; }
 }
 
 @layer components {
-  /* Carte de base : blanche, filet fin, ombre très légère. */
-  .surface { @apply rounded-[16px] bg-white shadow-card; }
-  /* Survol : la carte se soulève d'un pixel. */
-  .lift { transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
-  .lift:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px var(--line2), 0 2px 4px rgba(19,15,38,.04), 0 16px 32px -16px rgba(40,20,90,.22); }
+  /* Carte Halo : blanche, 22 px, flotte sur le fond nacré. */
+  .surface { @apply rounded-card bg-white shadow-halo; }
+  /* Survol : la carte se soulève (3 px) et son ombre s'étire. */
+  .lift { transition: transform .45s var(--ease), box-shadow .45s var(--ease); }
+  .lift:hover { transform: translateY(-3px); box-shadow: var(--sh-halo-lg); }
+  /* Variante discrète pour les lignes (cartes 16 px) : 1 px. */
+  .lift-sm { transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
+  .lift-sm:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px #e3dcf3, 0 10px 24px -12px rgba(60,30,120,.18); }
   .press { transition: transform .15s var(--ease); }
   .press:active { transform: scale(.97); }
   .eyebrow { @apply text-[11px] font-medium uppercase tracking-[.08em] text-ink-3; }
-  .skeleton { background: linear-gradient(90deg, #efedf5 0%, #f7f6fb 40%, #efedf5 80%); background-size: 800px 100%; animation: shimmer 1.4s linear infinite; border-radius: 10px; }
+  /* Libellé Halo (au-dessus d'un chiffre ou d'un titre). */
+  .label-halo { @apply text-[13px] font-medium text-ink-2; }
+  .skeleton { background: linear-gradient(90deg, #efebf7 0%, #f8f6fc 40%, #efebf7 80%); background-size: 800px 100%; animation: shimmer 1.4s linear infinite; border-radius: 12px; }
+
+  /* Verre : barres, pilules flottantes, feuilles. */
+  .glass { background: var(--glass); -webkit-backdrop-filter: blur(18px) saturate(1.5); backdrop-filter: blur(18px) saturate(1.5); box-shadow: var(--sh-glass); }
+  .glass-strong { background: rgba(255,255,255,.86); -webkit-backdrop-filter: blur(24px) saturate(1.6); backdrop-filter: blur(24px) saturate(1.6); box-shadow: var(--sh-glass); }
+
+  /* Ligne Halo : carte 16 px avec pastille (lignes de devis, listes). */
+  .row-card { @apply flex items-center gap-3.5 rounded-card-sm bg-white px-4 py-3.5 shadow-halo-sm; transition: box-shadow .3s var(--ease), transform .3s var(--ease); }
+  .row-card:hover { transform: translateY(-1px); box-shadow: 0 0 0 1px #e3dcf3, 0 10px 24px -12px rgba(60,30,120,.18); }
+
+  /* Chip Halo : pilule 26 px, ton pâle. Combiner avec .tone-* */
+  .chip { @apply inline-flex h-[26px] items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 text-[12.5px] font-medium; }
+  .chip svg { width: 14px; height: 14px; }
+
+  /* Tons pâles par domaine : fond pâle + encre franche. */
+  .tone-violet { background: #f1eafe; color: #6d28d9; }
+  .tone-mag { background: #fce8fd; color: #b02bc4; }
+  .tone-peach { background: #fff0e4; color: #d4661b; }
+  .tone-green { background: #e5f6ef; color: #0f8a5f; }
+  .tone-blue { background: #e8f0fe; color: #2f5fd0; }
+  .tone-cyan { background: #e3f5f8; color: #0e7490; }
+  .tone-amber { background: #fdf3dc; color: #a86206; }
+  .tone-rose { background: #fde9ee; color: #c81e4a; }
+  .tone-indigo { background: #eceefe; color: #4338ca; }
+  .tone-neutral { background: #f3f1f8; color: #5d5a72; }
+  .tone-white { background: #fff; color: #5d5a72; box-shadow: 0 0 0 1px #ece8f6; }
+
+  /* Étapes Halo (devis, onboarding) : <span class="step-halo" data-state="done|on"><b>1</b>Client</span> */
+  .step-halo { @apply flex items-center gap-2 text-[13.5px] font-medium text-ink-3; }
+  .step-halo > b { @apply grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] font-semibold; background: #ece8f6; color: #5d5a72; }
+  .step-halo[data-state='done'] { color: #5d5a72; }
+  .step-halo[data-state='done'] > b { background: #e5f6ef; color: #0f9d6b; }
+  .step-halo[data-state='on'] { color: #15122a; }
+  .step-halo[data-state='on'] > b { background: var(--dawn-d); color: #fff; box-shadow: 0 4px 12px -3px rgba(217,70,239,.6); }
 }
 
 @layer utilities {
   .num { font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1; letter-spacing: -0.02em; }
-  .dawn-text { background: var(--dawn); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .dawn-text, .text-dawn { background: var(--dawn); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  /* Texte dégradé qui glisse doucement (une fois par écran, au plus). */
+  .text-dawn-shift { background: var(--dawn); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: dawnshift 8s ease-in-out infinite alternate; }
+  /* Seconde moitié d'un titre Halo, grisée. */
+  .text-halo-mute { color: #a7a2bf; }
+  /* Grands titres et chiffres Halo. */
+  .title-halo { font-size: 30px; line-height: 1.06; letter-spacing: -0.042em; font-weight: 600; }
+  @media (min-width: 768px) { .title-halo { font-size: 40px; line-height: 1.02; letter-spacing: -0.045em; } }
+  .num-halo { font-variant-numeric: tabular-nums; font-weight: 600; letter-spacing: -0.05em; line-height: 1.05; }
   .scrollbar-none { scrollbar-width: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }
   .scrollbar-thin { scrollbar-width: thin; scrollbar-color: #dcd9e6 transparent; }
@@ -79,7 +131,28 @@
   .stagger-fast > *:nth-child(7) { animation-delay: .15s; }
   .stagger-fast > *:nth-child(n+8) { animation-delay: .17s; }
   .mask-fade-r { -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  /* Halo Aube local : taches floues violet / magenta / pêche derrière un bloc
+     (en-têtes, cartes héros, pages publiques). Le parent doit être relative ; le contenu passe devant. */
+  .halo-bg { position: relative; isolation: isolate; }
+  .halo-bg::before, .halo-bg::after { content: ''; position: absolute; z-index: -1; pointer-events: none; border-radius: 50%; filter: blur(60px); opacity: .6; }
+  .halo-bg::before { width: min(620px, 90%); height: 380px; right: -12%; top: -200px; background: radial-gradient(closest-side, #e9b8f5, transparent), radial-gradient(closest-side at 30% 60%, #c7b4fb, transparent); }
+  .halo-bg::after { width: min(480px, 70%); height: 320px; right: 30%; top: -220px; background: radial-gradient(closest-side, #d6c6fd, transparent), radial-gradient(closest-side at 80% 70%, #ffd3b0, transparent); opacity: .5; }
+  .halo-clip { overflow: hidden; }
   .grain { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+}
+
+/* ───── Aura Halo (coque) : fixée derrière toutes les pages, tourne avec le défilement ─────
+   <HaloBackdrop /> pose .aura ; --rot est piloté en JS (rotation liée au scroll, lissée). */
+.aura { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict; }
+.aura > i { position: absolute; left: 50%; top: 50%; width: 140vmax; height: 140vmax; margin: -70vmax 0 0 -70vmax; border-radius: 50%; will-change: transform;
+  transform: translate3d(calc(var(--ax, 0) * 1px), calc(var(--ay, 0) * 1px), 0) rotate(calc(var(--rot, 0) * 1deg)); }
+.aura > i:nth-child(1) { background: radial-gradient(18% 14% at 66% 18%, rgba(233,184,245,.62), transparent 70%), radial-gradient(16% 13% at 40% 22%, rgba(199,180,251,.55), transparent 70%); }
+.aura > i:nth-child(2) { background: radial-gradient(15% 12% at 76% 34%, rgba(255,211,176,.5), transparent 70%), radial-gradient(14% 12% at 22% 74%, rgba(214,198,253,.36), transparent 70%);
+  transform: translate3d(calc(var(--ax, 0) * -1.4px), calc(var(--ay, 0) * -1.4px), 0) rotate(calc(var(--rot, 0) * -0.7deg)); }
+.aura > i:nth-child(3) { width: 90vmax; height: 90vmax; margin: -45vmax 0 0 -45vmax; background: conic-gradient(from 0deg, rgba(109,40,217,.07), rgba(217,70,239,.09), rgba(251,146,60,.07), rgba(109,40,217,.07)); filter: blur(60px); opacity: .9; transform: rotate(calc(var(--rot, 0) * 2deg)); }
+.aura::after { content: ''; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 38%, transparent 52%, rgba(247,245,252,.7)); }
+@media (max-width: 767px) {
+  .aura > i:nth-child(1) { background: radial-gradient(26% 12% at 68% 22%, rgba(233,184,245,.6), transparent 70%), radial-gradient(22% 11% at 38% 25%, rgba(199,180,251,.5), transparent 70%); }
 }
 
 /* Tuile du logo : léger reflet au survol. */
@@ -88,15 +161,18 @@
 
 /* Transitions de page natives (View Transitions) quand le navigateur sait faire. */
 ::view-transition-old(root) { animation: fade-out .16s ease both; }
-::view-transition-new(root) { animation: page-in .38s var(--ease) both; }
+::view-transition-new(root) { animation: page-in .42s var(--ease) both; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .aura > i { transform: none !important; }
 }
 
 @keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
-@keyframes page-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes dawnshift { to { background-position: 100% 0; } }
+@keyframes ring-draw { from { stroke-dashoffset: var(--len); } }
 @keyframes shimmer { from { background-position: -400px 0; } to { background-position: 400px 0; } }
 @keyframes slide-up { from { transform: translateY(100%); } to { transform: none; } }
 @keyframes slide-down { from { transform: none; } to { transform: translateY(100%); } }

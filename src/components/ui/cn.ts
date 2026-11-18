@@ -6,9 +6,10 @@ import { extendTailwindMerge } from 'tailwind-merge';
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
-      shadow: [{ shadow: ['card', 'pop', 'dawn'] }],
-      'bg-image': [{ bg: ['dawn'] }],
-      rounded: [{ rounded: ['xl2'] }],
+      shadow: [{ shadow: ['xs', 'card', 'halo', 'halo-lg', 'halo-sm', 'pill', 'glass', 'raise', 'lift', 'pop', 'dawn', 'dawn-lg', 'ink', 'focus'] }],
+      'bg-image': [{ bg: ['dawn', 'dawn-soft', 'dawn-diag', 'dawn-pale', 'dawn-mist'] }],
+      rounded: [{ rounded: ['xl2', '2.5xl', '4xl', 'card', 'card-sm', 'tile', 'field', 'sheet', 'pill'] }],
+      'font-size': [{ text: ['2xs', 'halo-title', 'halo-title-sm', 'num-xl', 'num-lg', 'num-md'] }],
     },
   },
 });

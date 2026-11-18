@@ -1,7 +1,7 @@
 // Petites briques de motion design, partagées par toute l'app.
 // Règles : sorties douces (easeOutQuint), 150-600 ms, jamais de boucle qui distrait,
 // tout se coupe avec prefers-reduced-motion.
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/components/ui/cn';
 
 export const prefersReducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -122,24 +122,31 @@ export function SuccessDot({ size = 20, className }: { size?: number; className?
   );
 }
 
-/** Anneau de progression animé (avancement chantier, objectifs). */
+/**
+ * Anneau de progression Halo : rail lavande, arc qui se ferme à l'arrivée à l'écran.
+ * `tone="dawn"` = dégradé Aube (objectif du mois). `children` = contenu centré (ex. « 74 % » + « de l'objectif »).
+ * Pour un grand anneau (150 px, trait 12), passer `size={150} stroke={12}` : le texte centré n'est plus réduit.
+ */
 export function Ring({ value, size = 40, stroke = 4, tone = 'ink', children, className }: { value: number; size?: number; stroke?: number; tone?: 'ink' | 'dawn' | 'ok' | 'warn' | 'vi'; children?: ReactNode; className?: string }) {
   const [ref, seen] = useInView<HTMLSpanElement>();
+  const gid = `ring${useId().replace(/:/g, '')}`;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value));
-  const color = { ink: 'var(--ink)', ok: '#16a34a', warn: '#d97706', vi: '#6d28d9', dawn: 'url(#ringDawn)' }[tone];
+  const color = { ink: 'var(--ink)', ok: '#10b981', warn: '#f59e0b', vi: '#6d28d9', dawn: `url(#${gid})` }[tone];
   return (
     <span ref={ref} className={cn('relative inline-grid shrink-0 place-items-center', className)} style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90">
-        <defs>
-          <linearGradient id="ringDawn" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stopColor="#6d28d9" />
-            <stop offset=".6" stopColor="#d946ef" />
-            <stop offset="1" stopColor="#fb923c" />
-          </linearGradient>
-        </defs>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--line)" strokeWidth={stroke} />
+      <svg width={size} height={size} className="-rotate-90" aria-hidden>
+        {tone === 'dawn' && (
+          <defs>
+            <linearGradient id={gid} x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stopColor="#6d28d9" />
+              <stop offset=".6" stopColor="#d946ef" />
+              <stop offset="1" stopColor="#fb923c" />
+            </linearGradient>
+          </defs>
+        )}
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#f1edf9" strokeWidth={stroke} />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -150,10 +157,10 @@ export function Ring({ value, size = 40, stroke = 4, tone = 'ink', children, cla
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={seen ? c * (1 - pct / 100) : c}
-          style={{ transition: 'stroke-dashoffset 1.1s var(--ease) .1s' }}
+          style={{ transition: `stroke-dashoffset ${size > 80 ? 1.6 : 1.1}s var(--ease) .15s` }}
         />
       </svg>
-      {children && <span className="absolute inset-0 grid place-items-center text-[10.5px] font-semibold num">{children}</span>}
+      {children && <span className={cn('absolute inset-0 grid place-items-center font-semibold num', size > 80 ? 'text-[15px]' : 'text-[10.5px]')}>{children}</span>}
     </span>
   );
 }
@@ -162,7 +169,7 @@ export function Ring({ value, size = 40, stroke = 4, tone = 'ink', children, cla
 export function GrowBar({ value, className, barClassName }: { value: number; className?: string; barClassName?: string }) {
   const [ref, seen] = useInView<HTMLDivElement>();
   return (
-    <div ref={ref} className={cn('h-1.5 overflow-hidden rounded-full bg-sub', className)}>
+    <div ref={ref} className={cn('h-1.5 overflow-hidden rounded-full bg-halo-track', className)}>
       <div className={cn('h-full rounded-full bg-ink transition-[width] duration-[1100ms] ease-out-quint', barClassName)} style={{ width: seen ? `${Math.max(0, Math.min(100, value))}%` : '0%' }} />
     </div>
   );

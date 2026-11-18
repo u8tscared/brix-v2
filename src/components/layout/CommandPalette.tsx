@@ -120,9 +120,9 @@ export function CommandPalette() {
   let lastGroup = '';
   return createPortal(
     <div className="fixed inset-0 z-[85] flex items-start justify-center px-3 pt-[calc(10px+var(--safe-t))] md:pt-[11vh]">
-      <div className="absolute inset-0 animate-fade-in bg-[#15122a]/30 backdrop-blur-[3px]" onClick={close} />
-      <div role="dialog" aria-label="Rechercher" className="relative flex max-h-[min(640px,calc(100dvh-24px))] w-full max-w-[640px] origin-top animate-[scale-in_.22s_var(--ease)_both] flex-col overflow-hidden rounded-[20px] bg-white shadow-pop">
-        <div className="flex items-center gap-3 border-b border-line px-4">
+      <div className="absolute inset-0 animate-fade-in bg-[#1b1236]/20 backdrop-blur-[6px]" onClick={close} />
+      <div role="dialog" aria-label="Rechercher" className="relative flex max-h-[min(640px,calc(100dvh-24px))] w-full max-w-[640px] origin-top animate-[scale-in_.22s_var(--ease)_both] flex-col overflow-hidden rounded-[26px] bg-white/[.88] shadow-pop backdrop-blur-2xl backdrop-saturate-150">
+        <div className="flex items-center gap-3 border-b border-[#efebf7] px-5">
           <Search className="h-[18px] w-[18px] shrink-0 text-ink-3" strokeWidth={1.75} />
           <input
             ref={inputRef}
@@ -167,7 +167,7 @@ export function CommandPalette() {
                   data-idx={idx}
                   onMouseMove={() => i !== idx && setI(idx)}
                   onClick={c.run}
-                  className={cn('flex min-h-[48px] w-full items-center gap-3 rounded-[12px] px-2.5 py-1.5 text-left text-[13.5px] transition-colors duration-150', active ? 'bg-sub' : 'hover:bg-sub')}
+                  className={cn('flex min-h-[48px] w-full items-center gap-3 rounded-[16px] px-2.5 py-1.5 text-left text-[13.5px] transition-[background,box-shadow] duration-150', active ? 'bg-white shadow-halo-sm' : 'hover:bg-white/60')}
                 >
                   <IconTile name={c.icon} dept={c.dept} size="sm" solid={c.solid} />
                   <span className="min-w-0 flex-1">
@@ -183,7 +183,7 @@ export function CommandPalette() {
           })}
         </div>
 
-        <footer className="hidden items-center gap-4 border-t border-line bg-[#fbfaff] px-4 py-2.5 text-[11.5px] text-ink-3 md:flex">
+        <footer className="hidden items-center gap-4 border-t border-[#efebf7] bg-white/50 px-5 py-2.5 text-[11.5px] text-ink-3 md:flex">
           <span className="flex items-center gap-1.5"><Kbd><ArrowUp className="h-3 w-3" /></Kbd><Kbd><ArrowDown className="h-3 w-3" /></Kbd> naviguer</span>
           <span className="flex items-center gap-1.5"><Kbd><CornerDownLeft className="h-3 w-3" /></Kbd> ouvrir</span>
           <span className="ml-auto flex items-center gap-1.5"><Kbd>⌘J</Kbd> parler à Bob</span>

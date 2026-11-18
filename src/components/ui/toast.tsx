@@ -29,18 +29,24 @@ export function Toaster() {
           key={t.id}
           role="status"
           className={cn(
-            'pointer-events-auto relative flex max-w-md items-center gap-2.5 overflow-hidden rounded-[14px] bg-[#15122a]/95 py-2.5 pl-3 pr-4 text-[13.5px] text-white shadow-pop backdrop-blur-xl',
+            'glass-strong pointer-events-auto relative flex min-h-[46px] max-w-md items-center gap-2.5 overflow-hidden rounded-full py-2 pl-2.5 pr-5 text-[13.5px] font-medium text-ink shadow-[inset_0_0_0_1px_rgba(255,255,255,.9),0_1px_2px_rgba(60,30,120,.06),0_18px_40px_-14px_rgba(60,30,120,.32)]',
             t.leaving ? 'animate-[scale-out_.2s_var(--ease)_both]' : 'animate-[toast-in_.45s_var(--spring)_both]',
           )}
         >
-          {t.tone === 'ok' ? <SuccessDot size={18} className="bg-[#22c55e]" /> : t.tone === 'warn' ? <AlertTriangle className="h-4 w-4 text-peach" /> : <Info className="h-4 w-4 text-vi-300" />}
+          {t.tone === 'ok' ? (
+            <SuccessDot size={26} className="bg-[#16a34a] shadow-[0_4px_10px_-3px_rgba(22,163,74,.55)]" />
+          ) : (
+            <span className={cn('grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full', t.tone === 'warn' ? 'bg-pale-p text-deep-p' : 'bg-pale-v text-deep-v')}>
+              {t.tone === 'warn' ? <AlertTriangle className="h-3.5 w-3.5" /> : <Info className="h-3.5 w-3.5" />}
+            </span>
+          )}
           <span className="leading-snug">{t.text}</span>
           {t.action && (
-            <button className="ml-1 rounded-md px-1.5 py-0.5 font-semibold text-vi-300 transition hover:bg-white/10 hover:text-white" onClick={() => { t.action!.run(); drop(t.id); }}>
+            <button className="-mr-2 ml-1 h-8 rounded-full bg-ink px-3 text-[12.5px] font-semibold text-white transition hover:bg-[#241f3f] active:scale-95" onClick={() => { t.action!.run(); drop(t.id); }}>
               {t.action.label}
             </button>
           )}
-          <span className="absolute inset-x-0 bottom-0 h-[2px] origin-left animate-[toast-life_4s_linear_both] bg-white/20" />
+          <span className="absolute inset-x-6 bottom-0 h-[2px] origin-left animate-[toast-life_4s_linear_both] rounded-full bg-dawn opacity-50" />
         </div>
       ))}
     </div>

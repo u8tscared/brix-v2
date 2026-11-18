@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-// Direction artistique « Aube » V3 : voir src/index.css pour les variables.
+// Direction artistique « Halo » (famille Aube) : voir src/index.css et docs/design-system.md.
 const ease = 'cubic-bezier(.22,1,.36,1)'; // easeOutQuint : sorties douces
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
@@ -21,6 +21,10 @@ export default {
         ok: { DEFAULT: '#15803d', bg: '#ecfdf3', line: '#c6efd5' },
         warn: { DEFAULT: '#b45309', bg: '#fff8eb', line: '#fde3b0' },
         bad: { DEFAULT: '#dc2626', bg: '#fef2f2', line: '#fbd0d0' },
+        // Halo : tons pâles par domaine (fond) + encre franche (texte/icône). bg-pale-v + text-deep-v.
+        pale: { v: '#f1eafe', m: '#fce8fd', p: '#fff0e4', g: '#e5f6ef', b: '#e8f0fe', c: '#e3f5f8', a: '#fdf3dc', r: '#fde9ee', i: '#eceefe', n: '#f3f1f8' },
+        deep: { v: '#6d28d9', m: '#b02bc4', p: '#d4661b', g: '#0f8a5f', b: '#2f5fd0', c: '#0e7490', a: '#a86206', r: '#c81e4a', i: '#4338ca', n: '#5d5a72' },
+        halo: { track: '#f1edf9', line: '#ece8f6', hover: '#f6f3fc' },
       },
       fontFamily: {
         sans: ['Geist', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'sans-serif'],
@@ -29,23 +33,39 @@ export default {
       },
       fontSize: {
         '2xs': ['11px', { lineHeight: '14px' }],
+        // Halo : grands titres et grands chiffres serrés (Geist 600).
+        'halo-title': ['40px', { lineHeight: '1.04', letterSpacing: '-0.045em', fontWeight: '600' }],
+        'halo-title-sm': ['30px', { lineHeight: '1.08', letterSpacing: '-0.042em', fontWeight: '600' }],
+        'num-xl': ['48px', { lineHeight: '1.05', letterSpacing: '-0.05em', fontWeight: '600' }],
+        'num-lg': ['38px', { lineHeight: '1.1', letterSpacing: '-0.05em', fontWeight: '600' }],
+        'num-md': ['30px', { lineHeight: '1.1', letterSpacing: '-0.04em', fontWeight: '600' }],
       },
       backgroundImage: {
         dawn: 'linear-gradient(100deg,#6d28d9 0%,#d946ef 58%,#fb923c 100%)',
         'dawn-soft': 'linear-gradient(100deg,#f3ecff 0%,#fbeafd 58%,#fff1e6 100%)',
         'dawn-diag': 'linear-gradient(135deg,#6d28d9 0%,#d946ef 62%,#fb923c 100%)',
+        // Fond très pâle des cartes « total » / mises en avant (devis Halo).
+        'dawn-pale': 'linear-gradient(135deg,#faf5ff 0%,#fff5ee 100%)',
+        'dawn-mist': 'linear-gradient(160deg,#ffffff 40%,#fdf3fb 100%)',
       },
       boxShadow: {
-        xs: '0 1px 1px rgba(19,15,38,.04)',
-        card: '0 1px 2px rgba(19,15,38,.04), 0 0 0 1px var(--line)',
-        raise: '0 0 0 1px var(--line), 0 1px 2px rgba(19,15,38,.04), 0 8px 24px -12px rgba(19,15,38,.12)',
-        lift: '0 0 0 1px var(--line2), 0 2px 4px rgba(19,15,38,.04), 0 16px 32px -16px rgba(40,20,90,.22)',
-        pop: '0 0 0 1px rgba(19,15,38,.06), 0 24px 48px -20px rgba(30,20,70,.32), 0 10px 20px -10px rgba(30,20,70,.14)',
-        dawn: '0 8px 20px -8px rgba(190,60,200,.55), inset 0 1px 0 rgba(255,255,255,.28)',
-        ink: '0 1px 2px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.12)',
-        focus: '0 0 0 4px rgba(139,92,246,.18)',
+        xs: '0 1px 2px rgba(60,30,120,.05)',
+        // Halo : ombres teintées violet. card = alias historique de halo (garde un filet presque invisible).
+        card: '0 0 0 1px rgba(60,30,120,.035), 0 1px 2px rgba(60,30,120,.04), 0 12px 36px -14px rgba(60,30,120,.14)',
+        halo: '0 0 0 1px rgba(60,30,120,.035), 0 1px 2px rgba(60,30,120,.04), 0 12px 36px -14px rgba(60,30,120,.14)',
+        'halo-lg': '0 0 0 1px rgba(60,30,120,.04), 0 2px 4px rgba(60,30,120,.05), 0 22px 48px -16px rgba(60,30,120,.22)',
+        'halo-sm': '0 0 0 1px #f0edf7, 0 1px 2px rgba(60,30,120,.04)',
+        pill: '0 1px 2px rgba(60,30,120,.08), 0 4px 12px -4px rgba(60,30,120,.14)',
+        glass: 'inset 0 0 0 1px rgba(255,255,255,.9), 0 1px 2px rgba(60,30,120,.05), 0 10px 30px -12px rgba(60,30,120,.16)',
+        raise: '0 0 0 1px rgba(60,30,120,.04), 0 1px 2px rgba(60,30,120,.04), 0 12px 30px -14px rgba(60,30,120,.18)',
+        lift: '0 0 0 1px rgba(60,30,120,.04), 0 2px 4px rgba(60,30,120,.05), 0 22px 48px -16px rgba(60,30,120,.22)',
+        pop: '0 0 0 1px rgba(60,30,120,.05), 0 30px 70px -24px rgba(50,25,110,.34), 0 12px 24px -12px rgba(50,25,110,.14)',
+        dawn: '0 8px 22px -8px rgba(217,70,239,.6), inset 0 1px 0 rgba(255,255,255,.25)',
+        'dawn-lg': '0 14px 30px -10px rgba(217,70,239,.7), inset 0 1px 0 rgba(255,255,255,.25)',
+        ink: '0 1px 2px rgba(19,15,38,.24), 0 6px 16px -8px rgba(19,15,38,.4), inset 0 1px 0 rgba(255,255,255,.12)',
+        focus: '0 0 0 4px rgba(167,139,250,.22)',
       },
-      borderRadius: { xl2: '14px', '2.5xl': '20px', '4xl': '28px' },
+      borderRadius: { xl2: '14px', '2.5xl': '20px', '4xl': '28px', card: '22px', 'card-sm': '16px', tile: '13px', field: '14px', sheet: '28px', pill: '999px' },
       transitionTimingFunction: { out: ease, spring: 'cubic-bezier(.34,1.56,.64,1)' },
       keyframes: {
         'fade-up': { from: { opacity: '0', transform: 'translateY(8px)' }, to: { opacity: '1', transform: 'none' } },
@@ -57,7 +77,7 @@ export default {
         'slide-down': { from: { transform: 'none' }, to: { transform: 'translateY(100%)' } },
         'slide-left': { from: { transform: 'translateX(24px)', opacity: '0' }, to: { transform: 'none', opacity: '1' } },
         'slide-right-out': { from: { transform: 'none', opacity: '1' }, to: { transform: 'translateX(24px)', opacity: '0' } },
-        'page-in': { from: { opacity: '0', transform: 'translateY(6px)', filter: 'blur(2px)' }, to: { opacity: '1', transform: 'none', filter: 'none' } },
+        'page-in': { from: { opacity: '0', transform: 'translateY(10px)', filter: 'blur(3px)' }, to: { opacity: '1', transform: 'none', filter: 'none' } },
         shine: { from: { left: '-60px' }, to: { left: '120%' } },
         shimmer: { from: { backgroundPosition: '-400px 0' }, to: { backgroundPosition: '400px 0' } },
         pulse2: { '0%': { boxShadow: '0 0 0 0 rgba(22,163,74,.45)' }, '100%': { boxShadow: '0 0 0 8px rgba(22,163,74,0)' } },
@@ -75,7 +95,8 @@ export default {
         'fade-up': `fade-up .45s ${ease} both`,
         'fade-in': `fade-in .3s ${ease} both`,
         'scale-in': `scale-in .22s ${ease} both`,
-        'page-in': `page-in .5s ${ease} both`,
+        'page-in': `page-in .55s ${ease} both`,
+        'pop-spring': 'pop .5s cubic-bezier(.34,1.56,.64,1) both',
         'slide-left': `slide-left .35s ${ease} both`,
         shine: 'shine 3.2s ease-in-out infinite',
         shimmer: 'shimmer 1.4s linear infinite',
