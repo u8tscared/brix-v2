@@ -90,7 +90,7 @@ export const MODULES: ModuleDef[] = [
   { key: 'brief', dept: 'bob', name: 'Brief du matin', short: "Ce qui compte aujourd'hui, en 1 minute.", icon: 'Sunrise', path: 'bob/brief', plan: 'pro' },
   { key: 'agent_nuit', dept: 'bob', name: 'Agent de nuit', short: 'Bob relance et prépare pendant que vous dormez.', icon: 'MoonStar', path: 'bob/nuit', plan: 'equipe', isNew: true },
   { key: 'secretaire', dept: 'bob', name: 'Secrétaire téléphonique', short: 'Bob répond aux appels manqués pendant le chantier.', icon: 'PhoneCall', path: 'bob/secretaire', plan: 'equipe', priorities: ['clients'], isNew: true },
-  { key: 'mcp', dept: 'bob', name: 'Brix AI MCP', short: 'Pilotez Brix depuis Claude ou ChatGPT.', icon: 'Plug', path: 'bob/mcp', plan: 'equipe', isNew: true },
+  { key: 'mcp', dept: 'bob', name: 'Brix AI MCP', short: 'Interrogez Brix depuis Claude ou ChatGPT, et préparez des brouillons.', icon: 'Plug', path: 'bob/mcp', plan: 'equipe', isNew: true },
   // Métier
   { key: 'outils_metier', dept: 'metier', name: 'Outils métier', short: 'Les calculs et contrôles de votre métier.', icon: 'Calculator', path: 'outils', plan: 'start', core: true },
   // Visibilité

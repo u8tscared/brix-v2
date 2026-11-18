@@ -166,7 +166,7 @@ export default function DevisPublic() {
 
       {/* Barre d'action collée en bas (téléphone) */}
       {!signe && !refuse && data.expireDans > 0 && (
-        <div className={`fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(10px+var(--safe-b))] transition-[transform,opacity] duration-500 ease-spring lg:hidden ${ctaVisible ? 'pointer-events-none translate-y-[130%] opacity-0' : 'translate-y-0 opacity-100'}`} aria-hidden={ctaVisible}>
+        <div className={`fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(10px+var(--safe-b))] transition-[transform,opacity] duration-500 ease-spring lg:hidden [.kb-open_&]:hidden ${ctaVisible ? 'pointer-events-none translate-y-[130%] opacity-0' : 'translate-y-0 opacity-100'}`} aria-hidden={ctaVisible}>
           <div className="glass-strong mx-auto flex max-w-[560px] items-center gap-3 rounded-[24px] py-2 pl-5 pr-2">
             <div className="min-w-0 flex-1">
               <div className="text-[11.5px] text-ink-3">Total TTC</div>

@@ -9,9 +9,14 @@ export const prefersReducedMotion = () => typeof window !== 'undefined' && windo
 const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5);
 
 /** Valeur numérique qui glisse vers sa cible (au montage puis à chaque changement). */
+/** Départ du comptage : la plus petite valeur qui a le même nombre de chiffres (6 838 part de 1 000).
+ *  Avec les chiffres tabulaires, la largeur du nombre ne change pas pendant qu'il compte : rien ne bouge autour. */
+const sameWidthStart = (t: number) => (Math.abs(t) < 10 ? 0 : Math.sign(t) * 10 ** Math.floor(Math.log10(Math.abs(t))));
+
 export function useCountUp(target: number, { duration = 900, delay = 0, from }: { duration?: number; delay?: number; from?: number } = {}) {
-  const [v, setV] = useState(prefersReducedMotion() ? target : from ?? 0);
-  const prev = useRef(from ?? 0);
+  const start0 = from ?? sameWidthStart(target);
+  const [v, setV] = useState(prefersReducedMotion() ? target : start0);
+  const prev = useRef(start0);
   useEffect(() => {
     if (prefersReducedMotion()) {
       setV(target);
@@ -39,7 +44,16 @@ export function useCountUp(target: number, { duration = 900, delay = 0, from }: 
 /** Nombre animé. format reçoit la valeur courante (ex. money). */
 export function AnimatedNumber({ value, format = (n) => Math.round(n).toLocaleString('fr-FR'), duration, delay, className }: { value: number; format?: (n: number) => string; duration?: number; delay?: number; className?: string }) {
   const v = useCountUp(value, { duration, delay });
-  return <span className={cn('num', className)}>{format(v)}</span>;
+  // La valeur finale (transparente) réserve la place : le texte autour ne bouge pas pendant le comptage,
+  // et c'est elle que lisent les lecteurs d'écran ; les chiffres qui défilent sont posés par-dessus.
+  return (
+    <span className={cn('num', className)}>
+      <span className="inline-grid">
+        <span data-num-final className="text-transparent [grid-area:1/1]">{format(value)}</span>
+        <span aria-hidden className="[grid-area:1/1]">{format(v)}</span>
+      </span>
+    </span>
+  );
 }
 
 /** Vrai dès que l'élément entre dans l'écran (une seule fois). */

@@ -33,7 +33,11 @@ export default function Welcome() {
           <button onClick={() => navigate('/app')} className="glass flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-[13px] font-medium text-ink-2 transition hover:text-ink">
             Retour à {company || 'mon Brix'} <ArrowRight className="h-3.5 w-3.5" />
           </button>
-        ) : null}
+        ) : (
+          <button onClick={() => navigate('/connexion')} className="glass flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-[13px] font-medium text-ink-2 transition hover:text-ink">
+            J'ai déjà un compte <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        )}
       </header>
 
       <main className="relative z-10 mx-auto flex w-full max-w-[880px] flex-1 flex-col justify-center px-5 py-10 text-center md:py-10">

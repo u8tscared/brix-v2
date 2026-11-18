@@ -49,7 +49,7 @@ export function LeadCard({ lead, onOpen, compact, onDevis, onAdvance, nextLabel,
         {lead.estimate !== undefined && <span className="num whitespace-nowrap text-[12.5px] font-semibold text-ink-2">≈ {money(lead.estimate, true)}</span>}
         <div className="flex-1" />
         {compact && live && (onDevis || onAdvance) && (
-          <span className="flex items-center gap-1 rounded-full bg-white p-0.5 transition duration-200 ease-out-quint lg:absolute lg:bottom-2.5 lg:right-2.5 lg:translate-y-1 lg:opacity-0 lg:shadow-pill lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+          <span className="flex items-center gap-1 rounded-full bg-white p-0.5 transition duration-200 ease-out-quint lg:absolute lg:bottom-2.5 lg:right-2.5 lg:translate-y-1 lg:opacity-0 lg:shadow-pill lg:group-hover:translate-y-0 lg:group-hover:opacity-100 touch:!static touch:!translate-y-0 touch:!opacity-100 touch:!shadow-none">
             {onDevis && lead.status !== 'devis' && (
               <Tip label="Préparer le devis">
                 <button onClick={(e) => { e.stopPropagation(); onDevis(); }} aria-label="Préparer le devis" className="grid h-7 w-7 place-items-center rounded-full bg-pale-n text-ink-2 transition hover:bg-ink hover:text-white">

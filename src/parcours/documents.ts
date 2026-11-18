@@ -49,7 +49,8 @@ export function useDevisPublic(token: string): DevisPublicData | null {
   useBrix((s) => s.devis);
   const src = source();
   const t = norm(token);
-  const devis = src.devis.find((d) => d.id.toLowerCase() === t || d.number.toLowerCase() === t);
+  // « demo » : lien d'exemple public (#/d/demo) vers un devis à signer de la démo.
+  const devis = t === 'demo' ? (src.devis.find((d) => d.status === 'vu' || d.status === 'envoye') ?? src.devis.find((d) => d.lines.length > 1) ?? src.devis[0]) : src.devis.find((d) => d.id.toLowerCase() === t || d.number.toLowerCase() === t);
   const meta = useMeta(devis?.id);
   if (!devis) return null;
   const tt = totals(devis.lines);
@@ -86,7 +87,11 @@ export function useFacturePublique(token: string): FacturePublicData | null {
   useBrix((s) => s.factures);
   const src = source();
   const t = norm(token);
-  const facture = src.factures.find((f) => f.id.toLowerCase() === t || f.number.toLowerCase() === t);
+  // « demo » : lien d'exemple public (#/f/demo) vers une facture à payer de la démo.
+  const facture =
+    t === 'demo'
+      ? (src.factures.find((f) => (f.status === 'envoyee' || f.status === 'en_retard') && f.paidAmount < totals(f.lines).ttc) ?? src.factures.find((f) => f.status !== 'brouillon') ?? src.factures[0])
+      : src.factures.find((f) => f.id.toLowerCase() === t || f.number.toLowerCase() === t);
   if (!facture) return null;
   const ttc = totals(facture.lines).ttc;
   return {

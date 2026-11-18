@@ -183,7 +183,7 @@ export function CommandPalette() {
           })}
         </div>
 
-        <footer className="hidden items-center gap-4 border-t border-[#efebf7] bg-white/50 px-5 py-2.5 text-[11.5px] text-ink-3 md:flex">
+        <footer className="kbd-hint hidden items-center gap-4 border-t border-[#efebf7] bg-white/50 px-5 py-2.5 text-[11.5px] text-ink-3 md:flex">
           <span className="flex items-center gap-1.5"><Kbd><ArrowUp className="h-3 w-3" /></Kbd><Kbd><ArrowDown className="h-3 w-3" /></Kbd> naviguer</span>
           <span className="flex items-center gap-1.5"><Kbd><CornerDownLeft className="h-3 w-3" /></Kbd> ouvrir</span>
           <span className="ml-auto flex items-center gap-1.5"><Kbd>⌘J</Kbd> parler à Bob</span>

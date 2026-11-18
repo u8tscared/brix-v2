@@ -1,5 +1,5 @@
 // Écran final « Votre Brix est prêt » : construction en briques, récapitulatif, données de départ et import.
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Database, FileUp, Sprout, X } from 'lucide-react';
 import { DEPARTMENTS, MODULES, OFFERS, PRIORITIES, SIZES, TRADE_BY_KEY } from '@/lib/catalog';
 import { BrandTile } from '@/parcours/marque';
@@ -18,9 +18,12 @@ interface Props {
   onBack: () => void;
   onOpen: () => void;
   instant?: boolean;
+  /** Création du compte en cours (cloud) et message d'erreur éventuel. */
+  busy?: boolean;
+  error?: ReactNode;
 }
 
-export function Pret({ d, set, imported, setImported, onBack, onOpen, instant }: Props) {
+export function Pret({ d, set, imported, setImported, onBack, onOpen, instant, busy, error }: Props) {
   const bricks = useMemo(() => {
     const on = new Set(d.enabled);
     return DEPARTMENTS.map((dep) => ({ dep, n: MODULES.filter((m) => m.dept === dep.key && on.has(m.key)).length })).filter((b) => b.n > 0);
@@ -112,15 +115,20 @@ export function Pret({ d, set, imported, setImported, onBack, onOpen, instant }:
       )}
 
       {ready && (
-        <div className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] md:px-6">
+        <div className="fixed inset-x-0 bottom-[var(--kb)] z-30 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] md:px-6">
+          {error && (
+            <div role="alert" className="glass-strong mx-auto mb-2 max-w-[720px] rounded-[18px] px-4 py-3 text-[13px] leading-snug text-deep-r">
+              {error}
+            </div>
+          )}
           <div className="glass-strong mx-auto flex h-[68px] max-w-[720px] items-center gap-3 rounded-[24px] px-2.5 md:px-3">
             <button type="button" onClick={onBack} className="ob-btn ob-btn-ghost h-12 w-12 px-0 sm:w-auto sm:px-4" aria-label="Modifier mes réponses">
               <ArrowLeft className="h-[18px] w-[18px]" strokeWidth={1.75} /> <span className="hidden sm:inline">Modifier mes réponses</span>
             </button>
             <span className="flex-1" />
-            <button type="button" onClick={onOpen} className="bx-btn-dawn ob-btn h-12 flex-1 px-6 sm:flex-none">
-              Ouvrir mon Brix <ArrowRight className="h-4 w-4" strokeWidth={2} />
-              <span className="ob-kbd">Entrée</span>
+            <button type="button" onClick={onOpen} disabled={busy} aria-busy={busy} className="bx-btn-dawn ob-btn h-12 flex-1 px-6 sm:flex-none">
+              {busy ? 'Création de votre compte…' : <>Ouvrir mon Brix <ArrowRight className="h-4 w-4" strokeWidth={2} /></>}
+              {!busy && <span className="ob-kbd">Entrée</span>}
             </button>
           </div>
         </div>

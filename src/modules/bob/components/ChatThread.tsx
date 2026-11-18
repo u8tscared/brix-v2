@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { Typewriter } from '@/components/motion';
 import { BobCardView } from './BobCardView';
+import { Activites } from './Activites';
 import { BobMark } from './VoiceOrb';
 import type { ChatMessage } from '../chat';
 import type { BobCardAction } from '../engine';
@@ -24,15 +25,21 @@ export function Suggestions({ items, onPick, className = '' }: { items: string[]
 }
 
 function BobMessage({ m, last, thinking, onAction, onOpen, onPick }: { m: ChatMessage; last: boolean; thinking: boolean; onAction: (msgId: string, key: string, a: BobCardAction) => void; onOpen: (to: string) => void; onPick: (s: string) => void }) {
-  const [ready, setReady] = useState(typed.has(m.id));
+  // Bob en ligne : le texte arrive déjà au fil de l'eau, pas d'effet machine à écrire.
+  const [ready, setReady] = useState(m.flux || typed.has(m.id));
+  const writing = m.flux ? !!m.enCours : !ready;
   return (
     <div className="flex gap-2.5">
-      <BobMark size={28} className="mt-0.5" />
+      <BobMark size={28} className="mt-0.5" active={m.flux && m.enCours} />
       <div className="min-w-0 flex-1 space-y-2.5">
-        <p className="text-[14px] leading-relaxed text-ink">
-          {ready ? m.text : <Typewriter text={m.text} speed={12} onDone={() => { typed.add(m.id); setReady(true); }} />}
-          {!ready && <i className="ml-0.5 inline-block h-[15px] w-[2px] translate-y-[2px] animate-pulse bg-[#d946ef]" aria-hidden />}
-        </p>
+        {m.activites && m.activites.length > 0 && <Activites items={m.activites} onOpen={onOpen} />}
+        {(m.text || writing) && (
+          <p className="whitespace-pre-line text-[14px] leading-relaxed text-ink">
+            {ready ? m.text : <Typewriter text={m.text} speed={12} onDone={() => { typed.add(m.id); setReady(true); }} />}
+            {writing && <i className="ml-0.5 inline-block h-[15px] w-[2px] translate-y-[2px] animate-pulse bg-[#d946ef]" aria-hidden />}
+          </p>
+        )}
+        {m.note && <p className="text-[12.5px] text-ink-3">{m.note}</p>}
         {ready && (
           <div className="stagger space-y-2.5">
             {m.reply?.cards?.map((c, i) => (
@@ -65,6 +72,12 @@ export function ChatThread({ messages, thinking, onAction, onOpen, onPick }: {
       clearTimeout(stop);
     };
   }, [messages.length, thinking]);
+  // Bob en ligne : suit le texte diffusé, les pastilles et les cartes qui arrivent.
+  const tail = messages[messages.length - 1];
+  const tailSize = tail?.flux ? tail.text.length + (tail.activites?.length ?? 0) * 1000 + (tail.reply?.cards?.length ?? 0) * 100000 : 0;
+  useEffect(() => {
+    if (tailSize) end.current?.scrollIntoView({ block: 'end' });
+  }, [tailSize]);
 
   return (
     <div className="space-y-5">
@@ -77,7 +90,7 @@ export function ChatThread({ messages, thinking, onAction, onOpen, onPick }: {
           <BobMessage key={m.id} m={m} last={m === lastBob} thinking={thinking} onAction={onAction} onOpen={onOpen} onPick={onPick} />
         ),
       )}
-      {thinking && (
+      {thinking && !(lastBob?.flux && lastBob.enCours && messages[messages.length - 1] === lastBob) && (
         <div className="flex animate-fade-in items-center gap-2.5">
           <BobMark size={28} active />
           <span className="skeleton h-3.5 w-40 rounded-full" aria-label="Bob réfléchit" />

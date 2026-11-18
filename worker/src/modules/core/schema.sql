@@ -26,8 +26,18 @@ CREATE TABLE IF NOT EXISTS users (
   first_name TEXT,
   last_name TEXT,
   role TEXT NOT NULL DEFAULT 'patron',
-  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  -- Ajoutées après coup sur les bases existantes : voir migrations/ (lancées par worker/migrate.sh)
+  google_sub TEXT,                    -- identifiant Google (« Continuer avec Google »)
+  sessions_revoquees_avant INTEGER    -- secondes Unix : jetons émis avant = refusés (déconnecter tous les appareils)
 );
+
+-- Essais de connexion ratés (limite : 10 par e-mail et adresse IP sur 15 minutes).
+CREATE TABLE IF NOT EXISTS auth_tentatives (
+  cle TEXT NOT NULL,                  -- e-mail normalisé | IP
+  a INTEGER NOT NULL                  -- secondes Unix
+);
+CREATE INDEX IF NOT EXISTS idx_auth_tentatives ON auth_tentatives(cle, a);
 
 CREATE TABLE IF NOT EXISTS clients (
   id TEXT PRIMARY KEY,
@@ -135,4 +145,13 @@ CREATE TABLE IF NOT EXISTS einvoice_events (
   status TEXT NOT NULL,
   note TEXT,
   at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- État synchronisé de l'app (voir worker/src/lib/etat.ts) : version + date, le JSON vit dans R2.
+CREATE TABLE IF NOT EXISTS etat_org (
+  organization_id TEXT PRIMARY KEY,
+  version INTEGER NOT NULL DEFAULT 0,
+  maj_le TEXT,
+  maj_par TEXT,
+  taille INTEGER NOT NULL DEFAULT 0
 );

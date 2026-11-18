@@ -10,9 +10,11 @@
     "typecheck": "tsc -b",
     "test": "vitest run --passWithNoTests",
     "worker:dev": "wrangler dev",
-    "worker:typecheck": "tsc -p worker/tsconfig.json --noEmit"
+    "worker:typecheck": "tsc -p worker/tsconfig.json --noEmit",
+    "icons": "node scripts/generate-icons.cjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
@@ -34,5 +36,10 @@
     "vite": "^5.4.11",
     "vitest": "^2.1.5",
     "wrangler": "^3.90.0"
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "iOS >= 15",
+    "Safari >= 15"
+  ]
 }

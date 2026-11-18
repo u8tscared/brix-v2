@@ -160,6 +160,7 @@ export function exemples(base = 'https://app.brix-app.fr/'): { [M in ModeleEmail
       'karim@benali-elec.fr',
       brix,
     ),
+    mot_de_passe: ex('mot_de_passe', { prenom: 'Karim', lien: l('mot-de-passe?jeton=exemple'), minutes: 60 }, 'karim@benali-elec.fr', brix),
   };
 }
 
@@ -178,4 +179,5 @@ export const ORDRE_MODELES: ModeleEmail[] = [
   'reponse_fournisseur',
   'commande_fournisseur',
   'bienvenue',
+  'mot_de_passe',
 ];

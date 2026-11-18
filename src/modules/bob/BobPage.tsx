@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Check, Mic, RotateCcw } from 'lucide-react';
 import { AnimatedNumber, SuccessDot } from '@/components/motion';
@@ -5,6 +6,7 @@ import { Badge, Button, Card, CardHeader, EmptyState, Icon, IconTile, PageHeader
 import type { DepartmentKey } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import { useUI } from '@/lib/ui';
+import { etatIA } from './agent';
 import { capabilities } from './engine';
 import { useBobLocal } from './store';
 import { BobNav } from './components/BobNav';
@@ -26,6 +28,14 @@ export default function BobPage() {
   const decideNight = useBobLocal((s) => s.decideNight);
   const { tone, setTone } = useBobLocal();
   const caps = capabilities();
+  const [enLigne, setEnLigne] = useState(false);
+  useEffect(() => {
+    let vivant = true;
+    void etatIA().then((v) => vivant && setEnLigne(v.disponible));
+    return () => {
+      vivant = false;
+    };
+  }, []);
   const todo = bob.filter((b) => !b.done).length;
 
   const validate = (id: string) => {
@@ -133,8 +143,17 @@ export default function BobPage() {
             <div className="flex items-start gap-3">
               <IconTile name="ShieldCheck" tone="green" size="sm" />
               <div className="min-w-0 flex-1 text-[13px] text-ink-2">
-                <div className="mb-1 flex items-center gap-2 text-[14px] font-semibold text-ink">Version de démo <Badge tone="neutral">Démo</Badge></div>
-                Ici, Bob répond avec des réponses préparées et agit sur les données de démonstration. Il ne fait jamais rien d’important sans ton accord : envoyer un devis, payer, supprimer.
+                {enLigne ? (
+                  <>
+                    <div className="mb-1 text-[14px] font-semibold text-ink">Bob agit, tu valides</div>
+                    Bob comprend tes demandes et prépare le travail dans l’app. Il ne fait jamais rien d’important sans ton accord : envoyer un devis ou une relance, payer, supprimer.
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-1 flex items-center gap-2 text-[14px] font-semibold text-ink">Version de démo <Badge tone="neutral">Démo</Badge></div>
+                    Ici, Bob répond avec des réponses préparées et agit sur les données de démonstration. Il ne fait jamais rien d’important sans ton accord : envoyer un devis, payer, supprimer.
+                  </>
+                )}
               </div>
             </div>
             <button onClick={() => navigate('/app/bob/nuit')} className="mt-3 flex min-h-[44px] w-full items-center justify-between rounded-pill bg-halo-hover px-4 py-2.5 text-[13px] font-medium text-ink transition hover:bg-halo-track">

@@ -134,8 +134,8 @@ export default function SousTraitants() {
                 const amount = s.contracts.reduce((a, c) => a + c.amountHt, 0);
                 const access = chantiers.find((c) => c.id === s.accessChantierId);
                 return (
-                  <button key={s.id} onClick={() => setOpenId(s.id)} className="lift flex w-full flex-col rounded-card bg-white p-5 text-left shadow-halo">
-                    <div className="flex items-start gap-3">
+                  <button key={s.id} onClick={() => setOpenId(s.id)} className="lift flex w-full min-w-0 flex-col overflow-hidden rounded-card bg-white p-5 text-left shadow-halo">
+                    <div className="flex min-w-0 items-start gap-3">
                       <IconTile icon={<Building2 />} dept="achats" />
                       <div className="min-w-0 flex-1">
                         <div className="truncate text-[15px] font-semibold tracking-[-0.015em]">{s.name}</div>

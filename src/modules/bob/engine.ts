@@ -1,7 +1,6 @@
-// Moteur d'intentions local de Bob (version de démo, sans API).
-// Il comprend le français courant et AGIT sur le store. Quand le vrai modèle
-// sera branché (api.ts), il recevra la même question et renverra la même forme
-// de réponse (BobReply) ; ce moteur restera le secours hors ligne.
+// Moteur d'intentions local de Bob (sans réseau). Il comprend le français courant et AGIT
+// sur le store. C'est le secours hors ligne de Bob en ligne (agent.ts, API Claude via le
+// worker) : les deux partagent la même logique métier (outils/*.ts).
 
 import { useBrix } from '@/lib/store';
 import { findLesson } from './nlu/knowledge';

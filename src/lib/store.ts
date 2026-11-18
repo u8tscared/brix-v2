@@ -21,6 +21,8 @@ export interface Prefs {
 export interface BrixState {
   onboarded: boolean;
   isDemo: boolean;
+  /** Entreprise du compte dont ces données sont la copie (synchronisation cloud, src/lib/cloud.ts). Absent : données locales ou démo. */
+  compte?: string;
   plan: Plan;
   priorities: PriorityKey[];
   enabled: ModuleKey[];
@@ -135,7 +137,7 @@ export const useBrix = create<BrixState>()(
 
       loadDemo: (trade) => {
         const t = typeof trade === 'string' ? trade : get().onboarded ? get().company.trade : undefined;
-        set({ ...demoState(t), prefs: { ...initialPrefs, tourDone: true } });
+        set({ ...demoState(t), compte: undefined, prefs: { ...initialPrefs, tourDone: true } });
       },
 
       completeOnboarding: ({ company, user, priorities, enabled, plan, withDemoData }) => {
@@ -164,7 +166,7 @@ export const useBrix = create<BrixState>()(
       },
 
       reset: () => {
-        set({ onboarded: false, isDemo: false, enabled: [], priorities: [], company: emptyCompany, clients: [], chantiers: [], devis: [], factures: [], employees: [], events: [], leads: [], bob: [], expenses: [], bank: [], cashBalance: 0, prefs: initialPrefs, setupTasks: {} });
+        set({ onboarded: false, isDemo: false, compte: undefined, enabled: [], priorities: [], company: emptyCompany, clients: [], chantiers: [], devis: [], factures: [], employees: [], events: [], leads: [], bob: [], expenses: [], bank: [], cashBalance: 0, prefs: initialPrefs, setupTasks: {} });
       },
 
       toggleModule: (k, on) => set((s) => {

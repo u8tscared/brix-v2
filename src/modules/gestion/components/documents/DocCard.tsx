@@ -71,7 +71,7 @@ export function DocCard({ d, selecting, picked, fresh, fetching, onOpen, onDropF
         </div>
       </div>
       {!selecting && (
-        <span className="hidden shrink-0 items-center gap-1 text-[12px] font-medium text-ink-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 md:flex">
+        <span className="hidden shrink-0 items-center gap-1 text-[12px] font-medium text-ink-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 touch:opacity-100 md:flex">
           {over ? <><Upload className="h-3.5 w-3.5" />Déposer</> : <><FileText className="h-3.5 w-3.5" />Ouvrir</>}
         </span>
       )}

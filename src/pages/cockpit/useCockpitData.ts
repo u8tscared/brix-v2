@@ -3,6 +3,7 @@ import { daysBetween, localISO, todayISO, totals } from '@/lib/format';
 import { useBrix } from '@/lib/store';
 import { allPayments, useFactures } from '@/modules/factures/store';
 import { amounts, liveStatus } from '@/modules/factures/lib/model';
+import { encaisseDuMois } from '@/modules/factures/lib/encaisse';
 
 const monthLong = (iso: string) => new Date(iso + '-15T12:00:00').toLocaleDateString('fr-FR', { month: 'long' });
 
@@ -16,8 +17,8 @@ export function useCockpitData() {
     // Mêmes règles que l'écran Factures : paiements réellement reçus ce mois-ci,
     // reste à payer hors retenue de garantie, retard selon l'échéance.
     const all = allPayments(s.factures, payments);
-    const monthPayments = all.filter((p) => p.date.startsWith(month));
-    const paidThisMonth = monthPayments.reduce((a, p) => a + p.amount, 0);
+    // Même calcul que Bob (« Combien j'ai encaissé ce mois-ci ? ») : src/modules/factures/lib/encaisse.ts.
+    const { paiements: monthPayments, total: paidThisMonth } = encaisseDuMois(s.factures, payments, today);
     const prev = new Date(`${month}-01T12:00:00`);
     prev.setMonth(prev.getMonth() - 1);
     const prevMonth = localISO(prev).slice(0, 7);

@@ -1,15 +1,17 @@
+import { createPortal } from 'react-dom';
 import { create } from 'zustand';
 import { AlertTriangle, Info } from 'lucide-react';
 import { SuccessDot } from '@/components/motion';
 import { cn } from './cn';
 
-interface ToastItem { id: number; text: string; tone: 'ok' | 'info' | 'warn'; action?: { label: string; run: () => void }; leaving?: boolean }
+interface ToastItem { id: number; text: string; tone: 'ok' | 'info' | 'warn'; action?: { label: string; run: () => void }; leaving?: boolean; duration?: number }
 const useToasts = create<{ items: ToastItem[]; push: (t: Omit<ToastItem, 'id'>) => void; drop: (id: number) => void }>((set, get) => ({
   items: [],
   push: (t) => {
     const id = Date.now() + Math.random();
     set((s) => ({ items: [...s.items.slice(-2), { ...t, id }] }));
-    setTimeout(() => get().drop(id), 4000);
+    const d = t.duration ?? 4000;
+    if (d > 0) setTimeout(() => get().drop(id), d);
   },
   drop: (id) => {
     set((s) => ({ items: s.items.map((x) => (x.id === id ? { ...x, leaving: true } : x)) }));
@@ -18,12 +20,12 @@ const useToasts = create<{ items: ToastItem[]; push: (t: Omit<ToastItem, 'id'>) 
 }));
 
 /** Affiche une confirmation discrète en bas de l'écran. */
-export const toast = (text: string, tone: ToastItem['tone'] = 'ok', action?: ToastItem['action']) => useToasts.getState().push({ text, tone, action });
+export const toast = (text: string, tone: ToastItem['tone'] = 'ok', action?: ToastItem['action'], opts?: { duration?: number }) => useToasts.getState().push({ text, tone, action, duration: opts?.duration });
 
 export function Toaster() {
   const { items, drop } = useToasts();
-  return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(92px+var(--safe-b))] z-[90] flex flex-col items-center gap-2 px-4 md:bottom-6">
+  return createPortal(
+    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(var(--toast-b,92px)+var(--safe-b))] z-[90] flex flex-col items-center gap-2 px-4 md:bottom-[calc(var(--toast-b-md,24px)+var(--safe-b))]">
       {items.map((t) => (
         <div
           key={t.id}
@@ -46,9 +48,10 @@ export function Toaster() {
               {t.action.label}
             </button>
           )}
-          <span className="absolute inset-x-6 bottom-0 h-[2px] origin-left animate-[toast-life_4s_linear_both] rounded-full bg-dawn opacity-50" />
+          {(t.duration ?? 4000) > 0 && <span className="absolute inset-x-6 bottom-0 h-[2px] origin-left rounded-full bg-dawn opacity-50" style={{ animation: `toast-life ${(t.duration ?? 4000) / 1000}s linear both` }} />}
         </div>
       ))}
-    </div>
+    </div>,
+    document.body,
   );
 }

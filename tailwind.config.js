@@ -3,6 +3,8 @@
 const ease = 'cubic-bezier(.22,1,.36,1)'; // easeOutQuint : sorties douces
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  // Survol seulement sur les appareils qui savent survoler (souris) : pas de :hover collant après un tap sur iPad.
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
       colors: {
@@ -113,5 +115,12 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // touch: écran tactile sans survol (iPad, téléphone) ; mouse: souris ou trackpad.
+    // Sert à afficher d'office les actions qui n'apparaissent qu'au survol sur ordinateur.
+    ({ addVariant }) => {
+      addVariant('touch', '@media (hover: none), (pointer: coarse)');
+      addVariant('mouse', '@media (hover: hover) and (pointer: fine)');
+    },
+  ],
 };

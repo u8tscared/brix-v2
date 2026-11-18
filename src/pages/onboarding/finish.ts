@@ -1,5 +1,9 @@
-// Fin de l'inscription : création du Brix, import des clients, e-mail de bienvenue et notification.
+// Fin de l'inscription : création du Brix, import des clients, compte cloud (si le worker répond),
+// e-mail de bienvenue et notification.
+import { ApiError, api, cloudDisponible, ouvrirSession, type ReponseSession } from '@/lib/api';
 import { TRADE_BY_KEY } from '@/lib/catalog';
+import { extraire } from '@/lib/cloud-fusion';
+import { lierApresInscription } from '@/lib/cloud';
 import { useBrix } from '@/lib/store';
 import type { Client } from '@/lib/types';
 import { useBoite } from '@/emails/boite';
@@ -36,7 +40,51 @@ export function parseClientsCsv(text: string): ClientImporte[] {
     .slice(0, 2000);
 }
 
-export function finishOnboarding(d: Draft, imported: ClientImporte[]) {
+/** Erreur d'inscription : `compteExiste` pour proposer la connexion. */
+export class ErreurInscription extends Error {
+  constructor(message: string, public compteExiste = false, public motDePasseManquant = false) {
+    super(message);
+  }
+}
+
+/**
+ * Crée le Brix. Avec le cloud : crée aussi le compte (e-mail + mot de passe, ou Google) et envoie les
+ * données de départ ; en cas d'échec, le navigateur revient à son état d'avant. Sans cloud (preview
+ * statique) : tout reste local, comme avant.
+ */
+export async function finishOnboarding(d: Draft, imported: ClientImporte[]): Promise<void> {
+  const cloud = await cloudDisponible();
+  if (cloud && !d.google && d.password.length < 8) throw new ErreurInscription('Retapez votre mot de passe pour créer votre compte.', false, true);
+  const avant = useBrix.getState();
+  construire(d, imported);
+  if (cloud) {
+    try {
+      await creerCompte(d);
+    } catch (e) {
+      useBrix.setState(avant, true);
+      throw e;
+    }
+  }
+  accueillir(d);
+}
+
+async function creerCompte(d: Draft) {
+  const st = useBrix.getState();
+  const donnees = extraire(st as unknown as Record<string, unknown>);
+  const commun = { firstName: d.firstName.trim(), lastName: d.lastName.trim(), company: st.company, enabledModules: st.enabled, plan: st.plan, donnees };
+  try {
+    const r = d.google
+      ? await api<ReponseSession>('/api/auth/google', { body: { credential: d.google.credential, mode: 'signup', ...commun }, auth: false })
+      : await api<ReponseSession>('/api/auth/signup', { body: { email: d.email.trim(), password: d.password, ...commun }, auth: false });
+    lierApresInscription(ouvrirSession(r), donnees);
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 409) throw new ErreurInscription('Un compte existe déjà avec cet e-mail.', true);
+    if (e instanceof ApiError && e.status === 401 && d.google) throw new ErreurInscription('La connexion Google a expiré. Revenez à l’étape Accès et cliquez à nouveau sur Google.');
+    throw new ErreurInscription(e instanceof Error ? e.message : 'Création du compte impossible, réessayez.');
+  }
+}
+
+function construire(d: Draft, imported: ClientImporte[]) {
   const s = useBrix.getState();
   const trade = d.trade ?? 'autre';
   const initials = d.companyName.split(/\s+/).filter(Boolean).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -59,7 +107,11 @@ export function finishOnboarding(d: Draft, imported: ClientImporte[]) {
     useBrix.getState().upsertClient({ id: `c_imp_${Date.now().toString(36)}_${i}`, kind: 'particulier', tags: ['Import'], createdAt: now, ...c }),
   );
   if (imported.length || d.importFrom) useBrix.getState().markTask('import', true);
+}
 
+function accueillir(d: Draft) {
+  const trade = d.trade ?? 'autre';
+  const email = useBrix.getState().user.email;
   const prenom = d.firstName.trim();
   const entreprise = d.companyName.trim();
   const metier = TRADE_BY_KEY[trade].name;

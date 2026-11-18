@@ -2,6 +2,7 @@
 import { BellRing, Mail, MessageSquare, Moon, Smartphone } from 'lucide-react';
 import { IconTile, Switch, cn } from '@/components/ui';
 import { TYPES_REGLABLES, useNotifs, type Canal } from './store';
+import { PushAppareil } from './PushAppareil';
 
 const CANAUX: { k: Canal; label: string; I: typeof Mail }[] = [
   { k: 'app', label: 'App', I: BellRing },
@@ -14,6 +15,7 @@ export function Reglages() {
   const { prefs, basculer, calme, setCalme } = useNotifs();
   return (
     <div className="space-y-5">
+      <PushAppareil />
       <div className="overflow-hidden rounded-card-sm bg-white shadow-halo">
         <div className="grid grid-cols-[1fr_repeat(4,44px)] items-center gap-1 border-b border-halo-line bg-halo-hover px-3 py-2 text-[10.5px] font-semibold uppercase tracking-wide text-ink-3">
           <span>Prévenez-moi quand</span>

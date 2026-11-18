@@ -21,6 +21,8 @@ export interface Draft {
   importFrom?: string;
   tour: boolean;
   accessOk?: boolean; // accès déjà validé (le mot de passe n'est pas sauvegardé)
+  /** « Continuer avec Google » : jeton d'identité, gardé en mémoire seulement (comme le mot de passe). */
+  google?: { credential: string; email: string };
 }
 
 export const EMPTY: Draft = {
@@ -61,6 +63,7 @@ export function missing(step: number, d: Draft): string | null {
     case 4:
       if (!d.firstName.trim()) return 'Indiquez votre prénom';
       if (!emailOk(d.email)) return 'Indiquez un e-mail valide';
+      if (d.google) return null;
       return d.password.length >= 8 || (d.accessOk && !d.password) ? null : 'Mot de passe de 8 caractères minimum';
     default: return null;
   }
@@ -85,7 +88,7 @@ export function load(): Saved | null {
     const raw = sessionStorage.getItem(KEY);
     if (!raw) return null;
     const s = JSON.parse(raw) as Saved;
-    return { ...s, d: { ...EMPTY, ...s.d, password: '' } };
+    return { ...s, d: { ...EMPTY, ...s.d, password: '', google: undefined } };
   } catch {
     return null;
   }
@@ -94,7 +97,7 @@ export function load(): Saved | null {
 export function save(s: Saved) {
   try {
     // Le mot de passe ne quitte jamais la mémoire de la page.
-    sessionStorage.setItem(KEY, JSON.stringify({ ...s, d: { ...s.d, password: '' } }));
+    sessionStorage.setItem(KEY, JSON.stringify({ ...s, d: { ...s.d, password: '', google: undefined } }));
   } catch {
     /* navigation privée : on continue sans sauvegarde */
   }

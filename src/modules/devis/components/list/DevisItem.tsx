@@ -86,7 +86,7 @@ export function DevisRow({ d, client, ttc, score, meta, onOpen, onPreview, onRem
               onPreview();
             }}
             aria-label={`Aperçu du devis ${d.number}`}
-            className="grid h-9 w-9 place-items-center rounded-full text-ink-3 opacity-0 transition hover:bg-halo-hover hover:text-ink focus:opacity-100 group-hover:opacity-100"
+            className="grid h-9 w-9 place-items-center rounded-full text-ink-3 opacity-0 transition hover:bg-halo-hover hover:text-ink focus:opacity-100 group-hover:opacity-100 touch:h-11 touch:w-11 touch:opacity-100"
           >
             <Expand className="h-4 w-4" />
           </button>

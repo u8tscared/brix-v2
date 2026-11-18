@@ -4,6 +4,7 @@ import { Compass, Database, Download, RotateCcw } from 'lucide-react';
 import { Avatar, Badge, Button, Card, IconTile, Sheet, toast, type HaloTone } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { ROLE_LABEL } from '@/lib/catalog';
+import { CloudCompte } from './CloudCompte';
 
 export default function CompteTab() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function CompteTab() {
 
   return (
     <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1fr_1fr]">
+      <CloudCompte />
       <Card className="p-4 md:p-5">
         <div className="flex items-center gap-3">
           <Avatar initials={`${s.user.firstName[0] ?? ''}${s.user.lastName[0] ?? ''}`} dawn size={56} />
@@ -42,7 +44,7 @@ export default function CompteTab() {
       <Card className="p-4 md:p-5">
         <div className="flex items-center gap-3"><IconTile name="ShieldCheck" tone="blue" size="row" /><div className="text-[15px] font-semibold tracking-[-0.02em]">Sécurité</div></div>
         <div className="mt-3 space-y-2 text-[13px] text-ink-2">
-          <p>Connexion sans mot de passe : un lien ou un code arrive sur votre téléphone.</p>
+          <p>Connexion par e-mail et mot de passe, ou avec Google. Mot de passe oublié : un lien arrive par e-mail.</p>
           <p>Données hébergées en France, sauvegardées chaque nuit. Factures conservées 10 ans comme l’exige la loi.</p>
         </div>
         <div className="mt-6 rounded-card-sm bg-pale-r/60 p-4">

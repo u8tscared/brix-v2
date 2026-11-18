@@ -34,7 +34,7 @@ export function NightShift({ className, compact }: { className?: string; compact
             {pending.length ? `${pending.length} chose${pending.length > 1 ? 's' : ''} à valider` : 'Tout est validé'} <span className="max-sm:hidden">· de 2 h à 6 h</span>
           </p>
         </div>
-        <Button size="sm" variant="secondary" icon={<Play className="!h-3 !w-3 fill-current" />} onClick={() => navigate('/app/bob/brief')} aria-label="Écouter le brief d’une minute">
+        <Button size="sm" variant="secondary" icon={<Play className="!h-3 !w-3 fill-current" />} onClick={() => navigate('/app/bob/brief')} aria-label="1 min : écouter le brief">
           1 min
         </Button>
       </header>

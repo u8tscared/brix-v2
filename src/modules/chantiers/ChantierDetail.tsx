@@ -74,16 +74,16 @@ export default function ChantierDetail() {
       <DetailHeader v={v} bob={[line1, line2]} onAskBob={() => askBob(`Fais-moi le point sur le chantier ${ch.name}`)} />
 
       {/* Ordinateur : barre d'actions */}
-      <div className="hidden items-center gap-2 md:flex">
+      <div className="hidden flex-wrap items-center gap-2 md:flex">
         {actions.map((a) => (
-          <Button key={a.key} icon={a.icon} onClick={a.run} className="[&_svg]:h-4 [&_svg]:w-4">
-            {a.label}
+          <Button key={a.key} icon={a.icon} onClick={a.run} aria-label={a.label} className="[&_svg]:h-4 [&_svg]:w-4 max-lg:w-11 max-lg:px-0 touch:h-11">
+            <span className="max-lg:sr-only">{a.label}</span>
           </Button>
         ))}
         <div className="flex-1" />
         {!done && (
-          <Button variant="dawn" icon={<ClipboardCheck className="h-4 w-4" />} onClick={() => navigate(`/app/pv-reception?chantier=${ch.id}`)}>
-            Signer le PV de réception
+          <Button variant="dawn" icon={<ClipboardCheck className="h-4 w-4" />} onClick={() => navigate(`/app/pv-reception?chantier=${ch.id}`)} className="touch:h-11">
+            Signer le PV<span className="max-lg:hidden">&nbsp;de réception</span>
           </Button>
         )}
       </div>

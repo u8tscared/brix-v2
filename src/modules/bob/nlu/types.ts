@@ -1,5 +1,5 @@
 // Format des réponses de Bob : un texte court, des cartes riches et des suggestions.
-// Le moteur local (démo) et le vrai modèle (api.ts) renvoient la même forme.
+// Le moteur local et les outils de Bob en ligne (outils/*.ts) produisent les mêmes cartes.
 
 export interface BobCardAction {
   label: string;

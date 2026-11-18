@@ -29,11 +29,11 @@ const variants: Record<Variant, string> = {
 
 const sizes: Record<Size, string> = {
   xs: 'h-7 px-3 text-[12.5px] gap-1 [&_svg]:h-3.5 [&_svg]:w-3.5',
-  sm: 'h-9 max-md:h-10 px-3.5 text-[13px] gap-1.5 [&_svg]:h-4 [&_svg]:w-4',
+  sm: 'h-9 max-md:h-10 touch:h-11 px-3.5 text-[13px] gap-1.5 [&_svg]:h-4 [&_svg]:w-4',
   md: 'h-[42px] px-[18px] text-[14px] gap-2 [&_svg]:h-4 [&_svg]:w-4',
   lg: 'h-[52px] px-6 text-[15px] gap-2 [&_svg]:h-[18px] [&_svg]:w-[18px]',
-  icon: 'h-10 w-10 justify-center [&_svg]:h-[18px] [&_svg]:w-[18px]',
-  'icon-sm': 'h-9 w-9 max-md:h-10 max-md:w-10 justify-center [&_svg]:h-4 [&_svg]:w-4',
+  icon: 'h-10 w-10 touch:h-11 touch:w-11 justify-center [&_svg]:h-[18px] [&_svg]:w-[18px]',
+  'icon-sm': 'h-9 w-9 max-md:h-10 max-md:w-10 touch:h-11 touch:w-11 justify-center [&_svg]:h-4 [&_svg]:w-4',
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
@@ -56,7 +56,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {children}
       {iconRight && <span className="-mr-0.5 transition-transform duration-200 ease-out-quint group-hover/btn:translate-x-0.5">{iconRight}</span>}
       {kbd && (
-        <kbd className={cn('ml-0.5 hidden h-5 min-w-5 place-items-center rounded-full px-1.5 font-sans text-[11px] font-medium lg:inline-grid', variant === 'dawn' || variant === 'primary' ? 'bg-white/20 text-white/90' : 'bg-sub text-ink-3 shadow-[0_0_0_1px_var(--line)]')}>
+        <kbd className={cn('kbd-hint ml-0.5 hidden h-5 min-w-5 place-items-center rounded-full px-1.5 font-sans text-[11px] font-medium lg:inline-grid', variant === 'dawn' || variant === 'primary' ? 'bg-white/20 text-white/90' : 'bg-sub text-ink-3 shadow-[0_0_0_1px_var(--line)]')}>
           {kbd}
         </kbd>
       )}

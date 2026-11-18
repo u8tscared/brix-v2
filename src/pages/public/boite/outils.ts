@@ -1,6 +1,6 @@
 // Outils de la boîte de démo : rendu mémorisé, heure relative, icônes et libellés par modèle.
 
-import { BadgeEuro, BellRing, ClipboardList, DoorOpen, FileCheck2, FileClock, FileText, KeyRound, PackageCheck, Receipt, Reply, Wallet, type LucideIcon } from 'lucide-react';
+import { BadgeEuro, BellRing, ClipboardList, DoorOpen, FileCheck2, FileClock, FileText, KeyRound, LockKeyhole, PackageCheck, Receipt, Reply, Wallet, type LucideIcon } from 'lucide-react';
 import { rendreEmail, type DonneesEmail, type ModeleEmail, type RenduEmail } from '@/emails';
 import type { EmailEnvoye } from '@/emails/boite';
 
@@ -37,6 +37,7 @@ export const ICONE_MODELE: Record<ModeleEmail, LucideIcon> = {
   commande_fournisseur: PackageCheck,
   reponse_fournisseur: Reply,
   bienvenue: DoorOpen,
+  mot_de_passe: LockKeyhole,
 };
 
 const cache = new Map<string, RenduEmail>();

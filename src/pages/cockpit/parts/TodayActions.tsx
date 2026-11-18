@@ -27,7 +27,7 @@ export function TodayActions({ data, className }: { data: CockpitData; className
         title="À faire aujourd’hui"
         meta={all ? 'Tout est fait. Belle journée.' : `${items.length - n} chose${items.length - n > 1 ? 's' : ''} comptent encore`}
         right={
-          <div className="mt-1.5 flex items-center gap-1" aria-label={`${n} sur ${items.length} faites`}>
+          <div className="mt-1.5 flex items-center gap-1" role="img" aria-label={`${n} sur ${items.length} faites`}>
             {items.map((i) => (
               <i key={i.key} className={cn('h-1.5 rounded-full transition-all duration-500 ease-spring', done[i.key] ? 'w-4 bg-[#10b981]' : 'w-1.5 bg-[#e4dff0]')} />
             ))}

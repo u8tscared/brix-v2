@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowUp, Keyboard, Mic, RotateCcw, Settings2, X } from 'lucide-react';
+import { ArrowUp, Keyboard, Mic, RotateCcw, Settings2, Square, X } from 'lucide-react';
 import { Badge, IconTile, cn, toast } from '@/components/ui';
 import type { DepartmentKey } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import { useUI } from '@/lib/ui';
 import { useMediaQuery } from '@/components/layout/useMediaQuery';
-import { useChat } from './chat';
+import { etatIA } from './agent';
+import { brancherNavigation, useChat } from './chat';
 import { contextualSuggestions, type BobCardAction } from './engine';
 import { useBobLocal } from './store';
 import { devisExample } from './tradeExamples';
@@ -41,13 +42,22 @@ export default function BobPanel() {
       const t = text.trim();
       if (!t) return;
       setDraft('');
-      const reply = await useChat.getState().send(t, pathname);
-      if (voiceRef.current && useBobLocal.getState().tone.speak) speak(reply.text);
+      const reply = await useChat.getState().send(t, pathname, voiceRef.current);
+      const parle = voiceRef.current && useBobLocal.getState().tone.speak && useBrix.getState().prefs.voice !== false;
+      if (parle && reply.text) speak(reply.text);
     },
     [pathname],
   );
 
   const speech = useSpeech((t) => void send(t));
+
+  // Bob en ligne ? (sinon moteur local) ; navigation demandée par Bob (ouvrir un écran).
+  useEffect(() => {
+    if (!open) return;
+    void etatIA().then((v) => useChat.setState({ enLigne: v.disponible }));
+    brancherNavigation((to) => navigate(to));
+    return () => brancherNavigation(null);
+  }, [open, navigate]);
 
   // Ouverture : mode voix demandé, question pré-remplie.
   useEffect(() => {
@@ -95,6 +105,7 @@ export default function BobPanel() {
   const toggleMic = () => (speech.listening ? speech.stop() : speech.start());
   const suggestions = contextualSuggestions(pathname);
   const empty = chat.messages.length === 0;
+  const busy = chat.thinking && chat.enLigne;
 
   return createPortal(
     <div className="fixed inset-0 z-[85]">
@@ -112,12 +123,12 @@ export default function BobPanel() {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="text-[16px] font-semibold tracking-[-0.02em]">Bob</span>
-              <Badge tone="neutral" className="h-[19px] px-1.5 text-[10.5px]">Démo</Badge>
+              {!chat.enLigne && <Badge tone="neutral" className="h-[19px] px-1.5 text-[10.5px]">Démo</Badge>}
             </div>
             <div className="truncate text-[12px] text-ink-3">{speech.listening ? 'Je t’écoute…' : chat.thinking ? 'Je regarde…' : 'Ton assistant, il agit pour toi'}</div>
           </div>
           {!empty && (
-            <button onClick={chat.clear} className="grid h-10 w-10 place-items-center rounded-full text-ink-3 transition hover:bg-white hover:text-ink hover:shadow-[0_0_0_1px_#ece8f6]" aria-label="Nouvelle conversation" title="Nouvelle conversation">
+            <button onClick={() => { stopSpeaking(); chat.clear(); }} className="grid h-10 w-10 place-items-center rounded-full text-ink-3 transition hover:bg-white hover:text-ink hover:shadow-[0_0_0_1px_#ece8f6]" aria-label="Nouvelle conversation" title="Nouvelle conversation">
               <RotateCcw className="h-4 w-4" />
             </button>
           )}
@@ -169,14 +180,14 @@ export default function BobPanel() {
                   <VoiceOrb listening={speech.listening} onClick={toggleMic} size={isPhone ? 96 : 84} />
                 </div>
               ) : (
-                <TextInput refEl={inputRef} draft={draft} setDraft={setDraft} send={send} onMic={() => {}} micAvailable={false} />
+                <TextInput refEl={inputRef} draft={draft} setDraft={setDraft} send={send} onMic={() => {}} micAvailable={false} busy={busy} onStop={chat.stop} />
               )}
               {!speech.supported && <button className="mt-2 text-[12.5px] text-ink-3 underline" onClick={() => setVoice(false)}>Revenir au clavier</button>}
             </div>
           ) : (
-            <TextInput refEl={inputRef} draft={draft} setDraft={setDraft} send={send} micAvailable onMic={() => { setVoice(true); if (speech.supported) speech.start(); }} />
+            <TextInput refEl={inputRef} draft={draft} setDraft={setDraft} send={send} micAvailable onMic={() => { setVoice(true); if (speech.supported) speech.start(); }} busy={busy} onStop={chat.stop} />
           )}
-          <p className="mt-2 text-center text-[11px] text-ink-3">Version de démo : Bob répond avec des réponses préparées.</p>
+          <p className="mt-2 text-center text-[11px] text-ink-3">{chat.enLigne ? 'Bob peut se tromper : relis avant d’envoyer quoi que ce soit.' : 'Version de démo : Bob répond avec des réponses préparées.'}</p>
         </footer>
       </section>
     </div>,
@@ -184,7 +195,7 @@ export default function BobPanel() {
   );
 }
 
-function TextInput({ refEl, draft, setDraft, send, onMic, micAvailable }: { refEl: React.RefObject<HTMLInputElement>; draft: string; setDraft: (s: string) => void; send: (s: string) => void; onMic: () => void; micAvailable: boolean }) {
+function TextInput({ refEl, draft, setDraft, send, onMic, micAvailable, busy = false, onStop }: { refEl: React.RefObject<HTMLInputElement>; draft: string; setDraft: (s: string) => void; send: (s: string) => void; onMic: () => void; micAvailable: boolean; busy?: boolean; onStop?: () => void }) {
   return (
     <form
       className="flex w-full items-center gap-2"
@@ -208,9 +219,15 @@ function TextInput({ refEl, draft, setDraft, send, onMic, micAvailable }: { refE
           </button>
         )}
       </div>
+      {busy && onStop ? (
+        <button type="button" onClick={onStop} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white text-ink shadow-[0_1px_2px_rgba(60,30,120,.08),0_0_0_1px_#ece8f6] transition hover:-translate-y-px" aria-label="Arrêter" title="Arrêter">
+          <Square className="h-4 w-4 fill-current" />
+        </button>
+      ) : (
       <button type="submit" disabled={!draft.trim()} className={cn('grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-white shadow-ink transition duration-300 ease-spring hover:-translate-y-px disabled:bg-halo-track disabled:text-ink-3 disabled:shadow-none')} aria-label="Envoyer">
         <ArrowUp className="h-5 w-5" />
       </button>
+      )}
     </form>
   );
 }

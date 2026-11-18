@@ -69,7 +69,7 @@ export default function OffreTab() {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-[14px] font-semibold">Option Brix AI MCP <Badge tone="violet">Nouveau</Badge></div>
           <p className="text-[12.5px] text-ink-2">
-            Pilotez Brix depuis Claude ou ChatGPT. {plan === 'equipe' || plan === 'entreprise' ? 'Inclus dans votre offre.' : plan === 'pro' ? '9 € HT par mois en plus de l’offre Pro.' : 'Disponible à partir de l’offre Pro.'}
+            Interrogez Brix depuis Claude ou ChatGPT, et préparez des brouillons. {plan === 'equipe' || plan === 'entreprise' ? 'Inclus dans votre offre.' : plan === 'pro' ? '9 € HT par mois en plus de l’offre Pro.' : 'Disponible à partir de l’offre Pro.'}
           </p>
         </div>
         {plan === 'pro' ? (

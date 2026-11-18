@@ -17,7 +17,7 @@ Référence visuelle : maquette `directions/index.html`, objet `B` (`dash`, `dev
 | Rôle | Classe / valeur |
 |---|---|
 | Fond | `#f7f5fc` (`--page`), posé sur `html` ; halo par la coque |
-| Encre | `text-ink` #15122a, `text-ink-2` #5d5a72, `text-ink-3` #9794aa, seconde ligne de titre `text-halo-mute` #a7a2bf |
+| Encre | `text-ink` #15122a, `text-ink-2` #5d5a72, `text-ink-3` #706c86 (contraste AA), seconde ligne de titre `text-halo-mute` #8e89a8 (3:1, grands titres) |
 | Carte | `rounded-card` (22 px), `rounded-card-sm` (16 px), `shadow-halo` (= `shadow-card`), survol `shadow-halo-lg` / `.lift` |
 | Ligne en carte | `.row-card` (16 px, filet lavande, soulève 1 px), ombre `shadow-halo-sm` |
 | Verre | `.glass` (blanc 72 %, flou 18 px), `.glass-strong` (86 %, flou 24 px), ombre `shadow-glass` |
@@ -77,3 +77,12 @@ Lucide, trait 1,75 (1,9 sur pastille). Les modules s'affichent sur `IconTile` (t
 
 ## Téléphone
 Cibles 44 px. Feuilles qui montent du bas. Listes en cartes plutôt qu'en tableaux. Action principale collée en bas dans un formulaire. Aucun débordement horizontal à 390 px.
+
+## Tactile (iPad, téléphone) et PWA
+- `hover:` / `group-hover:` n'agissent qu'à la souris (`future.hoverOnlyWhenSupported`) : rien ne reste « collé » après un tap. Une action qui n'apparaît qu'au survol doit aussi porter `touch:opacity-100` (variante `touch:` = pas de survol ou doigt ; `mouse:` = souris).
+- Cibles de 44 px au doigt : `touch:h-11` (déjà fait dans Button `sm`/`icon`/`icon-sm`, Segmented, onglets, menu latéral).
+- Raccourcis clavier (`<Kbd>`, prop `kbd`, classe `kbd-hint`) : masqués au doigt.
+- Liens, images et icônes ne se glissent pas et n'ouvrent pas la bulle iOS (règle de base dans `index.css`) ; ce qu'on copie reste sélectionnable (champs, `.num`, `.font-mono`, `address`, `.selectable`).
+- Bords d'écran : `--safe-t/-b/-l/-r` (encoche, barre d'accueil), `--kb` = hauteur du clavier virtuel (`src/lib/viewport.ts`, classe `kb-open` sur `<html>`).
+- Fenêtres modales : `useModal` (`src/components/ui/useModal.ts`) pour Échap, piège de focus, fond inerte et blocage du défilement iOS.
+- PWA : `public/manifest.webmanifest`, icônes et écrans de démarrage générés par `scripts/generate-icons.cjs` (même dessin que `BrandTile`), service worker généré au build (`scripts/pwa/`), enregistré par `src/lib/pwa.ts` (production seulement).
