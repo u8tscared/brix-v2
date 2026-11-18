@@ -6,7 +6,7 @@ const head = html.match(/<head>([\s\S]*)<\/head>/)[1];
 const body = html.match(/<body>([\s\S]*)<\/body>/)[1];
 const keep = head
   .split('\n')
-  .filter((l) => !/<meta charset|<meta name="viewport"|rel="icon"/.test(l))
+  .filter((l) => !/<meta charset|<meta name="viewport"|rel="icon"|apple-touch|rel="manifest"|mask-icon/.test(l))
   .join('\n');
 const start = process.env.PREVIEW_START; // ex. /parcours : écran d'arrivée de la prévisualisation
 const boot = start ? `<script>if(!location.hash||location.hash==='#/')location.hash='#${start}'</script>\n` : '';
