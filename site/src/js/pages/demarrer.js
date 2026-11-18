@@ -10,7 +10,7 @@ const PRIOS = [
   { id: 'chantiers', name: 'Suivre mes chantiers et ma marge', icon: 'hard-hat', dept: 'chantiers' },
   { id: 'equipe', name: 'Organiser mon équipe', icon: 'users', dept: 'equipe', team: true },
   { id: 'achats', name: 'Commander mon matériel moins cher', icon: 'package', dept: 'achats' },
-  { id: 'bob', name: 'Déléguer l’administratif à Bob', icon: 'sparkles', dept: 'bob' },
+  { id: 'bob', name: 'Déléguer l’administratif à Bob', icon: 'headset', dept: 'bob' },
   { id: 'clients', name: 'Trouver plus de clients', icon: 'globe', dept: 'visibilite' },
   { id: 'conforme', name: 'Être prêt pour la facture électronique', icon: 'shield-check', dept: 'facturer' },
 ];
@@ -21,13 +21,20 @@ const WIDGETS = {
   chantiers: { icon: 'hard-hat', t: 'Marge chantiers', v: '31 %', s: '4 chantiers en cours', bar: 62 },
   equipe: { icon: 'users', t: 'Équipe demain', v: '4 compagnons', s: '2 chantiers, 7 h 30' },
   achats: { icon: 'package', t: 'Demandes de prix', v: '3 réponses', s: '107 € économisés' },
-  bob: { icon: 'sparkles', t: 'Bob', v: '5 actions', s: 'À valider en un clic' },
+  bob: { icon: 'headset', t: 'Bob', v: '5 actions', s: 'À valider en un clic' },
   clients: { icon: 'globe', t: 'Demandes entrantes', v: '2 nouvelles', s: 'Depuis votre site Brix' },
   conforme: { icon: 'shield-check', t: 'Facture électronique', v: 'Prête', s: 'Format conforme', bar: 100 },
 };
 const SIZE_HINT = { solo: 'Auto-entrepreneur ou artisan seul', '2-9': 'Une petite équipe sur le terrain', '10-49': 'Plusieurs équipes, un bureau', '50+': 'Agences, conducteurs de travaux' };
 const PLAN_FOR = { solo: 'pro', '2-9': 'equipe', '10-49': 'equipe', '50+': 'entreprise' };
 const STEPS = 5, MAX_WG = 4;
+// Bob est un assistant de bureau : pas d'étincelles, un casque de standardiste
+const dIcon = (d) => (d.icon === 'sparkles' ? 'headset' : d.icon);
+// pastille pâle à la couleur du département
+const dTone = (d) => `style="--dc:${d.color}"`;
+// une pastille de couleur par priorité et par métier (cycle)
+const TONES = ['v', 'p', 'g', 'b', 'm', 's', 'r', 'i'];
+const PRIO_TONE = { devis: 'v', paye: 'm', chantiers: 'p', equipe: 'i', achats: 'g', bob: 'm', clients: 'r', conforme: 's' };
 const sizeLabel = (s) => (s.id === 'solo' ? 'Seul' : s.id === '50+' ? '50 personnes et plus' : `${s.name} personnes`);
 
 boot(() => {
@@ -44,9 +51,9 @@ boot(() => {
   };
 
   const form = $('[data-wiz]'), hint = $('[data-hint]');
-  const optBtn = (role, attr, id, icon, label, sub, on) => `<button type="button" class="opt-b" role="${role}" ${role === 'radio' ? `aria-checked="${on}" tabindex="-1"` : `aria-checked="${on}"`} ${attr}="${id}">${icon ? `<span class="oi">${ic(icon)}</span>` : ''}<span>${label}${sub ? `<small>${sub}</small>` : ''}</span><span class="tick">${ic('check')}</span></button>`;
+  const optBtn = (role, attr, id, icon, label, sub, on, tone = 'v') => `<button type="button" class="opt-b" role="${role}" ${role === 'radio' ? `aria-checked="${on}" tabindex="-1"` : `aria-checked="${on}"`} ${attr}="${id}">${icon ? `<span class="oi tone-${tone}">${ic(icon)}</span>` : ''}<span>${label}${sub ? `<small>${sub}</small>` : ''}</span><span class="tick">${ic('check')}</span></button>`;
 
-  $('[data-trades]').innerHTML = TRADES.map((t) => optBtn('radio', 'data-t', t.id, t.icon, t.name, '', t.id === S.trade)).join('');
+  $('[data-trades]').innerHTML = TRADES.map((t, i) => optBtn('radio', 'data-t', t.id, t.icon, t.name, '', t.id === S.trade, TONES[i % TONES.length])).join('');
   $('[data-sizes]').innerHTML = SIZES.map((s) => optBtn('radio', 'data-s', s.id, null, `<b>${sizeLabel(s)}</b>`, SIZE_HINT[s.id], s.id === S.size)).join('');
   // un seul arrêt de tabulation par groupe : l'option cochée, sinon la première
   const rove = (g) => { const items = $$('[role="radio"]', g); const on = items.find((x) => x.getAttribute('aria-checked') === 'true') || items[0]; items.forEach((x) => { x.tabIndex = x === on ? 0 : -1; }); };
@@ -55,7 +62,7 @@ boot(() => {
   const team = () => S.size && S.size !== 'solo';
   const prioDepts = () => new Set([...S.prios].map((id) => PRIOS.find((p) => p.id === id).dept));
   function renderPrios() {
-    $('[data-prios]').innerHTML = PRIOS.filter((p) => !p.team || team()).map((p) => optBtn('checkbox', 'data-p', p.id, p.icon, p.name, '', S.prios.has(p.id))).join('');
+    $('[data-prios]').innerHTML = PRIOS.filter((p) => !p.team || team()).map((p) => optBtn('checkbox', 'data-p', p.id, p.icon, p.name, '', S.prios.has(p.id), PRIO_TONE[p.id])).join('');
   }
   const allMods = () => new Set(DEPARTMENTS.map((d) => d.id).filter((id) => id !== 'equipe' || team()));
   function defaultMods() { S.mods = allMods(); }
@@ -70,7 +77,7 @@ boot(() => {
   function renderMods() {
     const pd = prioDepts();
     const order = [...DEPARTMENTS].sort((a, b) => pd.has(b.id) - pd.has(a.id));
-    $('[data-mods]').innerHTML = order.map((d) => `<button type="button" class="mod" aria-pressed="${S.mods.has(d.id)}" data-m="${d.id}"><span class="mi-t">${ic(d.icon)}</span><span><b>${d.name}${pd.has(d.id) ? '<span class="badge v prio">Priorité</span>' : ''}</b><span class="s">${modDesc(d)}</span></span><span class="sw" aria-hidden="true"></span></button>`).join('');
+    $('[data-mods]').innerHTML = order.map((d) => `<button type="button" class="mod" aria-pressed="${S.mods.has(d.id)}" data-m="${d.id}"><span class="mi-t" ${dTone(d)}>${ic(dIcon(d))}</span><span><b>${d.name}${pd.has(d.id) ? '<span class="badge v prio">Priorité</span>' : ''}</b><span class="s">${modDesc(d)}</span></span><span class="sw" aria-hidden="true"></span></button>`).join('');
   }
   function renderPick() {
     if (!S.plan) S.plan = PLAN_FOR[S.size || 'solo'];
@@ -127,13 +134,13 @@ boot(() => {
     const out = shown.map((id) => {
       const w = WIDGETS[id];
       const extra = w.bar != null ? `<span class="wg-bar"><i style="--w:${w.bar}%"></i></span>` : w.bars ? `<span class="wg-sp">${w.bars.map((h) => `<i style="--h:${h}%"></i>`).join('')}</span>` : `<span class="wg-s">${w.s}</span>`;
-      return { k: id, html: `<div class="wg"><span class="wg-h">${ic(w.icon)}${w.t}</span><b class="wg-v">${w.v}</b>${w.bar != null || w.bars ? `<span class="wg-s">${w.s}</span>` : ''}${extra}</div>` };
+      return { k: id, html: `<div class="wg tone-${PRIO_TONE[id]}"><span class="wg-h"><span class="wg-i">${ic(w.icon)}</span>${w.t}</span><b class="wg-v">${w.v}</b>${w.bar != null || w.bars ? `<span class="wg-s">${w.s}</span>` : ''}${extra}</div>` };
     });
     if (ids.length > shown.length) out.push({ k: 'more', html: `<div class="wg more">+ ${ids.length - shown.length} autre${ids.length - shown.length > 1 ? 's' : ''}</div>` });
     return out;
   }
 
-  let lastTrade = null;
+  let lastTrade;
   function preview() {
     const t = TRADES.find((x) => x.id === S.trade), s = SIZES.find((x) => x.id === S.size);
     pv('trade').textContent = t ? t.name : 'Votre métier';
@@ -148,7 +155,7 @@ boot(() => {
     const depts = DEPARTMENTS.filter((d) => mods.has(d.id));
     // départements prioritaires en tête de la barre latérale
     const order = [...depts].sort((a, b) => pd.has(b.id) - pd.has(a.id));
-    keyed(pv('mods'), order.map((d) => ({ k: d.id, html: `<li title="${d.name}"><span class="d">${ic(d.icon)}</span><span class="nm">${d.name}</span>${pd.has(d.id) ? '<i class="prio-dot" role="img" aria-label="Priorité"></i>' : ''}</li>` })), { enter: { opacity: 0, x: -8 }, collapse: true });
+    keyed(pv('mods'), order.map((d) => ({ k: d.id, html: `<li title="${d.name}"><span class="d" ${dTone(d)}>${ic(dIcon(d))}</span><span class="nm">${d.name}</span>${pd.has(d.id) ? '<i class="prio-dot" role="img" aria-label="Priorité"></i>' : ''}</li>` })), { enter: { opacity: 0, x: -8 }, collapse: true });
     keyed(pv('widgets'), widgetsList());
     const count = depts.reduce((n, d) => n + d.features.length, 0);
     animNum(pv('count'), count, (v) => Math.round(v));

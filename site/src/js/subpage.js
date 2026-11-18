@@ -19,6 +19,24 @@ export function heroIn() {
   return tl;
 }
 
+/* En-tête Halo des pages produit : satellites qui arrivent puis flottent, halo et satellites
+   en légère parallaxe au défilement, anneaux qui se ferment. Sans animation : état final. */
+export function pageHero(root = $('.ph')) {
+  if (!root) return;
+  const sats = $$('.psat', root), rings = $$('.psat .pring .fg', root);
+  rings.forEach((c) => {
+    const len = c.getTotalLength ? c.getTotalLength() : 100;
+    c.style.strokeDasharray = len;
+    c.style.strokeDashoffset = len * (1 - (+c.dataset.p || 0));
+  });
+  if (reduce) return;
+  gsap.from(sats, { opacity: 0, scale: 0.9, yPercent: 40, duration: 1.2, ease: 'expo.out', stagger: 0.12, delay: 0.45 });
+  rings.forEach((c) => gsap.from(c, { strokeDashoffset: parseFloat(c.style.strokeDasharray), duration: 1.6, ease: 'power3.out', delay: 0.9 }));
+  const st = { trigger: root, start: 'top top', end: 'bottom top', scrub: true };
+  sats.forEach((s, i) => gsap.to(s, { y: -(14 + i * 14) * (+s.parentElement.dataset.depth || 1), ease: 'none', scrollTrigger: st }));
+  $$('.ph-halo i', root).forEach((h, i) => gsap.to(h, { y: 60 + i * 30, x: (i % 2 ? -1 : 1) * 40, ease: 'none', scrollTrigger: st }));
+}
+
 /* FAQ accessible : un bouton par question, aria-expanded tenu à jour. */
 export function faq(root) {
   // réponse fermée : retirée du parcours clavier et des lecteurs d'écran (inert)

@@ -89,9 +89,11 @@ export function bobGrid() {
   if (!root) return;
   const bob = DEPARTMENTS.find((d) => d.id === 'bob'), vendre = DEPARTMENTS.find((d) => d.id === 'vendre');
   const extra = vendre.features.filter((f) => /^Devis (dicté|depuis)/.test(f.name));
-  root.innerHTML = [...extra, ...bob.features].map((f) => `
+  // une pastille de couleur par fonction : les cartes ne se ressemblent pas toutes
+  const TONES = ['v', 'p', 'b', 'm', 'i', 'g', 's', 'r'];
+  root.innerHTML = [...extra, ...bob.features].map((f, i) => `
     <article class="fx">
-      <div class="fx-top"><span class="tl">${ic(f.icon)}</span>${f.tag ? `<span class="badge ${TAG[f.tag][0]}">${TAG[f.tag][1]}</span>` : ''}</div>
+      <div class="fx-top"><span class="tl tone-${TONES[i % TONES.length]}">${ic(f.icon)}</span>${f.tag ? `<span class="badge ${TAG[f.tag][0]}">${TAG[f.tag][1]}</span>` : ''}</div>
       <h3>${f.name}</h3><p>${f.desc}</p>
       <div class="fx-foot"><span class="plan-t">Dès ${PLANS[f.plan]}</span>${DEMO[f.name] ? `<a class="link" href="${DEMO[f.name]}">Voir ${ic('arrow-right')}</a>` : ''}</div>
     </article>`).join('');

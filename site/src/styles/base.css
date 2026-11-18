@@ -26,7 +26,7 @@
   color-scheme: light;
 }
 *, *::before, *::after { box-sizing: border-box }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--nav-h) + 20px) }
+html { overflow-x: clip; -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--nav-h) + 20px) }
 html.lenis, html.lenis body { height: auto }
 .lenis.lenis-smooth { scroll-behavior: auto !important }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: clip; text-rendering: optimizeLegibility; font-feature-settings: "ss01", "cv11" }

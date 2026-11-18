@@ -116,7 +116,7 @@ export const DEPARTMENTS = [
   {
     id: 'bob',
     name: 'Bob',
-    icon: 'sparkles',
+    icon: 'headset',
     color: '#c026d3',
     title: 'Posez la question,',
     accent: 'Bob lit vos chiffres.',

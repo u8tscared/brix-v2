@@ -1,10 +1,12 @@
-/* Parcours « du devis au paiement » : la scène suit l'étape visible. */
+/* Parcours « du devis au paiement » : la scène suit l'étape visible,
+   et les taches du fond tournent en continu avec la progression du défilement (--sp, 0 → 1). */
 import { gsap, reduce, $, $$, fmt } from '../core.js';
 
 export function initStory() {
   const stage = $('#stage');
   if (!stage) return;
-  const scenes = $$('.scene', stage), steps = $$('.step');
+  const story = stage.closest('.story');
+  const scenes = $$('.scene', stage), steps = $$('.step'), dots = $$('.stage-dots i', stage);
   const wave = $('#wave');
   for (let i = 0; i < 28; i++) {
     const s = document.createElement('i');
@@ -18,9 +20,10 @@ export function initStory() {
     if (n === cur) return;
     cur = n;
     stage.dataset.s = n;
-    scenes.forEach((s, i) => s.classList.toggle('on', i === n));
-    steps.forEach((s, i) => s.classList.toggle('on', i === n));
-    $$('.stage-dots i', stage).forEach((d, i) => d.classList.toggle('on', i === n));
+    // les scènes passées sortent vers le haut, les suivantes attendent en bas
+    scenes.forEach((s, i) => { s.classList.toggle('on', i === n); s.classList.toggle('past', i < n); });
+    steps.forEach((s, i) => { s.classList.toggle('on', i === n); s.classList.toggle('done', i < n); });
+    dots.forEach((d, i) => d.classList.toggle('on', i === n));
     if (n === 0) {
       const el = $('#said'), ls = $$('.ql');
       ls.forEach((l) => l.classList.remove('on'));
@@ -37,7 +40,7 @@ export function initStory() {
     if (n === 2 && !reduce) {
       $$('.rq b', stage).forEach((b) => {
         const to = +b.dataset.p, o = { v: to * 1.4 };
-        gsap.to(o, { v: to, duration: 1.2, ease: 'power3.out', onUpdate: () => { b.textContent = `${fmt(o.v, 2)} €`; } });
+        gsap.to(o, { v: to, duration: 1.2, ease: 'power3.out', onUpdate: () => { b.textContent = `${fmt(o.v, 2)} €`; } });
       });
     }
     if (n === 4 && !reduce) {
@@ -49,4 +52,13 @@ export function initStory() {
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) play(+e.target.dataset.step); }), { rootMargin: mobile ? '-64% 0px -28% 0px' : '-45% 0px -45% 0px' });
   steps.forEach((s) => io.observe(s));
   play(0);
+
+  // rotation continue des taches + remplissage du rail, liés au défilement (lissés par scrub)
+  if (reduce) { story.style.setProperty('--sp', '0.18'); return; }
+  const prog = { v: 0 };
+  gsap.to(prog, {
+    v: 1, ease: 'none',
+    scrollTrigger: { trigger: story, start: 'top 75%', end: 'bottom 40%', scrub: 0.9 },
+    onUpdate: () => story.style.setProperty('--sp', prog.v.toFixed(4)),
+  });
 }

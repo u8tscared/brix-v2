@@ -3,6 +3,10 @@
 import { boot, gsap, ScrollTrigger, reduce, $, $$, ic, esc } from '../core.js';
 import { COMPETITORS, MATRIX } from '../../data/competitors.js';
 import wordmark from '../../../partials/brix-wordmark.svg?raw';
+import { pageHero } from '../subpage.js';
+
+// pastilles colorées par domaine : chaque carte a la sienne
+const TONES = ['v', 'm', 'p', 'g', 'b', 's'];
 
 const BETTER = [
   { icon: 'audio-lines', t: 'Le devis par la voix, la photo, la vidéo ou le plan', d: "Ailleurs, l’IA s’arrête souvent à la dictée. Avec Brix, vous filmez la pièce, photographiez un croquis ou importez le plan de l’architecte, et le devis sort avec vos prix.", href: 'fonctionnalites.html#vendre' },
@@ -59,7 +63,7 @@ function initLane(t) {
 
 const card = (c, i) => `
   <a class="cp-card" href="${c.href}">
-    <div class="cp-card-top"><span class="cp-ic">${ic(c.icon)}</span><span class="cp-n mono">${String(i + 1).padStart(2, '0')}</span></div>
+    <div class="cp-card-top"><span class="cp-ic ic tone-${TONES[i % TONES.length]}">${ic(c.icon)}</span><span class="cp-n mono">${String(i + 1).padStart(2, '0')}</span></div>
     <h3>${c.t}</h3><p>${c.d}</p>
     <span class="cp-more">En savoir plus ${ic('arrow-right')}</span>
   </a>`;
@@ -67,12 +71,35 @@ const card = (c, i) => `
 const only = (c, i) => `
   <li><a class="cp-o" href="${c.href}">
     <span class="cp-n mono">${String(i + 1).padStart(2, '0')}</span>
-    <span class="cp-ic">${ic(c.icon)}</span>
+    <span class="cp-ic ic tone-${['v', 'm', 'i', 'p', 's'][i % 5]}">${ic(c.icon)}</span>
     <span class="cp-o-t"><b>${c.t}</b><span>${c.d}</span></span>
     <span class="cp-o-go">${ic('arrow-up-right')}</span>
   </a></li>`;
 
+/* En-têtes collants en verre : le tableau défile en largeur (overflow), position: sticky ne peut donc
+   pas suivre la page en hauteur. On fait glisser la ligne d'en-tête sous la navigation. */
+function stickyHead(wrap, t) {
+  const head = $('thead', t), navbar = $('.navbar');
+  let raf = 0;
+  const upd = () => {
+    raf = 0;
+    const nb = navbar ? navbar.getBoundingClientRect().bottom : 0;
+    const top = Math.max(10, nb + 10);
+    const r = wrap.getBoundingClientRect();
+    const d = Math.min(Math.max(top - r.top, 0), Math.max(0, r.height - head.offsetHeight - 70));
+    t.style.setProperty('--hy', `${Math.round(d)}px`);
+    t.classList.toggle('stuck', d > 0);
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(upd); };
+  addEventListener('scroll', kick, { passive: true });
+  addEventListener('resize', kick);
+  // la navigation se cache ou revient sans défilement : on suit sa transition
+  if (navbar) { navbar.addEventListener('transitionrun', (e) => { if (e.propertyName !== 'transform') return; const end = performance.now() + 600; const follow = () => { upd(); if (performance.now() < end) requestAnimationFrame(follow); }; follow(); }); }
+  upd();
+}
+
 boot(() => {
+  pageHero();
   const t = $('[data-cmp]');
   renderMatrix(t);
   $('[data-better]').innerHTML = BETTER.map(card).join('');
@@ -82,6 +109,7 @@ boot(() => {
   const wrap = $('.cp-wrap'), hint = $('.cp-hint');
   const fit = () => { hint.classList.toggle('on', wrap.scrollWidth > wrap.clientWidth + 4); wrap.classList.toggle('scrolled', wrap.scrollLeft > 4); };
   fit(); addEventListener('resize', fit); wrap.addEventListener('scroll', fit, { passive: true });
+  stickyHead(wrap, t);
 
   initLane(t);
   if (!reduce) {

@@ -376,3 +376,204 @@ ol { padding: 0; margin: 0; list-style: none }
   .qa button { font-size: 16.5px }
   .ai-row { gap: 8px 20px } .ai-row span { font-size: 16px } .ai-row small { width: 100% }
 }
+
+/* =========================================================================
+   HALO (18/11/2026) : surcharge de la page dans le langage Halo.
+   Sections transparentes (l'aura du socle passe derrière), cartes blanches
+   très arrondies qui flottent, pastilles colorées, pilules, verre dépoli.
+   ========================================================================= */
+.dt-sec, .trust, .faq-sec, .fin { background: none; border-top: 0 }
+.xh-bg { display: none }
+.bmark { display: block; width: 100%; height: 100%; fill: currentColor }
+.tl[class*="tone-"] { background: var(--tb); color: var(--tc); box-shadow: none }
+.tl { border-radius: 12px }
+
+/* ---------- Kit : sur-titre, pastilles, listes ---------- */
+.kicker { background: var(--glass); backdrop-filter: blur(14px) saturate(1.5); -webkit-backdrop-filter: blur(14px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .06), 0 8px 22px -10px rgba(60, 30, 120, .2); height: 36px; padding-right: 14px }
+.k-tag { background: var(--dawn-d); box-shadow: 0 4px 12px -4px rgba(217, 70, 239, .55) }
+.reassure .i { color: var(--t-g) }
+.ticks .i { width: 20px; height: 20px; padding: 3px; border-radius: 50%; background: var(--t-g-bg); color: var(--t-g); stroke-width: 2.6; margin-top: 0 }
+.seg { border-radius: 999px; padding: 4px; background: rgba(255, 255, 255, .6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 6px 18px -10px rgba(60, 30, 120, .2) }
+.seg button { border-radius: 999px }
+.seg-p { border-radius: 999px; box-shadow: 0 1px 2px rgba(60, 30, 120, .08), 0 4px 12px -4px rgba(60, 30, 120, .18) }
+
+/* Bob : la tuile Aube du logo, pas d'étincelles */
+.bob-av { background: var(--dawn-d); color: #fff; border-radius: 10px; padding: 7px; box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .3), 0 4px 12px -4px rgba(190, 50, 220, .55) }
+.bob-av.sm { padding: 4px; border-radius: 7px }
+
+/* ---------- HERO : la fenêtre de Bob en grande carte de verre ---------- */
+.xh-in { padding-bottom: clamp(48px, 6vw, 80px) }
+.bd { max-width: 540px; padding: 34px 0 120px 40px }
+.bd-halo { position: absolute; inset: -6% -10% 8% 0; z-index: -1; border-radius: 50%; background: radial-gradient(closest-side, rgba(233, 184, 245, .55), rgba(199, 180, 251, .35) 50%, transparent); filter: blur(30px) }
+.bd-win { position: relative; background: rgba(255, 255, 255, .66); backdrop-filter: blur(22px) saturate(1.6); -webkit-backdrop-filter: blur(22px) saturate(1.6); border-radius: var(--r-xl); padding: 8px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .95), 0 2px 4px rgba(60, 30, 120, .05), 0 40px 90px -36px rgba(60, 30, 120, .4); overflow: visible }
+.bd-h { padding: 12px 12px 14px; border-bottom: 0 }
+.bd-h b { font-size: 15.5px; letter-spacing: -.02em }
+.bob-av { width: 34px; height: 34px }
+.bd-live { background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .08), 0 0 0 1px var(--line) }
+.bd-list { display: grid; gap: 6px }
+.bd-list li { border-top: 0; border-radius: 16px; background: #fff; padding: 11px 12px; box-shadow: 0 0 0 1px #f0edf7; transition: box-shadow .3s, transform .3s var(--ease) }
+.bd-list li.hi { background: #fff; box-shadow: 0 0 0 1.5px #e9b8f5, 0 10px 30px -12px rgba(217, 70, 239, .35) }
+.bd-list .badge { border-radius: 999px; padding: 3px 10px }
+.bd-work { margin-top: 6px; border-top: 0; border-radius: 16px; background: rgba(255, 255, 255, .55); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9) }
+.bd-work > .i { color: var(--t-m) }
+.bd-bar { background: rgba(109, 40, 217, .08) }
+.bd-bar i { background: var(--dawn) }
+.bd-ask { width: 316px; padding: 18px; border-radius: var(--r-lg); box-shadow: 0 2px 4px rgba(60, 30, 120, .05), 0 30px 60px -22px rgba(60, 30, 120, .42) }
+.bd-ask small { color: var(--t-m) }
+.bd-btns .btn { height: 36px; padding: 0 14px }
+.bd-btns .btn.press { transform: scale(.94); background: var(--ok); box-shadow: none }
+.bd-toast { border-radius: 999px; padding: 10px 16px 10px 10px; box-shadow: 0 2px 4px rgba(60, 30, 120, .05), 0 20px 40px -16px rgba(60, 30, 120, .35) }
+.bd-toast .i { width: 22px; height: 22px; padding: 4px }
+/* la dictée flotte au-dessus de la fenêtre, en pilule de verre */
+.bd-mic { position: absolute; top: 0; right: -18px; z-index: 3; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 16px 0 7px; border-radius: 999px; background: #fff; box-shadow: 0 2px 4px rgba(60, 30, 120, .05), 0 18px 40px -16px rgba(60, 30, 120, .35); animation: bdfloat 7s ease-in-out infinite }
+.bd-mic .mono { font-size: 12px; color: var(--faint) }
+.bd-mic-b { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: var(--dawn-d); color: #fff; box-shadow: 0 6px 16px -6px rgba(217, 70, 239, .6) }
+.bd-mic-b .i { width: 17px; height: 17px }
+.bd-mic-w { display: flex; align-items: center; gap: 3px; height: 26px }
+.bd-mic-w i { width: 3px; height: 100%; border-radius: 3px; background: linear-gradient(180deg, #8b5cf6, #d946ef 60%, #fb923c); transform: scaleY(.25); animation: wv 1.1s ease-in-out infinite }
+.bd-mic-w i:nth-child(3n) { --h: .9; animation-delay: -.3s } .bd-mic-w i:nth-child(3n+1) { --h: .55; animation-delay: -.6s } .bd-mic-w i:nth-child(3n+2) { --h: .75; animation-delay: -.15s; animation-duration: .9s }
+@keyframes bdfloat { 50% { transform: translateY(-6px) } }
+
+/* ---------- Sommaire : pilule de verre qui flotte ---------- */
+.toc { top: calc(var(--nav-h) + env(safe-area-inset-top, 0px) + 4px); background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border: 0; pointer-events: none }
+.toc-in { justify-content: center }
+.toc-l { pointer-events: auto; margin: 0; padding: 5px; border-radius: 999px; background: rgba(255, 255, 255, .68); backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .05), 0 10px 30px -14px rgba(60, 30, 120, .22); max-width: 100% }
+.toc a { border-radius: 999px; height: 36px; padding: 0 14px }
+.toc a.on .i { color: var(--t-m) }
+.toc-p { top: 5px; bottom: 5px; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .08), 0 4px 12px -4px rgba(60, 30, 120, .16) }
+
+/* ---------- Fonctions : cartes qui flottent, pastilles par domaine ---------- */
+.fx-grid { gap: 16px; background: none; box-shadow: none; overflow: visible; border-radius: 0 }
+.fx { border-radius: var(--r-lg); box-shadow: var(--sh-2); padding: 22px 22px 18px; transition: transform .5s var(--ease), box-shadow .5s var(--ease) }
+.fx:hover { background: #fff; transform: translateY(-4px); box-shadow: var(--sh-3) }
+.fx:hover .tl { background: var(--tb); color: var(--tc) }
+.fx .tl { width: 42px; height: 42px; border-radius: 13px } .fx .tl .i { width: 19px; height: 19px }
+.fx .badge, .mx .badge { border-radius: 999px; padding: 3px 10px }
+.fx h3 { font-size: 16.5px; letter-spacing: -.02em }
+.fx-foot .link { border: 0; height: 30px; padding: 0 12px; border-radius: 999px; background: var(--paper-2); font-size: 13px }
+.fx-foot .link:hover { background: var(--t-v-bg); color: var(--t-v) }
+
+/* ---------- Dictée : grande carte, micro Aube, onde en dégradé ---------- */
+.dt { padding: 14px; border-radius: var(--r-xl); box-shadow: var(--sh-3) }
+.dt-rec { border-radius: 999px; padding: 7px 8px 7px 7px; background: var(--paper-2); box-shadow: none }
+.dt-mic { width: 40px; height: 40px; background: var(--dawn-d); box-shadow: 0 6px 16px -6px rgba(217, 70, 239, .6) }
+.dt-mic .i { width: 17px; height: 17px }
+.dt.live .dt-mic { background: var(--dawn-d) }
+.dt.live .dt-mic::before { box-shadow: 0 0 0 2px rgba(217, 70, 239, .3) }
+.dt-wave { height: 30px; gap: 3px }
+.dt-wave i { border-radius: 3px; background: #ddd6ee }
+.dt.live .dt-wave i { background: linear-gradient(180deg, #8b5cf6, #d946ef 60%, #fb923c) }
+.dt-lang { border-radius: 999px; padding: 4px 9px; font-size: 11px }
+.dt-said { margin: 18px 10px 4px }
+.dt-sep span { border-radius: 999px; box-shadow: 0 1px 2px rgba(60, 30, 120, .06), 0 0 0 1px var(--line) }
+.dt-sep .i { color: var(--t-m) }
+.dt-sep.on span { box-shadow: 0 0 0 1.5px #e9b8f5, 0 8px 22px -10px rgba(217, 70, 239, .45) }
+.dt-sep.on span::after { background: linear-gradient(100deg, transparent 30%, rgba(217, 70, 239, .12), transparent 70%) }
+.dt-doc { border-radius: var(--r-lg); background: var(--paper-2); box-shadow: none; padding: 6px }
+.dt-doc-h { background: none; border: 0; padding: 10px 10px 8px }
+.dt-l { border-top: 0; margin-top: 6px; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1px #f0edf7; padding: 11px 12px }
+.dt-l:first-of-type { margin-top: 0 }
+.dt-l b { font-family: var(--mono); font-size: 13px }
+.dt-l.flash { background: #fff; box-shadow: 0 0 0 1.5px #e9b8f5, 0 10px 26px -12px rgba(217, 70, 239, .4) }
+.dt-tot { margin-top: 6px; border-top: 0; border-radius: 14px; padding: 12px; background: linear-gradient(135deg, #faf5ff, #fff5ee); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9) }
+.dt-tot b { font-size: 22px; letter-spacing: -.04em }
+
+/* ---------- Nuit : la carte sombre, plus douce et très arrondie ---------- */
+.nt-panel { border-radius: var(--r-2xl); background: radial-gradient(120% 90% at 100% 0%, #2a1d57 0%, #15112e 55%, #110e26 100%); box-shadow: 0 50px 110px -50px rgba(40, 14, 90, .65) }
+.nt .eyebrow { background: rgba(255, 255, 255, .08); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); backdrop-filter: none; -webkit-backdrop-filter: none }
+.nt .ticks .i { background: rgba(255, 255, 255, .1); color: #fed7aa }
+.nt-feed li { border-radius: 16px }
+.nt-feed li.on { background: rgba(255, 255, 255, .07); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08) }
+.nt-feed .tl { border-radius: 11px }
+.nt-brief { border-radius: var(--r-lg); padding: 18px }
+.nb-h .bob-av { background: var(--dawn-d) }
+.nb-a .btn.dark { background: var(--dawn); box-shadow: var(--sh-dawn) }
+
+/* ---------- Téléphone : l'appel ---------- */
+.cl-phone { border-radius: 54px; padding: 10px; background: #18142e; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .12), 0 60px 110px -40px rgba(60, 30, 120, .55) }
+.cl-scr { border-radius: 44px; position: relative; background: radial-gradient(120% 50% at 80% 0%, #f3d4f8 0%, #ebe2fd 45%, #f8f6fd 80%) }
+.cl-head { border-radius: 20px; background: rgba(255, 255, 255, .75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 8px 24px -10px rgba(60, 30, 120, .2) }
+.cl-head[data-s="bob"] .cl-av, .cl-head[data-s="done"] .cl-av { background: var(--dawn-d) }
+.cl-head[data-s="bob"] .cl-who span { color: var(--t-m) }
+.cl-wave { border-radius: 999px; background: rgba(255, 255, 255, .75); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9) }
+.cl-wave[data-who="bob"] .cl-spk { color: var(--t-m) }
+.cl-wave[data-who="bob"] .cl-bars i { background: linear-gradient(180deg, #8b5cf6, #d946ef 60%, #fb923c) }
+.cl-bars i { border-radius: 3px }
+.cb { border-radius: 18px; font-size: 13px }
+.cb.bob { box-shadow: 0 1px 2px rgba(60, 30, 120, .06), 0 6px 18px -10px rgba(60, 30, 120, .2); border-bottom-left-radius: 6px }
+.cb.bob small { color: var(--t-m) }
+.cb.cli { background: #fff; background: rgba(255, 255, 255, .55); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9); border-bottom-right-radius: 6px }
+.cb.sms { border-radius: 16px; background: var(--t-g-bg); box-shadow: none }
+.cb.sum { border-radius: 18px; box-shadow: 0 0 0 1.5px #e9b8f5, 0 14px 30px -14px rgba(217, 70, 239, .4) }
+.cb.sum b .bob-av { width: 22px; height: 22px; padding: 4px; border-radius: 7px }
+.cl-replay { height: 38px }
+.csteps { gap: 6px }
+.csteps li { border-radius: 18px; padding: 12px 14px }
+.csteps li.on { background: #fff; box-shadow: 0 0 0 1.5px #e9b8f5, 0 10px 30px -12px rgba(217, 70, 239, .3) }
+.cs-n { border-radius: 50%; background: #ece8f6; color: var(--mute); box-shadow: none; font-family: var(--display); font-weight: 600 }
+.csteps li.on .cs-n { background: var(--dawn-d); color: #fff; box-shadow: 0 4px 12px -3px rgba(217, 70, 239, .6) }
+.csteps li.done .cs-n { background: var(--t-g-bg); color: var(--t-g) }
+
+/* ---------- Brix AI MCP : tout en cartes ---------- */
+.ai-row { border-top: 0; padding-top: 0; gap: 8px }
+.ai-row small { margin-right: 6px }
+.ai-row span { font-size: 15px; letter-spacing: -.02em; color: var(--ink-2); height: 40px; display: inline-flex; align-items: center; padding: 0 16px; border-radius: 999px; background: rgba(255, 255, 255, .7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 6px 18px -10px rgba(60, 30, 120, .22) }
+.qchip { border-radius: 18px; box-shadow: var(--sh-2); padding: 15px 18px }
+.qchip:hover { background: #fff; transform: translateY(-2px) }
+.qchip { transition: box-shadow .3s, transform .4s var(--ease) }
+.qchip[aria-pressed="true"] { box-shadow: 0 0 0 1.5px #e9b8f5, 0 12px 30px -12px rgba(217, 70, 239, .35) }
+.qchip[aria-pressed="true"] .i { color: var(--t-m) }
+.mc { border-radius: var(--r-xl); box-shadow: var(--sh-3) }
+.mc-h { background: none; border-bottom: 1px solid var(--line); padding: 14px 18px }
+.mc-h .badge { border-radius: 999px; padding: 4px 10px }
+.mc-b { padding: 22px 20px }
+.msg.u { border-radius: 20px 20px 6px 20px; background: var(--t-v-bg); color: var(--ink) }
+.tool { border-radius: 14px; background: var(--paper-2); box-shadow: none }
+.tool .tl { border-radius: 8px; background: #fff } .tool .tl .i { color: var(--t-m) }
+.tool.run::after { background: linear-gradient(100deg, transparent 30%, rgba(217, 70, 239, .1), transparent 70%) }
+.mc-in { border-radius: 999px; margin: 0 16px 16px; padding: 7px 7px 7px 18px; box-shadow: 0 0 0 1px var(--line), var(--sh-1) }
+.mc-send { width: 34px; height: 34px; border-radius: 50%; background: var(--dawn-d); box-shadow: 0 6px 14px -6px rgba(217, 70, 239, .6) }
+.st3 { gap: 16px; background: none; box-shadow: none; overflow: visible; border-radius: 0 }
+.st3 li { border-radius: var(--r-lg); box-shadow: var(--sh-2); padding: 24px }
+.st3-n { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; color: var(--mute) }
+.st3-n b { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--dawn-d); color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px -3px rgba(217, 70, 239, .55) }
+.crumb, .addr { border-radius: 999px; background: var(--paper-2); box-shadow: none }
+.crumb { padding: 9px 14px }
+.addr { padding: 5px 5px 5px 14px }
+.addr-b { border-radius: 999px; padding: 7px 12px }
+.st3-art .btn.dark { background: var(--dawn); box-shadow: var(--sh-dawn) }
+.facts { gap: 16px }
+.fct { border-top: 0; padding: 20px; border-radius: var(--r-lg); background: rgba(255, 255, 255, .62); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 10px 30px -16px rgba(60, 30, 120, .2) }
+
+/* ---------- Confiance ---------- */
+.hist { border-radius: var(--r-xl); padding: 22px; box-shadow: var(--sh-3) }
+.hist-h { border-bottom: 0; padding-bottom: 10px }
+.hist-l li { border-bottom: 0; margin-top: 6px; padding: 11px 12px; border-radius: 14px; background: var(--paper-2) }
+.hist-l .badge { border-radius: 999px; padding: 3px 10px }
+.sw { box-shadow: 0 1px 2px rgba(60, 30, 120, .08), 0 0 0 1px var(--line) }
+.hist-off { border-radius: 14px }
+
+/* ---------- FAQ en carte, appel final ---------- */
+.qas { padding: 6px 26px; border-radius: var(--r-xl); background: rgba(255, 255, 255, .72); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), var(--sh-2) }
+.qa:first-child { border-top: 0 }
+.qa:last-child { border-bottom: 0 }
+.qa button:hover { color: var(--t-m) }
+.fin-glow { display: none }
+.fin-mark { width: 60px; height: 60px; border-radius: 29%; padding: 13px; background: var(--dawn-d); box-shadow: inset 0 0 0 .5px rgba(255, 255, 255, .3), 0 16px 34px -12px rgba(190, 50, 220, .65) }
+
+@media (max-width: 1100px) {
+  .bd { padding-left: 0 }
+  .bd-mic { right: 0 }
+}
+@media (max-width: 560px) {
+  .bd { padding: 30px 0 150px }
+  .bd-mic { right: 8px; top: -2px; height: 46px } .bd-mic-b { width: 32px; height: 32px }
+  .bd-win { padding: 6px; border-radius: 24px }
+  .toc-in { justify-content: flex-start }
+  .toc a { height: 34px; padding: 0 12px; font-size: 13.5px }
+  .qas { padding: 4px 18px }
+  .nt-panel { border-radius: 26px }
+  .st3 li, .fct { padding: 18px }
+}
+@media (prefers-reduced-motion: reduce) { .bd-mic, .bd-mic-w i { animation: none } .bd-mic-w i { transform: scaleY(var(--h, .6)) } }
+@media (max-width: 560px) { .kicker { font-size: 13px; gap: 8px } .kicker > .i { display: none } }

@@ -76,10 +76,13 @@ export function heroRfq(intro) {
     gsap.set(g, { opacity: 1 });
     wires();
     paths.forEach((p) => { const L = p.getTotalLength(); gsap.set(p, { strokeDasharray: L, strokeDashoffset: L }); });
+    // les fournisseurs ne sont pas encore là : leurs cartes arriveront une par une avec la demande
+    gsap.set(orig, { opacity: 0, x: 28, scale: 0.96 });
     await wait(900);
     send.classList.add('press'); await wait(170); send.classList.remove('press');
-    paths.forEach((p, i) => { gsap.to(p, { strokeDashoffset: 0, duration: 0.7, delay: i * 0.1, ease: 'power2.inOut' }); travel(i, false, 0.8, 0.25 + i * 0.1); });
-    await wait(1100);
+    paths.forEach((p, i) => { gsap.to(p, { strokeDashoffset: 0, duration: 0.7, delay: i * 0.28, ease: 'power2.inOut' }); travel(i, false, 0.8, 0.2 + i * 0.28); });
+    orig.forEach((li, i) => gsap.to(li, { opacity: 1, x: 0, scale: 1, duration: 0.8, delay: 0.55 + i * 0.28, ease: 'back.out(1.5)' }));
+    await wait(1700);
     send.classList.add('done'); sendT.textContent = 'Envoyée';
     orig.forEach((li, i) => setTimeout(() => gsap.fromTo(st(li, 'sent', `${ic('check')}Envoyée`), { scale: 0.7 }, { scale: 1, duration: 0.45, ease: 'back.out(3)' }), i * 90));
     await wait(1100);
@@ -107,9 +110,12 @@ export function heroRfq(intro) {
     gsap.to(foot, { opacity: 1, y: 0, duration: 0.6, ease: 'expo.out' });
     await wait(4600);
     gsap.to(foot, { opacity: 0, duration: 0.4 });
-    await wait(400);
+    gsap.to(orig, { opacity: 0, y: -8, duration: 0.45, stagger: 0.06, ease: 'power2.in' });
+    await wait(700);
   }
 
+  gsap.set(orig, { opacity: 0 });
+  gsap.set(foot, { opacity: 0 });
   let started = false;
   intro.eventCallback('onComplete', () => { started = true; });
   const waitStart = async () => { while (!started) await wait(100); };

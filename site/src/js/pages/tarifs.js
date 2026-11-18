@@ -1,6 +1,7 @@
 /* Tarifs : offres (prix qui roulent au passage mensuel / annuel), simulateur qui allume l'offre conseillée,
    tableau complet fonction par fonction replié par département, FAQ facturation. */
-import { boot, gsap, reduce, $, $$, ic, euro } from '../core.js';
+import { boot, gsap, reduce, $, $$, ic as icon, euro } from '../core.js';
+import { pageHero } from '../subpage.js';
 import { renderPlans, initSimulator, initFaq } from '../shared.js';
 import { DEPARTMENTS } from '../../data/departments.js';
 import { PLAN_LIST, MCP_ADDON, annualMonthly, simulate } from '../../data/plans.js';
@@ -11,6 +12,11 @@ const TAG = { new: ['new', 'Nouveau'], only: ['only', 'Exclusif Brix'], soon: ['
 const OPTION = { 'Brix AI MCP': { pro: `${euro(MCP_ADDON)}` } };
 const OPEN = ['base', 'vendre']; // groupes dépliés à l'arrivée
 const GROUP_ICON = { base: { icon: 'layers' }, entreprise: { icon: 'building-2' } };
+// pas d'étincelles « IA » : Bob prend une main tendue
+const SWAP = { sparkles: { icon: 'hand-helping' } };
+const ic = (name, cls) => icon(SWAP[name]?.icon || name, cls);
+// pastille de groupe : couleur du département en version pâle
+const tint = (c) => (c ? ` style="--gc-bg:color-mix(in srgb, ${c} 13%, #fff);--gc:color-mix(in srgb, ${c} 74%, #1b1035)"` : '');
 
 /* ---------- Prix qui roulent : chaque chiffre est une petite colonne 0 → 9 ---------- */
 const COL = `<span class="od-c">${[...'0123456789'].map((n) => `<span>${n}</span>`).join('')}</span>`;
@@ -98,7 +104,7 @@ function cells(minPlan, f = {}) {
 }
 
 /* en-tête de groupe : bouton qui replie, et pour chaque offre le nombre de fonctions incluses */
-function group(key, title, icon, rows, feats) {
+function group(key, title, icon, rows, feats, color) {
   const n = feats.length;
   const sums = ORDER.map((id) => {
     if (!n) return `<td class="${hi(id)}"></td>`;
@@ -108,7 +114,7 @@ function group(key, title, icon, rows, feats) {
   }).join('');
   const open = OPEN.includes(key);
   return `<tbody class="tf-grp ${open ? 'open' : ''}" id="g-${key}">
-    <tr class="tf-g"><th scope="row"><button type="button" aria-expanded="${open}"><span class="tf-gi">${ic(icon)}</span><span class="tf-gn">${title}${n ? `<small class="mono">${n}</small>` : ''}</span>${ic('chevron-down', 'tf-ch')}</button></th>${sums}</tr>
+    <tr class="tf-g"><th scope="row"><button type="button" aria-expanded="${open}"><span class="tf-gi"${tint(color)}>${ic(icon)}</span><span class="tf-gn">${title}${n ? `<small class="mono">${n}</small>` : ''}</span>${ic('chevron-down', 'tf-ch')}</button></th>${sums}</tr>
     ${rows}
   </tbody>`;
 }
@@ -124,12 +130,12 @@ function renderTable(t) {
     row('Devis et factures', 'Nombre de documents par mois', ORDER.map((id) => `<td class="${hi(id)}">${txt(id === 'start' ? '5 + 5' : 'Illimités')}</td>`).join(''))
     + row('Utilisateurs', 'Personnes qui se connectent à Brix', `<td>${txt('1')}</td><td>${txt('1')}</td><td class="hi">${txt('5 inclus')}<small>puis 9 € par personne</small></td><td>${txt('Sur mesure')}</td>`), []);
 
-  const depts = DEPARTMENTS.map((d) => group(d.id, d.name, d.icon, d.features.map((f) => row(f.name, f.desc, cells(f.plan, f), f.tag)).join(''), d.features)).join('');
+  const depts = DEPARTMENTS.map((d) => group(d.id, d.name, d.icon, d.features.map((f) => row(f.name, f.desc, cells(f.plan, f), f.tag)).join(''), d.features, d.color)).join('');
 
   // ce qui n'existe qu'en Entreprise, repris de l'offre
   const ent = PLAN_LIST.find((p) => p.id === 'entreprise');
   const entFeats = ent.items.map((i) => ({ name: i, plan: 'entreprise' }));
-  const entRows = group('entreprise', 'Entreprise', GROUP_ICON.entreprise.icon, ent.items.map((i) => row(i, '', cells('entreprise'))).join(''), entFeats);
+  const entRows = group('entreprise', 'Entreprise', GROUP_ICON.entreprise.icon, ent.items.map((i) => row(i, '', cells('entreprise'))).join(''), entFeats, '#fb923c');
 
   t.innerHTML = `<caption class="sr">Comparatif des offres Brix ${PLAN_LIST.map((p) => p.name).join(', ')}, fonction par fonction</caption>${head}${base}${depts}${entRows}`;
 }
@@ -165,6 +171,7 @@ function initGroups(t, allBtn) {
 }
 
 boot(() => {
+  pageHero();
   const plans = $('[data-plans]');
   renderPlans(plans);
   initBilling($('.toggle'), plans);

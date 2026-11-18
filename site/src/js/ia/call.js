@@ -3,6 +3,9 @@
 import { gsap, reduce, $, $$, ic } from '../core.js';
 import { wait, onView } from '../subpage.js';
 
+// le B de Brix (déjà dans la page, dans la fenêtre de Bob du hero) sert d'avatar à Bob
+const MARK = document.querySelector('.bmark')?.outerHTML || '';
+
 // step : étape de la liste « csteps » qui s'allume à ce moment de l'appel
 const SCRIPT = [
   { s: 'missed', t: 'Appel manqué · vous êtes sur le toit', d: 1400 },
@@ -16,7 +19,7 @@ const SCRIPT = [
   { who: 'bob', m: 'C’est noté. Vous allez recevoir un SMS avec l’heure de passage. Bonne journée !', step: 3 },
   { s: 'done', t: 'Appel terminé · 1 min 12', d: 700 },
   { who: 'sms', m: `<small>${ic('message-square')}SMS envoyé au client</small>Martin Plomberie : visite confirmée jeudi à 8 h 30, 14 rue des Lilas. Pour décaler, répondez à ce message.` },
-  { who: 'sum', step: 4, m: `<b><span class="bob-av">${ic('sparkles')}</span>Résumé pour Karim</b><div><span>Client</span><span>Mme Dubois, nouvelle cliente</span></div><div><span>Demande</span><span>Fuite sous évier, pas urgente</span></div><div><span>Visite</span><span>Jeudi 8 h 30, dans le planning</span></div>` },
+  { who: 'sum', step: 4, m: `<b><span class="bob-av">${MARK}</span>Résumé pour Karim</b><div><span>Client</span><span>Mme Dubois, nouvelle cliente</span></div><div><span>Demande</span><span>Fuite sous évier, pas urgente</span></div><div><span>Visite</span><span>Jeudi 8 h 30, dans le planning</span></div>` },
 ];
 
 export function initCall() {

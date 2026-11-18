@@ -1,13 +1,19 @@
 /* Toutes les fonctionnalités : une section par département, recherche en direct,
    filtres par étiquette et par offre, index des départements collant avec indicateur de lecture. */
-import { boot, gsap, ScrollTrigger, reduce, $, $$, ic, esc, scrollToEl } from '../core.js';
+import { boot, gsap, ScrollTrigger, reduce, $, $$, ic as icon, esc, scrollToEl } from '../core.js';
+import { pageHero } from '../subpage.js';
 import { DEPARTMENTS, PLANS, FEATURE_COUNT } from '../../data/departments.js';
 
 const ORDER = ['start', 'pro', 'equipe', 'entreprise'];
+// pas d'étincelles « IA » sur le site : Bob, le bras droit, prend une icône de main tendue
+const SWAP = { sparkles: { icon: 'hand-helping' } };
+const ic = (name, cls) => icon(SWAP[name]?.icon || name, cls);
+// pastille du département : sa couleur en version pâle (fond) et foncée (encre)
+const tone = (d) => `--dc:${d.color}`;
 const TAG = { new: ['new', 'Nouveau'], only: ['only', 'Exclusif Brix'], soon: ['soon', 'Bientôt'] };
 const FILTERS = [
   { id: 'all', label: 'Tous' },
-  { id: 'new', label: 'Nouveau', icon: 'sparkles' },
+  { id: 'new', label: 'Nouveau', icon: 'badge-plus' },
   { id: 'only', label: 'Exclusif Brix', icon: 'badge-check' },
   { id: 'start', label: 'Inclus dans Start' },
   { id: 'pro', label: 'Inclus dans Pro' },
@@ -34,18 +40,18 @@ const minPlan = (d) => PLANS[ORDER[Math.min(...d.features.map((f) => ORDER.index
 function sectionHTML(d, i) {
   const only = d.features.filter((f) => f.tag === 'only').length;
   return `
-  <section class="fx-sec" id="${d.id}" aria-labelledby="h-${d.id}">
+  <section class="fx-sec" id="${d.id}" aria-labelledby="h-${d.id}" style="${tone(d)}">
     <header class="fx-sh">
-      <div class="fx-k"><span class="fx-ic">${ic(d.icon)}</span><span class="mono">${pad(i + 1)}</span><span>${d.name}</span></div>
+      <div class="fx-k"><span class="fx-ic">${ic(d.icon)}</span><span>${d.name}</span><span class="mono">${pad(i + 1)} / ${pad(DEPARTMENTS.length)}</span></div>
       <h2 id="h-${d.id}">${d.title} <span class="grad">${d.accent}</span></h2>
       <p>${d.pitch}</p>
       <div class="fx-mt"><span class="badge v" data-cnt>${d.features.length} fonctions</span><span class="badge ok">Dès Brix ${minPlan(d)}</span>${only ? `<span class="badge only">${only} exclusivité${only > 1 ? 's' : ''} Brix</span>` : ''}</div>
     </header>
     <div class="fx-grid">${d.features.map((f) => `
-      <article class="fc">
+      <article class="fc${f.tag ? ` t-${f.tag}` : ''}">
         <div class="fc-top"><span class="fc-ic">${ic(f.icon)}</span>${f.tag ? `<span class="badge ${TAG[f.tag][0]}">${TAG[f.tag][1]}</span>` : ''}</div>
         <h3>${esc(f.name)}</h3><p>${esc(f.desc)}</p>
-        <div class="fc-plan">${meter(f.plan)}<span class="mono">Dès ${PLANS[f.plan]}</span></div>
+        <div class="fc-plan"><span class="fc-pill p-${f.plan}">${meter(f.plan)}<span>Dès ${PLANS[f.plan]}</span></span></div>
       </article>`).join('')}
     </div>
   </section>`;
@@ -64,21 +70,23 @@ function render(list) {
 
 /* Index collant : le repère glisse d'un département à l'autre et se remplit à la lecture. */
 function initNav(nav, sections, list) {
-  nav.insertAdjacentHTML('beforeend', DEPARTMENTS.map((d, i) => `<a class="fx-l" href="#${d.id}" data-id="${d.id}"><span class="fx-l-ic">${ic(d.icon)}</span><span class="fx-l-n">${d.name}</span><span class="fx-l-c mono" data-c>${d.features.length}</span></a>`).join(''));
+  nav.insertAdjacentHTML('beforeend', DEPARTMENTS.map((d, i) => `<a class="fx-l" href="#${d.id}" data-id="${d.id}" style="${tone(d)}"><span class="fx-l-ic">${ic(d.icon)}</span><span class="fx-l-n">${d.name}</span><span class="fx-l-c mono" data-c>${d.features.length}</span></a>`).join(''));
   const links = $$('.fx-l', nav), ind = $('[data-ind]', nav), fill = $('i', ind), prog = $('[data-prog]', nav);
   const vertical = () => getComputedStyle(nav).flexDirection === 'column';
   let cur = null;
+  // la pilule blanche glisse sous le département lu, dans les deux sens (colonne ou barre)
   const place = () => {
     const l = links.find((x) => x.dataset.id === cur);
-    if (!l || l.hidden || !vertical()) { ind.style.opacity = 0; return; }
+    if (!l || l.hidden) { ind.style.opacity = 0; return; }
     ind.style.opacity = 1;
+    ind.style.width = `${l.offsetWidth}px`;
     ind.style.height = `${l.offsetHeight}px`;
-    ind.style.transform = `translateY(${l.offsetTop}px)`;
+    ind.style.transform = `translate(${l.offsetLeft}px, ${l.offsetTop}px)`;
   };
   const set = (id) => {
     if (id === cur) return;
     cur = id;
-    fill.style.transform = 'scaleY(0)';
+    fill.style.transform = 'scaleX(0)';
     links.forEach((l) => (l.dataset.id === id ? l.setAttribute('aria-current', 'true') : l.removeAttribute('aria-current')));
     place();
     // barre horizontale (mobile) : l'onglet actif reste visible
@@ -88,8 +96,8 @@ function initNav(nav, sections, list) {
   sections.forEach((s, i) => ScrollTrigger.create({
     trigger: s, start: 'top 42%', end: 'bottom 42%',
     // en remontant au-dessus du premier département, l'index revient sur lui
-    onToggle: (st) => { if (st.isActive) set(s.id); else if (i === 0 && st.direction < 0) { set(s.id); fill.style.transform = 'scaleY(0)'; } },
-    onUpdate: (st) => { if (s.id === cur) fill.style.transform = `scaleY(${st.progress.toFixed(3)})`; },
+    onToggle: (st) => { if (st.isActive) set(s.id); else if (i === 0 && st.direction < 0) { set(s.id); fill.style.transform = 'scaleX(0)'; } },
+    onUpdate: (st) => { if (s.id === cur) fill.style.transform = `scaleX(${st.progress.toFixed(3)})`; },
   }));
   ScrollTrigger.create({ trigger: list, start: 'top 42%', end: 'bottom 42%', onUpdate: (st) => { prog.style.transform = `scaleX(${st.progress.toFixed(3)})`; } });
   addEventListener('resize', place);
@@ -101,6 +109,7 @@ function initNav(nav, sections, list) {
 boot(() => {
   const list = $('[data-list]'), input = $('[data-q]'), chipsRoot = $('[data-chips]'), status = $('[data-status]');
   const empty = $('[data-empty]'), clear = $('[data-clear]'), kbd = $('[data-kbd]');
+  pageHero();
   const items = render(list);
   const sections = $$('.fx-sec', list);
 

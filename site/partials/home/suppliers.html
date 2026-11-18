@@ -5,29 +5,37 @@
       <p class="sub rv">Compatible avec tous vos fournisseurs, même ceux qui n’ont jamais entendu parler de Brix. Ils reçoivent un lien, répondent en deux minutes, et vous comparez sans ressaisir une ligne.</p>
     </div>
     <div class="flow rv" data-flow>
-      <svg class="flow-line" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="M20 20 H980"/><path class="fl-p" pathLength="1000" d="M20 20 H980"/></svg>
-      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-file-pen-line"/></svg></span><b>Devis signé</b><span>La liste de matériel est extraite du devis</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg></span><b>Demande de prix</b><span>Envoyée à 3 fournisseurs en un clic</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-git-compare"/></svg></span><b>Comparatif</b><span>Prix et délai, ligne par ligne</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-shopping-cart"/></svg></span><b>Commande</b><span>Bon de commande généré, au format EDI si besoin</span></div>
-      <div class="fnode"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-truck"/></svg></span><b>Livré sur chantier</b><span>Suivi, livraisons partielles, facture rapprochée</span></div>
+      <svg class="flow-line" aria-hidden="true" viewBox="0 0 1000 40" preserveAspectRatio="none"><defs><linearGradient id="flg" gradientUnits="userSpaceOnUse" x1="20" y1="0" x2="980" y2="0"><stop offset="0" stop-color="#6d28d9"/><stop offset=".6" stop-color="#d946ef"/><stop offset="1" stop-color="#fb923c"/></linearGradient></defs><path d="M20 20 H980"/><path class="fl-p" pathLength="1000" d="M20 20 H980"/></svg>
+      <div class="fnode tone-v"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-file-pen-line"/></svg></span><b>Devis signé</b><span>La liste de matériel est extraite du devis</span></div>
+      <div class="fnode tone-m"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-send"/></svg></span><b>Demande de prix</b><span>Envoyée à 3 fournisseurs en un clic</span></div>
+      <div class="fnode tone-p"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-git-compare"/></svg></span><b>Comparatif</b><span>Prix et délai, ligne par ligne</span></div>
+      <div class="fnode tone-b"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-shopping-cart"/></svg></span><b>Commande</b><span>Bon de commande généré, au format EDI si besoin</span></div>
+      <div class="fnode tone-g"><span class="fn-i"><svg class="i" aria-hidden="true"><use href="#i-truck"/></svg></span><b>Livré sur chantier</b><span>Suivi, livraisons partielles, facture rapprochée</span></div>
     </div>
     <div class="sup-split">
       <div class="sup-card rv">
         <span class="badge v">Pour vous, artisan</span>
         <h3 class="h3">Fini les devis matériel par téléphone.</h3>
+        <div class="rfq" data-rfq aria-label="Exemple de comparatif : trois fournisseurs, 122 euros d’écart" role="img">
+          <div class="rfq-h"><span class="mono">DP-0418 · tableau électrique T3</span><span class="hc ok">3 réponses</span></div>
+          <div class="rfq-r best" style="--w:.77"><span class="rfq-n">Comptoir Rhône Élec <em class="hc ok">Meilleur prix</em></span><span class="rfq-b"><i></i></span><b class="mono">412,00 €</b><small class="mono">J+1</small></div>
+          <div class="rfq-r" style="--w:.84"><span class="rfq-n">Négoce Gerland</span><span class="rfq-b"><i></i></span><b class="mono">448,50 €</b><small class="mono">J+2</small></div>
+          <div class="rfq-r" style="--w:1"><span class="rfq-n">Dépôt Lyon Sud</span><span class="rfq-b"><i></i></span><b class="mono">534,00 €</b><small class="mono">J+3</small></div>
+          <div class="rfq-f"><span class="rfq-save mono">− 122 €</span><span>d’écart sur une seule commande</span></div>
+        </div>
         <ul class="ticks">
           <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Vos tarifs fournisseurs importés (CSV, FAB-DIS), historique des prix</li>
           <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Alerte quand un prix augmente, avant d’envoyer le devis</li>
           <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Facture fournisseur comparée à la commande, écarts signalés</li>
-          <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Achats imputés au chantier : la marge réelle se met à jour</li>
+          <li><svg class="i" aria-hidden="true"><use href="#i-check"/></svg>Achats imputés au chantier : la marge réelle se met à jour</li>
         </ul>
         <p class="fine">Connexions directes avec les grands négoces en cours.</p>
       </div>
       <div class="sup-card dark rv" id="portail">
         <span class="badge only">Pour les fournisseurs</span>
         <h3 class="h3">Recevez les demandes des artisans. Sans installer quoi que ce soit.</h3>
-        <p>Le <b>Portail fournisseur Brix</b> s’ouvre depuis un lien sécurisé reçu par e-mail. Pour aller plus loin, l’<b>API Brix Fournisseurs</b> branche votre catalogue et vos stocks.</p>
+        <p>Le <b>Portail fournisseur Brix</b> s’ouvre depuis un lien sécurisé reçu par e-mail. Pour aller plus loin, l’<b>API Brix Fournisseurs</b> branche votre catalogue et vos stocks.</p>
+        <div class="portal-chip" aria-hidden="true"><span class="pc-ic"><svg class="i"><use href="#i-mail"/></svg></span><div><b>Nouvelle demande de prix</b><small>Benali Électricité · 14 lignes</small></div><span class="hc v">Répondre</span></div>
         <pre class="code" tabindex="0" role="region" aria-label="Exemple d'appel à l'API Brix Fournisseurs"><code><span class="c-k">POST</span> /v1/quotes/<span class="c-s">rfq_8KQ2</span>/responses
 {
   <span class="c-s">"lines"</span>: [{ <span class="c-s">"ref"</span>: <span class="c-s">"REC-90140"</span>, <span class="c-s">"price"</span>: <span class="c-n">412.00</span> }],

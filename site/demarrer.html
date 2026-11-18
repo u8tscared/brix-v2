@@ -17,7 +17,6 @@
 <!--@icons-->
 <!--@include nav-->
 <main id="main" class="onb">
-  <div class="onb-bg" aria-hidden="true"><div class="onb-grid-l"></div><div class="onb-glow"></div></div>
   <div class="wrap onb-in">
     <section class="wiz" aria-labelledby="wiz-h1">
       <h1 class="sr" id="wiz-h1">Composer mon Brix</h1>
@@ -25,11 +24,11 @@
         <div class="wiz-meta"><span class="mono" data-stepn>Étape 1 sur 5</span><span class="wiz-time"><svg class="i" aria-hidden="true"><use href="#i-clock"/></svg>Deux minutes</span></div>
         <div class="prog" role="progressbar" aria-label="Avancement" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1" aria-valuetext="Étape 1 sur 5"><i data-prog></i></div>
         <ol class="stp" data-stp>
-          <li><button type="button" data-go-step="0"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Métier</button></li>
-          <li><button type="button" data-go-step="1"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Équipe</button></li>
-          <li><button type="button" data-go-step="2"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Priorités</button></li>
-          <li><button type="button" data-go-step="3"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Départements</button></li>
-          <li><button type="button" data-go-step="4"><span class="stp-d"><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Offre</button></li>
+          <li><button type="button" data-go-step="0"><span class="stp-d"><b aria-hidden="true">1</b><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Métier</button></li>
+          <li><button type="button" data-go-step="1"><span class="stp-d"><b aria-hidden="true">2</b><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Équipe</button></li>
+          <li><button type="button" data-go-step="2"><span class="stp-d"><b aria-hidden="true">3</b><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Priorités</button></li>
+          <li><button type="button" data-go-step="3"><span class="stp-d"><b aria-hidden="true">4</b><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Départements</button></li>
+          <li><button type="button" data-go-step="4"><span class="stp-d"><b aria-hidden="true">5</b><svg class="i" aria-hidden="true"><use href="#i-check"/></svg></span>Offre</button></li>
         </ol>
       </div>
 
@@ -58,9 +57,9 @@
           <legend class="st-h"><span>Votre Brix est prêt à partir.</span><small>Rien à payer aujourd’hui. Vous choisissez votre offre, vous pourrez en changer quand vous voulez.</small></legend>
           <div class="plans-pick" data-pick role="radiogroup" aria-label="Offre"></div>
           <ul class="next-l">
-            <li><span class="mono">1</span><div><b>On importe vos données</b><span>Clients, devis, factures et prix depuis votre ancien logiciel ou un tableur. Offert.</span></div></li>
-            <li><span class="mono">2</span><div><b>Bob vous fait la visite</b><span>Trois minutes, sur vos propres écrans, pas sur une démo.</span></div></li>
-            <li><span class="mono">3</span><div><b>Vous envoyez votre premier devis</b><span>Dicté sur votre téléphone, signé par votre client.</span></div></li>
+            <li><span class="nx">1</span><div><b>On importe vos données</b><span>Clients, devis, factures et prix depuis votre ancien logiciel ou un tableur. Offert.</span></div></li>
+            <li><span class="nx">2</span><div><b>Bob vous fait la visite</b><span>Trois minutes, sur vos propres écrans, pas sur une démo.</span></div></li>
+            <li><span class="nx">3</span><div><b>Vous envoyez votre premier devis</b><span>Dicté sur votre téléphone, signé par votre client.</span></div></li>
           </ul>
         </fieldset>
 
@@ -77,10 +76,10 @@
 
     <aside class="prev" aria-label="Aperçu de votre Brix">
       <div class="pv" data-pv>
-        <div class="pv-bar"><span class="pv-tl"><i></i><i></i><i></i></span><span class="pv-url mono"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg>brix-app.fr</span><span class="pv-plan"><span class="badge v" data-pv-plan>Brix Pro</span></span></div>
+        <div class="pv-halo"></div>
+        <div class="pv-bar"><div class="logo pv-logo"><!--@include brix-wordmark.svg--></div><span class="pv-url mono"><svg class="i" aria-hidden="true"><use href="#i-lock"/></svg>brix-app.fr</span><span class="pv-plan"><span class="badge v" data-pv-plan>Brix Pro</span></span></div>
         <div class="pv-app">
           <div class="pv-side">
-            <div class="logo pv-logo"><!--@include brix-wordmark.svg--></div>
             <ul class="pv-nav" data-pv-mods></ul>
           </div>
           <div class="pv-main">

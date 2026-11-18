@@ -212,6 +212,6 @@ export function boot(pageInit) {
   initMagnetic();
   initLenis();
   // les ancres d'arrivée (#id) une fois tout en place
-  if (location.hash) { const t = document.querySelector(location.hash); if (t) setTimeout(() => t.scrollIntoView(), 60); }
+  if (location.hash) { const t = document.querySelector(location.hash); if (t) setTimeout(() => { t.scrollIntoView(); ScrollTrigger.refresh(); ScrollTrigger.update(); }, 60); }
   addEventListener('load', () => ScrollTrigger.refresh());
 }

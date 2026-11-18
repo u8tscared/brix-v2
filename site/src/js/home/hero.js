@@ -43,15 +43,30 @@ export function initHero() {
 
   if (reduce) { finalState(); return; }
 
-  // entrée
+  // entrée en cascade : titre, textes, capture qui sort du flou, puis les cartes satellites
+  const sats = $$('.sat', shot), phone = $('.phone', shot), ring = $('[data-ring]', shot);
   const intro = gsap.timeline({ defaults: { ease: 'expo.out' }, delay: 0.05 });
-  intro.from('.hero h1 .ln > span', { yPercent: 110, duration: 1.2, stagger: 0.08 })
-    .from('.hx', { y: 16, opacity: 0, duration: 0.9, stagger: 0.06 }, '-=0.95')
-    .from(shot, { y: 60, opacity: 0, duration: 1.4 }, '-=0.8');
+  intro.from('.hero .kicker', { y: 14, opacity: 0, scale: 0.96, duration: 0.9 })
+    .from('.hero h1 .ln > span', { yPercent: 110, duration: 1.2, stagger: 0.09 }, '-=0.75')
+    .from('.hero .h-in:not(.kicker)', { y: 18, opacity: 0, duration: 0.9, stagger: 0.07 }, '-=0.95')
+    .from('.h-halo', { opacity: 0, scale: 0.9, duration: 2.2, ease: 'power2.out' }, 0)
+    .from(shot, { y: 80, opacity: 0, filter: 'blur(14px)', duration: 1.5, clearProps: 'filter' }, '-=0.85')
+    .from(sats, { opacity: 0, scale: 0.7, y: 26, duration: 1.1, stagger: 0.14, ease: 'back.out(1.8)' }, '-=0.9');
+  if (phone) intro.from(phone, { x: 70, opacity: 0, rotate: 6, duration: 1.3 }, '<0.1');
+  if (ring) intro.fromTo(ring, { strokeDashoffset: 113.1 }, { strokeDashoffset: 66.7, duration: 1.6, ease: 'power3.out' }, '<0.3');
 
   // la capture se redresse en défilant
   gsap.fromTo(shot, { rotateX: 16, scale: 0.94 }, { rotateX: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: '.shot-wrap', start: 'top 92%', end: 'top 18%', scrub: 0.6 } });
-  gsap.to('.h-bg', { yPercent: 18, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true } });
+  // le halo réagit au défilement : chaque tache glisse, tourne et grossit à sa vitesse
+  const hs = { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 };
+  [[-14, 10, 30, 1.15], [18, 22, -40, 1.25], [-22, -18, 24, 0.9], [10, -30, -18, 1.2], [26, 14, 36, 1.1]].forEach(([x, y, r, sc], i) => {
+    gsap.to(`.hb.b${i + 1}`, { xPercent: x, yPercent: y, rotate: r, scale: sc, ease: 'none', scrollTrigger: hs });
+  });
+  gsap.to('.h-lines', { yPercent: 14, opacity: 0.4, ease: 'none', scrollTrigger: hs });
+  // parallaxe douce des satellites (yPercent, distinct du y de l'entrée)
+  const ps = { trigger: '.shot-wrap', start: 'top bottom', end: 'bottom top', scrub: 0.8 };
+  [-60, -110, -40, -80].forEach((d, i) => { if (sats[i]) gsap.to(sats[i], { yPercent: d, ease: 'none', scrollTrigger: ps }); });
+  if (phone) gsap.to(phone, { yPercent: -14, ease: 'none', scrollTrigger: ps });
 
   // curseur : position relative à .app
   const app = $('.app', shot);
@@ -112,9 +127,16 @@ export function initHero() {
   // ne joue que lorsqu'il est visible
   new IntersectionObserver((e) => { if (e[0].isIntersecting) loop.play(); else loop.pause(); }, { threshold: 0.15 }).observe(shot);
 
-  // léger suivi de la souris
+  // léger suivi de la souris : la capture pivote, les satellites et le halo glissent en profondeur
   if (fine) {
     const rx = gsap.quickTo(shot, 'rotationY', { duration: 1.2, ease: 'power3' });
-    $('.hero').addEventListener('pointermove', (e) => rx((e.clientX / innerWidth - 0.5) * 3));
+    const movers = sats.map((el, i) => [gsap.quickTo(el, 'x', { duration: 1.4, ease: 'power3' }), [14, -10, 18, -12][i] || 10]);
+    const hx = gsap.quickTo('.h-halo', 'x', { duration: 2, ease: 'power3' }), hy = gsap.quickTo('.h-halo', 'y', { duration: 2, ease: 'power3' });
+    $('.hero').addEventListener('pointermove', (e) => {
+      const px = e.clientX / innerWidth - 0.5, py = e.clientY / innerHeight - 0.5;
+      rx(px * 3);
+      movers.forEach(([f, k]) => f(px * k));
+      hx(px * -40); hy(py * -30);
+    });
   }
 }

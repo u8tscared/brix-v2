@@ -1,129 +1,218 @@
-/* ===== Page Tarifs : offres, simulateur, options, tableau fonction par fonction, FAQ ===== */
-.tf-top .ph-in { padding-bottom: clamp(64px, 8vw, 104px) }
-.tf-top .ptop { display: flex; justify-content: space-between; align-items: end; gap: 28px; flex-wrap: wrap }
+/* ===== Page Tarifs (Halo) : interrupteur en pilule à ressort, cartes d'offre 28 px,
+   offre recommandée à bord Aube et lueur, prix qui roulent, simulateur, options,
+   tableau fonction par fonction replié en cartes douces, FAQ dans une carte. =====
+   Les règles de base des offres viennent de home-3.css (modifié ailleurs) : tout ce qui
+   compte ici est redéfini sous .tf-top pour ne pas dépendre de ses changements. */
+.tf-top .ph-in { padding-bottom: clamp(24px, 3vw, 40px) }
+.tf-top .ptop { display: block; position: relative; min-height: 0 }
 .tf-top .ptop .sub { max-width: 50ch }
-.tf-top .plans { margin-top: 44px }
+.tf-top .plans { margin-top: clamp(48px, 6vw, 72px) }
 
-/* ---------- Bascule mensuel / annuel ---------- */
-.tf-top .toggle { display: inline-flex; position: relative; padding: 3px; border-radius: 11px; background: var(--paper-3); box-shadow: inset 0 0 0 1px var(--line) }
-.tf-top .toggle button { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 8px; font-weight: 500; font-size: 14px; color: var(--mute); transition: color .3s }
+/* ---------- Interrupteur mensuel / annuel : pilule à ressort ---------- */
+.tf-top .toggle { display: inline-flex; position: relative; margin-top: 32px; padding: 5px; border-radius: 999px; background: rgba(236, 232, 247, .66); backdrop-filter: blur(16px) saturate(1.5); -webkit-backdrop-filter: blur(16px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .75), 0 10px 28px -16px rgba(60, 30, 120, .22) }
+.tf-top .toggle button { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 9px; height: 44px; padding: 0 20px; border-radius: 999px; font-weight: 550; font-size: 14.5px; color: var(--mute); transition: color .3s }
 .tf-top .toggle button:hover { color: var(--ink) }
 .tf-top .toggle button[aria-pressed="true"] { color: var(--ink) }
-.tf-top .toggle .pill { position: absolute; top: 3px; bottom: 3px; left: 0; border-radius: 8px; background: #fff; box-shadow: 0 0 0 1px var(--line), 0 2px 6px -2px rgba(20, 17, 43, .16); transition: transform .45s var(--ease), width .45s var(--ease) }
-.tf-top .toggle em { font-style: normal; font-size: 11.5px; font-weight: 550; padding: 2px 7px; border-radius: 6px; background: var(--ok-bg); color: var(--ok); transition: transform .4s var(--spring) }
-.tf-top .toggle button[aria-pressed="true"] em { transform: scale(1.06) }
+.tf-top .toggle .pill { position: absolute; top: 5px; bottom: 5px; left: 0; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .08), 0 8px 20px -8px rgba(60, 30, 120, .3); transition: transform .6s cubic-bezier(.34, 1.56, .64, 1), width .5s cubic-bezier(.34, 1.4, .64, 1) }
+.tf-top .toggle em { font-style: normal; font-size: 11.5px; font-weight: 600; height: 22px; display: inline-grid; place-items: center; padding: 0 9px; border-radius: 999px; background: var(--t-g-bg); color: var(--t-g); transition: transform .45s var(--spring), background .3s, color .3s }
+.tf-top .toggle button[aria-pressed="true"] em { transform: scale(1.06); background: var(--dawn-d); color: #fff; box-shadow: 0 4px 12px -4px rgba(217, 70, 239, .6) }
 
 /* ---------- Cartes d'offre ---------- */
-.tf-top .plan-c { border-radius: 16px }
-.tf-top .price b { font-family: var(--display); font-weight: 600; letter-spacing: -.045em }
-.tf-top .price [data-per] { min-height: 2.7em; max-width: 26ch }
+.tf-top .plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: stretch }
+.tf-top .plan-c { position: relative; isolation: isolate; display: flex; flex-direction: column; gap: 18px; padding: 28px 26px 26px; border-radius: var(--r-xl); background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(60, 30, 120, .04), 0 14px 40px -18px rgba(60, 30, 120, .2); transition: transform .55s var(--ease), box-shadow .55s var(--ease) }
+.tf-top .plan-c:hover { transform: translateY(-5px); box-shadow: 0 2px 4px rgba(60, 30, 120, .05), 0 30px 60px -24px rgba(60, 30, 120, .32) }
+.tf-top .plan-c::before, .tf-top .plan-c::after { content: none }
+/* offre mise en avant : bord dégradé Aube, reflet rosé et lueur derrière */
+.tf-top .plan-c.hi { background: linear-gradient(170deg, #fff 30%, #fdf4fd 72%, #fff6ef); box-shadow: 0 2px 4px rgba(60, 30, 120, .05), 0 30px 70px -26px rgba(217, 70, 239, .55), 0 12px 30px -18px rgba(109, 40, 217, .35) }
+.tf-top .plan-c.hi::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: var(--dawn-d); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 1 }
+.tf-top .plan-c.hi::after { content: ""; position: absolute; z-index: -1; inset: 10% -6% -8%; border-radius: 50%; background: radial-gradient(closest-side, rgba(217, 70, 239, .26), rgba(251, 146, 60, .12) 60%, transparent); filter: blur(28px); pointer-events: none }
+.tf-top .plan-c.hi:hover { transform: translateY(-6px) }
+.tf-top .plan-c h3 { font-size: 19px; font-weight: 620; letter-spacing: -.03em; display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+.tf-top .plan-c .tag { height: 24px; display: inline-grid; place-items: center; padding: 0 10px; border-radius: 999px; background: var(--dawn-d); color: #fff; font-size: 11.5px; font-weight: 600; letter-spacing: -.005em; box-shadow: 0 6px 14px -6px rgba(217, 70, 239, .7) }
+.tf-top .plan-c .for { font-size: 14px; color: var(--mute); margin-top: -10px; line-height: 1.45; min-height: 2.9em }
+.tf-top .price { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; min-height: 0; padding: 18px 18px 16px; margin-inline: -8px; border-radius: 20px; background: var(--paper-2); border: 0 }
+.tf-top .plan-c.hi .price { background: rgba(255, 255, 255, .82); box-shadow: inset 0 0 0 1px rgba(233, 184, 245, .5) }
+.tf-top .price b { font-family: var(--display); font-weight: 620; font-size: 44px; letter-spacing: -.05em; line-height: 1; font-variant-numeric: tabular-nums }
+.tf-top .price b.txt { font-size: 32px }
+.tf-top .price > span, .tf-top .price [data-per] { color: var(--mute); font-size: 12.5px; line-height: 1.4; min-height: 2.8em; max-width: none }
 .tf-top .price b span { font-size: inherit; color: inherit; max-width: none; line-height: 1; min-height: 0 }
 .tf-top .price s { color: var(--soft); font-size: 11.5px; text-decoration-color: var(--faint) }
+.tf-top .plan-c ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none }
+.tf-top .plan-c li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45 }
+.tf-top .plan-c li .i { width: 18px; height: 18px; padding: 3.5px; border-radius: 50%; background: var(--t-g-bg); color: var(--t-g); margin-top: 1px; stroke-width: 2.8; flex: none }
+.tf-top .plan-c.hi li .i { background: #f6e6fd; color: #a21caf }
+.tf-top .plan-c li.lead { font-weight: 600; font-size: 13.5px; color: var(--ink) }
+.tf-top .plan-c .fine { margin-top: -4px }
+.tf-top .plan-c .btn { margin-top: auto; width: 100%; height: 48px; border-radius: 999px }
+.tf-top .plan-c:not(.hi) .btn.dark { background: #fff; color: var(--ink); box-shadow: 0 0 0 1px var(--line-2), 0 1px 2px rgba(60, 30, 120, .06) }
+.tf-top .plan-c:not(.hi) .btn.dark:hover { background: var(--paper-2); box-shadow: 0 0 0 1px #d3cbe9, 0 8px 20px -10px rgba(60, 30, 120, .25) }
+
 /* prix qui roulent : une colonne par chiffre */
 .od-w { display: inline-flex; align-items: baseline }
 .od { display: inline-block; height: 1em; overflow: hidden; vertical-align: top; line-height: 1 }
-.od-c { display: flex; flex-direction: column; transition: transform .9s var(--ease); will-change: transform }
+.od-c { display: flex; flex-direction: column; transition: transform 1s cubic-bezier(.34, 1.25, .64, 1); will-change: transform }
 .od-c > span { display: block; height: 1em; line-height: 1 }
 .od-s { display: inline-block; line-height: 1 }
+
 /* offre conseillée par le simulateur */
-.pc-rec { position: absolute; top: -11px; left: 20px; z-index: 2; height: 22px; display: inline-flex; align-items: center; padding: 0 9px; border-radius: 6px; background: var(--ink); color: #fff; font-size: 11px; letter-spacing: -.01em; opacity: 0; transform: translateY(4px) scale(.96); transition: opacity .3s, transform .4s var(--spring); pointer-events: none; white-space: nowrap }
-.plan-c.rec .pc-rec { opacity: 1; transform: none }
-.plan-c.rec:not(.hi) { box-shadow: 0 0 0 1.5px var(--ink), 0 20px 40px -24px rgba(36, 18, 84, .3) }
-.plan-c.hi.rec .tag { display: none }
+.pc-rec { position: absolute; top: -13px; left: 24px; z-index: 2; height: 26px; display: inline-flex; align-items: center; padding: 0 11px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 11.5px; letter-spacing: -.01em; opacity: 0; transform: translateY(6px) scale(.94); transition: opacity .3s, transform .5s var(--spring); pointer-events: none; white-space: nowrap; box-shadow: 0 8px 18px -8px rgba(20, 17, 43, .6) }
+.tf-top .plan-c.rec .pc-rec { opacity: 1; transform: none }
+.tf-top .plan-c.rec:not(.hi) { box-shadow: 0 0 0 2px #c9b6f7, 0 24px 50px -24px rgba(109, 40, 217, .4) }
+.tf-top .plan-c.hi.rec .tag { display: none }
 
 /* ---------- Simulateur ---------- */
-.tf-top .sim { margin-top: 12px }
-.sim-d { font-size: 14px; color: var(--mute); margin-top: 6px }
-.tf-top .sim-o b { font-family: var(--display); font-variant-numeric: tabular-nums }
+.tf-top .sim { display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center; margin-top: 16px; padding: clamp(24px, 3vw, 34px); border-radius: var(--r-xl); background: var(--glass); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .05), 0 16px 40px -20px rgba(60, 30, 120, .24) }
+.tf-top .sim .h3 { font-size: 22px }
+.tf-top .sim-r { display: block; margin-top: 20px }
+.tf-top .sim-r input { width: 100%; height: 28px; cursor: pointer; -webkit-appearance: none; appearance: none; background: transparent }
+.tf-top .sim-r input::-webkit-slider-runnable-track { height: 8px; border-radius: 8px; background: linear-gradient(90deg, #6d28d9 0%, #d946ef calc(var(--fill, 0%) * .7), #fb923c var(--fill, 0%), #e7e1f4 var(--fill, 0%)) }
+.tf-top .sim-r input::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(217, 70, 239, .25), 0 4px 12px -2px rgba(109, 40, 217, .4); transition: transform .35s var(--spring) }
+.tf-top .sim-r input:active::-webkit-slider-thumb { transform: scale(1.18) }
+.tf-top .sim-r input::-moz-range-track { height: 8px; border-radius: 8px; background: #e7e1f4 }
+.tf-top .sim-r input::-moz-range-progress { height: 8px; border-radius: 8px; background: var(--dawn) }
+.tf-top .sim-r input::-moz-range-thumb { width: 26px; height: 26px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(217, 70, 239, .25), 0 4px 12px -2px rgba(109, 40, 217, .4) }
+.tf-top .sim-r input:focus-visible { outline: none }
+.tf-top .sim-r input:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(167, 139, 250, .35), 0 4px 12px -2px rgba(109, 40, 217, .4) }
+.tf-top .sim-scale { display: flex; justify-content: space-between; font-size: 11px; color: var(--faint); padding-inline: 6px; margin-top: 6px }
+.tf-top .sim-o { display: grid; grid-template-columns: auto auto 1fr; gap: 10px; align-items: stretch }
+.tf-top .sim-o > div { padding: 14px 16px; border-radius: 18px; background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .05), 0 8px 22px -14px rgba(60, 30, 120, .22) }
+.tf-top .sim-o small { display: block; font-size: 10.5px; color: var(--faint); font-weight: 500; text-transform: uppercase; letter-spacing: .06em; font-family: var(--mono) }
+.tf-top .sim-o b { display: block; font-family: var(--display); font-size: 26px; font-weight: 620; letter-spacing: -.045em; line-height: 1.15; margin-top: 4px; font-variant-numeric: tabular-nums }
 .tf-top .sim-o > div:first-child b { font-family: var(--mono); font-weight: 500; letter-spacing: -.04em }
+.tf-top .sim-o > div:nth-child(2) b { color: #a21caf }
+.tf-top .sim-o span { display: block; font-size: 12.5px; color: var(--mute) }
 
 /* ---------- Options ---------- */
-.tf-sub { font-family: var(--display); font-weight: 600; font-size: 20px; letter-spacing: -.03em; margin-top: 56px }
-.tf-top .opts { margin-top: 16px; margin-bottom: 0 }
-.tf-top .opt { border-radius: 14px; transition: box-shadow .25s, transform .3s var(--ease) }
-.tf-top .opt:hover { box-shadow: 0 0 0 1px var(--line-2), var(--sh-2); transform: translateY(-1px) }
-.tf-top .opt > .i { width: 34px; height: 34px; padding: 8px; border-radius: 9px; background: var(--tile); color: var(--ink-2); box-shadow: inset 0 0 0 1px rgba(20, 17, 43, .05) }
+.tf-sub { font-family: var(--display); font-weight: 620; font-size: 22px; letter-spacing: -.03em; margin-top: 64px }
+.tf-top .opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 18px 0 0 }
+.tf-top .opt { display: flex; gap: 14px; align-items: flex-start; padding: 20px; border-radius: var(--r-lg); background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .04), 0 12px 32px -18px rgba(60, 30, 120, .2); transition: box-shadow .45s var(--ease), transform .45s var(--ease) }
+.tf-top .opt:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(60, 30, 120, .05), 0 22px 44px -20px rgba(60, 30, 120, .3) }
+.tf-top .opt > .ic { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; flex: none }
+.tf-top .opt > .ic .i { width: 18px; height: 18px }
+.tf-top .opt b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -.015em }
+.tf-top .opt span:not(.ic) { display: block; font-size: 13.5px; color: var(--mute); line-height: 1.5; margin-top: 3px }
 
 /* ---------- Tableau : en-tête ---------- */
-.tf-cmp { padding-block: clamp(72px, 8vw, 112px) clamp(56px, 7vw, 96px); border-top: 1px solid var(--line) }
-.tf-bar { display: flex; justify-content: space-between; align-items: center; gap: 14px 24px; flex-wrap: wrap; margin-top: 44px }
-.tf-legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13.5px; color: var(--mute) }
-.tf-legend span { display: inline-flex; align-items: center; gap: 8px }
+.tf-cmp { padding-block: clamp(56px, 7vw, 96px) clamp(56px, 7vw, 96px) }
+.tf-bar { display: flex; justify-content: space-between; align-items: center; gap: 14px 24px; flex-wrap: wrap; margin-top: 40px }
+.tf-legend { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--mute) }
+.tf-legend span { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px 0 7px; border-radius: 999px; background: rgba(255, 255, 255, .72); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .05) }
 .tf-legend i { font-style: normal }
+.tf-all { height: 40px }
 .tf-all .i { width: 15px; height: 15px }
-.tf-wrap { margin-top: 16px; border-radius: 16px; box-shadow: 0 0 0 1px var(--line), var(--sh-2); background: #fff; overflow: clip }
+.tf-wrap { margin-top: 18px; overflow: visible }
 .tf-t { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-size: 14.5px }
 .tf-t thead th:not(.tf-fc) { width: 14.5% }
-.tf-t th, .tf-t td { padding: 14px 12px; border-bottom: 1px solid var(--line); text-align: center; vertical-align: middle }
-.tf-t tbody:last-child tr:last-child > * { border-bottom: 0 }
+.tf-t th, .tf-t td { padding: 14px 12px; text-align: center; vertical-align: middle; background-clip: padding-box }
 
-/* en-tête collant sous la navigation, colonne Équipe marquée d'un fin liseré Aube */
-.tf-t thead th { position: sticky; top: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); z-index: 3; background: rgba(255, 255, 255, .97); backdrop-filter: blur(14px) saturate(1.6); -webkit-backdrop-filter: blur(14px) saturate(1.6); padding-block: 16px 14px; box-shadow: 0 1px 0 var(--line); border-bottom: 0 }
-.tf-t thead th b { display: block; font-size: 16px; font-weight: 600; letter-spacing: -.02em }
-.tf-t thead th.hi { background: rgba(251, 249, 255, .98) }
-.tf-t thead th.hi::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: var(--dawn) }
+/* en-tête collant : une barre de verre sous la navigation, l'offre Équipe sur fond Aube pâle */
+.tf-t thead th { position: sticky; top: calc(var(--nav-h) + env(safe-area-inset-top, 0px) + 6px); z-index: 3; padding-block: 14px 13px; background: rgba(255, 255, 255, .78); backdrop-filter: blur(18px) saturate(1.6); -webkit-backdrop-filter: blur(18px) saturate(1.6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), inset 0 -1px 0 rgba(224, 218, 240, .7); transition: top .5s var(--ease) }
+body:has(.nav.hide) .tf-t thead th { top: calc(env(safe-area-inset-top, 0px) + 10px) }
+.tf-t thead th:first-child { border-radius: 22px 0 0 22px }
+.tf-t thead th:last-child { border-radius: 0 22px 22px 0 }
+.tf-t thead th b { display: block; font-size: 16px; font-weight: 620; letter-spacing: -.025em }
+.tf-t thead th.hi { background: rgba(250, 240, 255, .88) }
+.tf-t thead th.hi b { background: var(--dawn); -webkit-background-clip: text; background-clip: text; color: transparent }
 .tf-pr { display: block; margin-top: 3px; font-size: 12px; color: var(--mute); font-variant-numeric: tabular-nums }
 .tf-pr small { font-size: 11px; color: var(--faint) }
 .tf-sh { display: none }
-.tf-t td.hi { background: #fbf9ff; box-shadow: inset 1px 0 0 #f0eafc, inset -1px 0 0 #f0eafc }
 
-/* ---------- Groupes repliables ---------- */
-.tf-g > * { background: #fcfbfe; padding-block: 0 }
-.tf-g td.hi { background: #f8f4ff }
+/* ---------- Groupes repliables : chaque département est une carte douce ---------- */
+.tf-t tbody th, .tf-t tbody td { background-color: #fff; border-bottom: 1px solid #f1edf8 }
+.tf-t tbody td.hi { background-color: #fcf7ff }
+.tf-t tbody > tr > :first-child { border-left: 1px solid #efeaf7 }
+.tf-t tbody > tr > :last-child { border-right: 1px solid #efeaf7 }
+/* l'espace entre deux cartes est une bordure transparente ; le rayon elliptique compense son épaisseur */
+.tf-g > * { border-top: 14px solid transparent; padding-block: 0 }
+.tf-g > :first-child { border-top-left-radius: 22px 36px }
+.tf-g > :last-child { border-top-right-radius: 22px 36px }
+.tf-grp:not(.open) .tf-g > *, .tf-grp.open tr:last-child > * { border-bottom: 1px solid #ebe5f5 }
+.tf-grp:not(.open) .tf-g > :first-child, .tf-grp.open tr:last-child > :first-child { border-bottom-left-radius: 22px }
+.tf-grp:not(.open) .tf-g > :last-child, .tf-grp.open tr:last-child > :last-child { border-bottom-right-radius: 22px }
+.tf-grp { filter: drop-shadow(0 10px 18px rgba(60, 30, 120, .06)) }
 .tf-g th { text-align: left; padding: 0 }
-.tf-g button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 12px 14px 16px; text-align: left; font-size: 15px; font-weight: 600; letter-spacing: -.02em; color: var(--ink); transition: color .2s }
-.tf-gi { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; flex: none; background: var(--tile); color: var(--ink-2); box-shadow: inset 0 0 0 1px rgba(20, 17, 43, .05); transition: color .2s }
-.tf-gi .i { width: 15px; height: 15px }
-.tf-gn { display: inline-flex; align-items: baseline; gap: 8px; min-width: 0 }
-.tf-gn small { font-size: 11.5px; font-weight: 400; color: var(--faint); letter-spacing: 0 }
-.tf-ch { width: 16px; height: 16px; margin-left: auto; color: var(--faint); transition: transform .4s var(--ease), color .2s }
+.tf-g button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 14px 12px 14px 14px; text-align: left; font-size: 15.5px; font-weight: 620; letter-spacing: -.02em; color: var(--ink); border-radius: 18px; transition: color .2s }
+.tf-gi { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; flex: none; background: var(--gc-bg, var(--t-v-bg)); color: var(--gc, var(--t-v)); transition: transform .45s var(--spring) }
+.tf-gi .i { width: 16px; height: 16px }
+.tf-gn { display: inline-flex; align-items: center; gap: 8px; min-width: 0 }
+.tf-gn small { height: 20px; padding: 0 7px; display: inline-grid; place-items: center; border-radius: 999px; background: var(--paper-2); font-size: 11px; font-weight: 500; color: var(--mute); letter-spacing: 0 }
+.tf-ch { width: 30px; height: 30px; padding: 7px; margin-left: auto; border-radius: 50%; background: var(--paper-2); color: var(--mute); transition: transform .5s var(--spring), color .2s, background .2s; flex: none }
 .tf-grp.open .tf-ch { transform: rotate(180deg) }
-.tf-g button:hover .tf-gi, .tf-g button:hover .tf-ch { color: var(--v) }
+.tf-g button:hover .tf-gi { transform: scale(1.08) rotate(-4deg) }
+.tf-g button:hover .tf-ch { color: var(--ink); background: var(--paper-3) }
 .tf-grp:not(.open) .tf-r { display: none }
-.tf-c { display: inline-block; font-size: 12px; color: var(--mute); padding: 2px 6px; border-radius: 5px; background: var(--paper-3); font-style: normal }
-.tf-all-y { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: #fff }
-.tf-all-y .i { width: 12px; height: 12px; stroke-width: 2.8 }
-.tf-grp.open .tf-g > * { border-bottom-color: var(--line) }
+.tf-c { display: inline-grid; place-items: center; height: 22px; font-size: 11.5px; color: var(--mute); padding: 0 8px; border-radius: 999px; background: var(--paper-2); font-style: normal }
+.tf-all-y { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--dawn-d); color: #fff; box-shadow: 0 4px 10px -4px rgba(217, 70, 239, .6) }
+.tf-all-y .i { width: 12px; height: 12px; stroke-width: 3 }
 
 /* lignes de fonction */
-.tf-t .tf-r th { text-align: left; font-weight: 400; padding-left: 20px }
+.tf-t .tf-r th { text-align: left; font-weight: 400; padding-left: 24px }
 .tf-r th b { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-weight: 550; font-size: 14.5px; line-height: 1.35; letter-spacing: -.01em }
 .tf-r th > span { display: block; margin-top: 3px; color: var(--mute); font-size: 13px; line-height: 1.5; max-width: 62ch }
 .tf-r > * { transition: background-color .15s }
-.tf-r:hover > * { background-color: #fcfbfe }
-.tf-r:hover > td.hi { background-color: #f6f1ff }
+.tf-r:hover > * { background-color: #fbf9fe }
+.tf-r:hover > td.hi { background-color: #f8effe }
+.tf-t .badge { height: 22px; padding: 0 9px; font-size: 11.5px; font-weight: 550 }
 
 /* marques */
 .tf-y, .tf-s, .tf-n, .tf-o { display: inline-grid; place-items: center; vertical-align: middle }
-.tf-y { width: 22px; height: 22px; border-radius: 50%; background: var(--ok-bg); color: var(--ok) }
-.tf-y .i { width: 12px; height: 12px; stroke-width: 2.8 }
-.tf-s { width: 22px; height: 22px; border-radius: 50%; background: #f3f4f6; color: #6b7280 }
-.tf-s .i { width: 12px; height: 12px; stroke-width: 2.2 }
-.tf-n { width: 10px; height: 1.5px; border-radius: 2px; background: #d6d1e4 }
-.tf-o { height: 22px; padding: 0 7px; border-radius: 6px; background: var(--warn-bg); color: var(--warn); font-size: 11.5px; font-weight: 600; white-space: nowrap; font-style: normal; font-family: var(--mono) }
-.tf-txt { font-weight: 500; font-size: 13.5px; font-variant-numeric: tabular-nums }
+.tf-y { width: 24px; height: 24px; border-radius: 50%; background: var(--t-g-bg); color: var(--t-g) }
+.tf-y .i { width: 12px; height: 12px; stroke-width: 3 }
+td.hi .tf-y { background: #f6e6fd; color: #a21caf }
+.tf-s { width: 24px; height: 24px; border-radius: 50%; background: #f1eff6; color: #6b6782 }
+.tf-s .i { width: 12px; height: 12px; stroke-width: 2.4 }
+.tf-n { width: 10px; height: 2px; border-radius: 2px; background: #ddd7ea }
+.tf-o { height: 24px; padding: 0 9px; border-radius: 999px; background: var(--t-p-bg); color: var(--t-p); font-size: 11.5px; font-weight: 600; white-space: nowrap; font-style: normal; font-family: var(--mono) }
+.tf-txt { font-weight: 550; font-size: 13.5px; font-variant-numeric: tabular-nums }
 .tf-t td small { display: block; margin-top: 3px; font-size: 11.5px; color: var(--mute); line-height: 1.35 }
-.tf-fine { margin-top: 16px }
+.tf-legend .tf-y, .tf-legend .tf-s, .tf-legend .tf-o, .tf-legend .tf-c { flex: none }
+.tf-fine { margin-top: 18px; padding-left: 6px }
 
-/* ---------- FAQ ---------- */
-.tf-faq-sec { border-top: 1px solid var(--line); background: var(--paper-2) }
+/* ---------- FAQ : les questions dans une grande carte ---------- */
+.tf-faq-sec { background: transparent; border: 0 }
+.tf-faq-sec .faq { padding-top: clamp(24px, 4vw, 48px) }
+.tf-faq-sec .qas { padding: 8px 28px; border-radius: var(--r-xl); background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .04), 0 16px 44px -22px rgba(60, 30, 120, .24) }
+.tf-faq-sec .qa { border-top: 1px solid var(--line) }
+.tf-faq-sec .qa:first-child { border-top: 0 }
+.tf-faq-sec .qa:last-child { border-bottom: 0 }
+.tf-faq-sec .qa button .i { width: 30px; height: 30px; padding: 7px; border-radius: 50%; background: var(--paper-2); transition: transform .5s var(--spring), background .25s, color .25s }
+.tf-faq-sec .qa.open button .i { background: var(--t-v-bg); color: var(--t-v) }
 
+@media (max-width: 1180px) {
+  .tf-top .plans { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+}
+@media (max-width: 1060px) {
+  .tf-top .sim { grid-template-columns: 1fr; gap: 24px }
+}
 @media (max-width: 860px) {
+  .tf-top .opts { grid-template-columns: 1fr }
   .tf-t { font-size: 14px }
   .tf-t th, .tf-t td { padding: 12px 6px }
   .tf-t thead th:not(.tf-fc) { width: 13% }
   .tf-pr small { display: none }
-  .tf-t .tf-r th { padding-left: 14px }
-  .tf-g button { padding-left: 12px }
+  .tf-t .tf-r th { padding-left: 16px }
+  .tf-g button { padding-left: 10px }
+}
+@media (max-width: 640px) {
+  .tf-top .plans { grid-template-columns: minmax(0, 1fr) }
+  .tf-top .sim-o { grid-template-columns: 1fr 1fr }
+  .tf-top .sim-o > div:last-child { grid-column: 1 / -1 }
 }
 @media (max-width: 560px) {
-  .tf-top .ptop { gap: 22px }
-  .tf-top .toggle { width: 100% }
-  .tf-top .toggle button { flex: 1; justify-content: center }
-  .tf-wrap { border-radius: 14px; margin-inline: -8px }
+  .tf-top .toggle { display: flex; width: 100% }
+  .tf-top .toggle button { flex: 1; justify-content: center; padding: 0 10px }
+  .tf-top .plan-c { padding: 24px 20px 22px }
+  .tf-top .plan-c .for { min-height: 0 }
+  .tf-top .plan-c.hi::after { inset: 10% 2% -6% }
+  .tf-top .price [data-per], .tf-top .price > span { min-height: 0 }
+  .tf-top .toggle button { white-space: nowrap }
+  .tf-top .toggle em { font-size: 11px; padding: 0 7px }
+  .tf-wrap { margin-inline: -8px }
   .tf-t thead th:not(.tf-fc) { width: 52px }
   .tf-t th, .tf-t td { padding: 12px 2px }
-  .tf-t thead th { padding-block: 12px }
+  .tf-t thead th { padding-block: 11px }
+  .tf-t thead th:first-child { border-radius: 18px 0 0 18px }
+  .tf-t thead th:last-child { border-radius: 0 18px 18px 0 }
   .tf-t thead th b { font-size: 13px; letter-spacing: -.02em }
   .tf-pr { font-size: 10px; letter-spacing: -.03em }
   .tf-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
@@ -131,14 +220,22 @@
   .tf-t .tf-r th { padding-left: 12px; padding-right: 6px }
   .tf-r th b { font-size: 13.5px; gap: 4px 6px }
   .tf-r th > span { display: none }
-  .tf-t .badge { font-size: 10.5px; padding: 1px 6px }
-  .tf-o { font-size: 10.5px; padding: 0 4px; height: 20px }
+  .tf-t .badge { font-size: 10.5px; padding: 0 6px; height: 20px }
+  .tf-o { font-size: 10.5px; padding: 0 5px; height: 20px }
+  .tf-y, .tf-s, .tf-all-y { width: 22px; height: 22px }
   .tf-txt { font-size: 11px; letter-spacing: -.02em }
   .tf-t td small { font-size: 10px }
-  .tf-g button { gap: 8px; padding: 12px 6px 12px 10px; font-size: 14px }
-  .tf-gi { width: 26px; height: 26px }
+  .tf-g > :first-child { border-top-left-radius: 18px 32px }
+  .tf-g > :last-child { border-top-right-radius: 18px 32px }
+  .tf-grp:not(.open) .tf-g > :first-child, .tf-grp.open tr:last-child > :first-child { border-bottom-left-radius: 18px }
+  .tf-grp:not(.open) .tf-g > :last-child, .tf-grp.open tr:last-child > :last-child { border-bottom-right-radius: 18px }
+  .tf-g button { gap: 8px; padding: 12px 4px 12px 10px; font-size: 14px }
+  .tf-gi { width: 28px; height: 28px; border-radius: 9px }
+  .tf-gi .i { width: 14px; height: 14px }
   .tf-ch { display: none }
-  .tf-gn { flex-direction: column; gap: 0 }
-  .tf-c { font-size: 10.5px; padding: 1px 3px; letter-spacing: -.04em }
-  .tf-legend { font-size: 12.5px; gap: 8px 14px }
+  .tf-gn { flex-direction: column; align-items: flex-start; gap: 2px }
+  .tf-c { font-size: 10.5px; padding: 0 4px; height: 20px; letter-spacing: -.04em }
+  .tf-legend { font-size: 12px }
+  .tf-legend span { height: 32px; padding-right: 11px }
+  .tf-faq-sec .qas { padding: 4px 18px }
 }

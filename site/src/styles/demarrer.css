@@ -198,3 +198,174 @@
   .wiz-nav [data-back] { flex: 0 0 auto }
   .pv-foot span { display: block; margin: 0 }
 }
+
+/* =========================================================================
+   HALO (18/11/2026) : parcours en étapes à pastilles dégradées, métiers en pilules,
+   aperçu de l'app dans une carte flottante qui se construit, final en dégradé Aube.
+   Le fond reste transparent : l'aura du socle passe derrière.
+   ========================================================================= */
+.onb { background: none }
+.onb-in { padding-top: clamp(28px, 4vh, 48px) }
+[class*="tone-"].oi, .wg[class*="tone-"] .wg-i { background: var(--tb); color: var(--tc); box-shadow: none }
+
+/* ---------- étapes : pastilles numérotées reliées par un trait ---------- */
+.wiz-top { padding: 14px 18px 12px; border-radius: var(--r-lg); background: rgba(255, 255, 255, .6); backdrop-filter: blur(16px) saturate(1.5); -webkit-backdrop-filter: blur(16px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 10px 30px -16px rgba(60, 30, 120, .22) }
+.wiz-meta .mono { font-size: 12px; color: var(--mute) }
+.prog { height: 3px; margin-top: 10px; background: rgba(109, 40, 217, .08) }
+.prog i { background: var(--dawn) }
+.stp { display: flex; align-items: center; gap: 0; margin-top: 14px; counter-reset: none }
+.stp li { display: flex; align-items: center; flex: 0 1 auto; min-width: 0 }
+.stp li + li::before { content: ""; flex: 1 1 18px; min-width: 10px; max-width: 34px; height: 1.5px; margin: 0 10px; border-radius: 2px; background: #e6e1f1; transition: background .4s }
+.stp li.done + li::before, .stp li.on + li::before { background: linear-gradient(90deg, #e9b8f5, #e6e1f1) }
+.stp li.done + li.done::before, .stp li.done + li.on::before { background: #b9e5d2 }
+.stp button { gap: 8px; width: auto; padding: 4px 0; font-size: 13.5px; color: var(--soft) }
+.stp-d { width: 26px; height: 26px; border-radius: 50%; background: #ece8f6; box-shadow: none; color: var(--mute); position: relative }
+.stp-d b { grid-area: 1 / 1; font-size: 12px; font-weight: 600; transition: opacity .2s }
+.stp-d .i { grid-area: 1 / 1; width: 13px; height: 13px; color: var(--t-g) }
+.stp li.on .stp-d { background: var(--dawn-d); color: #fff; box-shadow: 0 4px 12px -3px rgba(217, 70, 239, .6) }
+.stp li.on .stp-d::before { content: none }
+.stp li.done .stp-d { background: var(--t-g-bg); box-shadow: none }
+.stp li.done .stp-d b { opacity: 0 }
+.stp li.done button { color: var(--ink-2) }
+.stp li.on button { color: var(--ink) }
+
+/* ---------- titres d'étape ---------- */
+.st { padding-top: 34px }
+.st-h span { font-weight: 620; letter-spacing: -.048em }
+
+/* ---------- métiers : des pilules ---------- */
+[data-trades].opts-grid { display: flex; flex-wrap: wrap; gap: 10px }
+[data-trades] .opt-b { width: auto; height: 48px; padding: 0 18px 0 6px; border-radius: 999px; gap: 10px; font-size: 14.5px; box-shadow: 0 1px 2px rgba(60, 30, 120, .06), 0 6px 18px -10px rgba(60, 30, 120, .2); border: 1.5px solid transparent; background: linear-gradient(#fff, #fff) padding-box, linear-gradient(#fff, #fff) border-box }
+[data-trades] .opt-b > span:not(.oi):not(.tick) { flex: none; white-space: nowrap }
+[data-trades] .opt-b .oi { width: 36px; height: 36px; border-radius: 50% }
+[data-trades] .opt-b .tick { display: none }
+[data-trades] .opt-b:hover { transform: translateY(-2px) }
+[data-trades] .opt-b[aria-checked="true"] { background: linear-gradient(#fff, #fff) padding-box, var(--dawn-d) border-box; box-shadow: 0 12px 28px -12px rgba(217, 70, 239, .5) }
+[data-trades] .opt-b[aria-checked="true"] .oi { background: var(--dawn-d); color: #fff }
+
+/* ---------- autres options : cartes douces ---------- */
+.opt-b { border-radius: 18px; box-shadow: var(--sh-2); padding: 12px 14px }
+.opt-b:hover { box-shadow: var(--sh-3) }
+.opt-b .oi { width: 38px; height: 38px; border-radius: 12px; box-shadow: none }
+.opt-b[aria-checked="true"] { box-shadow: 0 0 0 1.5px #e9b8f5, 0 12px 30px -14px rgba(217, 70, 239, .45) }
+.opt-b[aria-checked="true"] .oi { background: var(--dawn-d); color: #fff; box-shadow: none }
+.opt-b .tick { width: 22px; height: 22px; box-shadow: inset 0 0 0 1.5px var(--line-2) }
+.opt-b[aria-checked="true"] .tick { background: var(--dawn-d) }
+.opts-list .opt-b { border-radius: var(--r-lg); padding: 16px 18px }
+.opts-grid { gap: 10px }
+.mods { gap: 10px }
+.mod { border-radius: 18px; box-shadow: var(--sh-2); padding: 13px 14px }
+.mod:hover { box-shadow: var(--sh-3) }
+.mod .mi-t { border-radius: 12px; box-shadow: none; background: color-mix(in srgb, var(--dc, #6d28d9) 12%, #fff); color: color-mix(in srgb, var(--dc, #6d28d9) 80%, #000) }
+.mod[aria-pressed="false"] { background: rgba(255, 255, 255, .5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .8) }
+.mod[aria-pressed="false"] .mi-t { filter: grayscale(1) }
+.mod .prio { border-radius: 999px; background: var(--t-m-bg); color: var(--t-m) }
+.sw { width: 38px; height: 22px } .sw::after { width: 18px; height: 18px }
+.mod[aria-pressed="true"] .sw { background: var(--dawn) }
+.mod[aria-pressed="true"] .sw::after { transform: translateX(16px) }
+.plans-pick { gap: 10px }
+.pp { border-radius: var(--r-lg); box-shadow: var(--sh-2); padding: 18px }
+.pp:hover { box-shadow: var(--sh-3) }
+.pp .pr { font-family: var(--mono); font-size: 13.5px; color: var(--ink-2) }
+.pp .badge { border-radius: 999px; padding: 3px 10px }
+.pp[aria-checked="true"] { border: 0; box-shadow: 0 0 0 1.5px #e9b8f5, 0 14px 34px -14px rgba(217, 70, 239, .45) }
+.next-l { border-radius: var(--r-lg); background: rgba(255, 255, 255, .6); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 10px 30px -18px rgba(60, 30, 120, .2) }
+.next-l .nx { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--t-v-bg); color: var(--t-v); font-size: 12.5px; font-weight: 600 }
+
+/* ---------- navigation : Continuer en pilule sombre, le final en dégradé Aube ---------- */
+.wiz-nav .btn.lg { height: 52px; border-radius: 999px }
+.wiz-nav [data-go] { padding: 0 28px; box-shadow: 0 14px 34px -12px rgba(217, 70, 239, .7), inset 0 1px 0 rgba(255, 255, 255, .3) }
+.wiz-kbd kbd { border-radius: 7px }
+.reas .i { color: var(--t-g) }
+
+/* ---------- aperçu : l'app dans une carte flottante, sur fond nacré à halos ---------- */
+.prev { top: calc(var(--nav-h) + 24px) }
+.pv { border-radius: var(--r-xl); background: #f7f5fc; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 2px 4px rgba(60, 30, 120, .05), 0 40px 90px -36px rgba(60, 30, 120, .42); isolation: isolate; overflow: visible }
+.pv-halo { position: absolute; inset: 0; z-index: -1; border-radius: inherit; overflow: hidden; pointer-events: none }
+.pv-halo::before, .pv-halo::after { content: ""; position: absolute; border-radius: 50%; filter: blur(40px) }
+.pv-halo::before { width: 70%; height: 55%; right: -14%; top: -22%; background: radial-gradient(closest-side, #e9b8f5, transparent); opacity: .7 }
+.pv-halo::after { width: 60%; height: 50%; left: -10%; top: -26%; background: radial-gradient(closest-side, #c7b4fb, transparent); opacity: .55 }
+.pv-bar { display: flex; height: 50px; margin: 12px 12px 0; padding: 0 8px 0 14px; border-radius: 18px; border: 0; background: rgba(255, 255, 255, .72); backdrop-filter: blur(16px) saturate(1.5); -webkit-backdrop-filter: blur(16px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 6px 18px -10px rgba(60, 30, 120, .18) }
+.pv-bar .pv-logo { display: inline-flex; padding: 0; gap: 7px }
+.pv-logo .tile { width: 24px; height: 24px } .pv-logo .name { font-size: 16px }
+.pv-url { font-size: 11px }
+.pv-plan .badge { height: 28px; padding: 0 12px; border-radius: 999px; background: var(--dawn-d); color: #fff; box-shadow: 0 6px 14px -6px rgba(217, 70, 239, .6) }
+.pv-app { grid-template-columns: 168px minmax(0, 1fr); min-height: 360px }
+.pv-side { border: 0; background: none; padding: 14px 6px 14px 12px }
+.pv-nav { gap: 2px }
+.pv-nav li { height: 34px; padding: 0 6px; border-radius: 999px; font-size: 12.5px }
+.pv-nav li:first-child { background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .08), 0 4px 12px -4px rgba(60, 30, 120, .16) }
+.pv-nav .d { width: 24px; height: 24px; border-radius: 50%; background: color-mix(in srgb, var(--dc, #6d28d9) 13%, #fff); color: color-mix(in srgb, var(--dc, #6d28d9) 80%, #000) }
+.pv-nav .d .i { width: 13px; height: 13px }
+.pv-nav .prio-dot { width: 6px; height: 6px; background: #d946ef; box-shadow: 0 0 0 3px rgba(217, 70, 239, .15); margin-right: 4px }
+.pv-main { padding: 14px 14px 18px 4px }
+.pv-who { padding: 12px; border-radius: 18px; background: #fff; box-shadow: var(--sh-2) }
+.pv-av { width: 42px; height: 42px; border-radius: 13px; background: var(--dawn-d); color: #fff; box-shadow: 0 6px 16px -6px rgba(217, 70, 239, .55) }
+.pv-av .i { width: 20px; height: 20px }
+.pv-who b { font-size: 15.5px; letter-spacing: -.02em }
+.pv-h { letter-spacing: 0; text-transform: none; font-size: 12.5px; font-weight: 500; color: var(--mute); margin: 16px 2px 8px }
+.pv-widgets { gap: 10px }
+.wg { padding: 12px; border-radius: 18px; box-shadow: var(--sh-2) }
+.wg-h { gap: 8px }
+.wg-i { width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; flex: none }
+.wg-h .wg-i .i { width: 13px; height: 13px; color: inherit }
+.wg-v { margin-top: 9px; font-size: 18px; font-weight: 600; letter-spacing: -.04em }
+.wg-bar { background: rgba(109, 40, 217, .08) } .wg-bar i { background: var(--dawn) }
+.wg-sp i { background: color-mix(in srgb, var(--tc, #6d28d9) 22%, #fff) } .wg-sp i:last-child { background: var(--tc, #6d28d9) }
+.wg.ghost { background: rgba(255, 255, 255, .5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9) }
+.wg.ghost i { background: #ebe6f6 }
+.wg.empty { border: 1.5px dashed #e3dcf3; border-radius: 18px; background: rgba(255, 255, 255, .35) }
+.wg.more { background: rgba(255, 255, 255, .6); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9) }
+/* le bas de l'aperçu flotte au-dessus de la carte */
+.pv-foot { position: relative; z-index: 2; margin: -6px 22px -30px; padding: 14px 18px; border: 0; border-radius: var(--r-lg); background: #fff; box-shadow: 0 2px 4px rgba(60, 30, 120, .05), 0 24px 50px -20px rgba(60, 30, 120, .4) }
+.pv-foot small { letter-spacing: 0; text-transform: none; font-size: 12px; font-weight: 500; color: var(--mute) }
+.pv-foot b { font-family: var(--mono); font-weight: 500; font-size: 24px; letter-spacing: -.05em }
+.pv.ready { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 0 0 1.5px #e9b8f5, 0 0 0 8px rgba(217, 70, 239, .07), 0 40px 90px -36px rgba(190, 50, 220, .5) }
+.pv .flash { animation: pvflash2 .9s var(--ease) }
+@keyframes pvflash2 { 0% { box-shadow: 0 0 0 1.5px #e9b8f5, 0 10px 24px -10px rgba(217, 70, 239, .45) } 100% { box-shadow: var(--sh-2) } }
+.prev-n { margin-top: 50px }
+.pv-live { background: var(--t-g) }
+
+@media (max-width: 1100px) {
+  .pv-bar { margin: 10px 10px 0; height: 46px } .pv-bar .pv-url { display: none } .pv-bar .pv-logo { display: inline-flex }
+  .pv-app { grid-template-columns: minmax(0, 1fr) }
+  .pv-side { background: none; border: 0; padding: 0 12px 10px }
+  .pv-nav li { width: 30px; height: 30px; border-radius: 50%; background: #fff; box-shadow: var(--sh-1) }
+  .pv-nav li:first-child { background: #fff }
+  .pv-nav .d { width: 24px; height: 24px }
+  .pv-main { padding: 10px 12px }
+  .pv-who { flex: 1; padding: 10px }
+  .pv-foot { margin: 0 12px 12px; box-shadow: var(--sh-2); padding: 10px 14px }
+  .pv-foot b { font-size: 20px }
+  .prev-n { display: none }
+}
+@media (max-width: 720px) {
+  .wiz-top { padding: 12px 14px }
+  [data-trades].opts-grid { gap: 8px }
+  [data-trades] .opt-b { height: 44px; padding: 0 14px 0 5px; font-size: 14px }
+  [data-trades] .opt-b .oi { width: 34px; height: 34px }
+  .wiz-nav { background: linear-gradient(180deg, rgba(248, 246, 253, 0), var(--paper) 30%) }
+}
+/* retouches après relecture */
+.stp li { flex: none }
+.stp li + li { flex: 1 1 auto }
+.stp li + li::before { flex: 1 1 auto; min-width: 8px; max-width: 40px; margin: 0 8px }
+.stp button { overflow: visible; text-overflow: clip; font-size: 13px; gap: 7px }
+.pv-foot b { font-family: var(--display); font-weight: 650; letter-spacing: -.04em }
+@media (max-width: 1240px) and (min-width: 1101px) { .stp li:not(.on) button { font-size: 0; gap: 0 } .stp li:not(.on) .stp-d { font-size: 12px } }
+.pp .pr { font-family: var(--body); font-size: 14.5px; font-weight: 550; color: var(--ink) }
+@media (max-width: 720px) {
+  .stp { margin-top: 10px }
+  .stp li:not(.on) button { font-size: 0; gap: 0 }
+  .stp li + li::before { margin: 0 6px }
+  .pv-bar { display: none }
+  .pv-main { padding: 10px 10px 8px }
+  .pv-who { padding: 8px 10px; border-radius: 16px }
+  .pv-av { width: 36px; height: 36px; border-radius: 11px }
+  .pv-side { padding: 0 10px 8px }
+  .pv-nav li { width: 28px; height: 28px }
+  .pv-foot { margin: 0 10px 10px; padding: 8px 12px; border-radius: 16px }
+  .pv-foot b { font-size: 18px }
+  .pv-foot small { font-size: 11px }
+}
+@media (max-width: 1100px) { .pv-app { min-height: 0 } }
