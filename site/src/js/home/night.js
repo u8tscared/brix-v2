@@ -43,21 +43,21 @@ export function initNight() {
 const CONVO = [
   {
     q: 'Qui ne m’a pas encore payé ce mois-ci ?',
-    tool: 'brix.factures_impayees',
+    tool: 'brix · impayes',
     a: 'Trois factures sont en attente, pour 6 820 € au total :',
     t: [['M. Garnier · F-0312', '2 340 €'], ['Mme Lefèvre · F-0315', '3 500 €'], ['SCI Les Tilleuls · F-0309', '980 €']],
     end: 'Bob a déjà programmé les relances de demain matin.',
   },
   {
     q: 'Quel chantier m’a le moins rapporté cette année ?',
-    tool: 'brix.rentabilite_chantiers',
+    tool: 'brix · chantiers',
     a: 'La rénovation Roux : 11 % de marge, contre 27 % en moyenne. Les achats ont dépassé le devis de 1 240 €, surtout sur le carrelage.',
   },
   {
-    q: 'Prépare-moi un point sur ma trésorerie à 90 jours.',
-    tool: 'brix.tresorerie_prevision',
-    a: 'Solde prévu fin février : 31 400 €. Point bas le 12 janvier à 8 900 €, juste après l’URSSAF.',
-    t: [['Encaissements attendus', '+ 58 200 €'], ['Charges prévues', '− 41 700 €']],
+    q: 'Combien j’ai facturé ce trimestre ?',
+    tool: 'brix · chiffre_affaires',
+    a: '48 300 € HT facturés depuis le 1er octobre, 12 % de plus que l’an dernier sur la même période.',
+    t: [['Encaissé', '41 480 €'], ['Reste à encaisser', '6 820 €']],
   },
 ];
 

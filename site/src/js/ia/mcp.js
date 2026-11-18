@@ -1,30 +1,31 @@
 /* Brix AI MCP : on choisit une question, elle se tape, l'assistant appelle l'outil Brix
-   (lecture seule), le résultat revient, puis la réponse s'écrit avec les vrais chiffres. */
+   (lecture), le résultat revient, puis la réponse s'écrit avec les vrais chiffres. */
 import { gsap, reduce, $, $$, ic } from '../core.js';
 import { wait, onView } from '../subpage.js';
 
 const QUESTIONS = [
   {
     q: 'Qui ne m’a pas encore payé ce mois-ci ?',
-    tool: 'brix.factures_impayees', res: '3 factures',
+    tool: 'brix · impayes', res: '3 factures',
     a: 'Trois factures sont en attente, pour 6 820 € au total :',
     t: [['M. Garnier · F-0312', '2 340 €'], ['Mme Lefèvre · F-0315', '3 500 €'], ['SCI Les Tilleuls · F-0309', '980 €']],
     end: 'La plus ancienne date de 41 jours. Vous voulez que Bob prépare une relance ?',
   },
   {
     q: 'Quel chantier m’a le moins rapporté cette année ?',
-    tool: 'brix.rentabilite_chantiers', res: '38 chantiers',
+    tool: 'brix · chantiers', res: '38 chantiers',
     a: 'La rénovation Roux : 11 % de marge, contre 27 % en moyenne sur vos chantiers. Les achats ont dépassé le devis de 1 240 €, surtout sur le carrelage.',
   },
   {
-    q: 'Qui est sur quel chantier demain ?',
-    tool: 'brix.planning_equipe', res: '3 affectations',
-    a: 'Voici le planning de demain :',
-    t: [['Mehdi et Lucas', 'Leroy · salle de bain'], ['Thomas', 'SCI Les Tilleuls · reprise'], ['Vous', 'Métré chez M. Petit · 9 h']],
+    q: 'Où acheter mes tubes PER de 16 le moins cher ?',
+    tool: 'brix · prix_materiaux', res: '3 fournisseurs',
+    a: 'Le meilleur prix dans vos catalogues fournisseurs :',
+    t: [['Comptoir Rhône Élec', '0,62 € / m'], ['Négoce Gerland', '0,68 € / m'], ['Dépôt Lyon Sud', '0,71 € / m']],
+    end: 'Le prix chez Négoce Gerland a augmenté de 6 % ce mois-ci.',
   },
   {
     q: 'Combien de devis signés ce trimestre, et pour quel montant ?',
-    tool: 'brix.devis_signes', res: '23 devis',
+    tool: 'brix · chiffre_affaires', res: '23 devis',
     a: '14 devis signés depuis le 1er octobre, pour 48 300 € HT. Votre taux de signature est de 61 %, sur 23 devis envoyés.',
   },
 ];
@@ -38,7 +39,7 @@ export function initMcp() {
   list.innerHTML = QUESTIONS.map((c, i) => `<button class="qchip" aria-pressed="${i === 0}" data-q="${i}">${c.q}${ic('arrow-right')}</button>`).join('');
   const btns = $$('.qchip', list);
   const add = (cls, html) => { const d = document.createElement('div'); d.className = `msg ${cls}`; d.innerHTML = html; box.appendChild(d); return d; };
-  const tool = (c, done) => `<div class="tool ${done ? 'ok' : 'run'}"><span class="tl">${ic('plug')}</span><span class="mono">${c.tool}</span><span class="tool-st">${done ? `${ic('check')}${c.res} · lecture seule` : `${ic('loader-circle')}Lecture dans Brix…`}</span></div>`;
+  const tool = (c, done) => `<div class="tool ${done ? 'ok' : 'run'}"><span class="tl">${ic('plug')}</span><span class="mono">${c.tool}</span><span class="tool-st">${done ? `${ic('check')}${c.res} lus` : `${ic('loader-circle')}Lecture dans Brix…`}</span></div>`;
   const body = (c, anim) => `<div>${anim ? words(c.a) : c.a}</div>${c.t ? `<table>${c.t.map(([a, b]) => `<tr><td>${a}</td><td>${b}</td></tr>`).join('')}</table>` : ''}${c.end ? `<div>${anim ? words(c.end) : c.end}</div>` : ''}`;
   let run = 0;
 

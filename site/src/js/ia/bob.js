@@ -132,12 +132,13 @@ export function bobSwitch() {
 }
 
 /* Étape 2 du MCP : le bouton « Copier » répond (démonstration, rien n'est copié). */
-export function copyDemo() {
-  const b = $('[data-copy]');
+export function copyDemo(root = document) {
+  const b = $('[data-copy]', root);
   if (!b) return;
   let tm;
   b.addEventListener('click', () => {
     clearTimeout(tm);
+    if (b.dataset.copy && navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).catch(() => {});
     b.classList.add('done');
     b.innerHTML = `${ic('check')}<span>Copié</span>`;
     if (!reduce) gsap.fromTo(b, { scale: 0.92 }, { scale: 1, duration: 0.5, ease: 'back.out(3)' });

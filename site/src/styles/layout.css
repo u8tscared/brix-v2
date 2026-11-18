@@ -83,3 +83,16 @@
   .dr-grid { grid-template-columns: 1fr }
   .fgrid { grid-template-columns: 1fr 1fr; gap: 30px 20px }
 }
+
+/* Lien vers l'app (en attendant les stores) */
+.store .i { fill: none; stroke: #fff; width: 20px; height: 20px }
+.store small { font-size: 10.5px }
+.store-n { color: var(--faint); font-size: 13px; line-height: 1.5; margin-top: 10px; max-width: 34ch }
+
+/* Écrans tactiles : liens et boutons d'au moins 44 px de haut, sans changer le dessin */
+@media (pointer: coarse) {
+  .fgrid a:not(.logo):not(.store) { display: flex; align-items: center; min-height: 44px; padding: 0 }
+  .fbot a { display: inline-flex; align-items: center; min-height: 44px }
+  a.link, button.link { min-height: 44px; border-bottom: 0; text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 5px }
+  .logo { min-height: 44px; display: inline-flex; align-items: center }
+}

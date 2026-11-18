@@ -67,7 +67,7 @@ export const DEPARTMENTS = [
     features: [
       { name: 'Suivi de chantier', icon: 'clipboard-list', plan: 'start', desc: 'Étapes, documents, notes et photos, rangés par chantier.' },
       { name: 'Rentabilité en direct', icon: 'trending-up', plan: 'pro', desc: 'Heures, achats et sous-traitance mis à jour : la marge réelle, pas une estimation.' },
-      { name: 'Prise de cotes', icon: 'ruler', plan: 'start', desc: 'Dessinez la pièce sur place, surfaces et linéaires passent dans le devis.' },
+      { name: 'Prise de cotes', icon: 'ruler', plan: 'pro', desc: 'Dessinez la pièce sur place, surfaces et linéaires passent dans le devis.' },
       { name: 'Métré par scan LiDAR', icon: 'scan-line', plan: 'pro', tag: 'only', desc: "Faites le tour de la pièce avec l’iPhone, le plan coté sort tout seul." },
       { name: 'Métré depuis un plan PDF', icon: 'map', plan: 'pro', tag: 'new', desc: "Importez le plan de l’architecte, Bob mesure surfaces et linéaires." },
       { name: 'Planning des chantiers', icon: 'calendar-range', plan: 'equipe', desc: 'Glissez les chantiers sur les équipes, chacun voit sa semaine sur son téléphone.' },
@@ -85,7 +85,7 @@ export const DEPARTMENTS = [
     accent: 'les heures comptées.',
     pitch: 'Du premier apprenti à 200 compagnons. Rôles, pointage, congés, habilitations et variables de paie au même endroit.',
     features: [
-      { name: 'Équipe et rôles', icon: 'user-cog', plan: 'pro', desc: 'Chacun voit ses chantiers, rien de plus. Vous gardez la main sur les prix.' },
+      { name: 'Équipe et rôles', icon: 'user-cog', plan: 'equipe', desc: 'Chacun voit ses chantiers, rien de plus. Vous gardez la main sur les prix.' },
       { name: 'Pointage sur le chantier', icon: 'timer', plan: 'equipe', desc: 'Arrivée et départ en un tap, heures imputées au bon chantier.' },
       { name: 'Congés et absences', icon: 'plane', plan: 'equipe', desc: 'Demande depuis le téléphone, validation en un geste, planning mis à jour.' },
       { name: 'Habilitations et cartes BTP', icon: 'id-card', plan: 'equipe', desc: 'Dates d’expiration suivies, alerte avant qu’une habilitation tombe.' },
@@ -108,7 +108,7 @@ export const DEPARTMENTS = [
       { name: 'Suivi des livraisons', icon: 'truck', plan: 'pro', desc: 'Confirmée, expédiée, livrée. Livraisons partielles comprises.' },
       { name: 'Catalogue et prix fournisseurs', icon: 'tags', plan: 'pro', desc: 'Import de vos tarifs CSV et FAB-DIS, historique et alerte de hausse.' },
       { name: 'Rapprochement des factures fournisseurs', icon: 'git-compare', plan: 'pro', desc: 'La facture reçue est comparée à la commande. Les écarts sautent aux yeux.' },
-      { name: 'Stocks', icon: 'warehouse', plan: 'equipe', desc: 'Dépôt et camionnettes, sorties imputées au chantier, réassort proposé.' },
+      { name: 'Stocks', icon: 'warehouse', plan: 'pro', desc: 'Dépôt et camionnettes, sorties imputées au chantier, réassort proposé.' },
       { name: 'Véhicules et outillage', icon: 'car', plan: 'equipe', desc: 'Qui a quoi, entretiens, contrôles techniques et assurances.' },
       { name: 'Connexions directes aux grands négoces', icon: 'plug', plan: 'pro', tag: 'soon', desc: 'Prix nets et commande en direct chez vos fournisseurs habituels. En cours.' },
     ],
@@ -127,7 +127,7 @@ export const DEPARTMENTS = [
       { name: 'Agent de nuit', icon: 'moon-star', plan: 'equipe', tag: 'only', desc: 'Bob prépare les relances et les devis la nuit. Vous validez en un geste au réveil.' },
       { name: 'Secrétaire téléphonique', icon: 'phone-incoming', plan: 'equipe', tag: 'new', desc: "Bob répond aux appels manqués, qualifie la demande et prend rendez-vous." },
       { name: 'Dictée dans votre langue', icon: 'languages', plan: 'pro', desc: 'Dictez en portugais, en arabe ou en turc. Le devis sort en français.' },
-      { name: 'Brix AI MCP', icon: 'plug-zap', plan: 'equipe', tag: 'only', desc: 'Parlez à votre entreprise depuis Claude ou ChatGPT. Lecture seule, coupure en un geste.' },
+      { name: 'Brix AI MCP', icon: 'plug-zap', plan: 'equipe', tag: 'only', desc: 'Pilotez Brix depuis Claude ou ChatGPT : il lit vos chiffres et prépare devis et relances, avec votre accord.' },
     ],
   },
   {
