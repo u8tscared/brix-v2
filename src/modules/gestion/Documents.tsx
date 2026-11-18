@@ -1,0 +1,194 @@
+import { useRef, useState } from 'react';
+import { Check, Copy, FolderLock, Link2, Share2, ShieldCheck, Upload, X } from 'lucide-react';
+import { Badge, Button, Card, IconTile, PageHeader, Select, Sheet, cn, toast } from '@/components/ui';
+import { AnimatedNumber, Ring, SuccessDot } from '@/components/motion';
+import { BobNote } from '@/modules/vendre/components/BobNote';
+import { DocCard } from './components/documents/DocCard';
+import { DocSheet } from './components/documents/DocSheet';
+import { GROUPS, TENDER, docState, guessDoc, lc, useDocs, type Doc } from './components/documents/store';
+
+export default function Documents() {
+  const { docs, renew } = useDocs();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [target, setTarget] = useState<string | null>(null);
+  const [fetching, setFetching] = useState<string | null>(null);
+  const [selecting, setSelecting] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [link, setLink] = useState<string | null>(null);
+  const [open, setOpen] = useState<Doc | null>(null);
+  const [fresh, setFresh] = useState<string | null>(null);
+  const [dropped, setDropped] = useState<{ file: File; docId: string } | null>(null);
+  const [overZone, setOverZone] = useState(false);
+
+  const states = docs.map((d) => docState(d));
+  const expired = docs.filter((_, i) => states[i].tone === 'bad');
+  const soon = docs.filter((_, i) => states[i].tone === 'warn');
+  const ok = docs.length - expired.length - soon.length;
+  const score = Math.round((ok / docs.length) * 100);
+
+  const flash = (id: string) => {
+    setFresh(id);
+    setTimeout(() => setFresh((f) => (f === id ? null : f)), 2400);
+  };
+  const apply = (id: string, file?: string) => {
+    renew(id, file);
+    flash(id);
+    toast(`${docs.find((d) => d.id === id)?.label} : à jour`);
+  };
+  const pick = (id: string) => {
+    setTarget(id);
+    fileRef.current?.click();
+  };
+  const onFile = (f?: File) => {
+    if (!f) return;
+    if (target) {
+      apply(target, f.name);
+      setTarget(null);
+      setOpen(null);
+    } else {
+      setDropped({ file: f, docId: guessDoc(f.name, docs)?.id ?? expired[0]?.id ?? soon[0]?.id ?? docs[0].id });
+    }
+  };
+  const fetchAuto = (d: Doc) => {
+    setFetching(d.id);
+    setTimeout(() => {
+      renew(d.id);
+      setFetching(null);
+      setOpen(null);
+      flash(d.id);
+      toast(`Bob a récupéré la nouvelle ${lc(d.label)} (démo)`);
+    }, 1500);
+  };
+  const share = () => setLink(`https://brix.fr/d/${Math.random().toString(36).slice(2, 8)}`);
+  const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  const stopSelecting = () => { setSelecting(false); setPicked([]); };
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        icon={<IconTile name="FolderLock" dept="gestion" size="lg" />}
+        title="Documents"
+        titleMuted="prêts à partir en un lien."
+        subtitle="Le coffre de l’entreprise : toujours à jour, prêt à envoyer en un lien."
+        actions={
+          selecting ? null : (
+            <>
+              <Button icon={<FolderLock />} onClick={() => { setSelecting(true); setPicked(TENDER); }}>Dossier appel d’offres</Button>
+              <Button variant="dawn" icon={<Share2 />} onClick={() => setSelecting(true)}>Partager</Button>
+            </>
+          )
+        }
+      />
+      <input ref={fileRef} type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ''; }} />
+
+      <div className="grid gap-4 [&>*]:min-w-0 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        <Card className="relative flex items-center gap-5 overflow-hidden p-5 md:gap-7 md:p-7">
+          <div aria-hidden className="pointer-events-none absolute -left-12 -top-16 h-60 w-60 rounded-full bg-[radial-gradient(closest-side,#f1dcfb,transparent)] opacity-70 blur-xl" />
+          <Ring value={score} size={112} stroke={10} tone={expired.length ? 'warn' : 'ok'} className="relative shrink-0">
+            <span className="flex flex-col items-center leading-none">
+              <span className="num-halo text-[28px]"><AnimatedNumber value={score} />%</span>
+              <span className="mt-0.5 text-[10px] font-medium text-ink-3">à jour</span>
+            </span>
+          </Ring>
+          <div className="relative min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 text-[12.5px] font-medium text-ink-3"><ShieldCheck className="h-3.5 w-3.5" />Coffre-fort chiffré, hébergé en France</div>
+            <div className="mt-1.5 text-[20px] font-semibold leading-snug tracking-[-0.03em] md:text-[22px]">
+              {expired.length ? `${expired.length} document${expired.length > 1 ? 's' : ''} à remplacer` : soon.length ? `${soon.length} document${soon.length > 1 ? 's' : ''} expire${soon.length > 1 ? 'nt' : ''} bientôt` : 'Tout est à jour'}
+            </div>
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              <Badge size="md" tone="ok" dot><span className="num font-semibold">{ok}</span> à jour</Badge>
+              <Badge size="md" tone="warn" dot><span className="num font-semibold">{soon.length}</span> bientôt</Badge>
+              <Badge size="md" tone="bad" dot><span className="num font-semibold">{expired.length}</span> expiré{expired.length > 1 ? 's' : ''}</Badge>
+            </div>
+          </div>
+        </Card>
+
+        <label
+          onDragOver={(e) => { e.preventDefault(); setOverZone(true); }}
+          onDragLeave={() => setOverZone(false)}
+          onDrop={(e) => { e.preventDefault(); setOverZone(false); setTarget(null); onFile(e.dataTransfer.files?.[0]); }}
+          onClick={(e) => { e.preventDefault(); setTarget(null); fileRef.current?.click(); }}
+          className={cn('group flex min-h-[132px] cursor-pointer flex-col items-center justify-center gap-2 rounded-card border-[1.5px] border-dashed px-5 py-5 text-center transition-all duration-300 ease-out-quint', overZone ? 'scale-[1.01] border-[#a78bfa] bg-pale-v' : 'glass border-[#d9cff0] hover:border-[#c4b5fd] hover:bg-white')}
+        >
+          <span className={cn('grid h-12 w-12 place-items-center rounded-tile bg-pale-i text-deep-i transition-transform duration-300 ease-spring', overZone ? '-translate-y-1 scale-110' : 'group-hover:-translate-y-0.5')}>
+            <Upload className="h-5 w-5" strokeWidth={1.75} />
+          </span>
+          <span className="text-[14px] font-semibold">{overZone ? 'Lâchez, on s’occupe du reste' : 'Glissez un document ici'}</span>
+          <span className="text-[12.5px] text-ink-3">ou touchez pour choisir un PDF ou une photo. Brix reconnaît la pièce.</span>
+        </label>
+      </div>
+
+      {(expired.length > 0 || soon.some((d) => d.auto)) && !selecting && (
+        <BobNote>
+          {expired.length > 0 && <>Ta {lc(expired[0].label)} a expiré : ne pose plus de borne avant de l’avoir renouvelée. </>}
+          {soon.some((d) => d.auto) && <>Je récupère moi-même l’{lc(soon.find((d) => d.auto)!.label)} le jour où elle expire, tu n’as rien à faire.</>}
+        </BobNote>
+      )}
+
+      {selecting && (
+        <div className="glass-strong sticky top-16 z-20 flex animate-[toast-in_.4s_var(--spring)_both] items-center gap-2 rounded-full p-1.5 pl-5 shadow-pop md:top-24">
+          <span className="min-w-0 flex-1 text-[13.5px]"><span className="num font-semibold">{picked.length}</span> document{picked.length > 1 ? 's' : ''} sélectionné{picked.length > 1 ? 's' : ''}</span>
+          <Button variant="ghost" size="icon-sm" aria-label="Annuler" onClick={stopSelecting}><X /></Button>
+          <Button variant="dawn" icon={<Link2 />} disabled={!picked.length} onClick={share}>Créer le lien</Button>
+        </div>
+      )}
+
+      {(Object.keys(GROUPS) as Doc['group'][]).map((g) => (
+        <section key={g}>
+          <h2 className="mb-3 px-1 text-[16px] font-semibold tracking-[-0.025em]">{GROUPS[g]}</h2>
+          <div className="stagger-fast grid gap-3 [&>*]:min-w-0 md:grid-cols-2">
+            {docs.filter((d) => d.group === g).map((d) => (
+              <DocCard key={d.id} d={d} selecting={selecting} picked={picked.includes(d.id)} fresh={fresh === d.id} fetching={fetching === d.id} onOpen={() => setOpen(d)} onToggle={() => toggle(d.id)} onDropFile={(f) => apply(d.id, f.name)} />
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <DocSheet doc={open} onClose={() => setOpen(null)} fetching={!!open && fetching === open.id} onFetch={fetchAuto} onReplace={(d) => pick(d.id)} onShare={(d) => { setOpen(null); setPicked([d.id]); share(); }} />
+
+      <Sheet
+        open={!!dropped}
+        onClose={() => setDropped(null)}
+        side="center"
+        width={440}
+        title="Ranger ce fichier"
+        subtitle={dropped?.file.name}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setDropped(null)}>Annuler</Button>
+            <Button variant="primary" onClick={() => { if (dropped) apply(dropped.docId, dropped.file.name); setDropped(null); }}>Ranger</Button>
+          </>
+        }
+      >
+        {dropped && (
+          <div className="space-y-3">
+            {guessDoc(dropped.file.name, docs) && <p className="flex items-center gap-2 text-[13px] text-ok"><Check className="h-4 w-4" />Brix a reconnu : {guessDoc(dropped.file.name, docs)?.label}</p>}
+            <Select value={dropped.docId} onChange={(e) => setDropped({ ...dropped, docId: e.target.value })} aria-label="Document remplacé">
+              {docs.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+            </Select>
+            <p className="text-[12.5px] text-ink-3">L’ancienne version est gardée dans l’historique.</p>
+          </div>
+        )}
+      </Sheet>
+
+      <Sheet open={!!link} onClose={() => { setLink(null); stopSelecting(); }} side="center" width={460}>
+        <div className="flex flex-col items-center pt-6 text-center">
+          <SuccessDot size={52} />
+          <h3 className="mt-4 text-[19px] font-semibold tracking-[-0.025em]">Lien prêt à envoyer</h3>
+          <p className="mt-1 text-[13px] text-ink-2">{picked.length} document{picked.length > 1 ? 's' : ''} · valable 30 jours · consultations suivies</p>
+        </div>
+        <div className="mt-5 space-y-3">
+          <div className="flex items-center gap-2 rounded-full bg-halo-track px-4 py-3">
+            <Link2 className="h-4 w-4 shrink-0 text-ink-3" />
+            <span className="min-w-0 flex-1 truncate font-mono text-[13px]">{link}</span>
+          </div>
+          <Button variant="primary" className="w-full justify-center" icon={<Copy />} onClick={() => { navigator.clipboard?.writeText(link ?? '').catch(() => {}); toast('Lien copié'); }}>Copier le lien</Button>
+          <ul className="stagger-fast space-y-1.5 pt-1 text-[12.5px] text-ink-2">
+            {docs.filter((d) => picked.includes(d.id)).map((d) => <li key={d.id} className="flex items-center gap-2"><Check className="h-3.5 w-3.5 text-ok" />{d.label}</li>)}
+          </ul>
+          <p className="text-[12px] text-ink-3">Le lien affiche toujours la dernière version : si une attestation est renouvelée, votre client voit la nouvelle.</p>
+        </div>
+      </Sheet>
+    </div>
+  );
+}

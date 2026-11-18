@@ -1,0 +1,196 @@
+/* =========================================================================
+   Brix · Système visuel V2.1 « Aube, version épurée »
+   Page blanche, encre violet nuit, un seul accent. Le dégradé Aube est réservé
+   au logo, aux moments clés (lueur du hero, appel final) et aux états actifs.
+   Geist partout (titres, texte), Geist Mono pour les chiffres du métier.
+   ========================================================================= */
+:root {
+  --paper: #ffffff; --paper-2: #f9f8fc; --paper-3: #f2f0f8; --tile: #f4f2fa;
+  --ink: #14112b; --ink-2: #2c2848; --mute: #5e5a76; --faint: #8b87a1; --soft: #a9a5bc;
+  --line: #ebe9f2; --line-2: #dedbe9;
+  --brand: #14112b;
+  --v: #6d28d9; --v2: #8b5cf6; --v3: #c4b5fd; --mag: #d946ef; --peach: #fb923c; --sky: #818cf8;
+  --ok: #15803d; --ok-bg: #e8f7ee; --warn: #b45309; --warn-bg: #fdf3e1; --bad: #dc2626;
+  --dawn: linear-gradient(110deg, #6d28d9 0%, #d946ef 62%, #fb923c 100%);
+  --dawn-soft: linear-gradient(110deg, #ede7fb 0%, #fbe8fd 60%, #fff0e3 100%);
+  --display: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --spring: cubic-bezier(.34, 1.4, .64, 1);
+  --nav-h: 64px;
+  --r: 12px; --r-lg: 18px; --r-xl: 24px;
+  --sh-1: 0 1px 2px rgba(20, 17, 43, .05);
+  --sh-2: 0 1px 2px rgba(20, 17, 43, .04), 0 6px 20px -8px rgba(20, 17, 43, .10);
+  --sh-3: 0 1px 2px rgba(20, 17, 43, .04), 0 24px 60px -24px rgba(36, 18, 84, .25);
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box }
+html { overflow-x: clip; -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--nav-h) + 20px) }
+html.lenis, html.lenis body { height: auto }
+.lenis.lenis-smooth { scroll-behavior: auto !important }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: clip; text-rendering: optimizeLegibility; font-feature-settings: "ss01", "cv11" }
+img, svg, video, canvas { display: block; max-width: 100% }
+a { color: inherit; text-decoration: none }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0 }
+h1, h2, h3, h4, h5, p, ul, figure { margin: 0 }
+ul, ol { padding: 0; list-style: none }
+:focus-visible { outline: 2px solid var(--v2); outline-offset: 3px; border-radius: 8px }
+::selection { background: #e9dffd; color: var(--ink) }
+.sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+.skip { position: fixed; left: 16px; top: -60px; z-index: 100; background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; transition: top .2s }
+.skip:focus { top: 12px }
+
+svg.i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none }
+.wrap { max-width: 1200px; margin: 0 auto; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)) }
+.mono { font-family: var(--mono); font-feature-settings: normal }
+.num { font-variant-numeric: tabular-nums }
+/* Titres en deux tons : la seconde moitié en gris doux (et non plus en dégradé) */
+.grad { color: var(--faint) }
+.dawn-t { background: var(--dawn); -webkit-background-clip: text; background-clip: text; color: transparent }
+
+/* ---------- Typo commune ---------- */
+.sec { padding-block: clamp(84px, 10vw, 136px) }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; font-size: 14px; color: var(--ink-2); letter-spacing: -.005em }
+.eyebrow .i { width: 15px; height: 15px; color: var(--v) }
+.h2 { font-family: var(--display); font-weight: 600; font-size: clamp(34px, 4.3vw, 58px); line-height: 1.04; letter-spacing: -.042em; margin-top: 18px; max-width: 18ch; text-wrap: balance }
+.h3 { font-family: var(--display); font-weight: 600; font-size: clamp(22px, 2.1vw, 28px); line-height: 1.15; letter-spacing: -.03em; text-wrap: balance }
+.sub { font-size: clamp(16px, 1.3vw, 18px); line-height: 1.6; color: var(--mute); max-width: 52ch; margin-top: 20px; text-wrap: pretty; letter-spacing: -.008em }
+.head { display: grid; grid-template-columns: 1.15fr 1fr; gap: 50px; align-items: end }
+.center { text-align: center; margin-inline: auto }
+.center .h2, .center .sub { margin-inline: auto }
+.fine { font-size: 13px; color: var(--faint); line-height: 1.5 }
+
+/* ---------- Boutons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 10px; font-weight: 500; font-size: 15px; letter-spacing: -.01em; white-space: nowrap; transition: background .2s, box-shadow .25s, color .2s, transform .25s var(--ease); position: relative; isolation: isolate }
+.btn .i { width: 17px; height: 17px; transition: transform .3s var(--ease) }
+.btn:hover .i.go { transform: translateX(3px) }
+.btn:active { transform: scale(.975) }
+.btn.dark, .btn.white { background: var(--ink); color: #fff; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 1px 2px rgba(20, 17, 43, .3), 0 0 0 1px var(--ink) }
+.btn.dark:hover, .btn.white:hover { background: #241f45; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 8px 22px -10px rgba(20, 17, 43, .6), 0 0 0 1px #241f45 }
+.btn.line, .btn.glass { background: #fff; color: var(--ink); box-shadow: 0 0 0 1px var(--line-2), var(--sh-1) }
+.btn.line:hover, .btn.glass:hover { background: var(--paper-2); box-shadow: 0 0 0 1px #cfcbe0, var(--sh-1) }
+.btn.dawn { color: #fff; background: var(--dawn); background-size: 140% 100%; background-position: 0 0; transition: background-position .6s var(--ease), box-shadow .3s; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25), 0 8px 24px -10px rgba(190, 50, 220, .55) }
+.btn.dawn:hover { background-position: 100% 0 }
+.btn.sm { height: 36px; padding: 0 14px; font-size: 14px; border-radius: 9px }
+.btn.lg { height: 48px; padding: 0 22px; font-size: 15.5px; border-radius: 11px }
+.link { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; color: var(--ink); border-bottom: 1px solid var(--line-2); padding-bottom: 1px; transition: border-color .2s }
+.link:hover { border-color: var(--ink) }
+.link .i { width: 15px; height: 15px; transition: transform .3s var(--ease) }
+.link:hover .i { transform: translateX(3px) }
+
+/* ---------- Badges ---------- */
+.badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; padding: 3px 8px; border-radius: 6px; white-space: nowrap; line-height: 1.4; letter-spacing: -.005em }
+.badge .i { width: 12px; height: 12px; stroke-width: 2.2 }
+.badge.ok { background: var(--ok-bg); color: var(--ok) }
+.badge.v { background: var(--paper-3); color: var(--ink-2) }
+.badge.new { background: #f5ecfe; color: #7e22ce }
+.badge.only { background: var(--dawn-soft); color: #7e22ce; box-shadow: inset 0 0 0 1px rgba(168, 85, 247, .14) }
+.badge.soon { background: #f3f4f6; color: #4b5563 }
+.badge.warn { background: var(--warn-bg); color: var(--warn) }
+
+/* ---------- Lueurs (le dégradé « vivant » devient une lueur douce) ---------- */
+.grain { display: none }
+canvas.mesh { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2 }
+
+/* ---------- Carte de base ---------- */
+.card { background: #fff; border-radius: var(--r-lg); box-shadow: 0 0 0 1px var(--line), var(--sh-2) }
+
+/* ---------- Tuiles d'icônes : neutres, partout ---------- */
+.ic, .dp-ic, .ft-ic, .fn-i, .mi2 { background: var(--tile) !important; color: var(--ink-2) !important; box-shadow: inset 0 0 0 1px rgba(20, 17, 43, .05) }
+
+@media (max-width: 1060px) { .head { grid-template-columns: 1fr; gap: 6px } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important }
+}
+
+/* mots découpés pour les titres animés */
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .12em; margin-bottom: -.12em }
+.w > span { display: inline-block }
+[hidden] { display: none !important }
+
+/* ---------- Logo Brix : tuile Aube + nom en Geist ---------- */
+.logo { display: inline-flex; align-items: center; gap: 9px; color: var(--ink) }
+.logo .tile { width: 28px; height: 28px; flex: none; border-radius: 27%; background: linear-gradient(135deg, #6d28d9 0%, #d946ef 62%, #fb923c 100%); box-shadow: inset 0 0 0 .5px rgba(255,255,255,.25), 0 2px 8px -2px rgba(160, 40, 210, .45); display: grid; overflow: hidden }
+.logo .tile svg { width: 100%; height: 100% }
+.logo .name { font-family: var(--display); font-weight: 700; font-size: 21px; letter-spacing: -.045em; line-height: 1 }
+.logo:hover .tile { animation: tilebob .7s var(--spring) }
+@keyframes tilebob { 40% { transform: rotate(-8deg) scale(1.06) } }
+
+/* =========================================================================
+   HALO · système visuel V3 (18/11/2026)
+   Fond nacré, halo Aube diffus qui tourne avec le défilement, cartes très
+   arrondies qui flottent, ombres teintées violet, pastilles colorées par domaine,
+   boutons en pilule. Même thème Aube, même logo, même Geist, mêmes icônes Lucide.
+   ========================================================================= */
+:root {
+  --paper: #f8f6fd; --paper-2: #f3f0fb; --paper-3: #ece8f7; --tile: #f1edfb; --card: #ffffff;
+  --line: #ece8f5; --line-2: #e0daf0;
+  --r: 14px; --r-lg: 22px; --r-xl: 28px; --r-2xl: 34px;
+  --sh-1: 0 1px 2px rgba(60, 30, 120, .05);
+  --sh-2: 0 1px 2px rgba(60, 30, 120, .04), 0 12px 36px -14px rgba(60, 30, 120, .16);
+  --sh-3: 0 2px 4px rgba(60, 30, 120, .05), 0 28px 60px -22px rgba(60, 30, 120, .28);
+  --sh-dawn: 0 10px 28px -10px rgba(217, 70, 239, .55), inset 0 1px 0 rgba(255, 255, 255, .28);
+  --glass: rgba(255, 255, 255, .7);
+  --dawn-d: linear-gradient(135deg, #6d28d9 0%, #d946ef 62%, #fb923c 100%);
+  /* pastilles par domaine (fond pâle + encre franche) */
+  --t-v-bg: #f1eafe; --t-v: #6d28d9;
+  --t-m-bg: #fce8fd; --t-m: #a21caf;
+  --t-p-bg: #fff0e4; --t-p: #c2410c;
+  --t-g-bg: #e5f6ef; --t-g: #047857;
+  --t-b-bg: #e8effe; --t-b: #3b5bdb;
+  --t-s-bg: #e3f4fb; --t-s: #0369a1;
+  --t-r-bg: #feeaef; --t-r: #be123c;
+  --t-i-bg: #ecebfd; --t-i: #4f46e5;
+  --nav-h: 76px;
+}
+body { background: var(--paper) }
+
+/* Aura : le halo Aube fixé derrière tout le site. Il tourne doucement avec le défilement
+   (--rot piloté par core.js) et suit un peu la souris (--ax, --ay). */
+.aura { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; contain: strict }
+.aura i { position: absolute; left: 50%; top: 50%; width: 140vmax; height: 140vmax; margin: -70vmax 0 0 -70vmax; border-radius: 50%; will-change: transform;
+  transform: translate3d(calc(var(--ax, 0) * 1px), calc(var(--ay, 0) * 1px), 0) rotate(calc(var(--rot, 0) * 1deg)) }
+.aura i:nth-child(1) { background: radial-gradient(18% 14% at 62% 22%, rgba(233, 184, 245, .55), transparent 70%), radial-gradient(16% 13% at 30% 30%, rgba(199, 180, 251, .5), transparent 70%) }
+.aura i:nth-child(2) { background: radial-gradient(15% 12% at 72% 62%, rgba(255, 211, 176, .42), transparent 70%), radial-gradient(14% 12% at 26% 70%, rgba(214, 198, 253, .38), transparent 70%); transform: translate3d(calc(var(--ax, 0) * -1.4px), calc(var(--ay, 0) * -1.4px), 0) rotate(calc(var(--rot, 0) * -0.7deg)) }
+.aura i:nth-child(3) { width: 90vmax; height: 90vmax; margin: -45vmax 0 0 -45vmax; background: conic-gradient(from 0deg, rgba(109, 40, 217, .07), rgba(217, 70, 239, .09), rgba(251, 146, 60, .07), rgba(109, 40, 217, .07)); filter: blur(60px); opacity: .9; transform: rotate(calc(var(--rot, 0) * 2deg)) }
+.aura::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 40%, transparent 50%, rgba(248, 246, 253, .65)) }
+
+/* Typo Halo : titres un peu plus pleins, seconde moitié grisée */
+.h2 { letter-spacing: -.048em; font-weight: 620 }
+.grad { color: #a7a2bf }
+.dawn-t { background: var(--dawn); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: dawnshift 8s ease-in-out infinite alternate }
+@keyframes dawnshift { to { background-position: 100% 0 } }
+
+/* Sur-titre : pilule de verre */
+.eyebrow { height: 32px; padding: 0 13px 0 11px; border-radius: 999px; background: var(--glass); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .06), 0 6px 18px -8px rgba(60, 30, 120, .16); backdrop-filter: blur(14px) saturate(1.5); -webkit-backdrop-filter: blur(14px) saturate(1.5); font-size: 13.5px }
+.eyebrow .i { color: #c026d3 }
+
+/* Boutons : pilules */
+.btn { border-radius: 999px; font-weight: 550; padding: 0 20px }
+.btn.sm { border-radius: 999px; padding: 0 15px }
+.btn.lg { border-radius: 999px; height: 52px; padding: 0 26px; font-size: 15.5px }
+.btn.dawn { box-shadow: var(--sh-dawn); transition: background-position .6s var(--ease), box-shadow .35s, transform .35s var(--spring) }
+.btn.dawn:hover { transform: translateY(-1px) scale(1.02); box-shadow: 0 16px 34px -12px rgba(217, 70, 239, .7), inset 0 1px 0 rgba(255, 255, 255, .3) }
+.btn.dark, .btn.white { transition: background .2s, box-shadow .3s, transform .35s var(--spring) }
+.btn.dark:hover, .btn.white:hover { transform: translateY(-1px) }
+.btn.line, .btn.glass { background: rgba(255, 255, 255, .82); box-shadow: 0 0 0 1px var(--line-2), 0 1px 2px rgba(60, 30, 120, .06); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px) }
+.btn.line:hover, .btn.glass:hover { background: #fff; box-shadow: 0 0 0 1px #d3cbe9, 0 8px 20px -10px rgba(60, 30, 120, .25); transform: translateY(-1px) }
+
+/* Badges : pilules */
+.badge { border-radius: 999px; padding: 3px 10px }
+.badge.v { background: var(--t-v-bg); color: var(--t-v) }
+
+/* Cartes : flottent sur le nacré */
+.card { border-radius: var(--r-lg); box-shadow: var(--sh-2); transition: transform .5s var(--ease), box-shadow .5s var(--ease) }
+.card.lift:hover, a.card:hover { transform: translateY(-4px); box-shadow: var(--sh-3) }
+.glass { background: var(--glass); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .05), 0 10px 30px -12px rgba(60, 30, 120, .16) }
+
+/* Tuiles d'icônes : retour des pastilles par domaine (violet par défaut) */
+.ic, .dp-ic, .ft-ic, .fn-i, .mi2 { background: var(--t-v-bg) !important; color: var(--t-v) !important; box-shadow: none; border-radius: 13px }
+.tone-v { --tb: var(--t-v-bg); --tc: var(--t-v) } .tone-m { --tb: var(--t-m-bg); --tc: var(--t-m) } .tone-p { --tb: var(--t-p-bg); --tc: var(--t-p) } .tone-g { --tb: var(--t-g-bg); --tc: var(--t-g) }
+.tone-b { --tb: var(--t-b-bg); --tc: var(--t-b) } .tone-s { --tb: var(--t-s-bg); --tc: var(--t-s) } .tone-r { --tb: var(--t-r-bg); --tc: var(--t-r) } .tone-i { --tb: var(--t-i-bg); --tc: var(--t-i) }
+[class*="tone-"].ic, [class*="tone-"] > .ic, .ic[class*="tone-"] { background: var(--tb) !important; color: var(--tc) !important }
+
+/* Logo : la tuile garde son reflet */
+.logo .tile { border-radius: 29% }

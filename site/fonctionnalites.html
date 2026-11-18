@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Toutes les fonctionnalités · Brix</title>
+<meta name="description" content="Devis dicté, facture électronique, chantiers, planning, pointage, achats, Bob et site vitrine. Toutes les fonctions de Brix, rangées par département, avec l’offre qui les inclut.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="logos/brix-icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="./src/styles/base.css">
+<link rel="stylesheet" href="./src/styles/layout.css">
+<link rel="stylesheet" href="./src/styles/home-1.css">
+<link rel="stylesheet" href="./src/styles/home-2.css">
+<link rel="stylesheet" href="./src/styles/home-3.css">
+<link rel="stylesheet" href="./src/styles/page.css">
+<link rel="stylesheet" href="./src/styles/fonctionnalites.css">
+</head>
+<body data-nav="solid">
+<!--@icons-->
+<!--@include nav-->
+<main id="main">
+  <header class="ph">
+    <div class="ph-halo" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="wrap ph-in">
+      <div class="ph-copy">
+        <span class="eyebrow rv"><svg class="i" aria-hidden="true"><use href="#i-layout-grid"/></svg>Toutes les fonctionnalités</span>
+        <h1 class="ph-t rv">Tout ce que Brix fait. <span class="grad">Rangé par département.</span></h1>
+        <p class="sub rv">Des devis aux fiches de paie, chaque fonction est rangée dans son département. Cherchez ce qui vous intéresse ou filtrez par offre pour voir ce que vous avez déjà.</p>
+        <div class="ph-meta rv" data-meta></div>
+      </div>
+      <div class="ph-sats" aria-hidden="true" data-depth="2.5">
+        <div class="psat a"><div><span class="ic tone-v"><svg class="i"><use href="#i-mic"/></svg></span><span><b>Devis dicté</b><small>Bob écrit les lignes avec vos prix</small></span></div></div>
+        <div class="psat soft b"><div><span class="ic tone-g"><svg class="i"><use href="#i-shield-check"/></svg></span><span><b>Facture électronique</b><small>Conforme, même en gratuit</small></span></div></div>
+        <div class="psat c"><div><span class="ic tone-p"><svg class="i"><use href="#i-timer"/></svg></span><span><b>Pointage sur le chantier</b><small>Arrivée et départ en un tap</small></span><span class="chip-ok"><svg class="i"><use href="#i-check"/></svg>8 h 02</span></div></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap fx-tools" role="search">
+    <div class="fx-bar rv">
+      <label class="fx-search">
+        <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
+        <span class="sr">Rechercher une fonction</span>
+        <input type="search" placeholder="Rechercher : relance, pointage, photo…" autocomplete="off" spellcheck="false" data-q>
+        <kbd class="fx-kbd mono" aria-hidden="true" data-kbd>/</kbd>
+        <button type="button" class="fx-clear" aria-label="Effacer la recherche" hidden data-clear><svg class="i" aria-hidden="true"><use href="#i-x"/></svg></button>
+      </label>
+      <div class="fx-chips" role="radiogroup" aria-label="Filtrer les fonctions" data-chips></div>
+    </div>
+    <p class="fx-status mono" aria-live="polite" data-status></p>
+  </div>
+
+  <div class="wrap fx-body">
+    <aside class="fx-side">
+      <nav class="fx-nav" aria-label="Départements" data-fxnav>
+        <span class="fx-nav-k mono" aria-hidden="true">Départements</span>
+        <span class="fx-ind" aria-hidden="true" data-ind><i></i></span>
+        <span class="fx-bar-p" aria-hidden="true"><i data-prog></i></span>
+      </nav>
+      <a class="fx-side-cta" href="tarifs.html#detail">
+        <span class="fx-side-k mono">Offres</span>
+        <b>Comparer Start, Pro et Équipe</b>
+        <span>Le tableau complet, fonction par fonction <svg class="i" aria-hidden="true"><use href="#i-arrow-right"/></svg></span>
+      </a>
+    </aside>
+
+    <div class="fx-main">
+      <div class="fx-list" data-list></div>
+      <div class="fx-empty" hidden data-empty>
+        <span class="fx-empty-ic"><svg class="i" aria-hidden="true"><use href="#i-search-x"/></svg></span>
+        <h2 class="h3">Aucune fonction ne correspond.</h2>
+        <p>Essayez un autre mot, par exemple « facture », « planning » ou « fournisseur ». Et si ce que vous cherchez n’existe pas encore, dites-le-nous à <a class="link" href="mailto:contact@brix-app.fr">contact@brix-app.fr</a>.</p>
+        <button type="button" class="btn line" data-reset>Tout afficher</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-end"></div>
+  <section class="final short">
+  <!--@include brix-b.svg-->
+    <div class="wrap">
+      <h2 class="h2" data-split>Brix n’affiche que ce qui vous sert.</h2>
+      <p class="sub rv">Dites-nous votre métier et la taille de votre entreprise. Brix allume les bons départements, vous commencez gratuitement.</p>
+      <div class="ctas rv"><a class="btn white lg mag" href="demarrer.html">Composer mon Brix <svg class="i go" aria-hidden="true"><use href="#i-arrow-right"/></svg></a><a class="btn glass lg mag" href="tarifs.html">Voir les tarifs</a></div>
+    </div>
+  </section>
+</main>
+<!--@include footer-->
+<script type="module" src="./src/js/pages/fonctionnalites.js"></script>
+</body>
+</html>

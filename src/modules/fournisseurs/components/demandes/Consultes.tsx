@@ -1,0 +1,99 @@
+// Fournisseurs consultés : qui a ouvert, qui a répondu, et les gestes utiles (relancer, saisir, simuler).
+import { useState } from 'react';
+import { BellRing, Check, ExternalLink, FileText, PhoneCall, Play } from 'lucide-react';
+import { Button, Card, CardHeader, toast } from '@/components/ui';
+import { useBrix } from '@/lib/store';
+import { lienPortail } from '../../data/helpers';
+import { useAchats } from '../../data/store';
+import type { Demande, Destinataire, Fournisseur } from '../../data/types';
+import { BadgeDestinataire, BandeauDemo, FournisseurPastille } from '../ui';
+import { pluriel, quand } from './commun';
+import SaisieReponse from './SaisieReponse';
+
+function detail(x: Destinataire) {
+  if (x.statut === 'repondue' && x.reponduLe) return `Réponse reçue ${quand(x.reponduLe)}`;
+  if (x.statut === 'declinee') return x.commentaire ? `« ${x.commentaire} »` : 'Ne peut pas fournir cette liste';
+  if (x.vuLe) return `Ouverte ${quand(x.vuLe)}, pas encore de prix`;
+  if (x.envoyeLe) return `Envoyée ${quand(x.envoyeLe)}`;
+  return 'Pas encore envoyée';
+}
+
+export default function Consultes({ d, fournisseurs }: { d: Demande; fournisseurs: Fournisseur[] }) {
+  const isDemo = useBrix((s) => s.isDemo);
+  const relancer = useAchats((s) => s.relancer);
+  const simuler = useAchats((s) => s.simulerReponses);
+  const [saisie, setSaisie] = useState(false);
+  const active = d.statut !== 'commandee' && d.statut !== 'annulee';
+  const attente = d.destinataires.filter((x) => x.statut === 'envoyee' || x.statut === 'vue');
+  const f = (id: string) => fournisseurs.find((x) => x.id === id);
+
+  return (
+    <Card>
+      <CardHeader title="Fournisseurs consultés" meta={`${d.destinataires.filter((x) => x.statut === 'repondue').length}/${d.destinataires.length} réponses`} />
+      <ul className="space-y-0.5 p-2.5">
+        {d.destinataires.map((x) => (
+          <li key={x.id} className="flex min-h-[64px] items-center gap-3 rounded-card-sm px-2.5 py-2.5 transition-colors hover:bg-halo-hover">
+            <span className="relative">
+              <FournisseurPastille f={f(x.fournisseurId)} size={36} />
+              {x.statut === 'vue' && <span className="fx-ping absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-vi-600" title="A ouvert la demande" />}
+              {x.statut === 'repondue' && <span className="bx-pop absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full border-2 border-white bg-[#10b981] text-white"><Check className="h-2.5 w-2.5" strokeWidth={3} /></span>}
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[13.5px] font-medium">{f(x.fournisseurId)?.nom ?? 'Fournisseur'}</div>
+              <div className="truncate text-[12px] text-ink-3">{detail(x)}</div>
+              {x.pieceJointe && <div className="mt-0.5 flex items-center gap-1 truncate text-[11.5px] text-ink-2"><FileText className="h-3 w-3 shrink-0 text-bad" strokeWidth={1.75} />{x.pieceJointe.nom}</div>}
+            </div>
+            <BadgeDestinataire s={x.statut} />
+            {isDemo && x.statut !== 'declinee' && (
+              <Button size="icon" variant="ghost" className="h-11 w-11 sm:h-9 sm:w-9" aria-label="Ouvrir le lien du fournisseur" title={x.statut === 'repondue' ? 'Voir son offre côté fournisseur (démo)' : 'Répondre à sa place (démo)'} onClick={() => window.open(lienPortail(x.token), '_blank')}>
+                <ExternalLink className="h-4 w-4" strokeWidth={1.75} />
+              </Button>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {active && (
+        <div className="space-y-2 border-t border-halo-line p-4">
+          {attente.length > 0 && (
+            <Button
+              variant="secondary"
+              className="h-11 w-full justify-center"
+              icon={<BellRing className="h-4 w-4" strokeWidth={1.75} />}
+              onClick={() => {
+                const n = relancer(d.id);
+                toast(n ? `Relance envoyée à ${pluriel(n, 'fournisseur')}.` : 'Tout le monde a déjà répondu.');
+              }}
+            >
+              Relancer ceux qui n’ont pas répondu
+            </Button>
+          )}
+          <Button variant="ghost" className="h-11 w-full justify-center" icon={<PhoneCall className="h-4 w-4" strokeWidth={1.75} />} onClick={() => setSaisie(true)}>
+            Saisir une réponse reçue par téléphone
+          </Button>
+          {isDemo && attente.length > 0 && (
+            <BandeauDemo>
+              <div className="flex flex-col gap-2">
+                <span>Démo : rien ne part chez un vrai fournisseur. Ouvrez son lien pour répondre à sa place, ou faites répondre tout le monde.</span>
+                <Button
+                  size="sm"
+                  variant="soft"
+                  className="w-full justify-center max-md:h-10"
+                  icon={<Play className="h-3.5 w-3.5" />}
+                  onClick={() => {
+                    const n = simuler(d.id);
+                    toast(`${pluriel(n, 'réponse simulée', 'réponses simulées')}. Le comparatif est à jour.`);
+                  }}
+                >
+                  Simuler les réponses (démo)
+                </Button>
+              </div>
+            </BandeauDemo>
+          )}
+        </div>
+      )}
+
+      <SaisieReponse d={d} fournisseurs={fournisseurs} open={saisie} onClose={() => setSaisie(false)} />
+    </Card>
+  );
+}

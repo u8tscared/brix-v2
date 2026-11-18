@@ -1,0 +1,84 @@
+/* ===== Pages secondaires : en-tête commun (fonctionnalités, tarifs, comparatif) =====
+   Langage Halo : l'en-tête reste transparent pour laisser voir l'aura du site, un halo
+   local plus dense éclaire le titre, et de petites cartes « satellites » flottent à côté. */
+.ph { position: relative; isolation: isolate; padding-top: calc(var(--nav-h) + env(safe-area-inset-top, 0px)); background: transparent }
+/* halo local : trois taches Aube floues derrière le titre */
+.ph-halo { position: absolute; inset: 0 0 auto; height: min(980px, 120%); z-index: -1; pointer-events: none; overflow: hidden; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent) }
+.ph-halo i { position: absolute; border-radius: 50%; filter: blur(70px); opacity: .62; will-change: transform }
+.ph-halo i:nth-child(1) { width: 680px; height: 460px; right: -6%; top: -140px; background: radial-gradient(closest-side, #ecbcf6, transparent) }
+.ph-halo i:nth-child(2) { width: 560px; height: 420px; right: 26%; top: -230px; background: radial-gradient(closest-side, #cdbcfc, transparent) }
+.ph-halo i:nth-child(3) { width: 520px; height: 380px; right: 4%; top: 260px; background: radial-gradient(closest-side, #ffdcc2, transparent); opacity: .55 }
+.ph-halo i:nth-child(4) { width: 480px; height: 360px; left: -10%; top: 40px; background: radial-gradient(closest-side, #e3d8fd, transparent); opacity: .5 }
+
+.ph-in { position: relative; padding-block: clamp(56px, 7.5vw, 104px) clamp(36px, 4.5vw, 56px) }
+.ph-copy { position: relative; z-index: 1; max-width: 800px }
+.ph-t { font-family: var(--display); font-weight: 620; font-size: clamp(44px, 5.6vw, 82px); line-height: 1; letter-spacing: -.052em; margin-top: 22px; max-width: 13em; text-wrap: balance }
+.ph .sub { max-width: 54ch; margin-top: 24px }
+
+/* chiffres de l'en-tête : une carte de verre découpée en quatre */
+.ph-meta { display: inline-flex; flex-wrap: wrap; margin-top: 40px; padding: 6px; border-radius: var(--r-lg); background: var(--glass); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 1px 2px rgba(60, 30, 120, .05), 0 14px 34px -16px rgba(60, 30, 120, .2); color: var(--mute); font-size: 13.5px }
+.ph-meta > span { display: flex; flex-direction: column; gap: 6px; padding: 14px 22px 13px; line-height: 1.3; position: relative }
+.ph-meta > span + span::before { content: ""; position: absolute; left: 0; top: 16px; bottom: 16px; width: 1px; background: var(--line-2) }
+.ph-meta b { font-family: var(--mono); font-weight: 500; font-size: 26px; letter-spacing: -.04em; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1 }
+.ph-meta:empty { min-height: 81px; min-width: 420px } /* rempli en JS : on réserve la place */
+
+/* ---------- Satellites : petites cartes qui flottent autour du titre ---------- */
+.ph-sats { position: absolute; z-index: 1; right: max(20px, env(safe-area-inset-right, 0px)); top: clamp(48px, 6vw, 84px); width: 360px; height: 360px; pointer-events: none }
+.psat { position: absolute; will-change: transform }
+.psat.a { left: 0; top: 18px } .psat.b { right: 0; top: 136px } .psat.c { left: 34px; top: 256px }
+.psat > div { display: flex; align-items: center; gap: 12px; padding: 12px 16px 12px 12px; border-radius: 20px; background: #fff; box-shadow: 0 1px 2px rgba(60, 30, 120, .05), 0 22px 48px -18px rgba(60, 30, 120, .3); white-space: nowrap; animation: psatfloat 7s ease-in-out infinite alternate }
+.psat:nth-child(2) > div { animation-delay: -2.4s; animation-duration: 8s }
+.psat:nth-child(3) > div { animation-delay: -4.6s; animation-duration: 9s }
+.psat.soft > div { background: rgba(255, 255, 255, .8); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 16px 36px -16px rgba(60, 30, 120, .26) }
+.psat .ic { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; flex: none }
+.psat .ic .i { width: 18px; height: 18px }
+.psat b { display: block; font-size: 14px; font-weight: 600; letter-spacing: -.02em; line-height: 1.25; color: var(--ink) }
+.psat small { display: block; font-size: 12.5px; color: var(--mute); line-height: 1.35; margin-top: 1px }
+.psat .num { font-family: var(--mono); font-weight: 500; letter-spacing: -.03em }
+.psat .chip-ok { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 9px; border-radius: 999px; background: var(--t-g-bg); color: var(--t-g); font-size: 12px; font-weight: 550 }
+.psat .chip-ok .i { width: 13px; height: 13px; stroke-width: 2.6 }
+.psat .tile-b { width: 38px; height: 38px; border-radius: 12px; background: var(--dawn-d); display: grid; place-items: center; flex: none; box-shadow: 0 8px 18px -8px rgba(217, 70, 239, .7), inset 0 1px 0 rgba(255, 255, 255, .25) }
+.psat .tile-b svg { width: 100%; height: 100% }
+/* anneau qui se ferme dans un satellite */
+.psat .pring { width: 38px; height: 38px; flex: none; position: relative; display: grid; place-items: center }
+.psat .pring svg { position: absolute; inset: 0; transform: rotate(-90deg) }
+.psat .pring circle { fill: none; stroke-width: 4 }
+.psat .pring .bg { stroke: #efeaf9 }
+.psat .pring .fg { stroke: url(#ph-ring); stroke-linecap: round }
+.psat .pring span { font-family: var(--mono); font-size: 10.5px; font-weight: 500; color: var(--ink) }
+@keyframes psatfloat { from { transform: translateY(0) } to { transform: translateY(-9px) } }
+
+/* titres de section secondaires */
+.sec-h { display: flex; justify-content: space-between; align-items: end; gap: 20px 56px; flex-wrap: wrap }
+.sec-h .sub { margin-top: 14px; max-width: 46ch }
+.sec-h .h2 { font-size: clamp(32px, 3.8vw, 52px) }
+
+/* CTA final : un peu moins haut que sur l'accueil */
+.final.short .wrap { padding-block: clamp(80px, 9vw, 120px) }
+.final.short .h2 { font-size: clamp(36px, 5.2vw, 72px) }
+.page-end { padding-bottom: clamp(56px, 7vw, 96px) }
+
+@media (max-width: 1180px) {
+  .ph-sats { width: 300px; right: 8px }
+  .ph-copy { max-width: 640px }
+}
+@media (max-width: 1060px) {
+  .ph-copy { max-width: none }
+  .ph-sats { position: relative; right: auto; top: auto; width: 100%; max-width: 520px; height: 196px; margin-top: 34px }
+  .psat.a { left: 0; top: 0 } .psat.b { right: 0; left: auto; top: 66px } .psat.c { left: 14px; top: 132px }
+}
+@media (max-width: 560px) {
+  .ph-in { padding-top: 40px }
+  .ph-t { font-size: clamp(40px, 11.4vw, 52px); letter-spacing: -.05em }
+  .ph-meta { display: grid; grid-template-columns: 1fr 1fr; margin-top: 30px; width: 100% }
+  .ph-meta > span { padding: 12px 14px }
+  .ph-meta > span + span::before { display: none }
+  .ph-meta b { font-size: 22px }
+  .ph-meta:empty { min-height: 140px; min-width: 0 }
+  .ph-sats { height: 182px; margin-top: 28px }
+  .psat.b { top: 60px } .psat.c { left: 6px; top: 120px }
+  .psat > div { padding: 10px 13px 10px 10px; gap: 10px; border-radius: 18px }
+  .psat .ic, .psat .tile-b, .psat .pring { width: 34px; height: 34px }
+  .psat b { font-size: 13px } .psat small { font-size: 11.5px }
+}
+@media (prefers-reduced-motion: reduce) { .psat > div { animation: none } }
