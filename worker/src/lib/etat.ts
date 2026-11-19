@@ -58,11 +58,33 @@ export function nettoyer(d: Record<string, unknown>): EtatDonnees {
   return out;
 }
 
+/**
+ * Stockage du JSON : R2 quand le binding FILES existe, sinon une table D1 (préproduction sans R2).
+ * D1 limite une valeur à ~2 Mo : suffisant pour tester, R2 est attendu en production.
+ */
+const sansR2 = (env: Env) => !(env as { FILES?: unknown }).FILES;
+
+async function lireDonnees(env: Env, orgId: string): Promise<EtatDonnees> {
+  if (sansR2(env)) {
+    const r = await env.DB.prepare('SELECT donnees FROM etat_donnees WHERE organization_id = ?').bind(orgId).first<{ donnees: string }>();
+    return r ? (JSON.parse(r.donnees) as EtatDonnees) : {};
+  }
+  const obj = await env.FILES.get(cle(orgId));
+  return obj ? ((await obj.json()) as EtatDonnees) : {};
+}
+
+async function ecrireDonnees(env: Env, orgId: string, texte: string, version: number) {
+  if (sansR2(env)) {
+    await env.DB.prepare('INSERT INTO etat_donnees (organization_id, donnees) VALUES (?, ?) ON CONFLICT(organization_id) DO UPDATE SET donnees = excluded.donnees').bind(orgId, texte).run();
+    return;
+  }
+  await env.FILES.put(cle(orgId), texte, { httpMetadata: { contentType: 'application/json' }, customMetadata: { version: String(version) } });
+}
+
 export async function lireEtat(env: Env, orgId: string): Promise<Etat> {
   const row = await env.DB.prepare('SELECT version, maj_le FROM etat_org WHERE organization_id = ?').bind(orgId).first<{ version: number; maj_le: string | null }>();
   if (!row) return { version: 0, majLe: null, donnees: {} };
-  const obj = await env.FILES.get(cle(orgId));
-  const donnees = obj ? ((await obj.json()) as EtatDonnees) : {};
+  const donnees = await lireDonnees(env, orgId);
   return { version: row.version, majLe: row.maj_le, donnees };
 }
 
@@ -84,7 +106,7 @@ export async function ecrireEtat(env: Env, orgId: string, donnees: Record<string
     ? await env.DB.prepare('UPDATE etat_org SET version = ?, maj_le = ?, maj_par = ?, taille = ? WHERE organization_id = ? AND version = ?').bind(suivante, majLe, par, texte.length, orgId, v).run()
     : await env.DB.prepare('INSERT OR IGNORE INTO etat_org (organization_id, version, maj_le, maj_par, taille) VALUES (?, ?, ?, ?, ?)').bind(orgId, suivante, majLe, par, texte.length).run();
   if (!res.meta.changes) throw new HttpError(409, 'conflit');
-  await env.FILES.put(cle(orgId), texte, { httpMetadata: { contentType: 'application/json' }, customMetadata: { version: String(suivante) } });
+  await ecrireDonnees(env, orgId, texte, suivante);
   return { version: suivante, majLe, donnees: propre };
 }
 

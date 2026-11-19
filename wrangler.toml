@@ -27,3 +27,22 @@ bucket_name = "brix-v2-files"
 
 [triggers]
 crons = ["* * * * *"]
+
+# Préproduction (adresse workers.dev, base séparée). Déployer : npx wrangler deploy --env preprod
+# R2 n'est pas encore activé sur le compte : l'état est alors stocké dans D1 (worker/src/lib/etat.ts).
+[env.preprod]
+name = "brix-v2-preprod"
+
+[env.preprod.vars]
+APP_ORIGIN = "https://brix-v2-preprod.marceau-ruis.workers.dev"
+PUBLIC_BASE_URL = "https://brix-v2-preprod.marceau-ruis.workers.dev"
+SIGNATURE_PROVIDER = "brix"
+STRIPE_PLATFORM_FEE_BPS = "0"
+VAPID_SUBJECT = "mailto:contact@brix-app.fr"
+ENVIRONMENT = "preprod"
+BOB_DEMO_OUVERT = "1"
+
+[[env.preprod.d1_databases]]
+binding = "DB"
+database_name = "brix-v2-preprod"
+database_id = "c7685683-4d27-46d8-a149-8953163875f2"

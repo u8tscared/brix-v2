@@ -155,3 +155,9 @@ CREATE TABLE IF NOT EXISTS etat_org (
   maj_par TEXT,
   taille INTEGER NOT NULL DEFAULT 0
 );
+
+-- Copie du JSON d'état quand R2 n'est pas disponible (préproduction).
+CREATE TABLE IF NOT EXISTS etat_donnees (
+  organization_id TEXT PRIMARY KEY,
+  donnees TEXT NOT NULL
+);
