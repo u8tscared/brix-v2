@@ -56,7 +56,7 @@ export function DocSheet({ doc, onClose, onReplace, onFetch, onShare, fetching }
             {doc.updatedAt && <Line label="Mis à jour le"><span className="num">{dateFull(doc.updatedAt)}</span></Line>}
           </dl>
 
-          {doc.auto && <p className="rounded-card-sm bg-dawn-pale px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">Bob récupère ce document tout seul sur le site officiel le jour où il expire. Vous n’avez rien à faire.</p>}
+          {doc.auto && <p className="rounded-card-sm bg-dawn-pale px-4 py-3 text-[12.5px] leading-relaxed text-ink-2">Brix AI récupère ce document tout seul sur le site officiel le jour où il expire. Vous n’avez rien à faire.</p>}
 
           <Button variant="secondary" className="w-full justify-center" icon={<Download />} onClick={() => toast(`${doc.file} téléchargé (démo)`)}>Télécharger le PDF</Button>
         </div>

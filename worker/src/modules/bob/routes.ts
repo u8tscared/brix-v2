@@ -1,5 +1,5 @@
 /**
- * Routes de Bob (assistant de l'artisan) sur l'API Claude.
+ * Routes de Brix AI (assistant de l'artisan) sur l'API Claude.
  *   GET  /api/bob/etat     → { disponible, demo } : le front choisit entre l'agent et le moteur local.
  *   POST /api/bob/message  → flux SSE : « texte » (morceaux de réponse), « outil » (un outil démarre),
  *                            « fin » (contenu complet du message assistant + stop_reason), « erreur ».
@@ -147,7 +147,7 @@ function flux(env: BobEnv, messages: BetaMessageParam[], contexte: BetaMessagePa
       const status = e instanceof Anthropic.APIError ? e.status : undefined;
       const code = status === 429 || status === 529 ? 'ia_surchargee' : status === 401 || status === 403 ? 'ia_indisponible' : 'ia_erreur';
       console.error('bob: appel au modèle en échec', status ?? '', e instanceof Error ? e.message : '');
-      envoyer('erreur', { code, message: code === 'ia_surchargee' ? 'Bob est très demandé, réessaie dans un instant.' : 'Bob n’a pas pu répondre.' });
+      envoyer('erreur', { code, message: code === 'ia_surchargee' ? 'Brix AI est très demandé, réessaie dans un instant.' : 'Brix AI n’a pas pu répondre.' });
     } finally {
       ouvert = false;
       writer.close().catch(() => {});
@@ -157,7 +157,7 @@ function flux(env: BobEnv, messages: BetaMessageParam[], contexte: BetaMessagePa
 }
 
 async function message(request: Request, env: BobEnv): Promise<Response> {
-  if (!env.ANTHROPIC_API_KEY) return erreur(503, 'ia_indisponible', 'Bob n’est pas encore branché');
+  if (!env.ANTHROPIC_API_KEY) return erreur(503, 'ia_indisponible', 'Brix AI n’est pas encore branché');
   const qui = await identifier(request, env);
   if (!qui) return erreur(401, 'non_connecte', 'Non connecté');
   const texte = await request.text();
@@ -177,7 +177,7 @@ async function message(request: Request, env: BobEnv): Promise<Response> {
     console.error('bob: quota illisible', e instanceof Error ? e.message : '');
     ok = qui.type === 'org';
   }
-  if (!ok) return erreur(429, 'quota', qui.type === 'demo' ? 'Tu as beaucoup parlé à Bob en démo : reviens dans une heure.' : 'Bob a beaucoup travaillé aujourd’hui : la limite du jour est atteinte.');
+  if (!ok) return erreur(429, 'quota', qui.type === 'demo' ? 'Tu as beaucoup parlé à Brix AI en démo : reviens dans une heure.' : 'Brix AI a beaucoup travaillé aujourd’hui : la limite du jour est atteinte.');
   return flux(env, messages, messageContexte(corps.contexte));
 }
 

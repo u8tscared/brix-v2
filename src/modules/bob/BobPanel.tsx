@@ -22,7 +22,7 @@ const QUICK: { label: string; icon: string; dept: DepartmentKey; ask: (s: string
   { label: 'Mon planning', icon: 'CalendarRange', dept: 'equipe', ask: () => 'Qu’est-ce que j’ai demain ?' },
 ];
 
-/** Panneau de conversation avec Bob : feuille à droite sur ordinateur, plein écran sur téléphone. */
+/** Panneau de conversation avec Brix AI : feuille à droite sur ordinateur, plein écran sur téléphone. */
 export default function BobPanel() {
   const ui = useUI();
   const open = ui.bob;
@@ -51,7 +51,7 @@ export default function BobPanel() {
 
   const speech = useSpeech((t) => void send(t));
 
-  // Bob en ligne ? (sinon moteur local) ; navigation demandée par Bob (ouvrir un écran).
+  // Brix AI en ligne ? (sinon moteur local) ; navigation demandée par Brix AI (ouvrir un écran).
   useEffect(() => {
     if (!open) return;
     void etatIA().then((v) => useChat.setState({ enLigne: v.disponible }));
@@ -112,7 +112,7 @@ export default function BobPanel() {
       <div className="absolute inset-0 hidden animate-[fade-up_.2s_ease_both] bg-[#1b1240]/20 backdrop-blur-[4px] md:block" onClick={close} />
       <section
         role="dialog"
-        aria-label="Bob"
+        aria-label="Brix AI"
         className="absolute inset-0 flex animate-[fade-up_.28s_cubic-bezier(.2,.8,.2,1)_both] flex-col overflow-hidden bg-[#f7f5fc] md:inset-y-3 md:left-auto md:right-3 md:w-[460px] md:rounded-sheet md:bg-white/90 md:shadow-[0_1px_2px_rgba(60,30,120,.06),0_40px_90px_-24px_rgba(60,30,120,.45)] md:ring-1 md:ring-white md:backdrop-blur-2xl"
       >
         <div className="pointer-events-none absolute inset-x-0 top-0 h-48 opacity-70" aria-hidden>
@@ -122,7 +122,7 @@ export default function BobPanel() {
           <BobMark size={34} active={speech.listening || chat.thinking} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="text-[16px] font-semibold tracking-[-0.02em]">Bob</span>
+              <span className="text-[16px] font-semibold tracking-[-0.02em]">Brix AI</span>
               {!chat.enLigne && <Badge tone="neutral" className="h-[19px] px-1.5 text-[10.5px]">Démo</Badge>}
             </div>
             <div className="truncate text-[12px] text-ink-3">{speech.listening ? 'Je t’écoute…' : chat.thinking ? 'Je regarde…' : 'Ton assistant, il agit pour toi'}</div>
@@ -132,7 +132,7 @@ export default function BobPanel() {
               <RotateCcw className="h-4 w-4" />
             </button>
           )}
-          <button onClick={() => go('/app/bob')} className="grid h-10 w-10 place-items-center rounded-full text-ink-3 transition hover:bg-white hover:text-ink hover:shadow-[0_0_0_1px_#ece8f6]" aria-label="Réglages de Bob" title="Tout ce que Bob sait faire">
+          <button onClick={() => go('/app/bob')} className="grid h-10 w-10 place-items-center rounded-full text-ink-3 transition hover:bg-white hover:text-ink hover:shadow-[0_0_0_1px_#ece8f6]" aria-label="Réglages de Brix AI" title="Tout ce que Brix AI sait faire">
             <Settings2 className="h-4 w-4" />
           </button>
           <button onClick={close} className="grid h-10 w-10 place-items-center rounded-full text-ink-2 transition hover:bg-white hover:text-ink hover:shadow-[0_0_0_1px_#ece8f6]" aria-label="Fermer">
@@ -187,7 +187,7 @@ export default function BobPanel() {
           ) : (
             <TextInput refEl={inputRef} draft={draft} setDraft={setDraft} send={send} micAvailable onMic={() => { setVoice(true); if (speech.supported) speech.start(); }} busy={busy} onStop={chat.stop} />
           )}
-          <p className="mt-2 text-center text-[11px] text-ink-3">{chat.enLigne ? 'Bob peut se tromper : relis avant d’envoyer quoi que ce soit.' : 'Version de démo : Bob répond avec des réponses préparées.'}</p>
+          <p className="mt-2 text-center text-[11px] text-ink-3">{chat.enLigne ? 'Brix AI peut se tromper : relis avant d’envoyer quoi que ce soit.' : 'Version de démo : Brix AI répond avec des réponses préparées.'}</p>
         </footer>
       </section>
     </div>,
@@ -209,7 +209,7 @@ function TextInput({ refEl, draft, setDraft, send, onMic, micAvailable, busy = f
           ref={refEl}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Demande à Bob…"
+          placeholder="Demande à Brix AI…"
           enterKeyHint="send"
           className="h-12 w-full rounded-full bg-white pl-5 pr-12 text-[15px] shadow-[0_1px_2px_rgba(60,30,120,.06),0_0_0_1px_#e6e1f1,0_10px_30px_-16px_rgba(60,30,120,.3)] placeholder:text-ink-3 focus:outline-none focus:shadow-[0_0_0_1px_#c4b5fd,0_0_0_4px_rgba(167,139,250,.22)]"
         />

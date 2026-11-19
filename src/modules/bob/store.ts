@@ -1,4 +1,4 @@
-// Store local du module Bob (persisté) : mémoire, ton, agent de nuit,
+// Store local du module Brix AI (persisté) : mémoire, ton, agent de nuit,
 // secrétaire téléphonique, brief et connexion MCP. Ces réglages vivront côté
 // worker plus tard ; en preview ils restent dans le navigateur.
 
@@ -87,7 +87,7 @@ export function memoryFor(trade: string | undefined, company: { name: string; ho
 }
 
 export const greetingFor = (companyName: string, firstName: string) =>
-  `Bonjour, vous êtes bien chez ${companyName}. ${firstName || 'Le patron'} est sur un chantier, je suis Bob, son assistant. Dites-moi ce dont vous avez besoin, je lui transmets tout de suite.`;
+  `Bonjour, vous êtes bien chez ${companyName}. ${firstName || 'Le patron'} est sur un chantier, je suis Brix AI, son assistant. Dites-moi ce dont vous avez besoin, je lui transmets tout de suite.`;
 
 export const DEFAULT_MEMORY: BobMemory[] = [
   { id: 'm1', kind: 'prix', label: 'Prise 2P+T posée', value: '24,50 € HT la prise + 0,5 h de pose', learnedFrom: '18 devis' },
@@ -124,7 +124,7 @@ export const useBobLocal = create<BobLocalState>()(
       brief: { whatsapp: true, sms: false, hour: '07:00', phone: '06 12 45 78 90' },
       secretary: {
         enabled: true,
-        greeting: 'Bonjour, vous êtes bien chez Benali Électricité. Karim est sur un chantier, je suis Bob, son assistant. Dites-moi ce dont vous avez besoin, je lui transmets tout de suite.',
+        greeting: 'Bonjour, vous êtes bien chez Benali Électricité. Karim est sur un chantier, je suis Brix AI, son assistant. Dites-moi ce dont vous avez besoin, je lui transmets tout de suite.',
         forwardNumber: '',
         forwardAfter: 4,
         hours: { days: 'Du lundi au vendredi', from: '07:30', to: '18:30' },
@@ -174,7 +174,7 @@ export const useBobLocal = create<BobLocalState>()(
   ),
 );
 
-/** Quand l'entreprise ou le métier change (démo, inscription), Bob repart avec une mémoire et un accueil à jour. */
+/** Quand l'entreprise ou le métier change (démo, inscription), Brix AI repart avec une mémoire et un accueil à jour. */
 function syncWithCompany() {
   const { company, user } = useBrix.getState();
   const key = `${company.trade}|${company.name}|${user.firstName}`;

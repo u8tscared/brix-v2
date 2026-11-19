@@ -25,7 +25,7 @@ export function Suggestions({ items, onPick, className = '' }: { items: string[]
 }
 
 function BobMessage({ m, last, thinking, onAction, onOpen, onPick }: { m: ChatMessage; last: boolean; thinking: boolean; onAction: (msgId: string, key: string, a: BobCardAction) => void; onOpen: (to: string) => void; onPick: (s: string) => void }) {
-  // Bob en ligne : le texte arrive déjà au fil de l'eau, pas d'effet machine à écrire.
+  // Brix AI en ligne : le texte arrive déjà au fil de l'eau, pas d'effet machine à écrire.
   const [ready, setReady] = useState(m.flux || typed.has(m.id));
   const writing = m.flux ? !!m.enCours : !ready;
   return (
@@ -72,7 +72,7 @@ export function ChatThread({ messages, thinking, onAction, onOpen, onPick }: {
       clearTimeout(stop);
     };
   }, [messages.length, thinking]);
-  // Bob en ligne : suit le texte diffusé, les pastilles et les cartes qui arrivent.
+  // Brix AI en ligne : suit le texte diffusé, les pastilles et les cartes qui arrivent.
   const tail = messages[messages.length - 1];
   const tailSize = tail?.flux ? tail.text.length + (tail.activites?.length ?? 0) * 1000 + (tail.reply?.cards?.length ?? 0) * 100000 : 0;
   useEffect(() => {
@@ -93,7 +93,7 @@ export function ChatThread({ messages, thinking, onAction, onOpen, onPick }: {
       {thinking && !(lastBob?.flux && lastBob.enCours && messages[messages.length - 1] === lastBob) && (
         <div className="flex animate-fade-in items-center gap-2.5">
           <BobMark size={28} active />
-          <span className="skeleton h-3.5 w-40 rounded-full" aria-label="Bob réfléchit" />
+          <span className="skeleton h-3.5 w-40 rounded-full" aria-label="Brix AI réfléchit" />
         </div>
       )}
       <div ref={end} />

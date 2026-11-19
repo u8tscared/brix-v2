@@ -1,4 +1,4 @@
-// Boucle de conversation de Bob sur l'API Claude (via le worker, POST /api/bob/message).
+// Boucle de conversation de Brix AI sur l'API Claude (via le worker, POST /api/bob/message).
 //
 // envoi → texte diffusé dans le panneau → blocs tool_use exécutés sur le store local
 // (outils/index.ts) → tous les tool_result renvoyés dans UN message utilisateur → on recommence,
@@ -110,7 +110,7 @@ async function lireFlux(res: Response, rappels: Rappels): Promise<Fin> {
     if (ev === 'texte' && typeof data.t === 'string') rappels.texte?.(data.t);
     else if (ev === 'outil' && typeof data.nom === 'string') rappels.outilDemarre?.(data.nom);
     else if (ev === 'fin') fin = { content: (data.content as BetaContentBlock[]) ?? [], stop_reason: (data.stop_reason as string) ?? null };
-    else if (ev === 'erreur') throw new ErreurIA(data.code === 'ia_indisponible' ? 'indisponible' : 'erreur', typeof data.message === 'string' ? data.message : 'Bob n’a pas pu répondre.');
+    else if (ev === 'erreur') throw new ErreurIA(data.code === 'ia_indisponible' ? 'indisponible' : 'erreur', typeof data.message === 'string' ? data.message : 'Brix AI n’a pas pu répondre.');
   };
   for (;;) {
     const { value, done } = await reader.read();
@@ -135,9 +135,9 @@ async function appeler(messages: MessageIA[], contexte: ContexteIA, rappels: Rap
     if (signal?.aborted) throw new ErreurIA('interrompu', 'Arrêté.');
     throw new ErreurIA('indisponible', 'Pas de connexion.');
   }
-  if (res.status === 503 || res.status === 401 || res.status === 404) throw new ErreurIA('indisponible', 'Bob en ligne indisponible.');
+  if (res.status === 503 || res.status === 401 || res.status === 404) throw new ErreurIA('indisponible', 'Brix AI en ligne indisponible.');
   if (!res.ok) {
-    let msg = 'Bob n’a pas pu répondre. Réessaie dans un instant.';
+    let msg = 'Brix AI n’a pas pu répondre. Réessaie dans un instant.';
     try {
       const d = (await res.json()) as { error?: string };
       if (d.error) msg = d.error;
@@ -146,7 +146,7 @@ async function appeler(messages: MessageIA[], contexte: ContexteIA, rappels: Rap
     }
     throw new ErreurIA('erreur', msg);
   }
-  if (!(res.headers.get('content-type') ?? '').includes('event-stream')) throw new ErreurIA('indisponible', 'Bob en ligne indisponible.');
+  if (!(res.headers.get('content-type') ?? '').includes('event-stream')) throw new ErreurIA('indisponible', 'Brix AI en ligne indisponible.');
   return lireFlux(res, rappels);
 }
 
@@ -198,7 +198,7 @@ export async function tourAgent(
     return { statut: 'ok', historique: msgs, texte: texte || 'J’ai fait plusieurs étapes. Dis-moi si je continue.' };
   } catch (e) {
     const statut: Statut = e instanceof ErreurIA ? e.statut : opts.signal?.aborted ? 'interrompu' : 'erreur';
-    const erreur = statut === 'interrompu' ? 'Arrêté.' : e instanceof ErreurIA ? e.message : 'Bob n’a pas pu répondre. Réessaie dans un instant.';
+    const erreur = statut === 'interrompu' ? 'Arrêté.' : e instanceof ErreurIA ? e.message : 'Brix AI n’a pas pu répondre. Réessaie dans un instant.';
     if (statut === 'indisponible') oublierEtatIA(true);
     return { statut, historique: msgs, texte, erreur };
   }

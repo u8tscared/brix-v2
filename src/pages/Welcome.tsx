@@ -88,7 +88,7 @@ export default function Welcome() {
           </div>
           <div className="mt-4 flex flex-col gap-3 border-t border-halo-line pt-4 sm:flex-row sm:items-center">
             <p key={trade} className="min-w-0 flex-1 animate-fade-in px-1 text-[13px] leading-snug text-ink-2">
-              Vous entrez chez <b className="font-semibold text-ink">{demo.name}</b> : ses devis, ses chantiers, son équipe, et Bob qui parle votre métier.
+              Vous entrez chez <b className="font-semibold text-ink">{demo.name}</b> : ses devis, ses chantiers, son équipe, et Brix AI qui parle votre métier.
             </p>
             <Button variant="primary" size="lg" className="shrink-0 justify-center" icon={<Play className="h-4 w-4 fill-current" />} onClick={() => navigate(`/demo?metier=${trade}`)}>
               Essayer la démo
@@ -99,7 +99,7 @@ export default function Welcome() {
         <div className="mx-auto mt-6 grid w-full max-w-[600px] animate-[fade-up_.6s_var(--ease)_.34s_both] grid-cols-3 gap-2 text-left sm:gap-3">
           {[
             { I: Timer, t: '3 minutes', s: 'pour un Brix sur mesure', tone: 'violet' as const },
-            { I: AudioLines, t: 'Bob', s: 'l’assistant qui travaille la nuit', tone: 'mag' as const },
+            { I: AudioLines, t: 'Brix AI', s: 'l’assistant qui travaille la nuit', tone: 'mag' as const },
             { I: ShieldCheck, t: 'Sans engagement', s: 'vous partez quand vous voulez', tone: 'green' as const },
           ].map(({ I, t, s, tone }) => (
             <div key={t} className="glass rounded-card-sm p-3">

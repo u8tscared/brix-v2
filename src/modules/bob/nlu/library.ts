@@ -1,4 +1,4 @@
-// Bibliothèque d'ouvrages que Bob connaît pour chiffrer un devis dicté.
+// Bibliothèque d'ouvrages que Brix AI connaît pour chiffrer un devis dicté.
 // Prix HT fournis-posés « moyens » d'un artisan en région lyonnaise (2026),
 // remplacés par la mémoire de prix quand l'artisan en a une.
 

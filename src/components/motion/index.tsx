@@ -200,7 +200,7 @@ export function LiveDot({ className, tone = 'ok' }: { className?: string; tone?:
   );
 }
 
-/** Texte qui défile lettre par lettre (réponses de Bob). */
+/** Texte qui défile lettre par lettre (réponses de Brix AI). */
 export function Typewriter({ text, speed = 14, className, onDone }: { text: string; speed?: number; className?: string; onDone?: () => void }) {
   const [n, setN] = useState(prefersReducedMotion() ? text.length : 0);
   useEffect(() => {

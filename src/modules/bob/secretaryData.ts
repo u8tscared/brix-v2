@@ -29,7 +29,7 @@ export function callsFor(trade: string | undefined, company: string, boss: strin
       summary: u.summary,
       outcome: 'Prévenu par SMS · rappel promis avant 14 h', outcomeIcon: 'BellRing',
       transcript: [
-        { who: 'bob', text: `Bonjour, ${company}, je suis Bob, l’assistant de ${who}. Il est sur un chantier : dites-moi tout, je lui transmets tout de suite.` },
+        { who: 'bob', text: `Bonjour, ${company}, je suis Brix AI, l’assistant de ${who}. Il est sur un chantier : dites-moi tout, je lui transmets tout de suite.` },
         { who: 'client', text: `Oui bonjour, c’est ${u.name}. ${u.say}` },
         { who: 'bob', text: u.ask },
         { who: 'client', text: u.answer },
@@ -43,7 +43,7 @@ export function callsFor(trade: string | undefined, company: string, boss: strin
       summary: v.visit.summary,
       outcome: 'Visite réservée jeudi à 17 h 30', outcomeIcon: 'CalendarCheck',
       transcript: [
-        { who: 'bob', text: `Bonjour, ${company}, je suis Bob, l’assistant de ${who}. Que puis-je faire pour vous ?` },
+        { who: 'bob', text: `Bonjour, ${company}, je suis Brix AI, l’assistant de ${who}. Que puis-je faire pour vous ?` },
         { who: 'client', text: `Bonjour. ${v.visit.say}` },
         { who: 'bob', text: `Très bien. ${who} peut passer voir ça jeudi à 17 h 30 ou vendredi à 8 h. Qu’est-ce qui vous arrange ?` },
         { who: 'client', text: 'Jeudi 17 h 30 c’est parfait. C’est au 8 rue Anatole France à Villeurbanne.' },
@@ -56,14 +56,14 @@ export function callsFor(trade: string | undefined, company: string, boss: strin
       summary: 'Demande où en est la cage C et si l’avenant est prêt.',
       outcome: 'Avenant à envoyer · rappel demandé demain matin', outcomeIcon: 'FileText',
       transcript: [
-        { who: 'bob', text: `Bonjour, ${company}, je suis Bob. ${who} est sur un chantier, je peux prendre un message ?` },
+        { who: 'bob', text: `Bonjour, ${company}, je suis Brix AI. ${who} est sur un chantier, je peux prendre un message ?` },
         { who: 'client', text: 'Oui c’est Marc Roche de la SCI, je voulais savoir où vous en êtes sur la cage C, et pour l’avenant.' },
         { who: 'bob', text: `La cage C est prévue jeudi et vendredi. Je dis à ${who} de vous envoyer l’avenant et de vous rappeler demain matin.` },
       ],
     },
     {
       id: 'call4', name: 'Numéro masqué', phone: 'Masqué', when: 'Hier', time: '10:03', duration: '0 min 21', urgency: 'info',
-      summary: 'Démarchage pour un contrat d’énergie. Bob a poliment décliné.',
+      summary: 'Démarchage pour un contrat d’énergie. Brix AI a poliment décliné.',
       outcome: 'Aucune suite à donner', outcomeIcon: 'ShieldCheck',
       transcript: [
         { who: 'client', text: 'Bonjour, je vous appelle au sujet de votre contrat d’électricité professionnel…' },

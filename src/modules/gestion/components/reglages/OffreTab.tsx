@@ -67,13 +67,13 @@ export default function OffreTab() {
       <Card className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center md:p-5">
         <IconTile name="Plug" dept="bob" size="md" />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 text-[14px] font-semibold">Option Brix AI MCP <Badge tone="violet">Nouveau</Badge></div>
+          <div className="flex items-center gap-2 text-[14px] font-semibold">Option « Connecter une IA » <Badge tone="violet">Nouveau</Badge></div>
           <p className="text-[12.5px] text-ink-2">
             Interrogez Brix depuis Claude ou ChatGPT, et préparez des brouillons. {plan === 'equipe' || plan === 'entreprise' ? 'Inclus dans votre offre.' : plan === 'pro' ? '9 € HT par mois en plus de l’offre Pro.' : 'Disponible à partir de l’offre Pro.'}
           </p>
         </div>
         {plan === 'pro' ? (
-          <Switch checked={mcp.mcpAddon} onChange={(v) => { setMcp({ mcpAddon: v }); toast(v ? 'Option Brix AI MCP ajoutée : 9 € HT par mois.' : 'Option retirée.'); }} label="Option Brix AI MCP" />
+          <Switch checked={mcp.mcpAddon} onChange={(v) => { setMcp({ mcpAddon: v }); toast(v ? 'Option « Connecter une IA » ajoutée : 9 € HT par mois.' : 'Option retirée.'); }} label="Option « Connecter une IA »" />
         ) : (
           <Badge tone={plan === 'start' ? 'neutral' : 'ok'}>{plan === 'start' ? 'Offre Pro requise' : 'Inclus'}</Badge>
         )}

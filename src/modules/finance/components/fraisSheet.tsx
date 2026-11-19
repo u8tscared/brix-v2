@@ -6,7 +6,7 @@ import type { Expense } from '@/lib/types';
 import { FRAIS_CATEGORIES, readReceipt, type ReceiptSample } from './fraisService';
 import { ReceiptScan } from './frais/ReceiptScan';
 
-/** Saisie d'une note de frais : depuis une photo (lecture par Bob) ou à la main, ou modification. */
+/** Saisie d'une note de frais : depuis une photo (lecture par Brix AI) ou à la main, ou modification. */
 export function FraisSheet({ open, onClose, file, sample, initial, photos, setPhoto }: { open: boolean; onClose: () => void; file: File | null; sample?: ReceiptSample; initial?: Expense; photos: Record<string, string>; setPhoto: (id: string, url: string) => void }) {
   const s = useBrix();
   const me = s.employees.find((e) => e.role === 'patron') ?? s.employees[0];
@@ -67,7 +67,7 @@ export function FraisSheet({ open, onClose, file, sample, initial, photos, setPh
       }>
       <div className="space-y-4">
         {(preview || (sample && !initial)) && <ReceiptScan preview={preview} sample={sample} reading={reading} read={read} date={x.date} />}
-        {read && <p className="animate-[fade-up_.4s_var(--ease)_.6s_both] text-[12.5px] text-ink-2">Bob a rempli la note. Vérifiez le montant, puis enregistrez.</p>}
+        {read && <p className="animate-[fade-up_.4s_var(--ease)_.6s_both] text-[12.5px] text-ink-2">Brix AI a rempli la note. Vérifiez le montant, puis enregistrez.</p>}
         <Field label="Fournisseur"><Input value={x.supplier} disabled={reading} onChange={(e) => set({ supplier: e.target.value })} placeholder="Total, Leroy Merlin…" /></Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Montant TTC"><Input type="number" inputMode="decimal" step="0.01" disabled={reading} value={x.amountTtc || ''} onChange={(e) => set({ amountTtc: Number(e.target.value) })} suffix="€" /></Field>

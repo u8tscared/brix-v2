@@ -1,4 +1,4 @@
-// « Encaissé ce mois » : une seule source pour l'accueil et Bob (audit #10).
+// « Encaissé ce mois » : une seule source pour l'accueil et Brix AI (audit #10).
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useBrix } from '@/lib/store';
 import { todayISO } from '@/lib/format';
@@ -9,7 +9,7 @@ import { encaisseDuMois } from './encaisse';
 beforeEach(() => useBrix.getState().loadDemo('electricien'));
 
 describe('encaissé ce mois', () => {
-  it('Bob donne le même total que l’accueil', () => {
+  it('Brix AI donne le même total que l’accueil', () => {
     const s = useBrix.getState();
     const accueil = encaisseDuMois(s.factures, useFactures.getState().payments, todayISO()).total;
     const bob = encaissements(s, 'mois').total;

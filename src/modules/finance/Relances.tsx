@@ -75,7 +75,7 @@ export default function Relances() {
       n++;
     }
     setBulk(false);
-    toast(n ? `${n} relance${n > 1 ? 's' : ''} envoyée${n > 1 ? 's' : ''}, Bob suit les réponses` : 'Les mises en demeure attendent votre validation', n ? 'ok' : 'info');
+    toast(n ? `${n} relance${n > 1 ? 's' : ''} envoyée${n > 1 ? 's' : ''}, Brix AI suit les réponses` : 'Les mises en demeure attendent votre validation', n ? 'ok' : 'info');
     setTimeout(() => setBusy({}), 2400);
   };
 
@@ -86,7 +86,7 @@ export default function Relances() {
         kicker="Facturer et encaisser"
         title="Relances"
         titleMuted={late.length ? 'poliment, au bon moment.' : 'tout le monde est à jour.'}
-        subtitle="Bob relance pour vous, poliment et au bon moment. Vous gardez la main."
+        subtitle="Brix AI relance pour vous, poliment et au bon moment. Vous gardez la main."
         actions={
           late.length > 0 && (
             <Button variant="dawn" loading={bulk} icon={<BellRing />} onClick={remindAll} className="w-full sm:w-auto">
@@ -103,7 +103,7 @@ export default function Relances() {
           <BigMoney value={lateSum} className={cn('mt-1.5 block text-[40px] md:text-[48px]', late.length && 'text-deep-r')} />
           <div className="mt-2 text-[12.5px] text-ink-2">{late.length} facture{late.length > 1 ? 's' : ''} · {avgLate} j de retard en moyenne</div>
         </Card>
-        <Mini icon={<Send />} tone="violet" label="Relances ce mois" value={String(sentThisMonth)} sub={`dont ${fx.reminders.filter((r) => r.by === 'bob' && r.at.startsWith(month)).length} par Bob`} />
+        <Mini icon={<Send />} tone="violet" label="Relances ce mois" value={String(sentThisMonth)} sub={`dont ${fx.reminders.filter((r) => r.by === 'bob' && r.at.startsWith(month)).length} par Brix AI`} />
         <Mini icon={<Wallet />} tone="green" label="Récupéré grâce aux relances" value={money(recovered, true)} sub="ce mois-ci" ok={recovered > 0} />
         <Mini icon={<CalendarClock />} tone="peach" label="À échéance cette semaine" value={String(soon.length)} sub={soon.length ? money(soon.reduce((t, f) => t + amounts(f).remaining, 0), true) : 'rien à signaler'} className="max-lg:col-span-2" />
       </div>
@@ -202,7 +202,7 @@ export default function Relances() {
                             {paid && <span className="chip tone-green !h-[22px] !px-2 !text-[11.5px]"><Check className="!h-3 !w-3" />payée depuis</span>}
                           </div>
                           <div className="text-[12px] text-ink-3">
-                            {r.by === 'bob' ? 'Par Bob' : 'Par vous'} · {dateShort(r.at.slice(0, 10))} à {r.at.slice(11, 16)} · {f?.number}
+                            {r.by === 'bob' ? 'Par Brix AI' : 'Par vous'} · {dateShort(r.at.slice(0, 10))} à {r.at.slice(11, 16)} · {f?.number}
                           </div>
                           <p className="mt-1 line-clamp-2 text-[12.5px] leading-relaxed text-ink-2">{r.text}</p>
                         </div>

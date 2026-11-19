@@ -61,7 +61,7 @@ export default function IntegrationsTab() {
         <IconTile name="Plug" dept="bob" size="md" />
         <div className="min-w-0 flex-1">
           <div className="text-[14px] font-semibold">Assistants IA (Claude, ChatGPT)</div>
-          <p className="text-[12.5px] text-ink-2">Interrogez Brix depuis votre assistant et préparez des brouillons avec Brix AI MCP.</p>
+          <p className="text-[12.5px] text-ink-2">Interrogez Brix depuis votre assistant et préparez des brouillons avec « Connecter une IA ».</p>
         </div>
         <ArrowRight className="h-4 w-4 shrink-0 text-ink-3 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-ink" />
       </Link>

@@ -65,7 +65,7 @@ export function regle(sujet: string) {
   return { lesson: l, contenu: { sujet: l.key, titre: l.card.title, sous_titre: l.card.subtitle ?? null, points: l.card.bullets ?? l.card.paragraphs ?? [], source: l.card.source ?? null } };
 }
 
-/** Écrans que Bob peut ouvrir (chemins de src/modules/registry.tsx, hors réglages internes). */
+/** Écrans que Brix AI peut ouvrir (chemins de src/modules/registry.tsx, hors réglages internes). */
 export const ECRANS: Record<string, { chemin: string; label: string; detail?: 'client' | 'devis' | 'facture' | 'chantier' }> = {
   accueil: { chemin: '/app', label: 'l’accueil' },
   demandes: { chemin: '/app/demandes', label: 'les demandes' },
@@ -94,7 +94,7 @@ export const ECRANS: Record<string, { chemin: string; label: string; detail?: 'c
   stock: { chemin: '/app/stock', label: 'le stock' },
   vehicules: { chemin: '/app/vehicules', label: 'les véhicules' },
   sous_traitants: { chemin: '/app/sous-traitants', label: 'les sous-traitants' },
-  bob: { chemin: '/app/bob', label: 'les réglages de Bob' },
+  bob: { chemin: '/app/bob', label: 'les réglages de Brix AI' },
   brief: { chemin: '/app/bob/brief', label: 'le brief du matin' },
   outils: { chemin: '/app/outils', label: 'les outils métier' },
   calcul_nfc15100: { chemin: '/app/outils/nfc15100', label: 'le calcul NF C 15-100' },

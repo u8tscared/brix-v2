@@ -33,7 +33,7 @@ function mood(late: number, h = new Date().getHours()) {
 
 /**
  * Accueil Halo. L'objectif du mois en grand (anneau qui se ferme), trois cartes chiffrées,
- * puis la journée : agenda, rappel de Bob, choses à faire, devis, chantiers et équipe.
+ * puis la journée : agenda, rappel de Brix AI, choses à faire, devis, chantiers et équipe.
  * Ordinateur : colonne principale + colonne de 360 px. Téléphone : une seule pile pensée pour le pouce.
  */
 export default function Cockpit() {
@@ -68,7 +68,7 @@ export default function Cockpit() {
               </span>
             )}
             <Button variant="secondary" icon={<Mic />} kbd="⌘J" onClick={() => ui.askBob('', true)}>
-              Parler à Bob
+              Parler à Brix AI
             </Button>
             <Button variant="dawn" icon={<Plus />} kbd="N" onClick={() => navigate('/app/devis/nouveau')}>
               Nouveau devis
@@ -83,12 +83,12 @@ export default function Cockpit() {
         <EmptyState
           icon={<FileText />}
           title="Votre accueil se remplira tout seul"
-          text="Commencez par un devis : dites-le à Bob ou tapez-le. Dès qu’il est signé, le chantier, la facture d’acompte et le planning se créent."
+          text="Commencez par un devis : dites-le à Brix AI ou tapez-le. Dès qu’il est signé, le chantier, la facture d’acompte et le planning se créent."
           className="py-16"
           action={
             <div className="flex flex-col justify-center gap-2 sm:flex-row">
               <Button size="lg" icon={<Mic />} onClick={() => ui.askBob('', true)}>
-                Dicter à Bob
+                Dicter à Brix AI
               </Button>
               <Button variant="dawn" size="lg" icon={<Plus />} onClick={() => navigate('/app/devis/nouveau')}>
                 Nouveau devis

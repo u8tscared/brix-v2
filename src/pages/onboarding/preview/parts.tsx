@@ -98,7 +98,7 @@ export function PreviewDevis({ d, lines = 4, compact }: { d: Draft; lines?: numb
   );
 }
 
-/** Vocabulaire du métier que Brix comprend (devis, dictée, Bob). */
+/** Vocabulaire du métier que Brix comprend (devis, dictée, Brix AI). */
 export function PreviewVocab({ d }: { d: Draft }) {
   const key = d.trade ?? 'autre';
   const extra = d.secondary.flatMap((k) => PROFILS[k].vocab.slice(0, 1));

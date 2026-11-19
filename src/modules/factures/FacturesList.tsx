@@ -94,9 +94,9 @@ export default function FacturesList() {
   });
 
   const subtitle = late.length
-    ? `${late.length} facture${late.length > 1 ? 's' : ''} en retard. Bob relance pour vous, ou en un clic ici.`
+    ? `${late.length} facture${late.length > 1 ? 's' : ''} en retard. Brix AI relance pour vous, ou en un clic ici.`
     : pending.length
-      ? 'Vos clients sont dans les temps. Bob relancera tout seul si une échéance passe.'
+      ? 'Vos clients sont dans les temps. Brix AI relancera tout seul si une échéance passe.'
       : 'Facturez un devis signé en deux clics, la facture électronique est incluse.';
 
   return (
@@ -153,7 +153,7 @@ export default function FacturesList() {
           <EmptyState
             icon={filter === 'en_retard' ? <ReceiptText /> : <FilePlus2 />}
             title={filter === 'en_retard' ? 'Aucune facture en retard' : needle ? 'Aucune facture trouvée' : 'Aucune facture ici'}
-            text={filter === 'en_retard' ? 'Tous vos clients sont à jour. Bob surveille les échéances pour vous.' : needle ? 'Essayez un autre mot ou retirez le filtre.' : 'Créez une facture en partant de zéro ou depuis un devis signé, en moins d’une minute.'}
+            text={filter === 'en_retard' ? 'Tous vos clients sont à jour. Brix AI surveille les échéances pour vous.' : needle ? 'Essayez un autre mot ou retirez le filtre.' : 'Créez une facture en partant de zéro ou depuis un devis signé, en moins d’une minute.'}
             action={
               needle || filter !== 'toutes' ? (
                 <Button onClick={() => (setQ(''), setFilter('toutes'))}>Tout afficher</Button>

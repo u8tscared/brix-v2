@@ -1,5 +1,5 @@
 // Source unique de « l'argent encaissé » sur une période : les paiements reçus sur les factures
-// (saisis dans Brix, ou reconstitués depuis le montant réglé). Utilisé par l'accueil, l'écran Factures et Bob.
+// (saisis dans Brix, ou reconstitués depuis le montant réglé). Utilisé par l'accueil, l'écran Factures et Brix AI.
 import type { Facture } from '@/lib/types';
 import { allPayments } from '../store';
 import type { Payment } from './model';

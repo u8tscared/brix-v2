@@ -1,5 +1,5 @@
-// Conversation en cours avec Bob (en mémoire : les cartes contiennent des actions).
-// Bob en ligne (agent.ts, API Claude via le worker) quand le worker le propose ;
+// Conversation en cours avec Brix AI (en mémoire : les cartes contiennent des actions).
+// Brix AI en ligne (agent.ts, API Claude via le worker) quand le worker le propose ;
 // sinon, et sans rien afficher, le moteur local (engine.ts).
 
 import { create } from 'zustand';
@@ -24,7 +24,7 @@ export interface ChatMessage {
   reply?: BobReply;
   /** Résultat d'une action déjà jouée sur une carte (clé : index carte + libellé). */
   done?: Record<string, string>;
-  /** Réponse de Bob en ligne : texte diffusé au fil de l'eau (pas d'effet machine à écrire). */
+  /** Réponse de Brix AI en ligne : texte diffusé au fil de l'eau (pas d'effet machine à écrire). */
   flux?: boolean;
   enCours?: boolean;
   activites?: Activite[];
@@ -36,7 +36,7 @@ interface ChatState {
   messages: ChatMessage[];
   thinking: boolean;
   memo: EngineContext['memo'];
-  /** Conversation au format de l'API (blocs complets), pour Bob en ligne. */
+  /** Conversation au format de l'API (blocs complets), pour Brix AI en ligne. */
   historique: MessageIA[];
   enLigne: boolean;
   send: (text: string, pathname: string, voix?: boolean) => Promise<BobReply>;
@@ -73,7 +73,7 @@ export const useChat = create<ChatState>((set, get) => {
   const patch = (msgId: string, f: (m: ChatMessage) => Partial<ChatMessage>) => set((s) => ({ messages: s.messages.map((m) => (m.id === msgId ? { ...m, ...f(m) } : m)) }));
 
   const local = async (text: string, pathname: string): Promise<BobReply> => {
-    // Petit délai réaliste : Bob « réfléchit ».
+    // Petit délai réaliste : Brix AI « réfléchit ».
     await new Promise((r) => setTimeout(r, 450 + Math.min(700, text.length * 12)));
     let reply: BobReply;
     try {

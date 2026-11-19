@@ -7,8 +7,8 @@ import { devisExample } from '@/modules/bob/tradeExamples';
 
 const buildSteps = (trade: string, solo: boolean) => [
   { icon: Hand, title: 'Bienvenue dans votre Brix', text: "Tout ce que vous avez choisi est prêt. Cette visite dure 30 secondes, et vous pouvez la relancer à tout moment dans Réglages." },
-  { icon: AudioLines, title: 'Parlez à Bob', text: `Le gros bouton micro, c'est Bob. Dites « ${devisExample(trade).replace(/^F/, 'f')} » : il le prépare, vous validez.` },
-  { icon: FileText, title: 'Un devis en 2 minutes', text: 'Chaque devis se remplit à la voix, depuis la bibliothèque de prix, ou depuis la prise de cotes. Bob vérifie les oublis et la marge avant l\'envoi.' },
+  { icon: AudioLines, title: 'Parlez à Brix AI', text: `Le gros bouton micro, c'est Brix AI. Dites « ${devisExample(trade).replace(/^F/, 'f')} » : il le prépare, vous validez.` },
+  { icon: FileText, title: 'Un devis en 2 minutes', text: 'Chaque devis se remplit à la voix, depuis la bibliothèque de prix, ou depuis la prise de cotes. Brix AI vérifie les oublis et la marge avant l\'envoi.' },
   { icon: LayoutGrid, title: 'Vos outils, rangés par département', text: solo ? 'Vendre, Facturer, Chantiers, vos outils de calcul… Vous ne voyez que ce que vous utilisez. Ajoutez un outil quand vous en avez besoin.' : 'Vendre, Facturer, Chantiers, Équipe, Achats… Vous ne voyez que ce que vous utilisez. Ajoutez un outil quand vous en avez besoin.' },
   { icon: Search, title: 'Tout trouver en 2 touches', text: 'Sur ordinateur, ⌘K (ou Ctrl K) cherche un client, un devis ou un outil. Sur téléphone, la loupe en haut fait pareil.' },
 ];

@@ -1,5 +1,5 @@
 /**
- * Limites d'usage de Bob, comptées dans D1 (table bob_quota).
+ * Limites d'usage de Brix AI, comptées dans D1 (table bob_quota).
  * - Compte connecté : 300 questions par jour et par entreprise (+ plafond d'appels, boucle d'outils comprise).
  * - Démo ouverte : 20 questions par heure et par adresse IP (+ plafond d'appels).
  * Une « question » est un message tapé ou dicté ; les allers-retours d'outils comptent seulement

@@ -14,7 +14,7 @@ const TABS = [
 
 /**
  * Barre d'onglets du téléphone (Halo) : pilule de verre qui flotte au-dessus du contenu, 4 onglets,
- * une pastille blanche qui glisse (ressort) sous l'onglet actif, et le micro de Bob au centre.
+ * une pastille blanche qui glisse (ressort) sous l'onglet actif, et le micro de Brix AI au centre.
  */
 export function MobileNav() {
   const ui = useUI();
@@ -47,7 +47,7 @@ export function MobileNav() {
           </button>
           <button
             onClick={() => ui.askBob('', true)}
-            aria-label="Parler à Bob"
+            aria-label="Parler à Brix AI"
             className="group absolute left-1/2 top-1/2 grid h-[52px] w-[52px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-night text-white shadow-[0_10px_24px_-8px_rgba(19,15,38,.6),0_0_0_4px_rgba(255,255,255,.9)] transition duration-300 ease-spring active:scale-90"
           >
             <span aria-hidden className="absolute inset-[-4px] rounded-full bg-dawn-diag opacity-0 blur-[3px] transition group-active:opacity-70" />

@@ -1,5 +1,5 @@
 /**
- * Définitions des outils de Bob (exécutés côté navigateur, sur les données locales de l'artisan :
+ * Définitions des outils de Brix AI (exécutés côté navigateur, sur les données locales de l'artisan :
  * src/modules/bob/outils/index.ts). Les noms, écrans et sujets doivent rester alignés avec le front
  * (un test le vérifie : src/modules/bob/outils/outils.test.ts).
  *

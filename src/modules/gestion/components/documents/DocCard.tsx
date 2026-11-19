@@ -67,7 +67,7 @@ export function DocCard({ d, selecting, picked, fresh, fetching, onOpen, onDropF
           ) : (
             <Badge tone={st.tone} dot>{st.label}</Badge>
           )}
-          {d.auto && !fresh && <span className="text-[11.5px] text-ink-3">· récupéré par Bob</span>}
+          {d.auto && !fresh && <span className="text-[11.5px] text-ink-3">· récupéré par Brix AI</span>}
         </div>
       </div>
       {!selecting && (

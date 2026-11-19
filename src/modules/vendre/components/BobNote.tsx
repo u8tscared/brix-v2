@@ -3,10 +3,10 @@ import { BrandTile } from '@/components/brand/Logo';
 import { cn } from '@/components/ui';
 
 /**
- * Note de Bob, version Halo : carte blanche qui rosit, tuile B Aube, ton calme.
+ * Note de Brix AI, version Halo : carte blanche qui rosit, tuile B Aube, ton calme.
  * Remplace les anciennes bannières sombres (partagée par Vendre, Gestion, Visibilité, Achats).
  */
-export function BobNote({ children, action, className, title = 'Bob' }: { children: ReactNode; action?: ReactNode; className?: string; title?: ReactNode }) {
+export function BobNote({ children, action, className, title = 'Brix AI' }: { children: ReactNode; action?: ReactNode; className?: string; title?: ReactNode }) {
   return (
     <div className={cn('relative isolate flex flex-wrap items-start gap-3.5 overflow-hidden rounded-card bg-dawn-mist px-4 py-4 shadow-halo md:flex-nowrap md:items-center md:px-5', className)}>
       <div aria-hidden className="pointer-events-none absolute -right-10 -top-16 -z-10 h-40 w-64 rounded-full bg-[radial-gradient(closest-side,#f8dcf6,transparent)] opacity-80 blur-xl" />

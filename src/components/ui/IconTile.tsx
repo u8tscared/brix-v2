@@ -47,7 +47,7 @@ const sizes = {
 
 /**
  * Icône sur pastille teintée. `dept` pour la couleur du domaine, ou `tone` pour un ton Halo libre.
- * `solid` = version pleine (dégradé de la teinte, icône blanche) ; `dawn` = pastille dégradé Aube (rare : Brix, Bob).
+ * `solid` = version pleine (dégradé de la teinte, icône blanche) ; `dawn` = pastille dégradé Aube (rare : Brix, Brix AI).
  */
 export function IconTile({ name, icon, dept = 'vendre', tone, size = 'md', solid, dawn, className }: { name?: string; icon?: ReactNode; dept?: DepartmentKey; tone?: HaloTone; size?: keyof typeof sizes; solid?: boolean; dawn?: boolean; className?: string }) {
   const t = tone ? HALO_TONE[tone] : DEPT_TONE[dept];

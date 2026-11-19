@@ -163,7 +163,7 @@ export function SendSheet({ open, onClose, d, client, company, user, meta, check
                     <Input value={subject} onChange={(e) => setSubject(e.target.value)} />
                   </Field>
                 )}
-                <Field label="Message" hint="Préparé par Bob, modifiable. Le lien de signature est ajouté automatiquement.">
+                <Field label="Message" hint="Préparé par Brix AI, modifiable. Le lien de signature est ajouté automatiquement.">
                   <Textarea value={message} onChange={(e) => setMessage(e.target.value)} className={channel === 'email' ? 'min-h-[220px]' : 'min-h-[120px]'} />
                 </Field>
                 <button onClick={() => setOptions((o) => !o)} className="flex h-11 w-full items-center justify-between rounded-full px-4 text-[13px] font-medium text-ink-2 shadow-[0_0_0_1px_#ece8f6] transition hover:bg-white hover:text-ink">

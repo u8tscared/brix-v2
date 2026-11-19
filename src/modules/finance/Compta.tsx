@@ -133,7 +133,7 @@ export default function Compta() {
           <IconTile icon={<Percent />} tone="indigo" />
           <Label className="mt-4">TVA de {monthName(now)}</Label>
           <BigMoney value={Math.max(0, vat.due)} cents dawn className="mt-1.5 block text-[40px] md:text-[48px]" />
-          <div className="mt-2 text-[12.5px] text-ink-2">à déclarer avant le {dueDay} · Bob a tout calculé</div>
+          <div className="mt-2 text-[12.5px] text-ink-2">à déclarer avant le {dueDay} · Brix AI a tout calculé</div>
           <div className="mt-5 space-y-2.5 text-[13px]">
             <div className="flex justify-between gap-3"><span className="text-ink-2">Encaissée sur vos factures</span><span className="num font-medium">{money(vat.collected)}</span></div>
             <div className="flex justify-between gap-3"><span className="text-ink-2">Récupérable sur vos achats et frais</span><span className="num font-medium text-deep-g">− {money(vat.deductible)}</span></div>

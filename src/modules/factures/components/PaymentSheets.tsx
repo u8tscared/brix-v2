@@ -65,7 +65,7 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
           text={
             done.left > 0 ? (
               <>
-                {money(done.amount)} reçus. Il reste <b className="font-medium text-ink">{money(done.left)}</b> à encaisser, Bob continue de suivre l’échéance.
+                {money(done.amount)} reçus. Il reste <b className="font-medium text-ink">{money(done.left)}</b> à encaisser, Brix AI continue de suivre l’échéance.
               </>
             ) : (
               <>
@@ -106,7 +106,7 @@ export function RecordPaymentSheet({ f, open, onClose }: { f: Facture; open: boo
         <Field label="Date de réception">
           <Input type="date" value={date} max={todayISO()} onChange={(e) => setDate(e.target.value)} />
         </Field>
-        {partial && <p className="rounded-field bg-pale-a px-3.5 py-2.5 text-[12.5px] text-deep-a">Il restera {money(a.remaining - amount)} à encaisser. Bob continuera de suivre l’échéance.</p>}
+        {partial && <p className="rounded-field bg-pale-a px-3.5 py-2.5 text-[12.5px] text-deep-a">Il restera {money(a.remaining - amount)} à encaisser. Brix AI continuera de suivre l’échéance.</p>}
       </div>
       )}
     </Sheet>

@@ -1,4 +1,4 @@
-// Frise « comment Bob relance » : l'échéance, puis chaque étape du scénario.
+// Frise « comment Brix AI relance » : l'échéance, puis chaque étape du scénario.
 // Les clients en retard sont posés sur la frise, à leur nombre de jours de retard.
 import { CalendarClock, Mail, MessageSquareText, Stamp } from 'lucide-react';
 import { Avatar, Card, cn, Tip } from '@/components/ui';
@@ -10,7 +10,7 @@ import { daysLate } from '@/modules/factures/lib/model';
 import { useFactures } from '@/modules/factures/store';
 
 const ICON = { email: Mail, sms: MessageSquareText, courrier: Stamp };
-const WHAT = { email: 'Un mail poli avec le lien de paiement', sms: 'Un SMS court, le lien en un appui', courrier: 'Bob prépare la lettre, vous la validez' };
+const WHAT = { email: 'Un mail poli avec le lien de paiement', sms: 'Un SMS court, le lien en un appui', courrier: 'Brix AI prépare la lettre, vous la validez' };
 
 export function RelanceTimeline({ late }: { late: Facture[] }) {
   const fx = useFactures();
@@ -30,7 +30,7 @@ export function RelanceTimeline({ late }: { late: Facture[] }) {
   return (
     <Card className="overflow-hidden">
       <div className="flex flex-wrap items-baseline justify-between gap-2 px-4 pt-4 md:px-5">
-        <h2 className="text-[16px] font-semibold tracking-[-0.025em]">Comment Bob relance</h2>
+        <h2 className="text-[16px] font-semibold tracking-[-0.025em]">Comment Brix AI relance</h2>
         <span className={cn('chip', fx.relanceAuto ? 'tone-green' : 'tone-neutral')}>{fx.relanceAuto ? 'Automatique, tous les jours à 9 h' : 'En pause : rien ne part sans vous'}</span>
       </div>
 

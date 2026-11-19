@@ -1,5 +1,5 @@
-// Moteur d'intentions local de Bob (sans réseau). Il comprend le français courant et AGIT
-// sur le store. C'est le secours hors ligne de Bob en ligne (agent.ts, API Claude via le
+// Moteur d'intentions local de Brix AI (sans réseau). Il comprend le français courant et AGIT
+// sur le store. C'est le secours hors ligne de Brix AI en ligne (agent.ts, API Claude via le
 // worker) : les deux partagent la même logique métier (outils/*.ts).
 
 import { useBrix } from '@/lib/store';
@@ -27,7 +27,7 @@ const NAV: [RegExp, string, string][] = [
 
 const trade = () => useBrix.getState().company.trade;
 
-/** Ce que Bob sait faire, avec des exemples dans les mots du métier. */
+/** Ce que Brix AI sait faire, avec des exemples dans les mots du métier. */
 export const capabilities = () => [
   { icon: 'FileText', title: 'Faire un devis', example: devisExample(trade()) },
   { icon: 'Wallet', title: 'Suivre l’argent', example: 'Combien j’ai encaissé ce mois ?' },

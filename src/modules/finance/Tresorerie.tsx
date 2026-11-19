@@ -44,7 +44,7 @@ export default function Tresorerie() {
     useBrix.setState((x) => ({ cashBalance: x.cashBalance + txs.reduce((a, t) => a + t.amount, 0) }));
     setSyncing(false);
     if (!txs.length) toast('Tout est à jour', 'info');
-    else toast(`${txs.length} nouvelles opérations${matched ? `, ${matched} paiement${matched > 1 ? 's' : ''} reconnu${matched > 1 ? 's' : ''} par Bob` : ''}`);
+    else toast(`${txs.length} nouvelles opérations${matched ? `, ${matched} paiement${matched > 1 ? 's' : ''} reconnu${matched > 1 ? 's' : ''} par Brix AI` : ''}`);
   };
 
   const tva = f.nextTva;

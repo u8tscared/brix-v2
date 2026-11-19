@@ -46,7 +46,7 @@ export function resoudreClient(s: Etat, raw: string): { client: Client; created:
   if (!name) return null;
   const found = trouverClient(s, name);
   if (found) return { client: found, created: false };
-  return { client: nouveauClient(name, {}, ['Ajouté par Bob']), created: true };
+  return { client: nouveauClient(name, {}, ['Ajouté par Brix AI']), created: true };
 }
 
 export interface ArticleDemande {
@@ -56,7 +56,7 @@ export interface ArticleDemande {
   prix_unitaire_ht?: number | null;
 }
 
-/** Chiffre une ligne : bibliothèque de Bob, puis bibliothèque de prix Brix, sinon prix à compléter. */
+/** Chiffre une ligne : bibliothèque de Brix AI, puis bibliothèque de prix Brix, sinon prix à compléter. */
 export function ligneDepuisArticle(a: ArticleDemande, vat: number): { line: DevisLigne; hours: number; connu: boolean } {
   const qty = a.quantite > 0 ? a.quantite : 1;
   const it = findItem(a.libelle);
@@ -104,7 +104,7 @@ export function enregistrerDevis(s: Etat, client: Client, created: boolean, line
   const title = titre?.trim() || (nouns.length ? capitalize(nouns.slice(0, 3).join(', ').replace(/, ([^,]*)$/, ' et $1')) : 'Nouveau devis');
   const sections: DevisLigne[] = lines.length ? [{ id: uid('l'), kind: 'section', designation: 'Travaux', quantity: 0, unit: '', unitPriceHt: 0, unitCostHt: 0, vatRate: 0 }, ...lines] : [];
   const devis: Devis = {
-    id: uid('q'), number: s.nextNumber('devis'), clientId: client.id, title, status: 'brouillon', createdAt: todayISO(), validityDays: 30, depositPercent: client.kind === 'pro' ? 40 : 30, lines: sections, notes: 'Préparé par Bob à partir de ta demande.',
+    id: uid('q'), number: s.nextNumber('devis'), clientId: client.id, title, status: 'brouillon', createdAt: todayISO(), validityDays: 30, depositPercent: client.kind === 'pro' ? 40 : 30, lines: sections, notes: 'Préparé par Brix AI à partir de ta demande.',
   };
   s.upsertDevis(devis);
   const t = totals(devis.lines);

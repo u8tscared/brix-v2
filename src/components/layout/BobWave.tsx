@@ -1,6 +1,6 @@
 import { cn } from '@/components/ui';
 
-/** Signature visuelle de Bob : 4 barres d'onde. Elles bougent quand Bob a quelque chose à dire. */
+/** Signature visuelle de Brix AI : 4 barres d'onde. Elles bougent quand Brix AI a quelque chose à dire. */
 export function BobWave({ active = false, className }: { active?: boolean; className?: string }) {
   const h = [8, 14, 10, 6];
   return (

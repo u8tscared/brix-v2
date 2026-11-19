@@ -63,7 +63,7 @@ export function seedChantiers() {
     { id: 'j4', chantierId: 'ch_lefevre', at: at(-3, '18:30'), kind: 'rapport', author: 'e_karim', text: 'Rapport d’intervention envoyé à Mme Lefèvre (6 photos). Lu le soir même.' },
     { id: 'j5', chantierId: 'ch_lefevre', at: at(-6, '08:00'), kind: 'evenement', author: 'bob', text: 'Chantier démarré. Acompte de 1 659,37 € encaissé.' },
     { id: 'j6', chantierId: 'ch_tilleuls', at: at(-1, '16:55'), kind: 'vocal', author: 'e_yanis', duration: 52, text: 'Cage B à moitié faite. Les plafonds sont plus hauts que prévu, il faut la nacelle pour la cage C. Je compte six heures de plus.' },
-    { id: 'j7', chantierId: 'ch_tilleuls', at: at(-1, '17:20'), kind: 'evenement', author: 'bob', text: 'Bob a détecté un dépassement d’heures : avenant conseillé.' },
+    { id: 'j7', chantierId: 'ch_tilleuls', at: at(-1, '17:20'), kind: 'evenement', author: 'bob', text: 'Brix AI a détecté un dépassement d’heures : avenant conseillé.' },
     { id: 'j8', chantierId: 'ch_tilleuls', at: at(-9, '16:40'), kind: 'rapport', author: 'e_karim', text: 'Rapport de fin de cage A envoyé à M. Roche (SCI Les Tilleuls).' },
     { id: 'j9', chantierId: 'ch_martin', at: at(-1, '17:10'), kind: 'vocal', author: 'e_mehdi', duration: 24, text: 'Four raccordé et testé à vide. Reste la chambre froide lundi matin, avant l’ouverture.' },
     { id: 'j10', chantierId: 'ch_martin', at: at(-3, '09:00'), kind: 'achat', author: 'bob', text: 'Commande Rexel livrée : tableau triphasé 4 rangées et 35 m de 5G10.' },

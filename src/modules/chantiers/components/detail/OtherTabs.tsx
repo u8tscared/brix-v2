@@ -126,7 +126,7 @@ export function JournalTab({ v, onVoice }: { v: ChantierView; onVoice: () => voi
                   )}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 text-xs text-ink-3">
-                      <span className="font-medium text-ink-2">{emp ? emp.firstName : e.author === 'bob' ? 'Bob' : 'Client'}</span>
+                      <span className="font-medium text-ink-2">{emp ? emp.firstName : e.author === 'bob' ? 'Brix AI' : 'Client'}</span>
                       <span className="tone-violet grid h-5 w-5 place-items-center rounded-full [&_svg]:h-3 [&_svg]:w-3">{J_ICON[e.kind]}</span>
                       <span className="num">{e.at.slice(11, 16)}</span>
                     </div>

@@ -29,7 +29,7 @@ export function MobileSummary({ open, onClose, d, t, update }: { open: boolean; 
           </span>
         </div>
         <Progress value={t.marginRate * 2} tone={low ? 'warn' : 'ok'} className="mt-2" />
-        {low && <p className="mt-2 text-[12.5px] text-warn">Sous 25 % : Bob peut remonter les lignes trop justes.</p>}
+        {low && <p className="mt-2 text-[12.5px] text-warn">Sous 25 % : Brix AI peut remonter les lignes trop justes.</p>}
       </div>
       <div className="mt-4">
         <div className="mb-2 text-[13px] text-ink-2">Acompte à la signature · {money((t.ttc * d.depositPercent) / 100)}</div>

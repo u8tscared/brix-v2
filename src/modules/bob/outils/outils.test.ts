@@ -1,4 +1,4 @@
-// Outils de Bob sur la démo (Benali Électricité) : mêmes résultats pour l'agent et le moteur local,
+// Outils de Brix AI sur la démo (Benali Électricité) : mêmes résultats pour l'agent et le moteur local,
 // relances seulement préparées, devis en brouillon, alignement avec les définitions du worker.
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useBrix } from '@/lib/store';

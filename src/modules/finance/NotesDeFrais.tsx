@@ -66,7 +66,7 @@ export default function NotesDeFrais() {
         kicker="Facturer et encaisser"
         title="Notes de frais"
         titleMuted="une photo, c'est rangé."
-        subtitle="Une photo du ticket, Bob lit le montant et la TVA, vous validez."
+        subtitle="Une photo du ticket, Brix AI lit le montant et la TVA, vous validez."
         actions={
           <>
             <Button icon={<Download />} onClick={doExport} disabled={!list.length} className="max-sm:flex-1">Exporter</Button>
@@ -117,7 +117,7 @@ export default function NotesDeFrais() {
             <span className="absolute inset-x-1.5 top-1/2 h-[2px] rounded-full bg-[#d946ef] opacity-0 shadow-[0_0_10px_#d946ef] transition-opacity duration-300 group-hover:opacity-100" />
           </span>
           <div>
-            <div className="text-[14px] font-semibold">{drag ? 'Lâchez, Bob s’en occupe' : 'Glissez la photo d’un ticket ici'}</div>
+            <div className="text-[14px] font-semibold">{drag ? 'Lâchez, Brix AI s’en occupe' : 'Glissez la photo d’un ticket ici'}</div>
             <div className="mt-1 text-[12.5px] text-ink-2">ou <span className="font-medium text-deep-v underline-offset-4 group-hover:underline">essayez avec un ticket d’exemple</span></div>
           </div>
         </button>

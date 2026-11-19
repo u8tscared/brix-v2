@@ -86,13 +86,13 @@ export function TransactionsCard() {
                   <div className="truncate text-[13.5px] font-medium">{cl?.name} · {f.number}</div>
                   <div className="truncate text-[12px] text-ink-3">{f.title}</div>
                 </div>
-                {i === 0 && <Badge tone="violet">Bob propose</Badge>}
+                {i === 0 && <Badge tone="violet">Brix AI propose</Badge>}
                 <span className="num text-[13px] font-semibold">{money(openAmount(f))}</span>
               </button>
             );
           })}
           {!suggestions.length && <p className="py-6 text-center text-[13px] text-ink-3">Aucune facture en attente.</p>}
-          <p className="pt-2 text-xs text-ink-3">Un acompte versé sans facture ? Créez la facture d'acompte depuis le devis, Bob l'associera tout seul.</p>
+          <p className="pt-2 text-xs text-ink-3">Un acompte versé sans facture ? Créez la facture d'acompte depuis le devis, Brix AI l'associera tout seul.</p>
         </div>
       </Sheet>
     </Card>

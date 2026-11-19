@@ -1,4 +1,4 @@
-// En-tête de la fiche chantier : identité, avancement, marge réelle contre prévue, temps, point de Bob.
+// En-tête de la fiche chantier : identité, avancement, marge réelle contre prévue, temps, point de Brix AI.
 
 import { Link } from 'react-router-dom';
 import { CalendarDays, ChevronLeft, MapPin, Navigation, Phone } from 'lucide-react';
@@ -136,14 +136,14 @@ export function DetailHeader({ v, bob, onAskBob }: { v: ChantierView; bob: [stri
           </Meter>
         </div>
 
-        {/* Le point de Bob */}
+        {/* Le point de Brix AI */}
         <div className="flex items-start gap-3 border-t border-halo-line bg-dawn-pale px-5 py-3.5 md:items-center md:px-6">
           <BrandTile size={30} className="shrink-0" />
           <p className="min-w-0 flex-1 text-[13px] leading-relaxed text-ink-2">
             <span className="font-medium text-ink">{bob[0]}</span> {bob[1]}
           </p>
           <Button size="sm" variant="soft" onClick={onAskBob} className="max-md:hidden">
-            Demander à Bob
+            Demander à Brix AI
           </Button>
         </div>
       </div>

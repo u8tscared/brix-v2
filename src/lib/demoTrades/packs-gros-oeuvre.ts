@@ -125,7 +125,7 @@ export const couvreur: TradePack = {
   memory: [
     ['prix', 'Tuile terre cuite posée', '38 € HT le m² hors liteaux'],
     ['prix', 'Gouttière zinc', '58 € HT le mètre avec descentes'],
-    ['habitude', 'Météo', 'Bob décale le planning si pluie annoncée'],
+    ['habitude', 'Météo', 'Brix AI décale le planning si pluie annoncée'],
   ],
   urgent: { name: 'Restaurant Le Comptoir', say: 'Il pleut dans la salle, ça coule du plafond près de la verrière.', ask: 'Je comprends, c’est urgent. Vous pouvez mettre un seau en attendant ?', answer: 'Oui, mais ça s’aggrave.', summary: 'Fuite au plafond de la salle près de la verrière, ça s’aggrave avec la pluie.', request: 'Fuite de toiture au-dessus de la salle, urgent.', estimate: 450 },
   visit: { say: 'On voudrait faire vérifier toute la toiture et peut-être isoler par l’extérieur.', summary: 'Diagnostic de toiture et isolation par l’extérieur. Maison à Villeurbanne.', request: 'Diagnostic toiture et isolation par l’extérieur.', estimate: 9800 },
@@ -252,7 +252,7 @@ export const paysagiste: TradePack = {
   memory: [
     ['prix', 'Gazon en rouleau posé', '14 € HT le m² hors terre'],
     ['prix', 'Taille de haie', '340 € HT le passage jusqu’à 30 ml'],
-    ['habitude', 'Saison', 'Plantations de novembre à mars, Bob te le rappelle'],
+    ['habitude', 'Saison', 'Plantations de novembre à mars, Brix AI te le rappelle'],
   ],
   urgent: { name: 'Restaurant Le Comptoir', say: 'Avec le vent, une grosse branche est tombée sur notre terrasse cette nuit.', ask: 'Personne n’est blessé ? La branche gêne l’entrée ?', answer: 'Non, mais elle bloque la moitié de la terrasse.', summary: 'Grosse branche tombée sur la terrasse, accès à moitié bloqué.', request: 'Branche tombée sur la terrasse, dégagement urgent.', estimate: 450 },
   visit: { say: 'On voudrait refaire tout le jardin au printemps, avec un arrosage automatique.', summary: 'Création de jardin avec arrosage automatique. Maison à Villeurbanne, au printemps.', request: 'Jardin complet avec arrosage automatique, au printemps.', estimate: 6400 },

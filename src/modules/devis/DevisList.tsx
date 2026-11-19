@@ -149,7 +149,7 @@ export default function DevisList() {
           <EmptyState
             icon={<FileText />}
             title={rows.length ? 'Aucun devis ne correspond' : 'Votre premier devis en 2 minutes'}
-            text={rows.length ? 'Essayez un autre mot ou retirez le filtre.' : 'Dictez-le à Bob ou piochez dans la bibliothèque de prix : les lots, la TVA et les mentions légales se font tout seuls.'}
+            text={rows.length ? 'Essayez un autre mot ou retirez le filtre.' : 'Dictez-le à Brix AI ou piochez dans la bibliothèque de prix : les lots, la TVA et les mentions légales se font tout seuls.'}
             action={
               rows.length ? (
                 <Button onClick={() => (setQ(''), setFilter('tous'))}>Tout afficher</Button>

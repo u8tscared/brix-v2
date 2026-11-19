@@ -1,5 +1,5 @@
 // Lecture des tickets et export des notes de frais.
-// En démo la lecture est simulée. Vraie version : POST /api/frais/ocr (image → Bob vision côté worker).
+// En démo la lecture est simulée. Vraie version : POST /api/frais/ocr (image → Brix AI vision côté worker).
 import { todayISO } from '@/lib/format';
 import type { Expense } from '@/lib/types';
 

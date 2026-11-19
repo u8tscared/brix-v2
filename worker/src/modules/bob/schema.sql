@@ -1,4 +1,4 @@
--- Bob (assistant) : compteurs de messages pour limiter les abus.
+-- Brix AI (assistant) : compteurs de messages pour limiter les abus.
 -- cle : « org:<organisation> » (compte connecté) ou « ip:<adresse> » (démo ouverte).
 -- fenetre : jour (AAAA-MM-JJ) ou heure (AAAA-MM-JJTHH) selon la limite.
 CREATE TABLE IF NOT EXISTS bob_quota (

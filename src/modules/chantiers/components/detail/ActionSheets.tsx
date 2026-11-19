@@ -72,7 +72,7 @@ export function VoiceNoteSheet({ v, open, onClose }: { v: ChantierView; open: bo
       {intents.length > 0 && !d.listening && (
         <div className="mt-3 flex flex-wrap gap-2">
           {intents.map((i) => (
-            <button key={i.label} onClick={() => toast(`${i.label} : noté pour Bob (démo)`, 'info')} className="flex h-10 items-center gap-1.5 rounded-full bg-pale-v px-3.5 text-[13px] font-medium text-deep-v hover:bg-vi-100">
+            <button key={i.label} onClick={() => toast(`${i.label} : noté pour Brix AI (démo)`, 'info')} className="flex h-10 items-center gap-1.5 rounded-full bg-pale-v px-3.5 text-[13px] font-medium text-deep-v hover:bg-vi-100">
               {i.icon} {i.label}
             </button>
           ))}
@@ -118,7 +118,7 @@ export function ReportSheet({ v, open, onClose }: { v: ChantierView; open: boole
   return (
     <Sheet open={open} onClose={onClose} title="Rapport d’intervention" subtitle={`Envoyé par e-mail à ${v.client?.email ?? 'votre client'}, visible dans son espace client.`} width={560} footer={<><Button variant="ghost" onClick={onClose}>Annuler</Button><Button variant="primary" loading={sending} onClick={send}>Envoyer au client</Button></>}>
       <div className="space-y-4">
-        <Field label="Message" hint="Rédigé par Bob à partir du journal. Modifiez-le librement.">
+        <Field label="Message" hint="Rédigé par Brix AI à partir du journal. Modifiez-le librement.">
           <Textarea value={text} onChange={(e) => setText(e.target.value)} rows={11} style={{ minHeight: 230 }} />
         </Field>
         <div>
@@ -201,7 +201,7 @@ export function AvenantSheet({ v, open, onClose }: { v: ChantierView; open: bool
             <Button size="icon" onClick={() => setHours((h) => h + 1)} aria-label="Plus"><Plus className="h-4 w-4" /></Button>
             <span className="text-[13px] text-ink-3">à {money(rate)} / h</span>
           </div>
-          {v.m.marginDelta < -6 && <p className="mt-2 text-xs text-ink-2">Bob propose {suggested} h : c’est l’écart entre les heures passées et l’avancement.</p>}
+          {v.m.marginDelta < -6 && <p className="mt-2 text-xs text-ink-2">Brix AI propose {suggested} h : c’est l’écart entre les heures passées et l’avancement.</p>}
         </div>
         <Field label="Fournitures en plus (HT)">
           <Input type="number" inputMode="decimal" min={0} value={materials || ''} onChange={(e) => setMaterials(Number(e.target.value) || 0)} placeholder="0" suffix="€" />

@@ -1,5 +1,5 @@
 // Scène de lecture d'un ticket : la photo (ou un ticket d'exemple), un faisceau qui balaye pendant
-// que Bob lit, puis les zones reconnues s'encadrent une à une et la liste se coche.
+// que Brix AI lit, puis les zones reconnues s'encadrent une à une et la liste se coche.
 import { cn } from '@/components/ui';
 import { DrawCheck } from '@/components/motion';
 import { dateFull, money } from '@/lib/format';
@@ -29,7 +29,7 @@ export function ReceiptScan({ preview, sample, reading, read, date }: { preview:
         )}
       </div>
       <ol className="flex flex-col justify-center gap-2.5">
-        <li className="mb-1 text-[11.5px] font-semibold uppercase tracking-[.08em] text-ink-3">{reading ? 'Bob lit…' : read ? 'Lu' : 'À lire'}</li>
+        <li className="mb-1 text-[11.5px] font-semibold uppercase tracking-[.08em] text-ink-3">{reading ? 'Brix AI lit…' : read ? 'Lu' : 'À lire'}</li>
         {FOUND.map((f, i) => (
           <li key={f} className="flex items-center gap-2 text-[12.5px]">
             <span className={cn('grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full transition-colors duration-300', read ? 'bg-[#10b981] text-white' : 'bg-white shadow-[inset_0_0_0_1.5px_#e3dcf3]')} style={{ transitionDelay: read ? `${i * 140}ms` : '0ms' }}>
@@ -45,7 +45,7 @@ export function ReceiptScan({ preview, sample, reading, read, date }: { preview:
   );
 }
 
-/** Ticket de caisse dessiné (démo). Les zones lues s'encadrent quand Bob a fini. */
+/** Ticket de caisse dessiné (démo). Les zones lues s'encadrent quand Brix AI a fini. */
 function FakeTicket({ sample, date, read }: { sample?: ReceiptSample; date: string; read: boolean }) {
   if (!sample) return null;
   const ht = sample.amountTtc - sample.vat;

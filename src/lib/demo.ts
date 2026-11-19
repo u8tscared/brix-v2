@@ -64,7 +64,7 @@ const devisLefevre: DevisLigne[] = [
   S('Lot 1 · Tableau électrique'),
   L('Coffret Drivia 3 rangées 39 modules', 1, 'u', 118.4, 82.9, { supplier: 'Rexel', supplierRef: 'Legrand 401213' }),
   L('Interrupteur différentiel 40 A 30 mA type A', 2, 'u', 64.9, 44.2, { supplier: 'Rexel', supplierRef: 'Legrand 411650' }),
-  L('Interrupteur différentiel 40 A 30 mA type F', 1, 'u', 112.5, 78.0, { supplier: 'Rexel', supplierRef: 'Legrand 411652', source: 'bob', detail: 'Ajouté par Bob : plaque induction' }),
+  L('Interrupteur différentiel 40 A 30 mA type F', 1, 'u', 112.5, 78.0, { supplier: 'Rexel', supplierRef: 'Legrand 411652', source: 'bob', detail: 'Ajouté par Brix AI : plaque induction' }),
   L('Disjoncteur DX³ 16 A courbe C', 8, 'u', 11.2, 7.1, { supplier: 'Rexel', supplierRef: 'Legrand 406774' }),
   L('Disjoncteur DX³ 20 A courbe C', 4, 'u', 11.9, 7.6, { supplier: 'Rexel', supplierRef: 'Legrand 406775' }),
   L('Pose et raccordement du tableau', 6, 'h', 55, 31.5, { detail: "Main d'œuvre · taux compagnon" }),

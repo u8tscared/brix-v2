@@ -48,9 +48,9 @@ export default function BobPage() {
     <div className="space-y-6">
       <PageHeader
         icon={<BobMark size={48} />}
-        title="Bob"
+        title="Brix AI"
         subtitle="Ton assistant : tu parles, il fait. Devis, relances, planning, questions de métier."
-        actions={<Button variant="dawn" size="lg" icon={<Mic className="h-5 w-5" />} kbd="⌘J" onClick={() => ui.askBob('', true)}>Parler à Bob</Button>}
+        actions={<Button variant="dawn" size="lg" icon={<Mic className="h-5 w-5" />} kbd="⌘J" onClick={() => ui.askBob('', true)}>Parler à Brix AI</Button>}
       />
       <BobNav />
 
@@ -73,7 +73,7 @@ export default function BobPage() {
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.35fr_1fr]">
         <div className="space-y-5">
           <Card>
-            <CardHeader title="Ce que Bob sait faire" meta="Touche un exemple pour l’essayer" />
+            <CardHeader title="Ce que Brix AI sait faire" meta="Touche un exemple pour l’essayer" />
             <div className="stagger-fast grid gap-2 p-3 sm:grid-cols-2">
               {caps.map((c) => (
                 <button key={c.title} onClick={() => ui.askBob(c.example)} className="group flex min-h-[76px] items-start gap-3 rounded-card-sm p-3 text-left transition hover:bg-halo-hover active:scale-[.99]">
@@ -91,9 +91,9 @@ export default function BobPage() {
           </Card>
 
           <Card>
-            <CardHeader title="Ce que Bob a fait" meta={todo ? `${todo} à valider` : 'tout est validé'} />
+            <CardHeader title="Ce que Brix AI a fait" meta={todo ? `${todo} à valider` : 'tout est validé'} />
             {bob.length === 0 ? (
-              <EmptyState className="m-4 shadow-none" icon={<RotateCcw />} title="Rien pour l’instant" text="Chaque action de Bob apparaîtra ici, avec un bouton pour la vérifier." />
+              <EmptyState className="m-4 shadow-none" icon={<RotateCcw />} title="Rien pour l’instant" text="Chaque action de Brix AI apparaîtra ici, avec un bouton pour la vérifier." />
             ) : (
               <ol className="stagger-fast relative px-4 py-2">
                 <span className="absolute bottom-6 left-[33px] top-6 w-px bg-halo-line" aria-hidden />
@@ -123,7 +123,7 @@ export default function BobPage() {
             <div className="flex items-center gap-3">
               <BobMark size={40} />
               <div className="min-w-0 flex-1">
-                <div className="text-[14px] font-semibold">Comment Bob te parle</div>
+                <div className="text-[14px] font-semibold">Comment Brix AI te parle</div>
                 <div className="text-[12.5px] text-ink-2">Il te tutoie et fait des phrases courtes.</div>
               </div>
             </div>
@@ -132,8 +132,8 @@ export default function BobPage() {
                 <span className="text-[13px] font-medium">Longueur des réponses</span>
                 <Segmented size="sm" value={tone.length} onChange={(v) => setTone({ length: v })} options={[{ value: 'court', label: 'Court' }, { value: 'detaille', label: 'Détaillé' }]} />
               </div>
-              <Toggle label="Vouvoyer tes clients" hint="Dans les mails et relances que Bob prépare." checked={tone.formal} onChange={(v) => setTone({ formal: v })} />
-              <Toggle label="Lire les réponses à voix haute" hint="Quand tu parles à Bob avec le micro." checked={tone.speak} onChange={(v) => setTone({ speak: v })} />
+              <Toggle label="Vouvoyer tes clients" hint="Dans les mails et relances que Brix AI prépare." checked={tone.formal} onChange={(v) => setTone({ formal: v })} />
+              <Toggle label="Lire les réponses à voix haute" hint="Quand tu parles à Brix AI avec le micro." checked={tone.speak} onChange={(v) => setTone({ speak: v })} />
             </div>
           </Card>
 
@@ -145,19 +145,19 @@ export default function BobPage() {
               <div className="min-w-0 flex-1 text-[13px] text-ink-2">
                 {enLigne ? (
                   <>
-                    <div className="mb-1 text-[14px] font-semibold text-ink">Bob agit, tu valides</div>
-                    Bob comprend tes demandes et prépare le travail dans l’app. Il ne fait jamais rien d’important sans ton accord : envoyer un devis ou une relance, payer, supprimer.
+                    <div className="mb-1 text-[14px] font-semibold text-ink">Brix AI agit, tu valides</div>
+                    Brix AI comprend tes demandes et prépare le travail dans l’app. Il ne fait jamais rien d’important sans ton accord : envoyer un devis ou une relance, payer, supprimer.
                   </>
                 ) : (
                   <>
                     <div className="mb-1 flex items-center gap-2 text-[14px] font-semibold text-ink">Version de démo <Badge tone="neutral">Démo</Badge></div>
-                    Ici, Bob répond avec des réponses préparées et agit sur les données de démonstration. Il ne fait jamais rien d’important sans ton accord : envoyer un devis, payer, supprimer.
+                    Ici, Brix AI répond avec des réponses préparées et agit sur les données de démonstration. Il ne fait jamais rien d’important sans ton accord : envoyer un devis, payer, supprimer.
                   </>
                 )}
               </div>
             </div>
             <button onClick={() => navigate('/app/bob/nuit')} className="mt-3 flex min-h-[44px] w-full items-center justify-between rounded-pill bg-halo-hover px-4 py-2.5 text-[13px] font-medium text-ink transition hover:bg-halo-track">
-              Régler ce que Bob fait seul <ArrowRight className="h-4 w-4" />
+              Régler ce que Brix AI fait seul <ArrowRight className="h-4 w-4" />
             </button>
           </Card>
         </div>

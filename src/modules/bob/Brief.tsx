@@ -55,7 +55,7 @@ export default function Brief() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Sunrise" tone="peach" size="lg" />} kicker="Bob" title="Brief du matin" subtitle="Ce qui compte aujourd’hui, en une minute. À écouter dans le camion." />
+      <PageHeader icon={<IconTile name="Sunrise" tone="peach" size="lg" />} kicker="Brix AI" title="Brief du matin" subtitle="Ce qui compte aujourd’hui, en une minute. À écouter dans le camion." />
       <BobNav />
 
       <section className="relative overflow-hidden rounded-card bg-dawn-mist shadow-halo">
@@ -169,7 +169,7 @@ export default function Brief() {
 
           <Card className="p-4">
             <div className="text-[14px] font-semibold">Recevoir le brief chaque matin</div>
-            <p className="mt-0.5 text-[12.5px] text-ink-2">Bob t’envoie le brief en message vocal, avant de partir.</p>
+            <p className="mt-0.5 text-[12.5px] text-ink-2">Brix AI t’envoie le brief en message vocal, avant de partir.</p>
             <div className="mt-4 space-y-3.5">
               <Toggle label="Par WhatsApp" hint="Message vocal + résumé écrit" checked={brief.whatsapp} onChange={(v) => setBrief({ whatsapp: v })} />
               <Toggle label="Par SMS" hint="Résumé écrit seulement" checked={brief.sms} onChange={(v) => setBrief({ sms: v })} />

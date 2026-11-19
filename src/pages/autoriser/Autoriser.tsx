@@ -110,7 +110,7 @@ export default function Autoriser() {
     <Cadre
       titre={<>Relier {d.client.nom} à Brix&nbsp;?</>}
       sousTitre={<><b className="font-semibold text-ink">{d.client.nom}</b>{hote ? ` (${hote})` : ''} demande à accéder aux données de {d.entreprise ? <b className="font-semibold text-ink">{d.entreprise}</b> : 'votre entreprise'}.</>}
-      pied="Vous pourrez couper cet accès à tout moment dans Bob › Brix AI MCP."
+      pied="Vous pourrez couper cet accès à tout moment dans Brix AI › Connecter une IA."
     >
       <dl className="grid gap-2 rounded-2xl bg-halo-track/60 px-4 py-3 text-[13px]">
         <div className="flex justify-between gap-3"><dt className="text-ink-2">Assistant</dt><dd className="min-w-0 text-right font-medium [overflow-wrap:anywhere]">{d.client.nom}{d.client.nom_declare !== d.client.nom ? ` · « ${d.client.nom_declare} »` : ''}</dd></div>

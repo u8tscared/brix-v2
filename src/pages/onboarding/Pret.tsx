@@ -224,7 +224,7 @@ function Import({ d, set, imported, setImported }: Pick<Props, 'd' | 'set' | 'im
       {d.importFrom && (
         <p key={d.importFrom} className="ob-rise mt-3 text-[12.5px] leading-relaxed text-ink-2">
           {d.importFrom === 'Autre' || d.importFrom === 'Excel'
-            ? 'Exportez vos clients et vos prix en CSV, puis déposez le fichier ci-dessus. Bob s\'adapte aux colonnes.'
+            ? 'Exportez vos clients et vos prix en CSV, puis déposez le fichier ci-dessus. Brix AI s\'adapte aux colonnes.'
             : `Dans ${d.importFrom}, exportez vos clients, votre bibliothèque de prix et vos devis (format CSV ou Excel). Déposez le fichier clients ici, le reste se reprend depuis Réglages, Import.`}
         </p>
       )}

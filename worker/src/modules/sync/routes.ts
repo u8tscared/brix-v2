@@ -30,7 +30,7 @@ export async function handleSyncRoutes(request: Request, env: Env, pathname: str
       return json({ version: e.version, majLe: e.majLe }, 200, pasDeCache);
     } catch (err) {
       if (!(err instanceof HttpError) || err.status !== 409) throw err;
-      // Quelqu'un a écrit entre-temps (autre appareil, MCP, Bob) : on renvoie la copie serveur pour fusion.
+      // Quelqu'un a écrit entre-temps (autre appareil, MCP, Brix AI) : on renvoie la copie serveur pour fusion.
       const srv = await lireEtat(env, auth.organizationId);
       return json({ error: 'conflit', ...srv }, 409, pasDeCache);
     }

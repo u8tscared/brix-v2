@@ -5,7 +5,7 @@ import { Button, Card, Icon, IconTile, cn, toast } from '@/components/ui';
 import { useBrix } from '@/lib/store';
 import { useBobLocal } from '@/modules/bob/store';
 
-/** Ce que Bob a fait cette nuit : carte calme, chaque action se valide en un geste. */
+/** Ce que Brix AI a fait cette nuit : carte calme, chaque action se valide en un geste. */
 export function NightShift({ className, compact }: { className?: string; compact?: boolean }) {
   const bob = useBrix((s) => s.bob);
   const updateBob = useBrix((s) => s.updateBob);
@@ -17,7 +17,7 @@ export function NightShift({ className, compact }: { className?: string; compact
   const validate = (id: string) => {
     updateBob(id, { done: true });
     decideNight(id, 'validee');
-    toast('Validé. Bob s’en occupe.', 'ok', { label: 'Annuler', run: () => { updateBob(id, { done: false }); decideNight(id, null); } });
+    toast('Validé. Brix AI s’en occupe.', 'ok', { label: 'Annuler', run: () => { updateBob(id, { done: false }); decideNight(id, null); } });
   };
   const validateAll = () => {
     pending.forEach((b) => { updateBob(b.id, { done: true }); decideNight(b.id, 'validee'); });
@@ -25,11 +25,11 @@ export function NightShift({ className, compact }: { className?: string; compact
   };
 
   return (
-    <Card className={cn('flex flex-col p-5 pb-3', className)} aria-label="Cette nuit, Bob a travaillé">
+    <Card className={cn('flex flex-col p-5 pb-3', className)} aria-label="Cette nuit, Brix AI a travaillé">
       <header className="flex items-center gap-3">
         <IconTile icon={<MoonStar />} tone="indigo" />
         <div className="min-w-0 flex-1">
-          <h2 className="text-[15px] font-semibold tracking-[-0.02em]">Cette nuit, Bob a travaillé</h2>
+          <h2 className="text-[15px] font-semibold tracking-[-0.02em]">Cette nuit, Brix AI a travaillé</h2>
           <p className="truncate text-[12.5px] text-ink-3">
             {pending.length ? `${pending.length} chose${pending.length > 1 ? 's' : ''} à valider` : 'Tout est validé'} <span className="max-sm:hidden">· de 2 h à 6 h</span>
           </p>
@@ -61,7 +61,7 @@ export function NightShift({ className, compact }: { className?: string; compact
             )}
           </li>
         ))}
-        {list.length === 0 && <li className="py-6 text-center text-[13px] text-ink-3">Bob n’a rien eu à faire cette nuit.</li>}
+        {list.length === 0 && <li className="py-6 text-center text-[13px] text-ink-3">Brix AI n’a rien eu à faire cette nuit.</li>}
       </ul>
 
       <footer className="mt-1 flex items-center gap-2 pt-1">

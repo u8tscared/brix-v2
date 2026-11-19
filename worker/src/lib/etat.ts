@@ -6,7 +6,7 @@
  * `etat_org` qui porte la version (concurrence optimiste) et la date de mise à jour.
  *
  * Tout le monde passe par ce module : la synchronisation de l'app (/api/sync), Brix AI MCP
- * (lecture et écriture), Bob côté serveur. Une écriture incrémente la version ; l'app la voit au
+ * (lecture et écriture), Brix AI côté serveur. Une écriture incrémente la version ; l'app la voit au
  * prochain tirage et fusionne.
  *
  * Le contenu est le sous-ensemble « données » de BrixState (pas les préférences d'affichage) :
@@ -89,7 +89,7 @@ export async function ecrireEtat(env: Env, orgId: string, donnees: Record<string
 }
 
 /**
- * Modifie l'état côté serveur (MCP, Bob) : lit, applique `fn`, réécrit, réessaie en cas de course.
+ * Modifie l'état côté serveur (MCP, Brix AI) : lit, applique `fn`, réécrit, réessaie en cas de course.
  * `fn` reçoit une copie modifiable et renvoie le résultat à rendre à l'appelant.
  */
 export async function modifierEtat<T>(env: Env, orgId: string, par: string, fn: (d: EtatDonnees) => T | Promise<T>): Promise<T> {

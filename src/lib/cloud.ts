@@ -1,6 +1,6 @@
 // Synchronisation cloud du store (un document JSON par entreprise, voir worker/src/lib/etat.ts).
 // Le store reste la copie de travail : chaque modification est enregistrée ici, envoyée 1,5 s plus tard.
-// Conflit (autre appareil, Brix AI MCP, Bob) : fusion à trois avec la dernière copie commune, puis renvoi.
+// Conflit (autre appareil, Brix AI MCP, Brix AI) : fusion à trois avec la dernière copie commune, puis renvoi.
 // Hors ligne : rien n'est perdu (le store est persisté), on réessaie avec un délai croissant.
 
 import { create } from 'zustand';
@@ -57,7 +57,7 @@ const actif = () => {
 };
 export const aDesModifsEnAttente = () => !!meta && actif() && !memes(local(), meta.base);
 
-/** Remplace les clés synchronisées du store (les préférences et Bob restent). */
+/** Remplace les clés synchronisées du store (les préférences et Brix AI restent). */
 function appliquer(d: Donnees, extra: Record<string, unknown> = {}) {
   const patch: Record<string, unknown> = { ...extra };
   for (const k of COLLECTIONS) patch[k] = Array.isArray(d[k]) ? d[k] : [];

@@ -5,7 +5,7 @@ import { BrandSymbol } from '@/components/brand/Logo';
 const RAYS = 28;
 
 /**
- * Gros bouton micro au dégradé d'aube. Quand Bob écoute, une couronne d'ondes vibre autour
+ * Gros bouton micro au dégradé d'aube. Quand Brix AI écoute, une couronne d'ondes vibre autour
  * (comme un égaliseur) et un halo respire : on voit qu'il entend.
  */
 export function VoiceOrb({ listening, busy, onClick, size = 112 }: { listening: boolean; busy?: boolean; onClick: () => void; size?: number }) {
@@ -42,7 +42,7 @@ export function VoiceOrb({ listening, busy, onClick, size = 112 }: { listening: 
       <button
         type="button"
         onClick={onClick}
-        aria-label={listening ? 'Arrêter' : 'Parler à Bob'}
+        aria-label={listening ? 'Arrêter' : 'Parler à Brix AI'}
         className={cn('relative grid place-items-center rounded-full bg-dawn-diag text-white shadow-dawn transition-transform duration-300 ease-spring active:scale-95', listening && 'scale-[1.04]', busy && 'opacity-80')}
         style={{ width: size, height: size }}
       >
@@ -65,7 +65,7 @@ export function VoiceOrb({ listening, busy, onClick, size = 112 }: { listening: 
 }
 
 /**
- * Avatar de Bob : le B de Brix, blanc sur pastille ronde Aube. Calme : aucune étincelle, aucune animation au repos.
+ * Avatar de Brix AI : le B de Brix, blanc sur pastille ronde Aube. Calme : aucune étincelle, aucune animation au repos.
  * `active` (il écoute ou réfléchit) : un halo doux respire autour, rien de plus.
  */
 export function BobMark({ size = 32, className, active }: { size?: number; className?: string; active?: boolean }) {

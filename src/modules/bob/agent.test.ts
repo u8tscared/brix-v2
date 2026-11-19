@@ -104,8 +104,8 @@ describe('tourAgent', () => {
   });
 
   it('erreur dans le flux : statut erreur avec le message du worker', async () => {
-    const { fetcher } = faux(() => sse(['erreur', { code: 'ia_surchargee', message: 'Bob est très demandé, réessaie dans un instant.' }]));
-    expect(await tourAgent([], 'Salut', CTX, {}, { fetcher })).toMatchObject({ statut: 'erreur', erreur: 'Bob est très demandé, réessaie dans un instant.' });
+    const { fetcher } = faux(() => sse(['erreur', { code: 'ia_surchargee', message: 'Brix AI est très demandé, réessaie dans un instant.' }]));
+    expect(await tourAgent([], 'Salut', CTX, {}, { fetcher })).toMatchObject({ statut: 'erreur', erreur: 'Brix AI est très demandé, réessaie dans un instant.' });
   });
 
   it('arrêt par l’utilisateur : interrompu, conversation valide', async () => {

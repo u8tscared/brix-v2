@@ -17,7 +17,7 @@ export function useCockpitData() {
     // Mêmes règles que l'écran Factures : paiements réellement reçus ce mois-ci,
     // reste à payer hors retenue de garantie, retard selon l'échéance.
     const all = allPayments(s.factures, payments);
-    // Même calcul que Bob (« Combien j'ai encaissé ce mois-ci ? ») : src/modules/factures/lib/encaisse.ts.
+    // Même calcul que Brix AI (« Combien j'ai encaissé ce mois-ci ? ») : src/modules/factures/lib/encaisse.ts.
     const { paiements: monthPayments, total: paidThisMonth } = encaisseDuMois(s.factures, payments, today);
     const prev = new Date(`${month}-01T12:00:00`);
     prev.setMonth(prev.getMonth() - 1);

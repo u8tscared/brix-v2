@@ -61,7 +61,7 @@ export interface RouteOptimization {
 }
 
 /**
- * Optimisation des trajets de la semaine. Prod : Bob (LLM) + API d'itinéraires (OSRM / Google Routes).
+ * Optimisation des trajets de la semaine. Prod : Brix AI (LLM) + API d'itinéraires (OSRM / Google Routes).
  * Ici : on réaffecte chaque créneau de chantier à la personne déjà la plus proche ce jour-là,
  * sans créer de conflit, et on mesure les kilomètres à vol d'oiseau majorés.
  */

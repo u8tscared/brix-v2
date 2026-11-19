@@ -15,7 +15,7 @@ import { NotificationBell } from '@/modules/notifications';
 import { HaloBackdrop } from './HaloBackdrop';
 import { PageLoader } from './PageLoader';
 
-// Bob (moteur, outils, voix) n'est chargé qu'à la première ouverture du panneau.
+// Brix AI (moteur, outils, voix) n'est chargé qu'à la première ouverture du panneau.
 const BobPanel = lazy(() => import('@/modules/bob/BobPanel'));
 
 // Squelette de chargement : dans son propre fichier (l'appli publique ne charge pas la coque).
@@ -37,7 +37,7 @@ export default function AppShell() {
   const fullBleed = /\/app\/(devis|factures)\/[^/]+$/.test(pathname);
   const devisEditor = /\/app\/devis\/[^/]+$/.test(pathname);
   const [drawer, setDrawer] = useState(false);
-  // Le panneau de Bob reste monté une fois ouvert (il coupe la voix à la fermeture).
+  // Le panneau de Brix AI reste monté une fois ouvert (il coupe la voix à la fermeture).
   const bobLoaded = useRef(false);
   if (ui.bob) bobLoaded.current = true;
 

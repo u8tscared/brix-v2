@@ -36,7 +36,7 @@ export default function Avis() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="Star" dept="vendre" size="lg" />} title="Avis clients" titleMuted="demandés au bon moment." subtitle="Plus d'avis Google, c'est plus d'appels. Bob demande au bon moment et répond pour vous." />
+      <PageHeader icon={<IconTile name="Star" dept="vendre" size="lg" />} title="Avis clients" titleMuted="demandés au bon moment." subtitle="Plus d'avis Google, c'est plus d'appels. Brix AI demande au bon moment et répond pour vous." />
 
       <KpiBand
         hero={{
@@ -75,9 +75,9 @@ export default function Avis() {
 
         <div className="space-y-4">
           <Card>
-            <CardHeader icon={<IconTile name="BellRing" tone="violet" size="sm" />} title="Demande automatique" action={<Switch checked={v.autoReview.on} onChange={(on) => { v.setAutoReview({ on }); toast(on ? 'Bob demandera un avis à chaque fin de chantier' : 'Demande automatique coupée', on ? 'ok' : 'info'); }} label="Demande automatique" />} />
+            <CardHeader icon={<IconTile name="BellRing" tone="violet" size="sm" />} title="Demande automatique" action={<Switch checked={v.autoReview.on} onChange={(on) => { v.setAutoReview({ on }); toast(on ? 'Brix AI demandera un avis à chaque fin de chantier' : 'Demande automatique coupée', on ? 'ok' : 'info'); }} label="Demande automatique" />} />
             <div className={cn('space-y-3 p-4 transition-opacity duration-300 md:p-5', !v.autoReview.on && 'opacity-50')}>
-              <p className="text-[13px] text-ink-2">À la signature du PV de réception, Bob envoie au client un lien direct vers votre fiche Google.</p>
+              <p className="text-[13px] text-ink-2">À la signature du PV de réception, Brix AI envoie au client un lien direct vers votre fiche Google.</p>
               <div className="grid grid-cols-2 gap-2">
                 <Select value={v.autoReview.delayDays} onChange={(e) => v.setAutoReview({ delayDays: Number(e.target.value) })} disabled={!v.autoReview.on} aria-label="Délai">
                   {[[0, 'Le jour même'], [1, 'Le lendemain'], [2, '2 jours après'], [7, '1 semaine après']].map(([d, l]) => <option key={d} value={d}>{l}</option>)}

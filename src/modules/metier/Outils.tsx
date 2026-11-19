@@ -105,14 +105,14 @@ function ToolList() {
                 <IconTile name="AudioLines" dept="bob" size="lg" />
                 <div>
                   <div className="text-[15px] font-semibold tracking-[-0.02em]">Un autre calcul ?</div>
-                  <div className="mt-1 text-[12.5px] leading-snug text-ink-2">Demandez-le à Bob à voix haute : « combien de sacs pour une dalle de 20 m² ? »</div>
+                  <div className="mt-1 text-[12.5px] leading-snug text-ink-2">Demandez-le à Brix AI à voix haute : « combien de sacs pour une dalle de 20 m² ? »</div>
                 </div>
               </Link>
             )}
           </div>
         </section>
       ) : (
-        <EmptyState icon={<Search />} title="Aucun outil trouvé" text="Essayez un autre mot, ou demandez à Bob de faire le calcul pour vous." action={<Button onClick={() => { setQ(''); setFilter('all'); }}>Voir tous les outils</Button>} />
+        <EmptyState icon={<Search />} title="Aucun outil trouvé" text="Essayez un autre mot, ou demandez à Brix AI de faire le calcul pour vous." action={<Button onClick={() => { setQ(''); setFilter('all'); }}>Voir tous les outils</Button>} />
       )}
 
       {featured && rest.length > 0 && (

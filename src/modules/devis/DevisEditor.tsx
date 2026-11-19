@@ -39,7 +39,7 @@ const TRADE_TO_LIB: Partial<Record<string, LibTrade>> = { electricien: 'electric
 /**
  * Brouillons ouverts par « Nouveau devis » : s'ils restent vides (pas de client, pas de ligne, titre d'origine),
  * ils sont supprimés en quittant l'éditeur, pour ne pas remplir la liste de « Nouveau devis 0 € ».
- * Les devis créés par Bob ou ailleurs ne passent pas par ici et ne sont jamais concernés.
+ * Les devis créés par Brix AI ou ailleurs ne passent pas par ici et ne sont jamais concernés.
  */
 const freshDrafts = new Set<string>();
 const openEditors = new Map<string, number>();
@@ -295,7 +295,7 @@ function Editor({ d }: { d: Devis }) {
           Ajouter un lot
         </Button>
         <Button variant="secondary" size={phone ? 'lg' : 'md'} icon={<Mic />} onClick={() => setVoice(true)}>
-          {phone ? 'Dicter' : 'Dicter des lignes à Bob'}
+          {phone ? 'Dicter' : 'Dicter des lignes à Brix AI'}
         </Button>
       </div>
       {(d.aides ?? []).length > 0 && (
@@ -324,7 +324,7 @@ function Editor({ d }: { d: Devis }) {
       <TopBar d={d} saving={saving} menu={menu} phone={phone} onBack={() => navigate('/app/devis')} onPreview={() => setViewer(true)} onMain={onMain} mainLabel={mainLabel} mainIcon={d.status === 'signe' ? <Receipt /> : undefined} checks={score} steps={steps} onStep={onStep} />
       {tablet && !desktop && (
         <div className="flex shrink-0 justify-center pt-3">
-          <Segmented value={tab} onChange={setTab} options={[{ value: 'devis', label: 'Devis' }, { value: 'apercu', label: 'Aperçu' }, { value: 'bob', label: 'Bob', count: suggestions.length || undefined }]} />
+          <Segmented value={tab} onChange={setTab} options={[{ value: 'devis', label: 'Devis' }, { value: 'apercu', label: 'Aperçu' }, { value: 'bob', label: 'Brix AI', count: suggestions.length || undefined }]} />
         </div>
       )}
       {phone ? (
@@ -421,7 +421,7 @@ function Editor({ d }: { d: Devis }) {
         }}
         onSend={actions.send}
       />
-      <Sheet open={bobSheet} onClose={() => setBobSheet(false)} title="Bob" subtitle="Conseils sur ce devis">
+      <Sheet open={bobSheet} onClose={() => setBobSheet(false)} title="Brix AI" subtitle="Conseils sur ce devis">
         <div className="-mx-5 -mb-5 h-[70dvh]">
           <BobColumn d={d} client={client} company={company} update={update} onVoice={() => setVoice(true)} messages={messages} setMessages={setMessages} className="h-full" />
         </div>

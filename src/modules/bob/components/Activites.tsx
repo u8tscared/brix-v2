@@ -2,7 +2,7 @@ import { ArrowUpRight, Check, CircleAlert, Loader2 } from 'lucide-react';
 import { cn } from '@/components/ui';
 import type { Activite } from '../chat';
 
-/** Pastilles discrètes de ce que Bob fait (« Recherche des impayés… », « Devis D-2026-123 créé »). */
+/** Pastilles discrètes de ce que Brix AI fait (« Recherche des impayés… », « Devis D-2026-123 créé »). */
 export function Activites({ items, onOpen }: { items: Activite[]; onOpen: (to: string) => void }) {
   return (
     <div className="stagger-fast flex flex-wrap gap-1.5" aria-live="polite">

@@ -1,4 +1,4 @@
-// Bob › Brix AI (route app/bob/mcp) : relier Claude, ChatGPT, Le Chat… aux données de Brix.
+// Brix AI › Connecter une IA (route app/bob/mcp) : relier Claude, ChatGPT, Le Chat… aux données de Brix.
 import { Plug } from 'lucide-react';
 import { Badge, Button, Card, IconTile, PageHeader, cn, toast } from '@/components/ui';
 import { planIncludes } from '@/lib/catalog';
@@ -15,8 +15,8 @@ export default function BrixAiPage() {
     <div className="space-y-6">
       <PageHeader
         icon={<IconTile icon={<Plug />} tone="violet" size="lg" />}
-        kicker="Bob"
-        title="Brix AI MCP"
+        kicker="Brix AI"
+        title="Connecter une IA"
         subtitle="Posez vos questions à Claude, ChatGPT ou Le Chat : votre assistant lit vos chiffres dans Brix et peut préparer des brouillons. Vous décidez de ce qu’il peut faire."
         actions={<Badge tone="neutral">Compatible MCP</Badge>}
       />

@@ -25,7 +25,7 @@ const ICONS: Record<Suggestion['icon'], { tone: HaloTone; icon: JSX.Element }> =
   plus: { tone: 'peach', icon: <Plus /> },
 };
 
-/** Bob signe avec le logo B (assistant calme, jamais d'étincelles). */
+/** Brix AI signe avec le logo B (assistant calme, jamais d'étincelles). */
 export function BobAvatar({ size = 32 }: { size?: number }) {
   return <BrandTile size={size} />;
 }
@@ -46,7 +46,7 @@ interface Props {
   setMessages: (fn: (m: BobMsg[]) => BobMsg[]) => void;
 }
 
-/** Colonne Bob : dernière action, suggestions qui modifient vraiment le devis, champ libre. */
+/** Colonne Brix AI : dernière action, suggestions qui modifient vraiment le devis, champ libre. */
 export function BobColumn({ d, client, company, update, onVoice, className, messages, setMessages }: Props) {
   const suggestions = useBobSuggestions(d, client, company);
   const { log, dismiss } = useDevisMeta();
@@ -85,7 +85,7 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
       <div className="flex items-center gap-3 px-5 pb-1 pt-5">
         <BobAvatar size={34} />
         <div className="min-w-0 flex-1 leading-tight">
-          <div className="text-[15px] font-semibold tracking-[-0.02em]">Bob</div>
+          <div className="text-[15px] font-semibold tracking-[-0.02em]">Brix AI</div>
           <div className="truncate text-[12px] text-ink-3">connaît ce chantier et ta bibliothèque</div>
         </div>
       </div>
@@ -109,7 +109,7 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
             <div key={m.id} className="animate-[fade-up_.3s_ease_both] rounded-card-sm bg-white p-3.5 shadow-halo-sm">
               <div className="mb-1 flex items-center gap-1.5 text-[12px]">
                 <BobAvatar size={18} />
-                <b className="font-semibold">Bob</b>
+                <b className="font-semibold">Brix AI</b>
                 <span className="text-ink-3">· à l'instant</span>
               </div>
               <p className="text-[13px] leading-relaxed text-ink">{m.text}</p>
@@ -120,7 +120,7 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
                   icon={<Undo2 className="h-3.5 w-3.5" />}
                   onClick={() => {
                     update(m.undoPatch!);
-                    log(d.id, 'Modification de Bob annulée', 'me');
+                    log(d.id, 'Modification de Brix AI annulée', 'me');
                     setMessages((all) => all.map((x) => (x.id === m.id ? { ...x, undoPatch: undefined, text: `${x.text} (annulé)` } : x)));
                   }}
                 >
@@ -132,7 +132,7 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
         )}
         {thinking && (
           <div className="flex items-center gap-2 text-[12.5px] text-ink-3">
-            <BobAvatar size={18} /> Bob regarde ton devis…
+            <BobAvatar size={18} /> Brix AI regarde ton devis…
           </div>
         )}
 
@@ -153,13 +153,13 @@ export function BobColumn({ d, client, company, update, onVoice, className, mess
         }}
         className="flex shrink-0 items-center gap-2 px-4 pb-4 pt-2"
       >
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Demande ou dicte à Bob…" className="h-11 min-w-0 flex-1 rounded-full bg-white px-4 text-[13.5px] shadow-[0_0_0_1px_#ece8f6] placeholder:text-ink-3 focus:shadow-[0_0_0_1.5px_#c4b5fd,0_0_0_5px_#f1eafe] focus:outline-none" aria-label="Demande à Bob" />
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Demande ou dicte à Brix AI…" className="h-11 min-w-0 flex-1 rounded-full bg-white px-4 text-[13.5px] shadow-[0_0_0_1px_#ece8f6] placeholder:text-ink-3 focus:shadow-[0_0_0_1.5px_#c4b5fd,0_0_0_5px_#f1eafe] focus:outline-none" aria-label="Demande à Brix AI" />
         {q.trim() ? (
-          <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-white transition active:scale-95" aria-label="Envoyer à Bob">
+          <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-white transition active:scale-95" aria-label="Envoyer à Brix AI">
             <ArrowUp className="h-4 w-4" />
           </button>
         ) : (
-          <button type="button" onClick={onVoice} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-white transition active:scale-95" aria-label="Dicter à Bob">
+          <button type="button" onClick={onVoice} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ink text-white transition active:scale-95" aria-label="Dicter à Brix AI">
             <Mic className="h-4 w-4" />
           </button>
         )}

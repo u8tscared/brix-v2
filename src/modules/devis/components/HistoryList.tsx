@@ -25,7 +25,7 @@ export function HistoryList({ d, client, meta, limit = 8 }: { d: Devis; client?:
         <li key={e.id} className="relative">
           <span className={cn('absolute -left-4 top-[5px] h-2 w-2 rounded-full border-[1.5px] bg-white', i === ev.length - 1 ? 'border-transparent [background:var(--dawn-d)] shadow-[0_0_0_3px_#fce8fd]' : e.tone === 'client' ? 'border-[#10b981]' : e.tone === 'bob' ? 'border-vi-500' : 'border-[#c9c4d9]')} />
           <div className="text-[12.5px] leading-snug text-ink">
-            {e.tone === 'bob' && <b className="font-semibold">Bob · </b>}
+            {e.tone === 'bob' && <b className="font-semibold">Brix AI · </b>}
             {e.text}
           </div>
           <div className="text-[11.5px] text-ink-3">{e.at.length > 10 ? ago(e.at) : dateShort(e.at)}</div>

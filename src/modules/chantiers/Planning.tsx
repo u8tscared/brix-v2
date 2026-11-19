@@ -132,7 +132,7 @@ export default function Planning() {
           <IconTile tone="violet" icon={<Route />} />
           <div className="min-w-0 flex-1 text-[13.5px]">
             <div className="font-semibold">
-              Bob a trouvé <span className="num">{opt.kmBefore - opt.kmAfter} km</span> et <span className="num">{Math.floor(opt.minutesSaved / 60) ? `${Math.floor(opt.minutesSaved / 60)} h ` : ''}{opt.minutesSaved % 60} min</span> de route en moins cette semaine
+              Brix AI a trouvé <span className="num">{opt.kmBefore - opt.kmAfter} km</span> et <span className="num">{Math.floor(opt.minutesSaved / 60) ? `${Math.floor(opt.minutesSaved / 60)} h ` : ''}{opt.minutesSaved % 60} min</span> de route en moins cette semaine
             </div>
             <div className="text-ink-2">
               <span className="num">{opt.kmBefore} km → {opt.kmAfter} km</span> en regroupant les chantiers voisins et en évitant le périphérique aux heures de pointe. Démo : calcul simulé.

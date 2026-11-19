@@ -1,4 +1,4 @@
-// Calculs dérivés d'un chantier : marge prévue / réelle, heures, retard, lots, résumé de Bob.
+// Calculs dérivés d'un chantier : marge prévue / réelle, heures, retard, lots, résumé de Brix AI.
 
 import { daysBetween, money, todayISO, totals } from '@/lib/format';
 import type { Chantier, Devis, Employee, PlanningEvent } from '@/lib/types';
@@ -92,7 +92,7 @@ export const hoursOf = (e: PlanningEvent) => {
   return Math.max(0, b - a);
 };
 
-/** Résumé de Bob en deux lignes, généré à partir des données (sans appel externe). */
+/** Résumé de Brix AI en deux lignes, généré à partir des données (sans appel externe). */
 export function bobSummary(ch: Chantier, m: ChantierMetrics, team: Employee[], rainSoon?: string): [string, string] {
   const who = team.map((e) => e.firstName).join(', ') || "personne d'affecté";
   let l1: string;

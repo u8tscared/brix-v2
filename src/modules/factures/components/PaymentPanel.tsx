@@ -110,7 +110,7 @@ export function PaymentPanel({ f, onPay, onLink, onRemind }: { f: Facture; onPay
             )}
           </div>
           {rems.length === 0 ? (
-            <p className="px-1 text-[12.5px] text-ink-3">{st === 'en_retard' ? 'Pas encore relancée.' : 'Bob relancera tout seul si l’échéance passe (réglable dans Relances).'}</p>
+            <p className="px-1 text-[12.5px] text-ink-3">{st === 'en_retard' ? 'Pas encore relancée.' : 'Brix AI relancera tout seul si l’échéance passe (réglable dans Relances).'}</p>
           ) : (
             <ul className="space-y-2">
               {rems.map((r) => (
@@ -118,7 +118,7 @@ export function PaymentPanel({ f, onPay, onLink, onRemind }: { f: Facture; onPay
                   <IconTile icon={r.channel === 'email' ? <Mail /> : r.channel === 'sms' ? <MessageSquareText /> : <Stamp />} tone={r.channel === 'email' ? 'blue' : r.channel === 'sms' ? 'violet' : 'rose'} size="row" />
                   <div className="min-w-0 flex-1">
                   <div className="flex justify-between gap-2 text-ink-3">
-                    <span>{r.channel === 'email' ? 'Mail' : r.channel === 'sms' ? 'SMS' : 'Mise en demeure'} · {r.by === 'bob' ? 'par Bob' : 'par vous'}</span>
+                    <span>{r.channel === 'email' ? 'Mail' : r.channel === 'sms' ? 'SMS' : 'Mise en demeure'} · {r.by === 'bob' ? 'par Brix AI' : 'par vous'}</span>
                     <span>{dateShort(r.at.slice(0, 10))}</span>
                   </div>
                   <p className="mt-1 line-clamp-2 text-ink-2">{r.text}</p>

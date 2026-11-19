@@ -8,7 +8,7 @@ import { Menu, NumInput } from './bits';
 export const VAT_RATES = [20, 10, 5.5, 0];
 
 export function sourceInfo(l: DevisLigne): { icon: JSX.Element; text: string; bob?: boolean } {
-  if (l.source === 'bob') return { icon: <AudioLines className="h-3 w-3" />, text: l.detail && /bob/i.test(l.detail) ? l.detail : 'Proposé par Bob', bob: true };
+  if (l.source === 'bob') return { icon: <AudioLines className="h-3 w-3" />, text: l.detail && /bob/i.test(l.detail) ? l.detail : 'Proposé par Brix AI', bob: true };
   if (l.source === 'taux' || l.unit === 'h') return { icon: <Clock className="h-3 w-3" />, text: (l.detail ?? "Main d'œuvre · votre taux").replace(/ton taux/, 'votre taux') };
   if (l.supplierRef || l.supplier) return { icon: <BookOpen className="h-3 w-3" />, text: [l.supplierRef, l.supplier].filter(Boolean).join(' · ') };
   if (l.source === 'bibliotheque') return { icon: <BookOpen className="h-3 w-3" />, text: l.detail ?? 'Bibliothèque de prix' };
@@ -31,7 +31,7 @@ const FAMILIES: { re: RegExp; tone: HaloTone; icon: () => JSX.Element }[] = [
   { re: /d[ée]placement|livraison|[ée]vacuation|gravats/i, tone: 'neutral', icon: () => <Truck /> },
 ];
 
-/** Pastille de la ligne : on reconnaît d'un coup d'œil la main-d'œuvre, la famille d'ouvrage, la remise, Bob. */
+/** Pastille de la ligne : on reconnaît d'un coup d'œil la main-d'œuvre, la famille d'ouvrage, la remise, Brix AI. */
 export function lineTile(l: DevisLigne): { tone: HaloTone; icon: JSX.Element } {
   if (l.kind === 'texte') return { tone: 'neutral', icon: <Type /> };
   if (l.unitPriceHt < 0) return { tone: 'green', icon: <Percent /> };

@@ -49,7 +49,7 @@ export function TodayActions({ data, className }: { data: CockpitData; className
       </div>
       {all && (
         <div className="mt-2 flex items-center gap-2 rounded-full bg-pale-g px-3.5 py-2 text-[13px] font-medium text-deep-g">
-          <DrawCheck className="h-4 w-4" /> Journée bouclée. Bob prépare demain cette nuit.
+          <DrawCheck className="h-4 w-4" /> Journée bouclée. Brix AI prépare demain cette nuit.
         </div>
       )}
     </Card>
@@ -81,7 +81,7 @@ function Row({ it, done, onToggle }: { it: TodayItem; done: boolean; onToggle: (
       <button
         onClick={() => {
           it.action.run();
-          if (it.action.icon === 'send') toast('Bob prépare la relance.', 'info');
+          if (it.action.icon === 'send') toast('Brix AI prépare la relance.', 'info');
         }}
         disabled={done}
         className="inline-flex h-10 shrink-0 items-center gap-1.5 self-center rounded-full bg-white px-3 text-[13px] font-medium text-ink shadow-[0_1px_2px_rgba(60,30,120,.08),0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:-translate-y-px active:scale-95 disabled:opacity-40 max-sm:w-10 max-sm:justify-center max-sm:px-0"

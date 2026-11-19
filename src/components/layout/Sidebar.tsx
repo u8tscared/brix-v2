@@ -247,8 +247,8 @@ export function Sidebar({ forceCollapsed = false, onExpand, drawer = false, onCl
 
       <div className={cn('mt-2 space-y-2 border-t border-[#e6e1f1]/80 pt-3', collapsed && 'flex w-full flex-col items-center')}>
         {collapsed ? (
-          <Tip label="Parler à Bob (⌘J)" side="right">
-            <button onClick={() => ui.askBob()} className="grid h-10 w-10 place-items-center rounded-full bg-dawn text-white shadow-dawn transition hover:scale-105 touch:h-11 touch:w-11" aria-label="Parler à Bob">
+          <Tip label="Parler à Brix AI (⌘J)" side="right">
+            <button onClick={() => ui.askBob()} className="grid h-10 w-10 place-items-center rounded-full bg-dawn text-white shadow-dawn transition hover:scale-105 touch:h-11 touch:w-11" aria-label="Parler à Brix AI">
               <BobWave />
             </button>
           </Tip>
@@ -259,7 +259,7 @@ export function Sidebar({ forceCollapsed = false, onExpand, drawer = false, onCl
               <BobWave active={pendingBob > 0} />
             </span>
             <span className="relative min-w-0 flex-1">
-              <b className="block text-[13px] font-semibold">Bob</b>
+              <b className="block text-[13px] font-semibold">Brix AI</b>
               <span className="block truncate text-[11.5px] text-ink-3">{pendingBob ? `${pendingBob} action${pendingBob > 1 ? 's' : ''} à valider` : 'Dites-lui ce que vous voulez'}</span>
             </span>
             <kbd className="kbd-hint relative rounded-full bg-pale-v px-2 font-sans text-[11px] text-deep-v">⌘J</kbd>

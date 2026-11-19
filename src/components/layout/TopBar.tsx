@@ -78,7 +78,7 @@ function QuickCreate() {
             className="flex h-12 w-full items-center gap-3 rounded-[16px] px-2 text-left text-[13.5px] font-medium transition hover:bg-white"
           >
             <IconTile icon={<Mic />} dept="bob" size="sm" solid />
-            <span className="flex-1">Dicter à Bob</span>
+            <span className="flex-1">Dicter à Brix AI</span>
             <Kbd>⌘J</Kbd>
           </button>
         </div>

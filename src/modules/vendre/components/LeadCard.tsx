@@ -8,7 +8,7 @@ export function ScoreDot({ score }: { score?: number }) {
   if (score === undefined) return null;
   const tone = score >= 80 ? 'text-deep-g bg-pale-g' : score >= 60 ? 'text-deep-a bg-pale-a' : 'text-ink-3 bg-pale-n';
   return (
-    <span title="Chances de signer selon Bob" className={cn('num inline-grid h-7 min-w-7 place-items-center rounded-full px-1.5 text-[11.5px] font-semibold', tone)}>
+    <span title="Chances de signer selon Brix AI" className={cn('num inline-grid h-7 min-w-7 place-items-center rounded-full px-1.5 text-[11.5px] font-semibold', tone)}>
       {score}
     </span>
   );

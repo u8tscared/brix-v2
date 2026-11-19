@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Brix",
   "short_name": "Brix",
-  "description": "Devis, factures, chantiers, planning et équipe : la gestion des artisans du bâtiment, avec Bob qui fait à votre place.",
+  "description": "Devis, factures, chantiers, planning et équipe : la gestion des artisans du bâtiment, avec Brix AI qui fait à votre place.",
   "lang": "fr",
   "dir": "ltr",
   "start_url": "./#/app",
@@ -25,6 +25,6 @@
     { "name": "Nouveau devis", "short_name": "Devis", "url": "./#/app/devis/nouveau", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
     { "name": "Factures", "url": "./#/app/factures", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
     { "name": "Planning", "url": "./#/app/planning", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
-    { "name": "Parler à Bob", "short_name": "Bob", "url": "./#/app/bob", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+    { "name": "Parler à Brix AI", "short_name": "Brix AI", "url": "./#/app/bob", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
   ]
 }

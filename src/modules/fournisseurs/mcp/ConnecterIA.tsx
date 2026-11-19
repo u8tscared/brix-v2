@@ -90,7 +90,7 @@ function Capacites() {
   );
 }
 
-/** `embedded` : affiché dans une page qui a déjà son titre (Bob › Brix AI). */
+/** `embedded` : affiché dans une page qui a déjà son titre (Brix AI › Connecter une IA). */
 export default function ConnecterIA({ embedded = false }: { embedded?: boolean }) {
   const s = useBrixAi();
   const url = urlServeur();
