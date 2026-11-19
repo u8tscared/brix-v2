@@ -4,7 +4,7 @@ import { Button, Sheet, toast } from '@/components/ui';
 import { SuccessDot } from '@/components/motion';
 import { publishSite } from '../service';
 
-const CHECKS = ['Textes relus par Bob', 'Mentions légales et SIRET', 'Certificat de sécurité (cadenas)', 'Formulaire de devis relié à Demandes'];
+const CHECKS = ['Textes relus par Brix AI', 'Mentions légales et SIRET', 'Certificat de sécurité (cadenas)', 'Formulaire de devis relié à Demandes'];
 
 /** Mise en ligne en trois temps : vérification, publication (progression), confirmation. */
 export function PublishSheet({ open, onClose, url, onPublished }: { open: boolean; onClose: () => void; url: string; onPublished: () => void }) {

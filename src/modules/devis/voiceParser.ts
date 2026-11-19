@@ -1,6 +1,6 @@
 // Parseur local de dictée : transforme une phrase d'artisan en lignes de devis.
 // « trois prises, deux différentiels 30 mA type A, huit disjoncteurs 16 A et six heures de pose »
-// Fonctionne sans réseau. Plus tard, la version serveur (Bob) pourra prendre le relais
+// Fonctionne sans réseau. Plus tard, la version serveur (Brix AI) pourra prendre le relais
 // via service.parseDictation(), avec ce parseur en secours hors ligne.
 
 import type { DevisLigne } from '@/lib/types';

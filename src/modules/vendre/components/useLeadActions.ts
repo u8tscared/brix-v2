@@ -32,7 +32,7 @@ export function useLeadActions() {
     };
     s.upsertDevis(d);
     s.upsertLead({ ...l, status: 'devis' });
-    addExchange({ clientId: client.id, at: new Date().toISOString().slice(0, 16), kind: 'note', text: `Devis ${d.number} préparé par Bob depuis la demande.` });
+    addExchange({ clientId: client.id, at: new Date().toISOString().slice(0, 16), kind: 'note', text: `Devis ${d.number} préparé par Brix AI depuis la demande.` });
     toast(`Devis ${d.number} prêt à relire`);
     navigate(`/app/devis/${d.id}`);
   };

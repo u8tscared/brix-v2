@@ -1,4 +1,4 @@
-// Icônes Lucide référencées par nom (catalogue, actions de Bob). Ajouter ici toute nouvelle icône nommée.
+// Icônes Lucide référencées par nom (catalogue, actions de Brix AI). Ajouter ici toute nouvelle icône nommée.
 import type { LucideIcon, LucideProps } from 'lucide-react';
 import {
   AirVent,

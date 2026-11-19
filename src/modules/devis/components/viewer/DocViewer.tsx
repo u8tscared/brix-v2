@@ -152,8 +152,8 @@ function Viewer({ onClose, spec, kind, reference, subtitle, status, checks, onFi
           </div>
           {subtitle && <div className="truncate text-[12px] text-ink-3">{subtitle}</div>}
         </div>
-        <div className="hidden flex-1 items-center justify-center gap-3 md:flex">
-          {pageNav}
+        <div className="hidden min-w-0 flex-1 items-center justify-center gap-3 md:flex">
+          <span className="hidden lg:contents">{pageNav}</span>
           {zoomCtl}
         </div>
         {score && !wideChecks && (
@@ -165,14 +165,14 @@ function Viewer({ onClose, spec, kind, reference, subtitle, status, checks, onFi
             <span className="hidden lg:inline">vérifiés</span>
           </button>
         )}
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden shrink-0 items-center gap-2 md:flex">
           {onEdit && (
-            <Button variant="secondary" size="sm" icon={<PenLine />} onClick={() => (onClose(), setTimeout(onEdit, 200))}>
-              {editLabel}
+            <Button variant="secondary" size="sm" icon={<PenLine />} onClick={() => (onClose(), setTimeout(onEdit, 200))} aria-label={editLabel} className="max-lg:w-11 max-lg:px-0">
+              <span className="max-lg:sr-only">{editLabel}</span>
             </Button>
           )}
-          <Button variant="secondary" size="sm" icon={<Printer />} onClick={print} kbd="⌘P">
-            Imprimer
+          <Button variant="secondary" size="sm" icon={<Printer />} onClick={print} kbd="⌘P" aria-label="Imprimer" className="max-xl:w-11 max-xl:px-0 max-xl:[&_kbd]:hidden">
+            <span className="max-xl:sr-only">Imprimer</span>
           </Button>
           {onSend && (
             <Button variant="dawn" size="sm" icon={<Send />} onClick={onSend}>
@@ -228,7 +228,7 @@ function Viewer({ onClose, spec, kind, reference, subtitle, status, checks, onFi
             <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
               <CheckList items={checks} onFix={onFix ? fix : undefined} />
             </div>
-            <div className="border-t border-[#f2eff8] px-5 py-3.5 text-[12px] leading-relaxed text-ink-3">
+            <div className="kbd-hint border-t border-[#f2eff8] px-5 py-3.5 text-[12px] leading-relaxed text-ink-3">
               <span className="inline-flex items-center gap-1.5">
                 <Kbd>+</Kbd>
                 <Kbd>-</Kbd> zoom · <Kbd>0</Kbd> ajuster · <Kbd>Ctrl</Kbd> + molette

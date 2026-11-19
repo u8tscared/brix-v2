@@ -1,9 +1,10 @@
 import type { Env } from './env';
-import { HttpError, json } from './lib/http';
+import { ConfigError, HttpError, json } from './lib/http';
 import { handleCoreRoutes } from './modules/core/routes';
 import { handleFournisseursRoutes } from './modules/fournisseurs/routes';
 import { handleApiPubliqueRoutes } from './modules/api-publique/routes';
 import { handleMcpRoutes } from './modules/mcp/routes';
+import { handleWellKnown } from './modules/mcp/wellknown';
 import { relancerWebhooks } from './modules/api-publique/webhooks';
 import { handleDocumentsRoutes } from './modules/documents/routes';
 import { handleSignatureRoutes } from './modules/signature/routes';
@@ -11,6 +12,8 @@ import { handlePaiementsRoutes } from './modules/paiements/routes';
 import { handleNotificationsRoutes } from './modules/notifications/routes';
 import { cronParcours } from './modules/notifications/cron';
 import { handleEmailsRoutes } from './modules/emails/routes';
+import { handleSyncRoutes } from './modules/sync/routes';
+import { handleBobRoutes } from './modules/bob/routes';
 
 // Point d'entrée du worker Brix V2. Chaque module expose handleXRoutes(request, env, pathname)
 // qui renvoie null si la route ne le concerne pas (convention du CLAUDE.md).
@@ -36,11 +39,11 @@ export default {
     const url = new URL(request.url);
     const h = cors(request.headers.get('origin'), env);
     // L'API publique et le MCP répondent eux-mêmes à OPTIONS (CORS ouvert, accès par clé).
-    const selfCors = url.pathname.startsWith('/api/public/') || url.pathname.startsWith('/api/mcp');
+    const selfCors = url.pathname.startsWith('/api/public/') || url.pathname.startsWith('/api/mcp') || url.pathname.startsWith('/.well-known/');
     if (request.method === 'OPTIONS' && !selfCors) return new Response(null, { status: 204, headers: h });
     try {
       if (url.pathname.startsWith('/api/')) {
-        const handlers = [handleCoreRoutes, handleDocumentsRoutes, handleSignatureRoutes, handlePaiementsRoutes, handleNotificationsRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes, handleEmailsRoutes];
+        const handlers = [handleCoreRoutes, handleSyncRoutes, handleDocumentsRoutes, handleSignatureRoutes, handlePaiementsRoutes, handleNotificationsRoutes, handleFournisseursRoutes, handleApiPubliqueRoutes, handleMcpRoutes, handleEmailsRoutes, handleBobRoutes];
         for (const handle of handlers) {
           const res = await handle(request, env, url.pathname);
           if (res) return withHeaders(res, h);
@@ -50,12 +53,15 @@ export default {
       // Liens courts reçus par e-mail / SMS : /d/<jeton> → /#/d/<jeton> (l'app est en HashRouter)
       const court = url.pathname.match(/^\/(d|f|p)\/([A-Za-z0-9_-]{43})$/);
       if (court) return Response.redirect(`${url.origin}/#/${court[1]}/${court[2]}`, 302);
+      // Découverte OAuth / MCP (Brix AI) : jamais la SPA, toujours du JSON (404 compris).
+      const wk = await handleWellKnown(request, env, url.pathname);
+      if (wk) return wk;
       if (env.ASSETS) return env.ASSETS.fetch(request);
       return new Response('Brix V2 API', { status: 200 });
     } catch (e) {
       const status = e instanceof HttpError ? e.status : 500;
       // Jamais de détail interne dans une erreur 500.
-      const message = status === 500 ? 'Erreur interne' : e instanceof Error ? e.message : 'Erreur';
+      const message = status === 500 && !(e instanceof ConfigError) ? 'Erreur interne' : e instanceof Error ? e.message : 'Erreur';
       if (status === 500) console.error(e);
       return withHeaders(json({ error: message }, status), h);
     }

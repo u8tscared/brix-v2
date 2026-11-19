@@ -21,7 +21,7 @@ export function PrioritesStep({ d, set }: StepProps) {
   };
   return (
     <>
-      <StepHeader kicker="Étape 3 sur 5" title="Qu'est-ce qui compte le plus pour vous ?" lead="Choisissez jusqu'à trois priorités, dans l'ordre. Votre cockpit les met en avant et Bob s'en occupe en premier." />
+      <StepHeader kicker="Étape 3 sur 5" title="Qu'est-ce qui compte le plus pour vous ?" lead="Choisissez jusqu'à trois priorités, dans l'ordre. Votre cockpit les met en avant et Brix AI s'en occupe en premier." />
       <div className="mb-3 flex items-center justify-between text-[12.5px] text-ink-3">
         <span>Touchez dans l'ordre d'importance</span>
         <span className="num" aria-live="polite">{d.priorities.length} sur {MAX}</span>

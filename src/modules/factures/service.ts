@@ -104,7 +104,7 @@ const civ = (c?: Client) => {
 };
 
 /**
- * Bob rédige une relance dans le ton de l'artisan.
+ * Brix AI rédige une relance dans le ton de l'artisan.
  * Niveau 1 : mail courtois. Niveau 2 : SMS court. Niveau 3 : mise en demeure.
  */
 export async function draftReminder(f: Facture, client: Client | undefined, company: Company, level: 1 | 2 | 3, tone: RelanceTone = 'cordial', userFirstName = 'Karim') {

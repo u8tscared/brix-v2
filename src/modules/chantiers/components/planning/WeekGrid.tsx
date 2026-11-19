@@ -41,25 +41,56 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
 
   const cellAt = (x: number, y: number) => (document.elementFromPoint(x, y)?.closest('[data-cell]') as HTMLElement | null)?.dataset.cell;
 
+  // Souris : on glisse tout de suite. Doigt : appui long (350 ms) avant de glisser, sinon le geste fait défiler la page.
   const onDown = (ev: React.PointerEvent, e: PlanningEvent) => {
-    if (ev.button !== 0) return;
+    if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+    const touch = ev.pointerType !== 'mouse';
     const r = (ev.currentTarget as HTMLElement).getBoundingClientRect();
     const d: Drag = { id: e.id, x: ev.clientX, y: ev.clientY, ox: ev.clientX - r.left, oy: ev.clientY - r.top, w: r.width, moving: false };
     dragRef.current = d;
+    let armed = !touch;
+    let aborted = false;
+    const blockScroll = (t: TouchEvent) => armed && t.cancelable && t.preventDefault();
+    const timer = touch
+      ? window.setTimeout(() => {
+          armed = true;
+          navigator.vibrate?.(8);
+          const cur = dragRef.current;
+          if (cur) setDrag({ ...cur, moving: true, target: cellAt(cur.x, cur.y) });
+          if (dragRef.current) dragRef.current = { ...dragRef.current, moving: true };
+        }, 350)
+      : 0;
+    const cleanup = () => {
+      clearTimeout(timer);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
+      window.removeEventListener('touchmove', blockScroll);
+      dragRef.current = null;
+      setDrag(null);
+    };
     const move = (m: PointerEvent) => {
-      const cur = dragRef.current!;
-      const moving = cur.moving || Math.hypot(m.clientX - d.x, m.clientY - d.y) > 6;
+      const cur = dragRef.current;
+      if (!cur) return;
+      const dist = Math.hypot(m.clientX - d.x, m.clientY - d.y);
+      if (!armed) {
+        // Le doigt bouge avant l'appui long : c'est un défilement, on laisse faire.
+        if (dist > 8) {
+          aborted = true;
+          cleanup();
+        }
+        return;
+      }
+      const moving = cur.moving || dist > 6;
       const next = { ...cur, x: m.clientX, y: m.clientY, moving, target: moving ? cellAt(m.clientX, m.clientY) : undefined };
       dragRef.current = next;
       if (moving) setDrag(next);
     };
+    const cancel = () => cleanup();
     const up = () => {
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', up);
       const cur = dragRef.current;
-      dragRef.current = null;
-      setDrag(null);
-      if (!cur) return;
+      cleanup();
+      if (!cur || aborted) return;
       if (!cur.moving) return onSlot({ ...e });
       if (!cur.target) return;
       const [employeeId, date] = cur.target.split('|');
@@ -71,6 +102,8 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', cancel);
+    if (touch) window.addEventListener('touchmove', blockScroll, { passive: false });
   };
 
   const dragged = drag ? events.find((e) => e.id === drag.id) : undefined;
@@ -141,10 +174,13 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
                           {isToday && i === nowIdx && <NowLine />}
                           <div
                             onPointerDown={(ev) => onDown(ev, e)}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(k) => (k.key === 'Enter' || k.key === ' ') && (k.preventDefault(), onSlot({ ...e }))}
                             style={personTone(p.color, e.kind)}
                             title={`${e.title} · ${e.start} – ${e.end}${conflict ? ' · conflit d’horaires' : ''}`}
                             className={cn(
-                              'relative cursor-grab touch-none rounded-[14px] py-1.5 pl-2.5 pr-2 text-left transition duration-300 ease-spring hover:-translate-y-px hover:shadow-raise active:cursor-grabbing',
+                              'relative cursor-grab touch-manipulation select-none rounded-[14px] [-webkit-touch-callout:none] py-1.5 pl-2.5 pr-2 text-left transition duration-300 ease-spring hover:-translate-y-px hover:shadow-raise active:cursor-grabbing',
                               conflict && 'ring-2 ring-bad',
                               past && 'opacity-55',
                               drag?.id === e.id && drag.moving && 'opacity-30',
@@ -162,7 +198,7 @@ export function WeekGrid({ days, people, events, conflicts, onSlot, outdoorOf }:
                       );
                     })}
                     {isToday && list.length > 0 && nowIdx === -1 && <NowLine />}
-                    <span className="pointer-events-none absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-white text-ink-3 shadow-pill opacity-0 transition group-hover:opacity-100">
+                    <span className="pointer-events-none absolute bottom-1 right-1 grid h-6 w-6 place-items-center rounded-full bg-white text-ink-3 shadow-pill opacity-0 transition group-hover:opacity-100 touch:opacity-60">
                       <Plus className="h-3.5 w-3.5" />
                     </span>
                   </div>

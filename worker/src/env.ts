@@ -51,4 +51,6 @@ export interface Env {
   EMAIL_FROM_NAME?: string;
   EMAIL_WEBHOOK_SECRET?: string;
   ENVIRONMENT?: string;
+  // Brix AI MCP : jeton de vérification de domaine OpenAI (/.well-known/openai-apps-challenge)
+  OPENAI_APPS_CHALLENGE?: string;
 }

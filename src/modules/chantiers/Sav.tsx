@@ -49,7 +49,7 @@ export default function Sav() {
         items={[
           { label: 'Ouvertes', value: open.length, tone: urgent ? 'bad' : undefined, sub: urgent ? `${urgent} urgente${urgent > 1 ? 's' : ''}` : "rien d'urgent" },
           { label: 'À planifier', value: toPlan.length, tone: toPlan.some((c) => contractState(c).key === 'retard') ? 'warn' : undefined, sub: toPlan.length ? `dont ${toPlan.filter((c) => contractState(c).key === 'retard').length} en retard` : 'tout est calé' },
-          { label: 'Rappels auto', value: myContracts.filter((c) => c.reminder).length, sub: nextReminder ? `prochain le ${dateShort(nextReminder)}${nextReminder.slice(0, 4) !== todayISO().slice(0, 4) ? ' ' + nextReminder.slice(0, 4) : ''}` : 'envoyés par Bob' },
+          { label: 'Rappels auto', value: myContracts.filter((c) => c.reminder).length, sub: nextReminder ? `prochain le ${dateShort(nextReminder)}${nextReminder.slice(0, 4) !== todayISO().slice(0, 4) ? ' ' + nextReminder.slice(0, 4) : ''}` : 'envoyés par Brix AI' },
         ]}
       />
 

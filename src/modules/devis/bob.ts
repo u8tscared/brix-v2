@@ -1,5 +1,5 @@
-// Suggestions de Bob sur un devis : calculées localement (règles métier), chaque action modifie
-// vraiment le devis. Plus tard, l'API Bob pourra enrichir cette liste (POST /api/bob/devis/review).
+// Suggestions de Brix AI sur un devis : calculées localement (règles métier), chaque action modifie
+// vraiment le devis. Plus tard, l'API Brix AI pourra enrichir cette liste (POST /api/bob/devis/review).
 
 import type { Client, Company, Devis, DevisLigne } from '@/lib/types';
 import { money, pct, totals, uid } from '@/lib/format';
@@ -137,7 +137,7 @@ export function buildSuggestions(d: Devis, client: Client | undefined, company: 
 }
 
 // ---------------------------------------------------------------------------
-// « Demande ou dicte à Bob » : petites commandes en langage courant.
+// « Demande ou dicte à Brix AI » : petites commandes en langage courant.
 
 export interface BobReply {
   text: string;

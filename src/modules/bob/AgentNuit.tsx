@@ -10,9 +10,9 @@ import { BobNav } from './components/BobNav';
 import { Toggle } from './components/SettingToggle';
 
 const LEVELS: { key: NightLevel; title: string; text: string; icon: string }[] = [
-  { key: 'ask', title: 'Me demander toujours', text: 'Bob prépare tout, mais rien ne part sans ton accord le matin.', icon: 'ShieldCheck' },
+  { key: 'ask', title: 'Me demander toujours', text: 'Brix AI prépare tout, mais rien ne part sans ton accord le matin.', icon: 'ShieldCheck' },
   { key: 'small', title: 'Agir pour les petites choses', text: 'Relances polies et rapprochements faits seul. Devis et commandes attendent ton accord.', icon: 'Zap' },
-  { key: 'auto', title: 'Autonome', text: 'Bob envoie aussi les devis préparés et passe les commandes sous 500 €.', icon: 'MoonStar' },
+  { key: 'auto', title: 'Autonome', text: 'Brix AI envoie aussi les devis préparés et passe les commandes sous 500 €.', icon: 'MoonStar' },
 ];
 
 const TASKS: { key: string; label: string; hint: string }[] = [
@@ -34,7 +34,7 @@ export default function AgentNuit() {
   const decide = (id: string, d: 'validee' | 'annulee') => {
     local.decideNight(id, d);
     if (d === 'validee') s.updateBob(id, { done: true });
-    toast(d === 'validee' ? 'Validé, Bob s’en occupe.' : 'Annulé, rien n’est parti.', d === 'validee' ? 'ok' : 'info', { label: 'Revenir', run: () => { local.decideNight(id, null); if (d === 'validee') s.updateBob(id, { done: false }); } });
+    toast(d === 'validee' ? 'Validé, Brix AI s’en occupe.' : 'Annulé, rien n’est parti.', d === 'validee' ? 'ok' : 'info', { label: 'Revenir', run: () => { local.decideNight(id, null); if (d === 'validee') s.updateBob(id, { done: false }); } });
   };
   const validateAll = () => {
     pending.forEach((b) => { local.decideNight(b.id, 'validee'); s.updateBob(b.id, { done: true }); });
@@ -51,7 +51,7 @@ export default function AgentNuit() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={<IconTile name="MoonStar" tone="indigo" size="lg" />} kicker="Bob" title="Agent de nuit" subtitle="Pendant que tu dors, Bob relance, prépare et range. Tu valides le matin en un geste." />
+      <PageHeader icon={<IconTile name="MoonStar" tone="indigo" size="lg" />} kicker="Brix AI" title="Agent de nuit" subtitle="Pendant que tu dors, Brix AI relance, prépare et range. Tu valides le matin en un geste." />
       <BobNav />
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[1.45fr_1fr]">
@@ -76,7 +76,7 @@ export default function AgentNuit() {
               <span className="flex items-center gap-1.5 text-[13px] font-medium text-deep-g"><SuccessDot size={20} /> Tout est traité</span>
             )}
           </header>
-          {log.length === 0 && <p className="relative px-5 pb-8 pt-4 text-[13px] text-ink-2">Bob n’a rien eu à faire cette nuit.</p>}
+          {log.length === 0 && <p className="relative px-5 pb-8 pt-4 text-[13px] text-ink-2">Brix AI n’a rien eu à faire cette nuit.</p>}
           <ol className="stagger-fast relative px-3 pb-3">
             <span className="absolute bottom-8 left-[87.5px] top-6 w-px bg-halo-line max-sm:left-[35.5px]" aria-hidden />
             {log.map((b) => {
@@ -113,7 +113,7 @@ export default function AgentNuit() {
 
         <div className="space-y-5">
           <Card className="p-4">
-            <div className="text-[14px] font-semibold">Ce que Bob peut faire seul</div>
+            <div className="text-[14px] font-semibold">Ce que Brix AI peut faire seul</div>
             <div className="mt-3 space-y-2">
               {LEVELS.map((l) => (
                 <button key={l.key} onClick={() => { local.setNightLevel(l.key); toast(`Autonomie : ${l.title.toLowerCase()}.`); }} className={cn('flex w-full items-start gap-3 rounded-card-sm border p-3 text-left transition duration-300 ease-spring active:scale-[.99]', local.nightLevel === l.key ? 'border-transparent bg-dawn-pale shadow-[0_0_0_1.5px_#e9b8f5,0_10px_30px_-12px_rgba(217,70,239,.3)]' : 'border-transparent bg-white shadow-halo-sm hover:-translate-y-px')}>
@@ -127,7 +127,7 @@ export default function AgentNuit() {
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-[11.5px] text-ink-3">Quel que soit le réglage, Bob ne paie rien, ne supprime rien et ne signe rien à ta place.</p>
+            <p className="mt-3 text-[11.5px] text-ink-3">Quel que soit le réglage, Brix AI ne paie rien, ne supprime rien et ne signe rien à ta place.</p>
           </Card>
 
           <Card className="p-4">
@@ -144,7 +144,7 @@ export default function AgentNuit() {
                 {tonight.map((t) => <li key={t} className="flex gap-2 text-[13px] text-ink-2"><span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-ink-3" />{t}</li>)}
               </ul>
             ) : (
-              <p className="mt-2 text-[13px] text-ink-2">Toutes les tâches sont coupées : Bob se repose aussi.</p>
+              <p className="mt-2 text-[13px] text-ink-2">Toutes les tâches sont coupées : Brix AI se repose aussi.</p>
             )}
             <button onClick={() => navigate('/app/bob/brief')} className="mt-3 flex items-center gap-1.5 text-[12.5px] font-medium text-ink-2 hover:text-ink"><RotateCcw className="h-3.5 w-3.5" /> Le résumé arrive dans ton brief du matin</button>
           </Card>

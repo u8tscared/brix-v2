@@ -76,7 +76,7 @@ export function Tip({ label, children, side = 'top' }: { label: ReactNode; child
   return (
     <span className="group/tip relative inline-flex">
       {children}
-      <span role="tooltip" className={cn('pointer-events-none absolute z-50 whitespace-nowrap rounded-full bg-ink px-2.5 py-1 text-[12px] font-medium text-white opacity-0 shadow-pop transition duration-150 group-hover/tip:opacity-100 group-hover/tip:delay-300 max-md:hidden', pos)}>
+      <span role="tooltip" className={cn('pointer-events-none absolute z-50 whitespace-nowrap rounded-full bg-ink px-2.5 py-1 text-[12px] font-medium text-white opacity-0 shadow-pop transition duration-150 group-hover/tip:opacity-100 group-hover/tip:delay-300 max-md:hidden touch:hidden', pos)}>
         {label}
       </span>
     </span>
@@ -107,7 +107,7 @@ export function Progress({ value, className, tone = 'ink' }: { value: number; cl
 }
 
 export function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="inline-grid h-5 min-w-5 place-items-center rounded-[6px] bg-white px-1 font-sans text-[11px] font-medium text-ink-3 shadow-[0_0_0_1px_#e6e1f1,0_1px_0_#e6e1f1]">{children}</kbd>;
+  return <kbd className="kbd-hint inline-grid h-5 min-w-5 place-items-center rounded-[6px] bg-white px-1 font-sans text-[11px] font-medium text-ink-3 shadow-[0_0_0_1px_#e6e1f1,0_1px_0_#e6e1f1]">{children}</kbd>;
 }
 
 export function Row({ children, className, onClick }: { children: ReactNode; className?: string; onClick?: () => void }) {

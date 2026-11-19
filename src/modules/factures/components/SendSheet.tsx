@@ -92,7 +92,7 @@ export function SendSheet({ f, open, onClose, missing, checks, onPreview }: { f:
           text={
             <>
               {client?.name ?? 'Votre client'} la reçoit à <b className="font-medium text-ink">{done.to}</b>
-              {f.kind !== 'avoir' && withLink ? ', avec un lien pour payer en un clic.' : '.'} {f.kind !== 'avoir' && 'Bob relancera tout seul si l’échéance passe.'}
+              {f.kind !== 'avoir' && withLink ? ', avec un lien pour payer en un clic.' : '.'} {f.kind !== 'avoir' && 'Brix AI relancera tout seul si l’échéance passe.'}
             </>
           }
           onClose={onClose}

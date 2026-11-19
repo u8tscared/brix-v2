@@ -67,11 +67,11 @@ export function DocCard({ d, selecting, picked, fresh, fetching, onOpen, onDropF
           ) : (
             <Badge tone={st.tone} dot>{st.label}</Badge>
           )}
-          {d.auto && !fresh && <span className="text-[11.5px] text-ink-3">· récupéré par Bob</span>}
+          {d.auto && !fresh && <span className="text-[11.5px] text-ink-3">· récupéré par Brix AI</span>}
         </div>
       </div>
       {!selecting && (
-        <span className="hidden shrink-0 items-center gap-1 text-[12px] font-medium text-ink-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 md:flex">
+        <span className="hidden shrink-0 items-center gap-1 text-[12px] font-medium text-ink-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100 touch:opacity-100 md:flex">
           {over ? <><Upload className="h-3.5 w-3.5" />Déposer</> : <><FileText className="h-3.5 w-3.5" />Ouvrir</>}
         </span>
       )}

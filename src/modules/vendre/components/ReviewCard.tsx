@@ -58,7 +58,7 @@ export function ReviewCard({ r }: { r: Review }) {
             </div>
           ) : editing && r.replyDraft !== undefined ? (
             <div className="mt-3 animate-fade-up space-y-2">
-              <div className="flex items-center gap-2 text-[12px] text-ink-3"><BrandTile size={20} className="rounded-[6px]" />Bob a rédigé, relisez et publiez</div>
+              <div className="flex items-center gap-2 text-[12px] text-ink-3"><BrandTile size={20} className="rounded-[6px]" />Brix AI a rédigé, relisez et publiez</div>
               <Textarea value={r.replyDraft} onChange={(e) => setReview(r.id, { replyDraft: e.target.value })} className="text-[13px]" />
               <div className="flex justify-end gap-2">
                 <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>Plus tard</Button>
@@ -69,7 +69,7 @@ export function ReviewCard({ r }: { r: Review }) {
             <div className="mt-3 flex items-center gap-2">
               <Badge tone="warn" dot>Sans réponse</Badge>
               <Button size="sm" variant="soft" loading={drafting} onClick={r.replyDraft ? () => setEditing(true) : draft} className={cn(drafting && 'opacity-80')}>
-                {drafting ? 'Bob écrit…' : 'Faire répondre par Bob'}
+                {drafting ? 'Brix AI écrit…' : 'Faire répondre par Brix AI'}
               </Button>
             </div>
           )}

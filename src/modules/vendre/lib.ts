@@ -32,7 +32,7 @@ export const clientSourceIcon = (s?: Client['source']): LucideIcon =>
 
 export const LEAD_STATUS: Record<Lead['status'], { label: string; tone: Tone; hint: string }> = {
   nouveau: { label: 'Nouvelles', tone: 'violet', hint: 'À rappeler' },
-  qualifie: { label: 'Qualifiées', tone: 'info', hint: 'Bob a tout vérifié' },
+  qualifie: { label: 'Qualifiées', tone: 'info', hint: 'Brix AI a tout vérifié' },
   rdv: { label: 'Visite prévue', tone: 'warn', hint: 'Rendez-vous calé' },
   devis: { label: 'Devis envoyé', tone: 'neutral', hint: 'En attente de signature' },
   gagne: { label: 'Gagnées', tone: 'ok', hint: 'Devenues chantier' },
@@ -47,7 +47,7 @@ export const URGENCY: Record<Urgency, { label: string; tone: Tone }> = {
   flexible: { label: 'Pas pressé', tone: 'neutral' },
 };
 
-/** Lecture rapide d'une demande par Bob (déterministe en démo, remplacée par l'IA côté serveur). */
+/** Lecture rapide d'une demande par Brix AI (déterministe en démo, remplacée par l'IA côté serveur). */
 export function readLead(l: Lead): { urgency: Urgency; summary: string; kind: string } {
   const t = l.request.toLowerCase();
   const urgency: Urgency = /urgent|saute|panne|plus de courant|fuite|vite/.test(t) ? 'urgent' : /rénovation|achat|devis|borne/.test(t) ? 'semaine' : 'flexible';

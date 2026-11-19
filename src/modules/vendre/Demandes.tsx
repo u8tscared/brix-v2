@@ -52,8 +52,8 @@ export default function Demandes() {
       <PageHeader
         icon={<IconTile name="Inbox" dept="vendre" size="lg" />}
         title="Demandes"
-        titleMuted="triées par Bob."
-        subtitle="Site, téléphone, WhatsApp, plateformes : tout arrive ici, Bob trie et estime."
+        titleMuted="triées par Brix AI."
+        subtitle="Site, téléphone, WhatsApp, plateformes : tout arrive ici, Brix AI trie et estime."
         actions={<Button variant="primary" icon={<Plus className="h-4 w-4" />} onClick={() => setCreating(true)}>Nouvelle demande</Button>}
       />
 
@@ -62,7 +62,7 @@ export default function Demandes() {
         items={[
           { label: 'À rappeler', value: fresh, tone: fresh ? 'warn' : 'ok', sub: fresh ? "Rappeler dans l'heure double les chances" : 'Tout le monde a été rappelé' },
           { label: 'Devenues devis', value: rate, format: (n) => `${Math.round(n)} %`, sub: 'sur 30 jours' },
-          { label: 'Temps de réponse', value: '38 min', sub: 'Bob répond la nuit' },
+          { label: 'Temps de réponse', value: '38 min', sub: 'Brix AI répond la nuit' },
         ]}
       />
 
@@ -81,7 +81,7 @@ export default function Demandes() {
       </div>
 
       {leads.length === 0 ? (
-        <EmptyState icon={<Inbox />} title="Aucune demande pour l'instant" text="Reliez votre site, votre numéro et Habitatpresto : chaque demande arrivera ici, déjà triée par Bob." action={<Button variant="primary" onClick={() => setCreating(true)}>Ajouter une demande</Button>} />
+        <EmptyState icon={<Inbox />} title="Aucune demande pour l'instant" text="Reliez votre site, votre numéro et Habitatpresto : chaque demande arrivera ici, déjà triée par Brix AI." action={<Button variant="primary" onClick={() => setCreating(true)}>Ajouter une demande</Button>} />
       ) : (
         <>
           {/* Téléphone et tablette : liste filtrée par étape */}

@@ -76,7 +76,7 @@ export function LotBlock({ lot, index, collapsed, onToggle, vatRate, h, lh, phon
       {sec && (
         <Menu
           trigger={({ toggle }) => (
-            <button onClick={toggle} className={cn('grid h-9 w-9 place-items-center rounded-full text-ink-3 transition hover:bg-white/70 hover:text-ink', !phone && 'opacity-0 focus:opacity-100 group-hover:opacity-100')} aria-label="Actions du lot">
+            <button onClick={toggle} className={cn('grid h-9 w-9 place-items-center rounded-full text-ink-3 transition hover:bg-white/70 hover:text-ink', !phone && 'opacity-0 focus:opacity-100 group-hover:opacity-100 touch:opacity-100')} aria-label="Actions du lot">
               <MoreHorizontal className="h-4 w-4" />
             </button>
           )}

@@ -33,7 +33,11 @@ export default function Welcome() {
           <button onClick={() => navigate('/app')} className="glass flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-[13px] font-medium text-ink-2 transition hover:text-ink">
             Retour à {company || 'mon Brix'} <ArrowRight className="h-3.5 w-3.5" />
           </button>
-        ) : null}
+        ) : (
+          <button onClick={() => navigate('/connexion')} className="glass flex min-h-[44px] items-center gap-1.5 rounded-full px-4 text-[13px] font-medium text-ink-2 transition hover:text-ink">
+            J'ai déjà un compte <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        )}
       </header>
 
       <main className="relative z-10 mx-auto flex w-full max-w-[880px] flex-1 flex-col justify-center px-5 py-10 text-center md:py-10">
@@ -84,7 +88,7 @@ export default function Welcome() {
           </div>
           <div className="mt-4 flex flex-col gap-3 border-t border-halo-line pt-4 sm:flex-row sm:items-center">
             <p key={trade} className="min-w-0 flex-1 animate-fade-in px-1 text-[13px] leading-snug text-ink-2">
-              Vous entrez chez <b className="font-semibold text-ink">{demo.name}</b> : ses devis, ses chantiers, son équipe, et Bob qui parle votre métier.
+              Vous entrez chez <b className="font-semibold text-ink">{demo.name}</b> : ses devis, ses chantiers, son équipe, et Brix AI qui parle votre métier.
             </p>
             <Button variant="primary" size="lg" className="shrink-0 justify-center" icon={<Play className="h-4 w-4 fill-current" />} onClick={() => navigate(`/demo?metier=${trade}`)}>
               Essayer la démo
@@ -95,7 +99,7 @@ export default function Welcome() {
         <div className="mx-auto mt-6 grid w-full max-w-[600px] animate-[fade-up_.6s_var(--ease)_.34s_both] grid-cols-3 gap-2 text-left sm:gap-3">
           {[
             { I: Timer, t: '3 minutes', s: 'pour un Brix sur mesure', tone: 'violet' as const },
-            { I: AudioLines, t: 'Bob', s: 'l’assistant qui travaille la nuit', tone: 'mag' as const },
+            { I: AudioLines, t: 'Brix AI', s: 'l’assistant qui travaille la nuit', tone: 'mag' as const },
             { I: ShieldCheck, t: 'Sans engagement', s: 'vous partez quand vous voulez', tone: 'green' as const },
           ].map(({ I, t, s, tone }) => (
             <div key={t} className="glass rounded-card-sm p-3">

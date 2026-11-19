@@ -8,7 +8,7 @@ import { isProName, readLead } from './lib';
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Qualification d'une demande par Bob (score, estimation). Vraie version : POST /api/bob/qualify. */
+/** Qualification d'une demande par Brix AI (score, estimation). Vraie version : POST /api/bob/qualify. */
 export async function qualifyLead(l: Lead): Promise<Pick<Lead, 'score' | 'estimate'>> {
   await wait(900);
   const r = readLead(l);
@@ -37,7 +37,7 @@ export async function lookupCompany(q: string): Promise<Partial<Client> | null> 
   return { name: q.trim().replace(/\b\w/g, (c) => c.toUpperCase()), siret: '9' + String(Math.floor(Math.random() * 1e8)).padStart(8, '0').replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3') + ' 00019', address: '8 rue Garibaldi', city: '69006 Lyon' };
 }
 
-/** Lignes de devis pré-remplies à partir d'une demande. Vraie version : Bob côté serveur avec la bibliothèque de prix. */
+/** Lignes de devis pré-remplies à partir d'une demande. Vraie version : Brix AI côté serveur avec la bibliothèque de prix. */
 export function linesFromLead(l: Lead, rate = 55): DevisLigne[] {
   const kind = readLead(l).kind;
   const mk = (designation: string, quantity: number, unit: string, unitPriceHt: number, unitCostHt: number, k: DevisLigne['kind'] = unit === 'h' ? 'main_oeuvre' : 'fourniture'): DevisLigne => ({
@@ -143,7 +143,7 @@ export function parseContacts(text: string, filename: string): Partial<Client>[]
     .filter((c) => c.name);
 }
 
-/** Réponse à un avis rédigée par Bob. Vraie version : POST /api/bob/review-reply puis Google Business Profile API. */
+/** Réponse à un avis rédigée par Brix AI. Vraie version : POST /api/bob/review-reply puis Google Business Profile API. */
 export async function draftReviewReply(r: { author: string; rating: number; text: string }, signer: string): Promise<string> {
   await wait(1100);
   const first = r.author.split(' ')[0].replace(/\.$/, '');

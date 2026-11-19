@@ -1,8 +1,9 @@
-import { useEffect, type ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { usePresence } from '@/components/motion';
 import { cn } from './cn';
+import { useModal } from './useModal';
 
 /**
  * Panneau modal : glisse depuis le bas sur téléphone, depuis la droite sur
@@ -11,17 +12,9 @@ import { cn } from './cn';
  */
 export function Sheet({ open, onClose, title, subtitle, children, footer, side = 'right', width = 480, icon, bare }: { open: boolean; onClose: () => void; title?: ReactNode; subtitle?: ReactNode; children: ReactNode; footer?: ReactNode; side?: 'right' | 'center' | 'full'; width?: number; icon?: ReactNode; bare?: boolean }) {
   const { mounted, closing } = usePresence(open, 240);
-  useEffect(() => {
-    if (!open) return;
-    const k = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', k);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', k);
-      document.body.style.overflow = prev;
-    };
-  }, [open, onClose]);
+  const panel = useRef<HTMLDivElement>(null);
+  // Échap, piège de focus, fond inerte et défilement du fond bloqué (iOS compris).
+  useModal(panel, open, onClose);
   if (!mounted) return null;
   const anim = closing
     ? side === 'right'
@@ -34,13 +27,16 @@ export function Sheet({ open, onClose, title, subtitle, children, footer, side =
     <div className="fixed inset-0 z-[80]">
       <div className={cn('absolute inset-0 bg-[#1b1236]/20 backdrop-blur-[6px]', closing ? 'animate-[fade-out_.22s_ease_both]' : 'animate-[fade-in_.3s_ease_both]')} onClick={onClose} />
       <div
+        ref={panel}
         role="dialog"
         aria-modal="true"
+        tabIndex={-1}
+        aria-label={typeof title === 'string' ? title : undefined}
         style={{ ['--w' as string]: `${width}px` }}
         className={cn(
-          'absolute flex flex-col overflow-hidden bg-white/[.88] shadow-pop backdrop-blur-2xl backdrop-saturate-150',
+          'absolute flex flex-col overflow-hidden bg-white/[.88] shadow-pop outline-none backdrop-blur-2xl backdrop-saturate-150 max-md:px-safe',
           side === 'full' ? 'inset-0 md:inset-3 md:rounded-sheet' : 'inset-x-0 bottom-0 max-h-[92dvh] rounded-t-sheet',
-          side === 'right' && 'md:inset-y-3 md:left-auto md:right-3 md:max-h-none md:w-[var(--w)] md:max-w-[calc(100vw-24px)] md:rounded-sheet',
+          side === 'right' && 'md:top-[max(12px,var(--safe-t))] md:bottom-[max(12px,var(--safe-b))] md:left-auto md:right-[calc(12px+var(--safe-r))] md:max-h-none md:w-[var(--w)] md:max-w-[calc(100vw-24px)] md:rounded-sheet',
           side === 'center' && 'md:inset-0 md:m-auto md:h-fit md:max-h-[86dvh] md:w-[var(--w)] md:max-w-[calc(100vw-32px)] md:rounded-sheet',
           anim,
         )}
@@ -54,7 +50,7 @@ export function Sheet({ open, onClose, title, subtitle, children, footer, side =
               {title && <h3 className="text-[20px] font-semibold leading-tight tracking-[-0.035em]">{title}</h3>}
               {subtitle && <p className="mt-1 text-[13px] leading-snug text-ink-2">{subtitle}</p>}
             </div>
-            <button onClick={onClose} aria-label="Fermer" className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/70 text-ink-3 shadow-[0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:rotate-90 hover:bg-white hover:text-ink">
+            <button onClick={onClose} aria-label="Fermer" className="grid h-9 w-9 touch:h-11 touch:w-11 shrink-0 place-items-center rounded-full bg-white/70 text-ink-3 shadow-[0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:rotate-90 hover:bg-white hover:text-ink">
               <X className="h-4 w-4" />
             </button>
           </div>

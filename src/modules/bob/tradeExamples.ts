@@ -1,4 +1,4 @@
-// Phrases d'exemple dans les mots de chaque métier (Bob, visite guidée, palette).
+// Phrases d'exemple dans les mots de chaque métier (Brix AI, visite guidée, palette).
 
 export const DEVIS_EXAMPLE: Record<string, string> = {
   electricien: 'Fais un devis pour Mme Martin, 3 prises et un radiateur',

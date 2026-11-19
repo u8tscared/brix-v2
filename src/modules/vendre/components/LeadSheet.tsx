@@ -71,9 +71,9 @@ export function LeadSheet({ lead, onClose }: { lead: Lead | null; onClose: () =>
         <div className="relative overflow-hidden rounded-card-sm bg-dawn-mist p-4 shadow-halo-sm">
           <div className="flex items-center gap-2.5">
             <BrandTile size={28} className="rounded-[9px]" />
-            <span className="text-[13px] font-semibold">Ce que Bob en pense</span>
+            <span className="text-[13px] font-semibold">Ce que Brix AI en pense</span>
             <div className="flex-1" />
-            {qualifying ? <span className="text-xs text-ink-3">Bob lit la demande…</span> : <ScoreDot score={lead.score} />}
+            {qualifying ? <span className="text-xs text-ink-3">Brix AI lit la demande…</span> : <ScoreDot score={lead.score} />}
           </div>
           {qualifying ? (
             <div className="mt-3 space-y-2">

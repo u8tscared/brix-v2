@@ -54,12 +54,12 @@ export const MODULE_ROUTES: ModuleRouteDef[] = [
   r('stocks', 'stock', () => import('./achats/Stock')),
   r('vehicules', 'vehicules', () => import('./achats/Vehicules')),
   r('soustraitants', 'sous-traitants', () => import('./achats/SousTraitants')),
-  // Bob
+  // Brix AI
   r('bob', 'bob', () => import('./bob/BobPage')),
   r('brief', 'bob/brief', () => import('./bob/Brief')),
   r('agent_nuit', 'bob/nuit', () => import('./bob/AgentNuit')),
   r('secretaire', 'bob/secretaire', () => import('./bob/Secretaire')),
-  r('mcp', 'bob/mcp', () => import('./bob/Mcp')),
+  r('mcp', 'bob/mcp', () => import('./fournisseurs/mcp/BrixAiPage')),
   // Métier
   r('outils_metier', 'outils', () => import('./metier/Outils')),
   r('outils_metier', 'outils/:tool', () => import('./metier/Outils')),

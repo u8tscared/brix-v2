@@ -78,8 +78,8 @@ export default function FacturePublique() {
           <p className="mt-3 text-[15px] text-ink-2">{f.title}</p>
         </section>
 
-        <div className="grid gap-6 pb-10 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-10">
-          <aside className="lg:order-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 pb-10 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-10">
+          <aside className="min-w-0 lg:order-2">
             <div className="space-y-4 lg:sticky lg:top-[92px]">
               <Card className="p-5 sm:p-6">
                 <div className="label-halo">{payee ? 'Montant réglé' : 'Reste à régler'}</div>

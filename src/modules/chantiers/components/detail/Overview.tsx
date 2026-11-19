@@ -123,7 +123,7 @@ export function Overview({ v, missingPhoto, onOpenJournal }: { v: ChantierView; 
                 )}
               </div>
               {outdoor && (
-                <Button size="sm" onClick={() => toast('Bob a décalé les travaux extérieurs au lendemain (démo)', 'info')}>
+                <Button size="sm" onClick={() => toast('Brix AI a décalé les travaux extérieurs au lendemain (démo)', 'info')}>
                   Décaler
                 </Button>
               )}

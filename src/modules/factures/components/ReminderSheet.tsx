@@ -1,4 +1,4 @@
-// Relance rédigée par Bob, modifiable avant envoi (mail, SMS ou mise en demeure).
+// Relance rédigée par Brix AI, modifiable avant envoi (mail, SMS ou mise en demeure).
 
 import { useEffect, useState } from 'react';
 import { Mail, MessageSquareText, Printer, RotateCcw, Send, Stamp } from 'lucide-react';
@@ -94,12 +94,12 @@ export function ReminderSheet({ f, open, onClose, level: initial }: { f: Facture
         />
         <div className="flex items-center gap-2.5 rounded-card-sm bg-dawn-mist px-3 py-2.5 text-[12.5px] text-ink-2 shadow-halo-sm">
           <BrandTile size={24} />
-          {drafting ? 'Bob rédige…' : 'Bob a rédigé ce message dans votre ton. Modifiez-le si besoin.'}
+          {drafting ? 'Brix AI rédige…' : 'Brix AI a rédigé ce message dans votre ton. Modifiez-le si besoin.'}
           <button onClick={() => draft(level)} className="ml-auto inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-1 font-medium text-deep-v transition hover:bg-pale-v">
             <RotateCcw className="h-3.5 w-3.5" /> Autre version
           </button>
         </div>
-        <Textarea value={drafting ? '' : text} placeholder={drafting ? 'Bob rédige…' : ''} onChange={(e) => setText(e.target.value)} style={{ minHeight: level === 2 ? 140 : 340 }} />
+        <Textarea value={drafting ? '' : text} placeholder={drafting ? 'Brix AI rédige…' : ''} onChange={(e) => setText(e.target.value)} style={{ minHeight: level === 2 ? 140 : 340 }} />
         {level === 2 && <div className="text-right text-[11.5px] text-ink-3">{text.length} caractères · {Math.max(1, Math.ceil(text.length / 160))} SMS</div>}
         {level === 3 && <p className="rounded-field bg-pale-n px-3.5 py-2.5 text-[12px] text-ink-2">Envoi en lettre recommandée électronique (AR24) en un clic, ou imprimez-la. En démo, rien n’est envoyé.</p>}
       </div>

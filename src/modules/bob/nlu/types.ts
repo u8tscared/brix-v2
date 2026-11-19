@@ -1,5 +1,5 @@
-// Format des réponses de Bob : un texte court, des cartes riches et des suggestions.
-// Le moteur local (démo) et le vrai modèle (api.ts) renvoient la même forme.
+// Format des réponses de Brix AI : un texte court, des cartes riches et des suggestions.
+// Le moteur local et les outils de Brix AI en ligne (outils/*.ts) produisent les mêmes cartes.
 
 export interface BobCardAction {
   label: string;
@@ -7,7 +7,7 @@ export interface BobCardAction {
   to?: string;
   /** Action immédiate (envoi, annulation…). Renvoie un message de confirmation. */
   run?: () => string | void;
-  /** Texte envoyé à Bob comme si l'utilisateur l'avait tapé. */
+  /** Texte envoyé à Brix AI comme si l'utilisateur l'avait tapé. */
   ask?: string;
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
   icon?: string;

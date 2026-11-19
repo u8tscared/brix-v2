@@ -4,14 +4,14 @@ import { useBrix } from '@/lib/store';
 import type { ModuleKey } from '@/lib/catalog';
 
 const ITEMS: { to: string; label: string; icon: string; module: ModuleKey }[] = [
-  { to: '/app/bob', label: 'Bob', icon: 'AudioLines', module: 'bob' },
+  { to: '/app/bob', label: 'Brix AI', icon: 'AudioLines', module: 'bob' },
   { to: '/app/bob/brief', label: 'Brief du matin', icon: 'Sunrise', module: 'brief' },
   { to: '/app/bob/nuit', label: 'Agent de nuit', icon: 'MoonStar', module: 'agent_nuit' },
   { to: '/app/bob/secretaire', label: 'Secrétaire', icon: 'PhoneCall', module: 'secretaire' },
-  { to: '/app/bob/mcp', label: 'Brix AI MCP', icon: 'Plug', module: 'mcp' },
+  { to: '/app/bob/mcp', label: 'Connecter une IA', icon: 'Plug', module: 'mcp' },
 ];
 
-/** Onglets entre les écrans de Bob (seulement les modules actifs). */
+/** Onglets entre les écrans de Brix AI (seulement les modules actifs). */
 export function BobNav() {
   const enabled = useBrix((s) => s.enabled);
   const items = ITEMS.filter((i) => i.module === 'bob' || enabled.includes(i.module));

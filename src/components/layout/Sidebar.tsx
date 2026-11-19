@@ -1,8 +1,11 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, ChevronsUpDown, LayoutDashboard, PanelLeftClose, PanelLeftOpen, Plus, Search, Settings } from 'lucide-react';
 import { BrandTile } from '@/components/brand/Logo';
 import { Avatar, DEPT_TONE, Icon, Kbd, Tip, cn } from '@/components/ui';
+import { useModal } from '@/components/ui/useModal';
+import { usePresence } from '@/components/motion';
 import { MODULES, ROLE_LABEL, TRADE_BY_KEY, type DepartmentKey } from '@/lib/catalog';
 import { useBrix } from '@/lib/store';
 import { useUI } from '@/lib/ui';
@@ -15,12 +18,13 @@ function Item({ to, icon, label, badge, collapsed, end, dept }: { to: string; ic
     <NavLink
       to={to}
       end={end}
+      draggable={false}
       aria-label={collapsed ? label : undefined}
       style={tone ? ({ ['--tone' as string]: tone.fg } as React.CSSProperties) : undefined}
       className={({ isActive }) =>
         cn(
           'group relative z-[1] flex h-9 items-center gap-2.5 rounded-full text-[13.5px] font-medium tracking-[-0.01em] transition-colors duration-200',
-          collapsed ? 'w-10 justify-center' : 'px-3',
+          collapsed ? 'w-10 justify-center touch:h-11 touch:w-11' : 'px-3 touch:h-11',
           isActive ? 'text-ink [&_.nav-ico]:text-[var(--tone,#6d28d9)]' : 'text-ink-2 hover:bg-white/45 hover:text-ink',
         )
       }
@@ -61,16 +65,44 @@ function useActivePill(dep: unknown) {
   return { ref, box };
 }
 
-export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }) {
+/** Fondu en haut / en bas de la liste quand il reste des liens cachés (indice de défilement). */
+function useScrollFade(ref: React.RefObject<HTMLElement>, dep: unknown) {
+  const [edges, setEdges] = useState({ top: false, bottom: false });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const maj = () => setEdges({ top: el.scrollTop > 2, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 2 });
+    maj();
+    el.addEventListener('scroll', maj, { passive: true });
+    const ro = new ResizeObserver(maj);
+    ro.observe(el);
+    if (el.firstElementChild) ro.observe(el.firstElementChild);
+    return () => {
+      el.removeEventListener('scroll', maj);
+      ro.disconnect();
+    };
+  }, [dep]);
+  return edges;
+}
+
+/**
+ * Barre latérale en verre.
+ * - Ordinateur : complète (ou repliée au choix).
+ * - Tablette et éditeurs plein écran : rail replié (`forceCollapsed`) ; le bouton du haut ouvre le menu complet
+ *   par-dessus (`onExpand`), rendu par <SidebarDrawer>.
+ * - `drawer` : version complète dans le tiroir ; `onClose` la referme.
+ */
+export function Sidebar({ forceCollapsed = false, onExpand, drawer = false, onClose }: { forceCollapsed?: boolean; onExpand?: () => void; drawer?: boolean; onClose?: () => void }) {
   const s = useBrix();
   const ui = useUI();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const collapsed = forceCollapsed || s.prefs.sidebarCollapsed;
+  const collapsed = !drawer && (forceCollapsed || s.prefs.sidebarCollapsed);
   const { primary, groups } = buildNav(s.enabled);
   const [closed, setClosed] = useState<Record<string, boolean>>({});
   const trade = TRADE_BY_KEY[s.company.trade];
   const { ref: navRef, box } = useActivePill(`${pathname}|${collapsed}|${JSON.stringify(closed)}`);
+  const fade = useScrollFade(navRef, `${collapsed}|${JSON.stringify(closed)}`);
 
   const badges: Record<string, number> = {
     leads: s.leads.filter((l) => l.status === 'nouveau').length,
@@ -83,16 +115,27 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
   const deptOf = (key: string) => MODULES.find((m) => m.key === key)?.dept;
 
   return (
-    <aside className={cn('sticky top-0 z-20 flex h-dvh shrink-0 py-3 pl-3 transition-[width] duration-[400ms] ease-out-quint', collapsed ? 'w-[84px]' : 'w-[272px]')}>
+    <aside
+      className={cn(
+        'flex h-dvh shrink-0 pb-[calc(12px+var(--safe-b))] pl-[calc(12px+var(--safe-l))] pt-[calc(12px+var(--safe-t))]',
+        drawer ? 'w-[calc(296px+var(--safe-l))] max-w-[calc(100vw-48px)] pr-0' : 'sticky top-0 z-20 transition-[width] duration-[400ms] ease-out-quint',
+        !drawer && (collapsed ? 'w-[calc(84px+var(--safe-l))]' : 'w-[calc(272px+var(--safe-l))]'),
+      )}
+    >
       {/* Halo : barre latérale en verre qui flotte au-dessus du halo, 37 modules rangés par département. */}
-      <div className={cn('glass flex min-w-0 flex-1 flex-col rounded-[26px]', collapsed ? 'items-center px-2 py-3.5' : 'px-3 py-4')}>
+      <div className={cn('flex min-w-0 flex-1 flex-col rounded-[26px]', drawer ? 'glass-strong !bg-white/[.95] shadow-pop' : 'glass', collapsed ? 'items-center px-2 py-3.5' : 'px-3 py-4')}>
       <div className={cn('flex items-center', collapsed ? 'mb-3 flex-col gap-2' : 'mb-3 justify-between pl-1.5')}>
-        <button onClick={() => navigate('/app')} className="flex items-center gap-2" aria-label="Accueil Brix">
+        <button onClick={() => navigate('/app')} className={cn('flex items-center gap-2', collapsed && 'grid h-11 w-11 place-items-center')} aria-label="Accueil Brix">
           <BrandTile size={collapsed ? 34 : 28} animated />
           {!collapsed && <span className="font-display text-[20px] font-bold leading-none tracking-[-0.05em] text-night">Brix</span>}
         </button>
-        {!forceCollapsed && (
-          <button onClick={() => s.setPrefs({ sidebarCollapsed: !collapsed })} className="grid h-8 w-8 place-items-center rounded-full text-ink-3 transition hover:bg-white/70 hover:text-ink" aria-label={collapsed ? 'Ouvrir le menu' : 'Réduire le menu'}>
+        {(drawer || !forceCollapsed || onExpand) && (
+          <button
+            onClick={() => (drawer ? onClose?.() : forceCollapsed ? onExpand?.() : s.setPrefs({ sidebarCollapsed: !collapsed }))}
+            className="grid h-8 w-8 place-items-center rounded-full text-ink-3 transition hover:bg-white/70 hover:text-ink touch:h-11 touch:w-11"
+            aria-label={collapsed ? 'Ouvrir le menu' : drawer ? 'Fermer le menu' : 'Réduire le menu'}
+            aria-expanded={drawer ? true : collapsed ? false : undefined}
+          >
             {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
           </button>
         )}
@@ -109,7 +152,7 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
         </button>
       )}
 
-      <button onClick={() => ui.set({ palette: true })} className={cn('group my-3 flex items-center gap-2 rounded-full text-[13px] text-ink-3 transition hover:text-ink-2', collapsed ? 'h-10 w-10 justify-center hover:bg-white/70' : 'h-10 bg-white/55 px-3.5 shadow-[inset_0_0_0_1px_rgba(236,232,246,.9)] hover:bg-white/85')} aria-label="Rechercher">
+      <button onClick={() => ui.set({ palette: true })} className={cn('group my-3 flex items-center gap-2 rounded-full text-[13px] text-ink-3 transition hover:text-ink-2', collapsed ? 'h-10 w-10 justify-center hover:bg-white/70 touch:h-11 touch:w-11' : 'h-10 touch:h-11 bg-white/55 px-3.5 shadow-[inset_0_0_0_1px_rgba(236,232,246,.9)] hover:bg-white/85')} aria-label="Rechercher">
         <Search className="h-4 w-4 transition group-hover:scale-110" />
         {!collapsed && (
           <>
@@ -119,7 +162,12 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
         )}
       </button>
 
-      <nav ref={navRef} className={cn('relative -mx-1 flex-1 overflow-y-auto px-1 pb-2 scrollbar-none', collapsed && 'flex flex-col items-center')}>
+      <nav
+        ref={navRef}
+        aria-label="Modules"
+        className={cn('scroll-fade-y relative -mx-1 flex-1 overflow-y-auto overscroll-contain px-1 pb-2 scrollbar-none', collapsed && 'flex flex-col items-center')}
+        style={{ ['--fade-t' as string]: fade.top ? '28px' : '0px', ['--fade-b' as string]: fade.bottom ? '40px' : '0px' }}
+      >
         {box && (
           <span
             aria-hidden
@@ -151,7 +199,7 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
           <>
             <h6 className="eyebrow px-3 pb-1.5 pt-5">Chantiers épinglés</h6>
             {pinned.map((c) => (
-              <NavLink key={c.id} to={`/app/chantiers/${c.id}`} className={({ isActive }) => cn('relative z-[1] flex h-9 items-center gap-2.5 rounded-full px-3 text-[13.5px] font-medium transition-colors', isActive ? 'text-ink' : 'text-ink-2 hover:bg-white/45 hover:text-ink')}>
+              <NavLink key={c.id} to={`/app/chantiers/${c.id}`} draggable={false} className={({ isActive }) => cn('relative z-[1] flex h-9 touch:h-11 items-center gap-2.5 rounded-full px-3 text-[13.5px] font-medium transition-colors', isActive ? 'text-ink' : 'text-ink-2 hover:bg-white/45 hover:text-ink')}>
                 <span className="relative grid h-[17px] w-[17px] place-items-center">
                   <svg viewBox="0 0 20 20" className="h-[17px] w-[17px] -rotate-90">
                     <circle cx="10" cy="10" r="7.5" fill="none" stroke="#ece8f6" strokeWidth="2.5" />
@@ -174,7 +222,7 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
             </div>
           ) : (
             <div key={g.dept}>
-              <button onClick={() => setClosed((c) => ({ ...c, [g.dept]: !c[g.dept] }))} className="eyebrow flex w-full items-center gap-1.5 px-3 pb-1.5 pt-5 transition hover:text-ink-2">
+              <button onClick={() => setClosed((c) => ({ ...c, [g.dept]: !c[g.dept] }))} aria-expanded={!closed[g.dept]} className="eyebrow flex w-full items-center gap-1.5 px-3 pb-1.5 pt-5 transition hover:text-ink-2">
                 <i className="h-1.5 w-1.5 rounded-full" style={{ background: DEPT_TONE[g.dept].solid }} />
                 <span className="flex-1 text-left">{g.name}</span>
                 <ChevronDown className={cn('h-3 w-3 transition-transform duration-300 ease-out-quint', closed[g.dept] && '-rotate-90')} />
@@ -199,8 +247,8 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
 
       <div className={cn('mt-2 space-y-2 border-t border-[#e6e1f1]/80 pt-3', collapsed && 'flex w-full flex-col items-center')}>
         {collapsed ? (
-          <Tip label="Parler à Bob (⌘J)" side="right">
-            <button onClick={() => ui.askBob()} className="grid h-10 w-10 place-items-center rounded-full bg-dawn text-white shadow-dawn transition hover:scale-105" aria-label="Parler à Bob">
+          <Tip label="Parler à Brix AI (⌘J)" side="right">
+            <button onClick={() => ui.askBob()} className="grid h-10 w-10 place-items-center rounded-full bg-dawn text-white shadow-dawn transition hover:scale-105 touch:h-11 touch:w-11" aria-label="Parler à Brix AI">
               <BobWave />
             </button>
           </Tip>
@@ -211,10 +259,10 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
               <BobWave active={pendingBob > 0} />
             </span>
             <span className="relative min-w-0 flex-1">
-              <b className="block text-[13px] font-semibold">Bob</b>
+              <b className="block text-[13px] font-semibold">Brix AI</b>
               <span className="block truncate text-[11.5px] text-ink-3">{pendingBob ? `${pendingBob} action${pendingBob > 1 ? 's' : ''} à valider` : 'Dites-lui ce que vous voulez'}</span>
             </span>
-            <kbd className="relative rounded-full bg-pale-v px-2 font-sans text-[11px] text-deep-v">⌘J</kbd>
+            <kbd className="kbd-hint relative rounded-full bg-pale-v px-2 font-sans text-[11px] text-deep-v">⌘J</kbd>
           </button>
         )}
         <div className={cn('flex items-center gap-2.5', collapsed ? 'flex-col' : 'px-1 pt-0.5')}>
@@ -225,12 +273,46 @@ export function Sidebar({ forceCollapsed = false }: { forceCollapsed?: boolean }
               <span className="block truncate text-[11.5px] text-ink-3">{ROLE_LABEL[s.user.role]} · Brix {s.plan === 'equipe' ? 'Équipe' : s.plan.charAt(0).toUpperCase() + s.plan.slice(1)}</span>
             </div>
           )}
-          <NavLink to="/app/reglages" className="grid h-8 w-8 place-items-center rounded-full text-ink-3 transition hover:rotate-45 hover:bg-white/70 hover:text-ink" aria-label="Réglages">
+          <NavLink to="/app/reglages" draggable={false} className="grid h-8 w-8 place-items-center rounded-full text-ink-3 transition hover:rotate-45 touch:h-11 touch:w-11 hover:bg-white/70 hover:text-ink" aria-label="Réglages">
             <Settings className="h-4 w-4" />
           </NavLink>
         </div>
       </div>
       </div>
     </aside>
+  );
+}
+
+/**
+ * Menu complet par-dessus l'écran (tablette, éditeurs plein écran) : même barre de verre, étiquettes visibles.
+ * Se ferme au changement d'écran, au tap à côté et avec Échap.
+ */
+export function SidebarDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { pathname } = useLocation();
+  const { mounted, closing } = usePresence(open, 220);
+  const panel = useRef<HTMLDivElement>(null);
+  useModal(panel, open, onClose);
+  const first = useRef(pathname);
+  useEffect(() => {
+    if (pathname !== first.current) onClose();
+    first.current = pathname;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+  if (!mounted) return null;
+  return createPortal(
+    <div className="fixed inset-0 z-[75]">
+      <div aria-hidden className={cn('absolute inset-0 bg-[#1b1236]/15 backdrop-blur-[3px]', closing ? 'animate-[fade-out_.2s_ease_both]' : 'animate-[fade-in_.25s_ease_both]')} onClick={onClose} />
+      <div
+        ref={panel}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        tabIndex={-1}
+        className={cn('absolute inset-y-0 left-0 outline-none', closing ? 'animate-[drawer-out_.2s_var(--ease)_both]' : 'animate-[drawer-in_.36s_var(--ease)_both]')}
+      >
+        <Sidebar drawer onClose={onClose} />
+      </div>
+    </div>,
+    document.body,
   );
 }

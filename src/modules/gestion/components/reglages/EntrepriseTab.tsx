@@ -80,7 +80,7 @@ export default function EntrepriseTab() {
         </div>
       </SettingsSection>
 
-      <SettingsSection title="Vos prix par défaut" text="Bob s’en sert pour chiffrer la main d’œuvre et préremplir vos devis.">
+      <SettingsSection title="Vos prix par défaut" text="Brix AI s’en sert pour chiffrer la main d’œuvre et préremplir vos devis.">
         <div className="grid grid-cols-2 gap-3 sm:max-w-md">
           <Field label="Taux horaire HT"><Input value={d.hourlyRate} inputMode="decimal" suffix="€/h" className="num" onChange={(e) => set('hourlyRate', Number(e.target.value.replace(',', '.')) || 0)} /></Field>
           <Field label="TVA par défaut">

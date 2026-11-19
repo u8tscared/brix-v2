@@ -12,13 +12,13 @@ export function NewLeadSheet({ open, onClose, onCreated }: { open: boolean; onCl
   const save = () => {
     const l: Lead = { id: uid('ld'), name: f.name.trim(), phone: f.phone.trim(), city: f.city.trim() || '—', request: f.request.trim(), source: f.source, receivedAt: todayISO(), status: 'nouveau' };
     upsertLead(l);
-    toast('Demande ajoutée, Bob la lit');
+    toast('Demande ajoutée, Brix AI la lit');
     setF({ name: '', phone: '', city: '', request: '', source: 'telephone' });
     onClose();
     onCreated(l);
   };
   return (
-    <Sheet open={open} onClose={onClose} title="Nouvelle demande" subtitle="Un appel, un message : notez-le ici, Bob s'occupe du reste." footer={<><Button variant="ghost" onClick={onClose}>Annuler</Button><Button variant="primary" disabled={!ok} onClick={save}>Ajouter</Button></>}>
+    <Sheet open={open} onClose={onClose} title="Nouvelle demande" subtitle="Un appel, un message : notez-le ici, Brix AI s'occupe du reste." footer={<><Button variant="ghost" onClick={onClose}>Annuler</Button><Button variant="primary" disabled={!ok} onClick={save}>Ajouter</Button></>}>
       <div className="space-y-3">
         <Field label="Nom"><Input autoFocus value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Mme Durand" /></Field>
         <div className="grid grid-cols-2 gap-3">

@@ -1,12 +1,12 @@
 // Services Visibilité, simulés en démo.
-// Vraies versions : génération du site par Bob puis déploiement Cloudflare Pages (POST /api/site/publish),
+// Vraies versions : génération du site par Brix AI puis déploiement Cloudflare Pages (POST /api/site/publish),
 // achat de domaine via le registrar (POST /api/site/domain), publication Meta Graph API et Google Business Profile
 // (POST /api/reseaux/publish).
 import type { TradeKey } from '@/lib/types';
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export const SITE_STEPS = ['Lecture de votre fiche entreprise', 'Rédaction des textes par Bob', 'Choix des photos de vos chantiers', 'Ajout de vos avis Google', 'Mise en ligne sécurisée'];
+export const SITE_STEPS = ['Lecture de votre fiche entreprise', 'Rédaction des textes par Brix AI', 'Choix des photos de vos chantiers', 'Ajout de vos avis Google', 'Mise en ligne sécurisée'];
 
 export async function generateSite(onStep: (i: number) => void) {
   for (let i = 0; i < SITE_STEPS.length; i++) {

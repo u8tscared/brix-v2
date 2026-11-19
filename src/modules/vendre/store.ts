@@ -35,7 +35,7 @@ export const useVendre = create<VendreState>()(
         { id: 'x3', clientId: 'c_lefevre', at: ago(31) + 'T17:40', kind: 'appel', text: 'Premier appel : souhaite une rénovation complète avant emménagement.' },
         { id: 'x4', clientId: 'c_garnier', at: ago(0) + 'T07:30', kind: 'note', text: 'A rouvert le devis 3 fois, s\'intéresse à l\'option VMC.' },
         { id: 'x5', clientId: 'c_martin', at: ago(2) + 'T11:00', kind: 'appel', text: 'Mme Martin demande la mise en service lundi avant 6 h pour le fournil.' },
-        { id: 'x6', clientId: 'c_tilleuls', at: ago(12) + 'T09:20', kind: 'mail', text: 'Relance amiable situation n°2 envoyée par Bob.' },
+        { id: 'x6', clientId: 'c_tilleuls', at: ago(12) + 'T09:20', kind: 'mail', text: 'Relance amiable situation n°2 envoyée par Brix AI.' },
       ],
       reminders: {
         c_tilleuls: { on: true, date: dayOffset(1), label: 'Entretien annuel des parties communes' },

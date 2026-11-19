@@ -2,7 +2,7 @@ import { Check, Globe, Loader2 } from 'lucide-react';
 import { Button, IconTile, cn } from '@/components/ui';
 import { SITE_STEPS } from '../service';
 
-/** Écran avant création : une maquette de site qui se construit au fil des étapes de Bob. */
+/** Écran avant création : une maquette de site qui se construit au fil des étapes de Brix AI. */
 export function SiteSetup({ step, onStart, url }: { step: number | null; onStart: () => void; url: string }) {
   const s = step ?? -1;
   const blocks = [
@@ -16,7 +16,7 @@ export function SiteSetup({ step, onStart, url }: { step: number | null; onStart
       <div className="animate-[fade-up_.5s_var(--ease)_both]">
         <IconTile name="Globe" dept="visibilite" size="xl" />
         <h2 className="mt-5 text-[30px] font-semibold leading-[1.04] tracking-[-0.045em] md:text-[40px]">Votre site internet,<br /><span className="text-halo-mute">prêt en une minute.</span></h2>
-        <p className="mt-3 max-w-md text-[14.5px] leading-relaxed text-ink-2">Bob écrit les textes, choisit vos plus belles photos de chantier et ajoute vos avis Google. Les demandes de devis arrivent directement dans Brix.</p>
+        <p className="mt-3 max-w-md text-[14.5px] leading-relaxed text-ink-2">Brix AI écrit les textes, choisit vos plus belles photos de chantier et ajoute vos avis Google. Les demandes de devis arrivent directement dans Brix.</p>
         {step === null ? (
           <Button variant="dawn" size="lg" className="mt-7" icon={<Globe />} onClick={onStart}>Créer mon site</Button>
         ) : (

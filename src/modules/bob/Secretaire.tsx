@@ -39,13 +39,13 @@ export default function Secretaire() {
     <div className="space-y-6">
       <PageHeader
         icon={<IconTile name="PhoneCall" tone="blue" size="lg" />}
-        kicker="Bob"
+        kicker="Brix AI"
         title="Secrétaire téléphonique"
-        subtitle="Quand tu ne peux pas décrocher, Bob répond, comprend la demande et prend les rendez-vous."
+        subtitle="Quand tu ne peux pas décrocher, Brix AI répond, comprend la demande et prend les rendez-vous."
         actions={
           <span className={cn('inline-flex h-10 items-center gap-2 rounded-full px-3.5 text-[13px] font-medium', sec.enabled ? 'glass text-ink' : 'bg-halo-track text-ink-3')}>
             {sec.enabled ? <LiveDot /> : <span className="h-2 w-2 rounded-full bg-ink-3" />}
-            {sec.enabled ? <>Bob décroche au <span className="num">{BOB_LINE}</span></> : 'Secrétaire coupée'}
+            {sec.enabled ? <>Brix AI décroche au <span className="num">{BOB_LINE}</span></> : 'Secrétaire coupée'}
           </span>
         }
       />
@@ -60,7 +60,7 @@ export default function Secretaire() {
           </Card>
 
           <Card>
-            <CardHeader title="Appels manqués" meta="transcrits et résumés par Bob" />
+            <CardHeader title="Appels manqués" meta="transcrits et résumés par Brix AI" />
             {DEMO_CALLS.map((c) => {
               const isOpen = open === c.id;
               const done = callsDone[c.id];
@@ -124,13 +124,13 @@ export default function Secretaire() {
           <Card className="p-4">
             <div className="flex items-center gap-3">
               <div className="min-w-0 flex-1">
-                <div className="text-[14px] font-semibold">Bob répond à ta place</div>
+                <div className="text-[14px] font-semibold">Brix AI répond à ta place</div>
                 <div className="text-[12.5px] text-ink-2">{sec.enabled ? 'Actif : aucun appel perdu.' : 'Coupé : les appels vont sur ta messagerie.'}</div>
               </div>
               <Switch checked={sec.enabled} onChange={(v) => setSecretary({ enabled: v })} label="Activer la secrétaire" />
             </div>
             <div className="mt-4 space-y-3">
-              <Field label="Message d’accueil" hint="Bob le dit avec une voix naturelle, puis écoute la demande.">
+              <Field label="Message d’accueil" hint="Brix AI le dit avec une voix naturelle, puis écoute la demande.">
                 <Textarea value={sec.greeting} onChange={(e) => setSecretary({ greeting: e.target.value })} className="min-h-[110px]" />
               </Field>
               <Button size="sm" variant="secondary" icon={<Volume2 className="h-4 w-4" />} onClick={() => speak(sec.greeting) || toast('La lecture audio n’est pas disponible sur ce navigateur.', 'info')}>Écouter</Button>
@@ -139,7 +139,7 @@ export default function Secretaire() {
 
           <Card className="p-4">
             <div className="text-[14px] font-semibold">Horaires</div>
-            <p className="text-[12.5px] text-ink-2">En dehors, Bob prend un message et propose un créneau.</p>
+            <p className="text-[12.5px] text-ink-2">En dehors, Brix AI prend un message et propose un créneau.</p>
             <div className="mt-3 grid grid-cols-2 items-end gap-2">
               <Field label="Jours" className="col-span-2">
                 <Select value={sec.hours.days} onChange={(e) => setSecretary({ hours: { ...sec.hours, days: e.target.value } })}>
@@ -156,7 +156,7 @@ export default function Secretaire() {
 
           <Card className="p-4">
             <div className="text-[14px] font-semibold">Renvoi d’appel</div>
-            <p className="text-[12.5px] text-ink-2">Ton numéro ne change pas : si tu ne décroches pas, l’appel bascule sur la ligne de Bob.</p>
+            <p className="text-[12.5px] text-ink-2">Ton numéro ne change pas : si tu ne décroches pas, l’appel bascule sur la ligne de Brix AI.</p>
             <div className="mt-3 space-y-3">
               <Field label="Ton numéro professionnel">
                 <Input value={sec.forwardNumber} onChange={(e) => setSecretary({ forwardNumber: e.target.value })} placeholder="06 12 45 78 90" inputMode="tel" />

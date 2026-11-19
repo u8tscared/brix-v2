@@ -19,7 +19,7 @@ export const DEPARTMENTS: Department[] = [
   { key: 'chantiers', name: 'Chantiers', tagline: 'Planifier, suivre, livrer', icon: 'HardHat' },
   { key: 'equipe', name: 'Équipe', tagline: 'Heures, congés, paie', icon: 'Users' },
   { key: 'achats', name: 'Achats', tagline: 'Fournisseurs, stock, matériel', icon: 'Truck' },
-  { key: 'bob', name: 'Bob', tagline: "L'assistant qui travaille pour vous", icon: 'AudioLines' },
+  { key: 'bob', name: 'Brix AI', tagline: "L'assistant qui travaille pour vous", icon: 'AudioLines' },
   { key: 'metier', name: 'Outils métier', tagline: 'Les calculs de votre métier', icon: 'Ruler' },
   { key: 'visibilite', name: 'Visibilité', tagline: 'Être trouvé et recommandé', icon: 'Sparkles' },
   { key: 'gestion', name: 'Gestion', tagline: 'Compta, documents, réglages', icon: 'Landmark' },
@@ -55,7 +55,7 @@ export interface ModuleDef {
 
 export const MODULES: ModuleDef[] = [
   // Vendre
-  { key: 'leads', dept: 'vendre', name: 'Demandes', short: 'Toutes les demandes de clients au même endroit, triées par Bob.', icon: 'Inbox', path: 'demandes', plan: 'start', priorities: ['clients'] },
+  { key: 'leads', dept: 'vendre', name: 'Demandes', short: 'Toutes les demandes de clients au même endroit, triées par Brix AI.', icon: 'Inbox', path: 'demandes', plan: 'start', priorities: ['clients'] },
   { key: 'devis', dept: 'vendre', name: 'Devis', short: 'Un devis pro en 2 minutes, à la voix ou au clavier.', icon: 'FileText', path: 'devis', plan: 'start', core: true },
   { key: 'clients', dept: 'vendre', name: 'Clients', short: 'Le carnet de vos clients avec tout leur historique.', icon: 'Contact', path: 'clients', plan: 'start', core: true },
   { key: 'rdv', dept: 'vendre', name: 'Rendez-vous en ligne', short: 'Vos clients réservent une visite tout seuls.', icon: 'CalendarCheck', path: 'rendez-vous', plan: 'pro', priorities: ['clients'], isNew: true },
@@ -64,9 +64,9 @@ export const MODULES: ModuleDef[] = [
   { key: 'factures', dept: 'facturer', name: 'Factures', short: 'Factures, acomptes et situations en un geste.', icon: 'Receipt', path: 'factures', plan: 'start', core: true },
   { key: 'efacture', dept: 'facturer', name: 'Facture électronique', short: "Prêt pour l'obligation 2026-2027, sans rien faire.", icon: 'ShieldCheck', path: 'facture-electronique', plan: 'start', core: true, isNew: true },
   { key: 'paiements', dept: 'facturer', name: 'Paiements', short: 'Lien de paiement, carte sur le téléphone, 3 fois sans frais.', icon: 'CreditCard', path: 'paiements', plan: 'pro', priorities: ['argent'] },
-  { key: 'relances', dept: 'facturer', name: 'Relances', short: 'Bob relance les retards à votre place, poliment.', icon: 'BellRing', path: 'relances', plan: 'pro', priorities: ['argent'] },
+  { key: 'relances', dept: 'facturer', name: 'Relances', short: 'Brix AI relance les retards à votre place, poliment.', icon: 'BellRing', path: 'relances', plan: 'pro', priorities: ['argent'] },
   { key: 'tresorerie', dept: 'facturer', name: 'Trésorerie', short: 'Votre banque reliée et votre argent à 90 jours.', icon: 'Landmark', path: 'tresorerie', plan: 'pro', priorities: ['argent', 'admin'] },
-  { key: 'frais', dept: 'facturer', name: 'Notes de frais', short: 'Une photo du ticket, Bob fait le reste.', icon: 'ScanLine', path: 'notes-de-frais', plan: 'pro', minSize: 'petite', priorities: ['admin'] },
+  { key: 'frais', dept: 'facturer', name: 'Notes de frais', short: 'Une photo du ticket, Brix AI fait le reste.', icon: 'ScanLine', path: 'notes-de-frais', plan: 'pro', minSize: 'petite', priorities: ['admin'] },
   // Chantiers
   { key: 'chantiers', dept: 'chantiers', name: 'Chantiers', short: 'Avancement, marge et photos de chaque chantier.', icon: 'HardHat', path: 'chantiers', plan: 'start', core: true },
   { key: 'planning', dept: 'chantiers', name: 'Planning', short: 'Qui fait quoi, où et quand. Avec la météo.', icon: 'CalendarRange', path: 'planning', plan: 'pro', minSize: 'petite', priorities: ['organisation'] },
@@ -85,12 +85,12 @@ export const MODULES: ModuleDef[] = [
   { key: 'stocks', dept: 'achats', name: 'Stock', short: 'Ce qu\'il reste au dépôt et dans les camions.', icon: 'Boxes', path: 'stock', plan: 'pro', minSize: 'petite', priorities: ['achats'] },
   { key: 'vehicules', dept: 'achats', name: 'Véhicules et outillage', short: 'Entretiens, contrôles, prêts d\'outils.', icon: 'Car', path: 'vehicules', plan: 'equipe', minSize: 'petite' },
   { key: 'soustraitants', dept: 'achats', name: 'Sous-traitants', short: 'Contrats, attestations URSSAF, autoliquidation.', icon: 'Building2', path: 'sous-traitants', plan: 'equipe', minSize: 'petite' },
-  // Bob
-  { key: 'bob', dept: 'bob', name: 'Bob', short: 'Parlez-lui, il fait. Devis, relances, planning.', icon: 'AudioLines', path: 'bob', plan: 'start', core: true },
+  // Brix AI
+  { key: 'bob', dept: 'bob', name: 'Brix AI', short: 'Parlez-lui, il fait. Devis, relances, planning.', icon: 'AudioLines', path: 'bob', plan: 'start', core: true },
   { key: 'brief', dept: 'bob', name: 'Brief du matin', short: "Ce qui compte aujourd'hui, en 1 minute.", icon: 'Sunrise', path: 'bob/brief', plan: 'pro' },
-  { key: 'agent_nuit', dept: 'bob', name: 'Agent de nuit', short: 'Bob relance et prépare pendant que vous dormez.', icon: 'MoonStar', path: 'bob/nuit', plan: 'equipe', isNew: true },
-  { key: 'secretaire', dept: 'bob', name: 'Secrétaire téléphonique', short: 'Bob répond aux appels manqués pendant le chantier.', icon: 'PhoneCall', path: 'bob/secretaire', plan: 'equipe', priorities: ['clients'], isNew: true },
-  { key: 'mcp', dept: 'bob', name: 'Brix AI MCP', short: 'Pilotez Brix depuis Claude ou ChatGPT.', icon: 'Plug', path: 'bob/mcp', plan: 'equipe', isNew: true },
+  { key: 'agent_nuit', dept: 'bob', name: 'Agent de nuit', short: 'Brix AI relance et prépare pendant que vous dormez.', icon: 'MoonStar', path: 'bob/nuit', plan: 'equipe', isNew: true },
+  { key: 'secretaire', dept: 'bob', name: 'Secrétaire téléphonique', short: 'Brix AI répond aux appels manqués pendant le chantier.', icon: 'PhoneCall', path: 'bob/secretaire', plan: 'equipe', priorities: ['clients'], isNew: true },
+  { key: 'mcp', dept: 'bob', name: 'Connecter une IA', short: 'Interrogez Brix depuis Claude ou ChatGPT, et préparez des brouillons.', icon: 'Plug', path: 'bob/mcp', plan: 'equipe', isNew: true },
   // Métier
   { key: 'outils_metier', dept: 'metier', name: 'Outils métier', short: 'Les calculs et contrôles de votre métier.', icon: 'Calculator', path: 'outils', plan: 'start', core: true },
   // Visibilité
@@ -236,9 +236,9 @@ export interface Offer {
 }
 
 export const OFFERS: Offer[] = [
-  { key: 'start', name: 'Start', price: 0, unit: 'pour toujours', pitch: 'Pour démarrer seul', includes: ['5 devis et 5 factures par mois', 'Facture électronique incluse', 'Outils métier', 'Bob : 20 demandes par mois'] },
-  { key: 'pro', name: 'Pro', price: 29.99, unit: 'HT / mois', pitch: 'Pour l\'artisan qui tourne', includes: ['Devis et factures illimités', 'Paiements, relances, trésorerie', 'Prise de cotes, SAV, portail client', 'Bob : 500 demandes par mois'], highlight: true },
-  { key: 'equipe', name: 'Équipe', price: 69, unit: 'HT / mois, 5 utilisateurs', pitch: 'Pour l\'entreprise qui grandit', includes: ['Tout Pro, plus planning et pointage', 'Congés, habilitations et paie', 'Bob illimité et agent de nuit', 'Brix AI MCP inclus', '9 € par utilisateur en plus'] },
+  { key: 'start', name: 'Start', price: 0, unit: 'pour toujours', pitch: 'Pour démarrer seul', includes: ['5 devis et 5 factures par mois', 'Facture électronique incluse', 'Outils métier', 'Brix AI : 20 demandes par mois'] },
+  { key: 'pro', name: 'Pro', price: 29.99, unit: 'HT / mois', pitch: 'Pour l\'artisan qui tourne', includes: ['Devis et factures illimités', 'Paiements, relances, trésorerie', 'Prise de cotes, SAV, portail client', 'Brix AI : 500 demandes par mois'], highlight: true },
+  { key: 'equipe', name: 'Équipe', price: 69, unit: 'HT / mois, 5 utilisateurs', pitch: 'Pour l\'entreprise qui grandit', includes: ['Tout Pro, plus planning et pointage', 'Congés, habilitations et paie', 'Brix AI illimité et agent de nuit', 'Brix AI dans Claude et ChatGPT inclus', '9 € par utilisateur en plus'] },
   { key: 'entreprise', name: 'Entreprise', price: null, unit: 'sur devis', pitch: 'À partir de 50 personnes', includes: ['Agences et tableaux de bord', 'Validations et droits fins', 'SSO Google et Microsoft', 'API et accompagnement dédié'] },
 ];
 

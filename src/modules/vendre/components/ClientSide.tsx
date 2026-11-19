@@ -7,14 +7,14 @@ import type { Client } from '@/lib/types';
 import { CLIENT_SOURCE } from '../lib';
 import { useVendre } from '../store';
 
-/** Rappel d'entretien : Bob prévient le client et vous à la date choisie. */
+/** Rappel d'entretien : Brix AI prévient le client et vous à la date choisie. */
 export function MaintenanceCard({ client }: { client: Client }) {
   const r = useVendre((v) => v.reminders[client.id]);
   const setReminder = useVendre((v) => v.setReminder);
   const cur = r ?? { on: false, date: dayOffset(365), label: client.kind === 'pro' ? 'Contrôle annuel de l\'installation' : 'Vérification de l\'installation' };
   return (
     <Card>
-      <CardHeader title="Rappel d'entretien" icon={<IconTile icon={<BellRing />} tone="amber" size="sm" />} action={<Switch checked={cur.on} onChange={(on) => { setReminder(client.id, { ...cur, on }); toast(on ? `Bob rappellera ${client.name.split(' ')[0]} le ${dateLong(cur.date)}` : 'Rappel désactivé', on ? 'ok' : 'info'); }} label="Rappel d'entretien" />} />
+      <CardHeader title="Rappel d'entretien" icon={<IconTile icon={<BellRing />} tone="amber" size="sm" />} action={<Switch checked={cur.on} onChange={(on) => { setReminder(client.id, { ...cur, on }); toast(on ? `Brix AI rappellera ${client.name.split(' ')[0]} le ${dateLong(cur.date)}` : 'Rappel désactivé', on ? 'ok' : 'info'); }} label="Rappel d'entretien" />} />
       <div className="space-y-2.5 p-4">
         {cur.on ? (
           <>
@@ -23,7 +23,7 @@ export function MaintenanceCard({ client }: { client: Client }) {
             <p className="text-xs text-ink-3">Le client reçoit un SMS 15 jours avant avec un lien pour réserver. Un contrat d'entretien, c'est du chiffre d'affaires qui revient tout seul.</p>
           </>
         ) : (
-          <p className="text-[13px] text-ink-2">Activez-le pour que Bob propose une visite chaque année : c'est le client qui revient sans effort.</p>
+          <p className="text-[13px] text-ink-2">Activez-le pour que Brix AI propose une visite chaque année : c'est le client qui revient sans effort.</p>
         )}
       </div>
     </Card>

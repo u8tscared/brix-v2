@@ -9,6 +9,13 @@ export class HttpError extends Error {
   }
 }
 
+/** Erreur de configuration du serveur (secret manquant…) : message affiché tel quel, sans détail sensible. */
+export class ConfigError extends HttpError {
+  constructor(message: string) {
+    super(500, message);
+  }
+}
+
 export async function readJson<T = Record<string, unknown>>(req: Request): Promise<T> {
   try {
     return (await req.json()) as T;

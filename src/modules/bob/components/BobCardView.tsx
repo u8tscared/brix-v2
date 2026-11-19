@@ -5,7 +5,7 @@ import type { BobCard, BobCardAction } from '../engine';
 
 const toneText: Record<string, string> = { ok: 'text-ok', warn: 'text-warn', bad: 'text-bad', violet: 'text-vi-700', neutral: 'text-ink-2' };
 
-/** Carte riche affichée sous une réponse de Bob. */
+/** Carte riche affichée sous une réponse de Brix AI. */
 export function BobCardView({ card, done, onAction, onOpen }: { card: BobCard; done?: string; onAction: (a: BobCardAction) => void; onOpen: (to: string) => void }) {
   const actions = (card.actions ?? []).filter((a) => !(done && a.run));
   return (

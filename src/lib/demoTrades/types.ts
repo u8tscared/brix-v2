@@ -11,7 +11,7 @@ export type SiteSlot = 'lefevre' | 'martin' | 'tilleuls' | 'nguyen' | 'dupuis' |
 export type JobSlot = 'roux' | 'tilleuls' | 'benoit' | 'martin' | 'nguyen';
 export type Hab = [label: string, expiresInDays: number];
 
-/** Ce que Bob dit et retient pour ce métier (secrétaire, mémoire). */
+/** Ce que Brix AI dit et retient pour ce métier (secrétaire, mémoire). */
 export interface TradeVoice {
   /** Trois éléments appris : [type, libellé, valeur]. */
   memory: ['prix' | 'habitude', string, string][];

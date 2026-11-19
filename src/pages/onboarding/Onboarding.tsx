@@ -1,5 +1,5 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { HaloBackdrop } from '@/components/layout/HaloBackdrop';
 import { TRADE_BY_KEY, recommendModules } from '@/lib/catalog';
@@ -9,7 +9,8 @@ import { BrandLogo } from '@/parcours/marque';
 import '@/parcours/parcours.css';
 import './onboarding.css';
 import { EMPTY, PRET, STEPS, clear, firstOpen, load, missing, save, type Draft } from './draft';
-import { finishOnboarding, type ClientImporte } from './finish';
+import { ErreurInscription, finishOnboarding, type ClientImporte } from './finish';
+import { reprendreIdentiteGoogle } from '@/pages/connexion/attente';
 import { Pret } from './Pret';
 import { ApercuDesktop, ApercuMobile } from './preview/Apercu';
 import { AccesStep } from './steps/AccesStep';
@@ -30,7 +31,9 @@ export default function Onboarding() {
   const fromSite = !!metierParam && !!TRADE_BY_KEY[metierParam];
 
   const [d, setD] = useState<Draft>(() => {
-    const base = saved?.d ?? { ...EMPTY, firstName: storeUser.firstName, lastName: storeUser.lastName, email: storeUser.email };
+    const g = reprendreIdentiteGoogle(); // « Continuer avec Google » sans compte, depuis /connexion
+    const base0 = saved?.d ?? { ...EMPTY, firstName: storeUser.firstName, lastName: storeUser.lastName, email: storeUser.email };
+    const base = g ? { ...base0, google: { credential: g.credential, email: g.email }, email: g.email, firstName: base0.firstName || g.prenom, lastName: base0.lastName || g.nom } : base0;
     if (fromSite && !base.trade) return { ...base, trade: metierParam!, secondary: base.secondary.filter((x) => x !== metierParam) };
     return base;
   });
@@ -81,10 +84,29 @@ export default function Onboarding() {
     goTo(step + 1);
   };
   const back = () => (step === 0 ? navigate('/bienvenue') : goTo(step - 1));
-  const open = () => {
-    finishOnboarding(d, imported);
-    clear();
-    navigate('/app', { replace: true });
+  const [creation, setCreation] = useState<{ busy: boolean; error?: ReactNode }>({ busy: false });
+  const open = async () => {
+    if (creation.busy) return;
+    setCreation({ busy: true });
+    try {
+      await finishOnboarding(d, imported);
+      clear();
+      navigate('/app', { replace: true });
+    } catch (e) {
+      if (e instanceof ErreurInscription && e.motDePasseManquant) {
+        setCreation({ busy: false });
+        goTo(PRET - 1);
+        setD((x) => ({ ...x, accessOk: false }));
+        return;
+      }
+      const msg = e instanceof Error ? e.message : 'Création impossible, réessayez.';
+      setCreation({
+        busy: false,
+        error: e instanceof ErreurInscription && e.compteExiste ? (
+          <>{msg} <Link to="/connexion" className="font-semibold underline underline-offset-4">Se connecter</Link></>
+        ) : msg,
+      });
+    }
   };
 
   // Entrée pour continuer (sauf sur un bouton, un lien ou un champ qui gère sa propre touche Entrée).
@@ -98,7 +120,7 @@ export default function Onboarding() {
       // Sur une carte de choix, Entrée valide l'étape (Espace coche ou décoche).
       if (!t.closest('.ob-card') && t.closest('button, a, textarea, select, [data-enter="ignore"]')) return;
       e.preventDefault();
-      keyRef.current.step === PRET ? keyRef.current.open() : keyRef.current.next();
+      keyRef.current.step === PRET ? void keyRef.current.open() : keyRef.current.next();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -112,7 +134,7 @@ export default function Onboarding() {
           <BrandLogo size={24} />
         </header>
         <div className="relative z-10">
-          <Pret d={d} set={set} imported={imported} setImported={setImported} onBack={() => goTo(PRET - 1)} onOpen={open} instant={initialPret} />
+          <Pret d={d} set={set} imported={imported} setImported={setImported} onBack={() => goTo(PRET - 1)} onOpen={() => void open()} instant={initialPret} busy={creation.busy} error={creation.error} />
         </div>
       </div>
     );
@@ -144,7 +166,7 @@ export default function Onboarding() {
           {step === 4 && <AccesStep d={d} set={set} />}
         </main>
 
-        <footer className="fixed inset-x-0 bottom-0 z-20 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] md:px-6 lg:right-[46%]">
+        <footer className="fixed inset-x-0 bottom-[var(--kb)] z-20 px-3 pb-[calc(10px+env(safe-area-inset-bottom))] md:px-6 lg:right-[46%]">
           {block && <p className="glass mx-auto mb-2 w-fit max-w-full rounded-full px-3.5 py-1.5 text-center text-[12px] font-medium text-ink-2 sm:hidden">{block}</p>}
           <div className="glass-strong mx-auto flex h-[68px] w-full max-w-[640px] items-center gap-3 rounded-[24px] px-2.5 md:px-3">
             <button type="button" onClick={back} className="ob-btn ob-btn-ghost h-12 w-12 shrink-0 px-0 sm:w-auto sm:px-4" aria-label={step === 0 ? 'Retour à l\'accueil' : 'Étape précédente'}>

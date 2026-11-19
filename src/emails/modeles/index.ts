@@ -5,6 +5,7 @@ import { bienvenue, devisSigneArtisan, paiementRecuArtisan, reponseFournisseur }
 import { codeSignature, devisEnvoye, devisRelance, devisSigneClient } from './client-devis';
 import { factureEnvoyee, factureRelance, paiementRecuClient } from './client-facture';
 import { commandeFournisseur, demandePrix } from './fournisseur';
+import { motDePasse } from './compte';
 
 export const MODELES: { [M in ModeleEmail]: (d: DonneesEmail[M]) => RenduEmail } = {
   devis_envoye: devisEnvoye,
@@ -20,6 +21,7 @@ export const MODELES: { [M in ModeleEmail]: (d: DonneesEmail[M]) => RenduEmail }
   commande_fournisseur: commandeFournisseur,
   reponse_fournisseur: reponseFournisseur,
   bienvenue,
+  mot_de_passe: motDePasse,
 };
 
 /** À qui s'adresse chaque modèle (filtres de la boîte, en-têtes List-Unsubscribe, tags). */
@@ -37,6 +39,7 @@ export const PUBLIC_MODELE: Record<ModeleEmail, 'client' | 'artisan' | 'fourniss
   commande_fournisseur: 'fournisseur',
   reponse_fournisseur: 'artisan',
   bienvenue: 'artisan',
+  mot_de_passe: 'artisan',
 };
 
 /** Nom lisible du modèle (galerie, journal). */
@@ -54,6 +57,7 @@ export const NOM_MODELE: Record<ModeleEmail, string> = {
   commande_fournisseur: 'Bon de commande',
   reponse_fournisseur: 'Réponse fournisseur',
   bienvenue: 'Bienvenue',
+  mot_de_passe: 'Nouveau mot de passe',
 };
 
 export { esc, euros, dateLongue, dateHeure } from './outils';

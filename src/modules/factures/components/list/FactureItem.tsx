@@ -65,12 +65,12 @@ export function FactureRow({ f, client, a, st, due, onOpen, onPreview, onAction 
       </div>
       <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
         <Tip label="Aperçu plein écran">
-          <button onClick={onPreview} aria-label="Aperçu plein écran" className="grid h-8 w-8 place-items-center rounded-full text-ink-3 opacity-60 transition hover:bg-halo-hover hover:text-ink group-hover:opacity-100">
+          <button onClick={onPreview} aria-label="Aperçu plein écran" className="grid h-8 w-8 place-items-center rounded-full text-ink-3 opacity-60 transition hover:bg-halo-hover hover:text-ink group-hover:opacity-100 touch:h-11 touch:w-11 touch:opacity-100">
             <Expand className="h-4 w-4" strokeWidth={1.75} />
           </button>
         </Tip>
         {act && (
-          <Button size="sm" variant={act.key === 'remind' ? 'secondary' : 'ghost'} icon={act.icon} onClick={() => onAction(act.key)} className={cn(act.key !== 'remind' && 'opacity-70 group-hover:opacity-100')}>
+          <Button size="sm" variant={act.key === 'remind' ? 'secondary' : 'ghost'} icon={act.icon} onClick={() => onAction(act.key)} className={cn(act.key !== 'remind' && 'opacity-70 group-hover:opacity-100 touch:opacity-100')}>
             {act.label}
           </Button>
         )}

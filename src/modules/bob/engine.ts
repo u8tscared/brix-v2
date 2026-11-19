@@ -1,7 +1,6 @@
-// Moteur d'intentions local de Bob (version de démo, sans API).
-// Il comprend le français courant et AGIT sur le store. Quand le vrai modèle
-// sera branché (api.ts), il recevra la même question et renverra la même forme
-// de réponse (BobReply) ; ce moteur restera le secours hors ligne.
+// Moteur d'intentions local de Brix AI (sans réseau). Il comprend le français courant et AGIT
+// sur le store. C'est le secours hors ligne de Brix AI en ligne (agent.ts, API Claude via le
+// worker) : les deux partagent la même logique métier (outils/*.ts).
 
 import { useBrix } from '@/lib/store';
 import { findLesson } from './nlu/knowledge';
@@ -28,7 +27,7 @@ const NAV: [RegExp, string, string][] = [
 
 const trade = () => useBrix.getState().company.trade;
 
-/** Ce que Bob sait faire, avec des exemples dans les mots du métier. */
+/** Ce que Brix AI sait faire, avec des exemples dans les mots du métier. */
 export const capabilities = () => [
   { icon: 'FileText', title: 'Faire un devis', example: devisExample(trade()) },
   { icon: 'Wallet', title: 'Suivre l’argent', example: 'Combien j’ai encaissé ce mois ?' },

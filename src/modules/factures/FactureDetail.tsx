@@ -226,7 +226,7 @@ function Detail({ f }: { f: Facture }) {
 
   return (
     <div className="min-h-full">
-      <header className="glass sticky top-[60px] z-20 mx-1 mt-1 flex h-14 items-center gap-2 rounded-full px-2 md:top-3 md:mx-4 md:mt-2 md:h-[60px] md:px-2.5">
+      <header className="glass sticky top-1.5 z-20 mx-1 mt-1.5 flex h-14 items-center gap-2 rounded-full px-2 md:top-3 md:mx-4 md:mt-2 md:h-[60px] md:px-2.5">
         <Button variant="ghost" size="icon" aria-label="Retour aux factures" onClick={() => navigate('/app/factures')}>
           <ArrowLeft className="h-[18px] w-[18px]" />
         </Button>
@@ -251,7 +251,7 @@ function Detail({ f }: { f: Facture }) {
         </Button>
         <MoreMenu items={menu} />
         {primary && (
-          <Button variant="dawn" size="sm" className="h-9 max-md:h-10" icon={primary.icon} onClick={primary.run}>
+          <Button variant="dawn" size="sm" icon={primary.icon} onClick={primary.run}>
             <span className="sm:hidden">{primary.short}</span>
             <span className="hidden sm:inline">{primary.label}</span>
           </Button>

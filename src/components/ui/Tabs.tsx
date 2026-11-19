@@ -20,6 +20,8 @@ function useIndicator(active: string) {
 
 /** Halo : pilule blanche qui glisse d'un onglet à l'autre avec un léger ressort. */
 const PILL = 'absolute rounded-full bg-white shadow-pill transition-[left,width] duration-500 ease-spring';
+/** Au doigt : onglet de 36 px dans un rail de 44 px, zone de tap étendue à toute la hauteur du rail (44 px). */
+const TOUCH_TAB = "touch:h-9 touch:before:absolute touch:before:inset-x-0 touch:before:-inset-y-1 touch:before:content-['']";
 
 export function Segmented<T extends string>({ value, onChange, options, className, size = 'md' }: { value: T; onChange: (v: T) => void; options: { value: T; label: ReactNode; count?: number }[]; className?: string; size?: 'sm' | 'md' }) {
   const { wrap, box } = useIndicator(value);
@@ -36,6 +38,7 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
           className={cn(
             'relative z-[1] flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full font-medium transition-colors duration-200 [&_svg]:h-4 [&_svg]:w-4',
             size === 'sm' ? 'h-7 px-3 text-[12.5px]' : 'h-8 px-3.5 text-[13px]',
+            TOUCH_TAB,
             value === o.value ? 'text-ink' : 'text-ink-2 hover:text-ink',
           )}
         >
@@ -63,7 +66,7 @@ export function UnderlineTabs<T extends string>({ value, onChange, options, clas
           role="tab"
           aria-selected={value === o.value}
           onClick={() => onChange(o.value)}
-          className={cn('relative z-[1] flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13.5px] font-medium transition-colors duration-200 [&_svg]:h-4 [&_svg]:w-4', value === o.value ? 'text-ink' : 'text-ink-2 hover:bg-white/50 hover:text-ink')}
+          className={cn(TOUCH_TAB, 'touch:h-11 relative z-[1] flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-[13.5px] font-medium transition-colors duration-200 [&_svg]:h-4 [&_svg]:w-4', value === o.value ? 'text-ink' : 'text-ink-2 hover:bg-white/50 hover:text-ink')}
         >
           {o.label}
           {o.count !== undefined && <span className={cn('num rounded-full px-1.5 text-[11px] font-semibold leading-[18px] transition-colors', value === o.value ? 'bg-pale-v text-deep-v' : 'bg-[#ece8f6] text-ink-2')}>{o.count}</span>}

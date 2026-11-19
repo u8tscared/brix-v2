@@ -1,4 +1,4 @@
-// Scénario de relance automatique : étapes, délais, canal et ton des messages de Bob.
+// Scénario de relance automatique : étapes, délais, canal et ton des messages de Brix AI.
 
 import { useState } from 'react';
 import { Mail, MessageSquareText, Stamp } from 'lucide-react';
@@ -22,7 +22,7 @@ export function ScenarioCard({ sample }: { sample?: Facture }) {
 
   return (
     <Card>
-      <CardHeader title="Relance automatique" meta={fx.relanceAuto ? 'Bob s’en occupe' : 'désactivée'} action={<Switch checked={fx.relanceAuto} onChange={(v) => fx.set({ relanceAuto: v })} label="Relance automatique" />} />
+      <CardHeader title="Relance automatique" meta={fx.relanceAuto ? 'Brix AI s’en occupe' : 'désactivée'} action={<Switch checked={fx.relanceAuto} onChange={(v) => fx.set({ relanceAuto: v })} label="Relance automatique" />} />
       <div className={cn('space-y-4 p-4 transition', !fx.relanceAuto && 'opacity-50')}>
         <ol className="space-y-2">
           {fx.steps.map((st, i) => (
@@ -47,7 +47,7 @@ export function ScenarioCard({ sample }: { sample?: Facture }) {
 
         <div>
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <span className="text-[12.5px] font-medium text-ink-2">Ton de Bob</span>
+            <span className="text-[12.5px] font-medium text-ink-2">Ton de Brix AI</span>
             <Segmented<RelanceTone>
               size="sm"
               value={fx.relanceTone}
@@ -71,7 +71,7 @@ export function ScenarioCard({ sample }: { sample?: Facture }) {
             <p className="text-[12.5px] text-ink-3">L’aperçu apparaîtra quand une facture sera en retard.</p>
           )}
         </div>
-        <p className="text-[12px] text-ink-3">Bob n’envoie jamais de relance à un client qui a payé ou qui a un litige en cours. La mise en demeure reste à valider par vous.</p>
+        <p className="text-[12px] text-ink-3">Brix AI n’envoie jamais de relance à un client qui a payé ou qui a un litige en cours. La mise en demeure reste à valider par vous.</p>
       </div>
     </Card>
   );

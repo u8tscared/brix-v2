@@ -22,7 +22,7 @@ interface Cmd {
 }
 
 const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-const ORDER = ['Actions', 'Demander à Bob', 'Clients', 'Devis', 'Factures', 'Chantiers', 'Outils métier', 'Aller à', 'Bob'];
+const ORDER = ['Actions', 'Demander à Brix AI', 'Clients', 'Devis', 'Factures', 'Chantiers', 'Outils métier', 'Aller à', 'Brix AI'];
 
 /** Barre de commande universelle (⌘K) : tout trouver et tout lancer en 2 touches. */
 export function CommandPalette() {
@@ -91,8 +91,8 @@ export function CommandPalette() {
     const nq = norm(raw);
     if (!nq) {
       const bob: Cmd[] = [
-        { id: 'b-devis', group: 'Demander à Bob', label: devisExample(s.company.trade), icon: 'AudioLines', dept: 'bob', solid: true, run: ask(devisExample(s.company.trade)) },
-        { id: 'b-retard', group: 'Demander à Bob', label: 'Qui est en retard de paiement ?', icon: 'AudioLines', dept: 'bob', solid: true, kbd: '⌘J', run: ask('Qui est en retard de paiement ?') },
+        { id: 'b-devis', group: 'Demander à Brix AI', label: devisExample(s.company.trade), icon: 'AudioLines', dept: 'bob', solid: true, run: ask(devisExample(s.company.trade)) },
+        { id: 'b-retard', group: 'Demander à Brix AI', label: 'Qui est en retard de paiement ?', icon: 'AudioLines', dept: 'bob', solid: true, kbd: '⌘J', run: ask('Qui est en retard de paiement ?') },
       ];
       return { results: [...cmds.filter((c) => c.group === 'Actions'), ...bob, ...cmds.filter((c) => c.group === 'Aller à').slice(0, 6)], found: true };
     }
@@ -106,7 +106,7 @@ export function CommandPalette() {
     // Par section, les meilleurs d'abord ; 6 au plus par section.
     const groups = ORDER.map((g) => hits.filter((x) => x.c.group === g).sort((a, b) => b.score - a.score).slice(0, 6).map((x) => x.c));
     const flat = groups.flat();
-    const bob: Cmd = { id: 'ask', group: 'Bob', label: `Demander à Bob : « ${raw} »`, icon: 'AudioLines', dept: 'bob', solid: true, run: ask(raw) };
+    const bob: Cmd = { id: 'ask', group: 'Brix AI', label: `Demander à Brix AI : « ${raw} »`, icon: 'AudioLines', dept: 'bob', solid: true, run: ask(raw) };
     return { results: [...flat, bob], found: flat.length > 0 };
   }, [q, cmds, s.company.trade]);
 
@@ -134,7 +134,7 @@ export function CommandPalette() {
               if (e.key === 'Enter') { e.preventDefault(); results[i]?.run(); }
               if (e.key === 'Escape') close();
             }}
-            placeholder="Chercher un client, un devis, un outil… ou demander à Bob"
+            placeholder="Chercher un client, un devis, un outil… ou demander à Brix AI"
             aria-activedescendant={results[i] ? `cmd-${results[i].id}` : undefined}
             className="h-14 min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-ink-3"
           />
@@ -152,7 +152,7 @@ export function CommandPalette() {
             <div className="animate-fade-in px-3 pb-2 pt-6 text-center">
               <div className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-sub text-ink-3"><Search className="h-5 w-5" strokeWidth={1.75} /></div>
               <div className="mt-3 text-[14px] font-semibold">Rien trouvé pour « {q.trim()} »</div>
-              <p className="mx-auto mt-1 max-w-sm text-[12.5px] leading-snug text-ink-2">Essayez un nom de client, un numéro de devis (D-2026-…) ou une ville. Ou posez la question à Bob :</p>
+              <p className="mx-auto mt-1 max-w-sm text-[12.5px] leading-snug text-ink-2">Essayez un nom de client, un numéro de devis (D-2026-…) ou une ville. Ou posez la question à Brix AI :</p>
             </div>
           )}
           {results.map((c, idx) => {
@@ -160,8 +160,8 @@ export function CommandPalette() {
             const active = idx === i;
             return (
               <div key={c.id} className={cn(idx < 14 && 'animate-[fade-up_.28s_var(--ease)_both]')} style={idx < 14 ? { animationDelay: `${idx * 14}ms` } : undefined}>
-                {head && head !== 'Bob' && <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-[.06em] text-ink-3 first:pt-1.5">{head}</div>}
-                {head === 'Bob' && found && <div className="mx-3 my-2 h-px bg-line" />}
+                {head && head !== 'Brix AI' && <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-[.06em] text-ink-3 first:pt-1.5">{head}</div>}
+                {head === 'Brix AI' && found && <div className="mx-3 my-2 h-px bg-line" />}
                 <button
                   id={`cmd-${c.id}`}
                   data-idx={idx}
@@ -183,10 +183,10 @@ export function CommandPalette() {
           })}
         </div>
 
-        <footer className="hidden items-center gap-4 border-t border-[#efebf7] bg-white/50 px-5 py-2.5 text-[11.5px] text-ink-3 md:flex">
+        <footer className="kbd-hint hidden items-center gap-4 border-t border-[#efebf7] bg-white/50 px-5 py-2.5 text-[11.5px] text-ink-3 md:flex">
           <span className="flex items-center gap-1.5"><Kbd><ArrowUp className="h-3 w-3" /></Kbd><Kbd><ArrowDown className="h-3 w-3" /></Kbd> naviguer</span>
           <span className="flex items-center gap-1.5"><Kbd><CornerDownLeft className="h-3 w-3" /></Kbd> ouvrir</span>
-          <span className="ml-auto flex items-center gap-1.5"><Kbd>⌘J</Kbd> parler à Bob</span>
+          <span className="ml-auto flex items-center gap-1.5"><Kbd>⌘J</Kbd> parler à Brix AI</span>
         </footer>
       </div>
     </div>,

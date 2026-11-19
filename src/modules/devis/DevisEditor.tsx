@@ -36,6 +36,44 @@ import { useDevisActions } from './useDevisActions';
 
 const TRADE_TO_LIB: Partial<Record<string, LibTrade>> = { electricien: 'electricite', plombier: 'plomberie', peintre: 'peinture', carreleur: 'carrelage', plaquiste: 'platrerie', menuisier: 'menuiserie', macon: 'maconnerie', climaticien: 'plomberie' };
 
+/**
+ * Brouillons ouverts par « Nouveau devis » : s'ils restent vides (pas de client, pas de ligne, titre d'origine),
+ * ils sont supprimés en quittant l'éditeur, pour ne pas remplir la liste de « Nouveau devis 0 € ».
+ * Les devis créés par Brix AI ou ailleurs ne passent pas par ici et ne sont jamais concernés.
+ */
+const freshDrafts = new Set<string>();
+const openEditors = new Map<string, number>();
+const isPristine = (d: Devis) => !d.clientId && d.status === 'brouillon' && d.title === 'Nouveau devis' && !(d.aides ?? []).length && d.lines.every((l) => l.kind === 'section');
+function dropIfPristine(id: string) {
+  if (!freshDrafts.has(id) || (openEditors.get(id) ?? 0) > 0) return;
+  freshDrafts.delete(id);
+  const cur = useBrix.getState().devis.find((x) => x.id === id);
+  if (!cur || !isPristine(cur)) return;
+  useBrix.getState().removeDevis(id);
+  useDevisMeta.setState((s) => {
+    const meta = { ...s.meta };
+    delete meta[id];
+    return { meta };
+  });
+}
+function useDiscardEmptyDraft(id: string) {
+  useEffect(() => {
+    openEditors.set(id, (openEditors.get(id) ?? 0) + 1);
+    const hide = (e: PageTransitionEvent) => {
+      if (e.persisted) return;
+      openEditors.set(id, 0);
+      dropIfPristine(id);
+    };
+    window.addEventListener('pagehide', hide);
+    return () => {
+      window.removeEventListener('pagehide', hide);
+      openEditors.set(id, Math.max(0, (openEditors.get(id) ?? 1) - 1));
+      // Différé : en développement (StrictMode), React démonte puis remonte aussitôt.
+      setTimeout(() => dropIfPristine(id), 0);
+    };
+  }, [id]);
+}
+
 export default function DevisEditor() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
@@ -48,6 +86,7 @@ export default function DevisEditor() {
     const s = useBrix.getState();
     const d: Devis = { id: `q_${Date.now().toString(36)}`, number: s.nextNumber('devis'), clientId: '', title: 'Nouveau devis', status: 'brouillon', createdAt: todayISO(), validityDays: 30, depositPercent: 30, lines: renumber([newSection('Travaux')]) };
     s.upsertDevis(d);
+    freshDrafts.add(d.id);
     useDevisMeta.getState().log(d.id, 'Devis créé', 'me');
     navigate(`/app/devis/${d.id}`, { replace: true });
   }, [id, navigate]);
@@ -65,6 +104,7 @@ export default function DevisEditor() {
 
 function Editor({ d }: { d: Devis }) {
   const navigate = useNavigate();
+  useDiscardEmptyDraft(d.id);
   const company = useBrix((s) => s.company);
   const user = useBrix((s) => s.user);
   const client = useBrix((s) => s.clients.find((c) => c.id === d.clientId));
@@ -255,7 +295,7 @@ function Editor({ d }: { d: Devis }) {
           Ajouter un lot
         </Button>
         <Button variant="secondary" size={phone ? 'lg' : 'md'} icon={<Mic />} onClick={() => setVoice(true)}>
-          {phone ? 'Dicter' : 'Dicter des lignes à Bob'}
+          {phone ? 'Dicter' : 'Dicter des lignes à Brix AI'}
         </Button>
       </div>
       {(d.aides ?? []).length > 0 && (
@@ -284,7 +324,7 @@ function Editor({ d }: { d: Devis }) {
       <TopBar d={d} saving={saving} menu={menu} phone={phone} onBack={() => navigate('/app/devis')} onPreview={() => setViewer(true)} onMain={onMain} mainLabel={mainLabel} mainIcon={d.status === 'signe' ? <Receipt /> : undefined} checks={score} steps={steps} onStep={onStep} />
       {tablet && !desktop && (
         <div className="flex shrink-0 justify-center pt-3">
-          <Segmented value={tab} onChange={setTab} options={[{ value: 'devis', label: 'Devis' }, { value: 'apercu', label: 'Aperçu' }, { value: 'bob', label: 'Bob', count: suggestions.length || undefined }]} />
+          <Segmented value={tab} onChange={setTab} options={[{ value: 'devis', label: 'Devis' }, { value: 'apercu', label: 'Aperçu' }, { value: 'bob', label: 'Brix AI', count: suggestions.length || undefined }]} />
         </div>
       )}
       {phone ? (
@@ -381,7 +421,7 @@ function Editor({ d }: { d: Devis }) {
         }}
         onSend={actions.send}
       />
-      <Sheet open={bobSheet} onClose={() => setBobSheet(false)} title="Bob" subtitle="Conseils sur ce devis">
+      <Sheet open={bobSheet} onClose={() => setBobSheet(false)} title="Brix AI" subtitle="Conseils sur ce devis">
         <div className="-mx-5 -mb-5 h-[70dvh]">
           <BobColumn d={d} client={client} company={company} update={update} onVoice={() => setVoice(true)} messages={messages} setMessages={setMessages} className="h-full" />
         </div>

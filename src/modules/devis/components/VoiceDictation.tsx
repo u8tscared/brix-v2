@@ -83,7 +83,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
       <div className="rounded-card bg-white p-4 shadow-halo">
         <div className="mb-1.5 flex items-center justify-between text-[12px] text-ink-3">
           <span>Tu dictes</span>
-          <span>{dict.demo ? 'Dictée de démonstration' : 'Bob structure en direct'}</span>
+          <span>{dict.demo ? 'Dictée de démonstration' : 'Brix AI structure en direct'}</span>
         </div>
         {dict.text || dict.interim ? <Highlighted text={dict.text} chunks={chunks} interim={dict.interim} /> : <p className="text-[16px] leading-relaxed text-ink-3">Parle normalement : {ex?.hint ?? '« trois prises, deux différentiels 30 mA type A, huit disjoncteurs 16 A et six heures de pose »'}.</p>}
       </div>
@@ -147,7 +147,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
         </button>
       </div>
       <div className="pb-1 text-center text-[12.5px] text-ink-3">
-        {listening ? 'Bob écoute · parle normalement' : dict.status === 'done' ? `${lines.length} ligne${lines.length > 1 ? 's' : ''} prête${lines.length > 1 ? 's' : ''} · touche la coche pour les ajouter` : 'En pause'}
+        {listening ? 'Brix AI écoute · parle normalement' : dict.status === 'done' ? `${lines.length} ligne${lines.length > 1 ? 's' : ''} prête${lines.length > 1 ? 's' : ''} · touche la coche pour les ajouter` : 'En pause'}
         {dict.demo && <span className="block text-[11.5px]">Micro indisponible ici : dictée de démonstration</span>}
       </div>
     </div>
@@ -181,7 +181,7 @@ export function VoiceDictation({ open, onClose, onInsert, hourlyRate, vatRate, t
       <div role="dialog" aria-modal="true" aria-label="Dicter le devis" className="relative flex max-h-[88dvh] w-[600px] max-w-full animate-scale-in flex-col gap-3 rounded-sheet bg-[#f7f5fc] p-5 shadow-[0_30px_80px_-20px_rgba(60,30,120,.35)]">
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <div className="text-[17px] font-semibold">Dicter à Bob</div>
+            <div className="text-[17px] font-semibold">Dicter à Brix AI</div>
             <div className="truncate text-[12.5px] text-ink-3">{subtitle} · les lignes rejoignent les bons lots</div>
           </div>
           <span className="num inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-3 text-[12.5px] font-semibold shadow-pill">

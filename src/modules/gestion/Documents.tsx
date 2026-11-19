@@ -56,7 +56,7 @@ export default function Documents() {
       setFetching(null);
       setOpen(null);
       flash(d.id);
-      toast(`Bob a récupéré la nouvelle ${lc(d.label)} (démo)`);
+      toast(`Brix AI a récupéré la nouvelle ${lc(d.label)} (démo)`);
     }, 1500);
   };
   const share = () => setLink(`https://brix.fr/d/${Math.random().toString(36).slice(2, 8)}`);

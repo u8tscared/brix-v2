@@ -47,7 +47,7 @@ export function TopBar({ d, saving, menu, onPreview, onMain, mainLabel, mainIcon
   );
   if (phone)
     return (
-      <div className="sticky top-14 z-20 px-3 pt-1">
+      <div className="sticky top-0 z-20 px-3 pt-1.5">
         <div className="glass flex h-14 items-center gap-1.5 rounded-full pl-1 pr-1.5">
           <button onClick={onBack} className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink transition active:scale-95" aria-label="Retour aux devis">
             <ChevronLeft className="h-5 w-5" />

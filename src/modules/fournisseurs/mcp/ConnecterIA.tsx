@@ -1,203 +1,125 @@
-// « Connecter une IA à Brix » : un accès personnel, en lecture seule, pour Claude, ChatGPT ou tout assistant compatible MCP.
-// Monté dans Bob › MCP. Fonctionne même si l'espace Achats n'a jamais été ouvert (la liste des accès est alors vide).
+// « Connecter une IA » (Brix AI) : une adresse unique à coller dans Claude, ChatGPT, Le Chat…,
+// puis « Autoriser » dans Brix. Aucun secret à copier. Jetons personnels rangés dans « Avancé ».
+// Avec un compte cloud, tout est réel (worker/src/modules/mcp) ; en démo, l'écran est simulé.
 import { useState } from 'react';
-import {
-  BarChart3, Building2, Check, CircleAlert, Copy, FileText, HandCoins, HardHat, KeyRound, Plug, Plus, Receipt, Scale, ShieldCheck, Store, Tag, TrendingUp, Truck, Users,
-} from 'lucide-react';
-import { Button, Card, CardHeader, Field, IconTile, Input, PageHeader, Sheet, cn, toast } from '@/components/ui';
-import { dateShort, relative } from '@/lib/format';
-import { useAchats } from '../data/store';
+import { Check, Copy, Eye, FilePen, ShieldCheck } from 'lucide-react';
+import { Badge, Button, Card, IconTile, Switch, cn } from '@/components/ui';
+import { AccesListe, Journal } from './AccesListe';
+import { Assistants } from './Assistants';
+import { ACTIONS, LECTURES } from './contenu';
+import { Avance } from './Avance';
+import { urlServeur } from './api';
+import { copier } from './copier';
+import { useBrixAi } from './useBrixAi';
 
-const LECTURES = [
-  { icon: <Building2 />, t: 'Votre entreprise' },
-  { icon: <FileText />, t: 'Vos devis' },
-  { icon: <Receipt />, t: 'Vos factures' },
-  { icon: <HandCoins />, t: 'Les impayés' },
-  { icon: <BarChart3 />, t: 'Votre chiffre d’affaires' },
-  { icon: <HardHat />, t: 'Vos chantiers' },
-  { icon: <Users />, t: 'Vos clients' },
-  { icon: <Truck />, t: 'Achats et livraisons' },
-  { icon: <Scale />, t: 'Demandes de prix' },
-  { icon: <Tag />, t: 'Prix des matériaux' },
-  { icon: <TrendingUp />, t: 'Hausses de prix' },
-  { icon: <Store />, t: 'Vos fournisseurs' },
-];
+const QUESTIONS = ['Qui me doit de l’argent ?', 'Prépare un devis pour Mme Martin : 6 prises et un radiateur', 'Combien j’ai signé ce mois-ci ?', 'Qu’est-ce que j’ai au planning demain ?', 'Quels prix de matériaux ont augmenté ?'];
 
-const QUESTIONS = ['Qui me doit de l’argent ?', 'Où acheter mes disjoncteurs le moins cher ?', 'Combien j’ai signé ce mois-ci ?', 'Quels chantiers attendent encore du matériel ?', 'Quels prix de matériaux ont augmenté ?'];
-
-async function copier(texte: string, ok: string) {
-  try {
-    await navigator.clipboard.writeText(texte);
-    toast(ok);
-    return true;
-  } catch {
-    toast('Copie impossible : sélectionnez le texte et copiez-le à la main', 'warn');
-    return false;
-  }
-}
-
-function CreerAcces({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const creerJeton = useAchats((s) => s.creerJeton);
-  const [nom, setNom] = useState('');
-  const [url, setUrl] = useState<string | null>(null);
+function Adresse({ url, actif, onBasculer, demo }: { url: string; actif: boolean; onBasculer: (v: boolean) => void; demo: boolean }) {
   const [copie, setCopie] = useState(false);
-  const fermer = () => {
-    setNom('');
-    setUrl(null);
-    setCopie(false);
-    onClose();
-  };
-  const creer = () => setUrl(`${location.origin}/api/mcp/k/${creerJeton(nom.trim() || 'Assistant IA')}`);
-
   return (
-    <Sheet
-      open={open}
-      onClose={fermer}
-      width={520}
-      title={url ? 'Votre adresse est prête' : 'Créer un accès'}
-      subtitle={url ? 'Collez-la dans les réglages de votre assistant.' : 'Un accès par appareil ou par assistant : vous pourrez couper chacun séparément.'}
-      footer={
-        url ? (
-          <Button variant="primary" size="lg" onClick={fermer} disabled={!copie} className="flex-1 justify-center sm:flex-none">{copie ? 'C’est fait' : 'Copiez d’abord l’adresse'}</Button>
-        ) : (
-          <>
-            <Button variant="ghost" onClick={fermer} className="hidden sm:inline-flex">Annuler</Button>
-            <Button variant="dawn" size="lg" icon={<KeyRound className="h-4 w-4" />} onClick={creer} className="flex-1 justify-center sm:flex-none">Créer l’accès</Button>
-          </>
-        )
-      }
-    >
-      {!url ? (
-        <Field label="Nom de l’accès" hint="Pour le reconnaître dans la liste, rien de plus.">
-          <Input autoFocus value={nom} onChange={(e) => setNom(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && creer()} placeholder="Claude sur mon ordinateur" />
-        </Field>
-      ) : (
-        <div className="space-y-4">
-          <div className="rounded-card-sm bg-halo-track/70 p-4">
-            <div className="select-all break-all font-mono text-[12.5px] leading-relaxed text-ink">{url}</div>
-            <Button variant={copie ? 'secondary' : 'primary'} className="mt-3 w-full justify-center" icon={copie ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} onClick={async () => setCopie((await copier(url, 'Adresse copiée')) || copie)}>
-              {copie ? 'Copiée' : 'Copier l’adresse'}
-            </Button>
-          </div>
-          <div className="flex gap-2.5 rounded-card-sm bg-pale-a px-4 py-3.5 text-[13px] text-deep-a">
-            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
-            <div>
-              <div className="font-medium">Cette adresse ne sera plus jamais affichée</div>
-              <div className="mt-0.5 text-[12.5px]">Elle sert de clé : gardez-la pour vous. Si vous la perdez, créez simplement un nouvel accès.</div>
-            </div>
-          </div>
-          <button className="min-h-10 text-[12.5px] font-medium text-ink-2 underline-offset-2 hover:underline" onClick={() => setCopie(true)}>Je l’ai copiée autrement</button>
+    <Card className="halo-bg halo-clip relative overflow-hidden p-5 md:p-7">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <div className="label-halo">Votre adresse Brix AI</div>
+          <p className="mt-0.5 text-[13px] text-ink-2">La même pour tous les assistants. Elle ne contient aucun secret.</p>
         </div>
-      )}
-    </Sheet>
+        <div className="flex shrink-0 items-center gap-3 self-start rounded-full bg-white/80 py-1.5 pl-4 pr-2 shadow-[0_0_0_1px_#ece8f6]">
+          <span className="text-[13px] font-medium">Relier votre IA</span>
+          <Switch checked={actif} onChange={onBasculer} label="Relier votre IA" />
+        </div>
+      </div>
+      <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+        <div className="min-w-0 flex-1 select-all rounded-field bg-white px-4 py-3 font-mono text-[14px] text-ink shadow-[0_0_0_1px_#ece8f6] [overflow-wrap:anywhere]">{url}</div>
+        <Button variant="dawn" size="lg" className="justify-center" icon={copie ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />} onClick={async () => setCopie(await copier(url, 'Adresse copiée'))}>
+          {copie ? 'Copiée' : 'Copier l’adresse'}
+        </Button>
+      </div>
+      {!actif && <p className="mt-3 rounded-2xl bg-pale-a px-4 py-2.5 text-[13px] text-deep-a">Accès coupé : aucun assistant ne peut lire Brix tant que l’interrupteur est éteint.</p>}
+      <ol className="mt-5 grid gap-4 md:grid-cols-3">
+        {[
+          ['Copiez l’adresse', 'Un clic sur le bouton ci-dessus.'],
+          ['Collez-la dans votre assistant', 'Dans ses réglages de connecteurs (pas à pas ci-dessous).'],
+          ['Touchez « Autoriser »', 'Brix s’ouvre : vous choisissez lecture seule ou lecture et actions.'],
+        ].map(([t, d], i) => (
+          <li key={t} className="flex gap-3">
+            <span className="num grid h-7 w-7 shrink-0 place-items-center rounded-full bg-pale-v text-[12.5px] font-semibold text-deep-v">{i + 1}</span>
+            <div>
+              <div className="text-[14px] font-semibold tracking-[-0.02em]">{t}</div>
+              <p className="text-[12.5px] leading-relaxed text-ink-2">{d}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {demo && <p className="mt-4 text-[12px] text-ink-3">Mode démo : l’adresse fonctionne avec un vrai compte Brix. Ici, les réglages et la liste sont simulés.</p>}
+    </Card>
   );
 }
 
-const TONS_LECTURE = ['violet', 'mag', 'peach', 'green', 'blue', 'amber', 'indigo', 'cyan'] as const;
-
-/** `embedded` : affiché dans un onglet d'une page qui a déjà son titre (Bob › Brix AI MCP). */
-export default function ConnecterIA({ embedded = false }: { embedded?: boolean }) {
-  const { jetons, revoquerJeton } = useAchats();
-  const [ouvrir, setOuvrir] = useState(false);
-  const [aRevoquer, setARevoquer] = useState<string | null>(null);
-
+function Capacites() {
   return (
-    <div className="space-y-6">
-      {embedded ? (
-        <div className="flex justify-end"><Button variant="dawn" icon={<Plus className="h-4 w-4" />} onClick={() => setOuvrir(true)}>Créer un accès</Button></div>
-      ) : <PageHeader
-        icon={<IconTile icon={<Plug />} dept="bob" size="xl" />}
-        title="Connecter une IA à Brix"
-        subtitle="Posez vos questions à Claude, ChatGPT ou un autre assistant : il lit vos chiffres dans Brix et vous répond avec vos vraies données."
-        actions={<Button variant="dawn" icon={<Plus className="h-4 w-4" />} onClick={() => setOuvrir(true)}>Créer un accès</Button>}
-      />}
-
-      <Card className="halo-bg halo-clip relative overflow-hidden p-6 md:p-7">
-        <ol className="grid gap-5 md:grid-cols-3 md:gap-7">
-          {[
-            { t: 'Créez un accès', d: 'Brix vous donne une adresse personnelle, à copier une seule fois.' },
-            { t: 'Collez-la dans votre assistant', d: <>Dans Claude : <b className="font-medium text-ink">Réglages › Connecteurs › Ajouter un connecteur personnalisé</b>, puis collez l’adresse. Dans ChatGPT ou un autre assistant compatible MCP : ouvrez ses réglages de connecteurs et collez la même adresse.</> },
-            { t: 'Posez votre question', d: 'En français, comme à un associé. L’assistant va chercher la réponse dans Brix.' },
-          ].map((e, i) => (
-            <li key={i} className="flex gap-3.5">
-              <span className={cn('num grid h-8 w-8 shrink-0 place-items-center rounded-full text-[13px] font-semibold', i === 0 ? 'bg-dawn text-white shadow-[0_4px_12px_-3px_rgba(217,70,239,.6)]' : 'bg-pale-v text-deep-v')}>{i + 1}</span>
-              <div>
-                <div className="text-[15px] font-semibold tracking-[-0.02em]">{e.t}</div>
-                <p className="mt-1 text-[13px] leading-relaxed text-ink-2">{e.d}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </Card>
-
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 [&>*]:min-w-0">
-        <Card>
-          <CardHeader title="Vos accès" meta={jetons.length ? `${jetons.length}` : undefined} icon={<IconTile icon={<KeyRound />} tone="violet" size="sm" />} />
-          {jetons.length === 0 ? (
-            <div className="flex flex-col items-center px-4 py-10 text-center">
-              <IconTile icon={<KeyRound />} tone="neutral" size="lg" className="mb-3" />
-              <div className="text-[15px] font-semibold tracking-[-0.02em]">Aucun accès pour l’instant</div>
-              <p className="mx-auto mt-1 max-w-xs text-[12.5px] text-ink-2">Créez-en un pour relier votre assistant. Vous pourrez le couper à tout moment.</p>
-            </div>
-          ) : (
-            jetons.map((j) => (
-              <div key={j.id} className="flex min-h-[60px] items-center gap-3 border-b border-halo-line px-5 py-3 last:border-b-0">
-                <IconTile icon={<KeyRound />} tone="violet" size="row" />
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-[13.5px] font-medium">{j.nom}</div>
-                  <div className="truncate text-[11.5px] text-ink-3">
-                    <span className="font-mono">{j.prefixe}…</span> · créé le {dateShort(j.createdAt)}
-                    {j.derniereUtilisation ? ` · utilisé ${relative(j.derniereUtilisation)}` : ' · jamais utilisé'}
-                  </div>
-                </div>
-                {aRevoquer === j.id ? (
-                  <div className="flex shrink-0 gap-1">
-                    <Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => setARevoquer(null)}>Garder</Button>
-                    <Button size="sm" variant="danger" className="max-md:h-10" onClick={() => { revoquerJeton(j.id); setARevoquer(null); toast('Accès coupé : l’assistant ne peut plus rien lire', 'info'); }}>Couper</Button>
-                  </div>
-                ) : (
-                  <Button size="sm" variant="ghost" className="max-md:h-10" onClick={() => setARevoquer(j.id)}>Révoquer</Button>
-                )}
-              </div>
-            ))
-          )}
-        </Card>
-
-        <Card className="p-5 md:p-6">
-          <div className="flex items-start gap-3.5">
-            <IconTile icon={<ShieldCheck />} tone="green" />
-            <div>
-              <div className="text-[15px] font-semibold tracking-[-0.02em]">Lecture seule, toujours</div>
-              <p className="mt-1 text-[12.5px] leading-relaxed text-ink-2">
-                L’assistant peut lire, jamais modifier : il ne peut rien créer, rien supprimer, rien envoyer à vos clients ni à vos fournisseurs. Chaque accès se révoque en un clic et s’arrête immédiatement.
-              </p>
-            </div>
+    <section className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
+      <Card className="p-5">
+        <div className="flex items-center gap-3">
+          <IconTile icon={<Eye />} tone="blue" size="sm" />
+          <div>
+            <div className="text-[15px] font-semibold tracking-[-0.02em]">Ce que l’assistant peut lire</div>
+            <div className="text-[12.5px] text-ink-2">Uniquement les données de votre entreprise.</div>
           </div>
-          <div className="mt-5 text-[12.5px] font-medium text-ink-2">Essayez par exemple</div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {QUESTIONS.map((q) => (
-              <button key={q} onClick={() => void copier(q, 'Question copiée')} className="min-h-10 rounded-full bg-white px-3.5 py-1.5 text-left text-[12.5px] text-ink shadow-[0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:-translate-y-px hover:bg-pale-v hover:text-deep-v" title="Copier la question">
-                {`«\u00a0${q.replace(' ?', '\u00a0?')}\u00a0»`}
-              </button>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      <section>
-        <h2 className="text-[19px] font-semibold tracking-[-0.03em]">Ce que l’assistant peut lire</h2>
-        <p className="mt-0.5 text-[13px] text-ink-2">Uniquement les données de votre entreprise, rien d’autre.</p>
-        <ul className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {LECTURES.map((l, i) => (
-            <li key={l.t} className="row-card min-h-[56px] gap-3 px-3 py-2.5 text-[13px] font-medium">
-              <IconTile icon={l.icon} tone={TONS_LECTURE[i % TONS_LECTURE.length]} size="row" />
-              {l.t}
-            </li>
-          ))}
+        </div>
+        <ul className="mt-3 flex flex-wrap gap-1.5">
+          {LECTURES.map((l) => <li key={l}><Badge size="md">{l}</Badge></li>)}
         </ul>
-      </section>
+      </Card>
+      <Card className="p-5">
+        <div className="flex items-center gap-3">
+          <IconTile icon={<FilePen />} tone="violet" size="sm" />
+          <div>
+            <div className="text-[15px] font-semibold tracking-[-0.02em]">Ce qu’il peut préparer</div>
+            <div className="text-[12.5px] text-ink-2">Seulement si vous choisissez « Lecture et actions ».</div>
+          </div>
+        </div>
+        <ul className="mt-3 flex flex-wrap gap-1.5">
+          {ACTIONS.map((l) => <li key={l}><Badge size="md" tone="violet">{l}</Badge></li>)}
+        </ul>
+        <p className="mt-3 flex items-start gap-2 text-[12.5px] text-ink-2">
+          <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-ok" />
+          Rien n’est envoyé à vos clients, aucun paiement, aucune suppression : vous relisez et envoyez depuis Brix.
+        </p>
+      </Card>
+    </section>
+  );
+}
 
-      <CreerAcces open={ouvrir} onClose={() => setOuvrir(false)} />
+/** `embedded` : affiché dans une page qui a déjà son titre (Brix AI › Connecter une IA). */
+export default function ConnecterIA({ embedded = false }: { embedded?: boolean }) {
+  const s = useBrixAi();
+  const url = urlServeur();
+  return (
+    <div className={cn('space-y-6', !embedded && 'pt-2')}>
+      <Adresse url={url} actif={s.actif} onBasculer={(v) => void s.basculer(v)} demo={!s.cloud} />
+      {s.erreur && (
+        <div role="alert" className="flex flex-col gap-2 rounded-card-sm bg-pale-r px-4 py-3 text-[13px] text-deep-r sm:flex-row sm:items-center sm:justify-between">
+          {s.erreur}
+          <Button size="sm" variant="secondary" onClick={() => void s.recharger()}>Réessayer</Button>
+        </div>
+      )}
+      <Assistants url={url} />
+      <div className="grid gap-5 xl:grid-cols-[1.2fr_1fr] [&>*]:min-w-0">
+        <AccesListe acces={s.acces} chargement={s.chargement} onCouper={(id) => void s.couper(id)} demo={!s.cloud} />
+        <Journal lignes={s.journal} demo={!s.cloud} />
+      </div>
+      <Capacites />
+      <Card className="p-5">
+        <div className="text-[14.5px] font-semibold tracking-[-0.02em]">Essayez par exemple</div>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {QUESTIONS.map((q) => (
+            <button key={q} onClick={() => void copier(q, 'Question copiée')} className="min-h-10 rounded-full bg-white px-3.5 py-1.5 text-left text-[12.5px] text-ink shadow-[0_0_0_1px_#ece8f6] transition duration-300 ease-spring hover:-translate-y-px hover:bg-pale-v hover:text-deep-v" title="Copier la question">
+              {`« ${q.replace(' ?', ' ?')} »`}
+            </button>
+          ))}
+        </div>
+      </Card>
+      <Avance cloud={s.cloud} onCree={() => void s.recharger()} />
     </div>
   );
 }

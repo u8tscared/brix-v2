@@ -10,7 +10,7 @@ export interface TodayItem {
   kind: 'chantier' | 'devis' | 'argent' | 'demande' | 'equipe';
   title: string;
   sub: string;
-  /** Petite phrase de Bob (il tutoie). */
+  /** Petite phrase de Brix AI (il tutoie). */
   bob?: string;
   progress?: number;
   action: { label: string; icon: 'phone' | 'send' | 'open' | 'route'; run: () => void };

@@ -36,7 +36,7 @@ export async function createDepositLink(devis: Devis, amount: number): Promise<{
   return { url: `https://pay.brix.fr/${devis.number.toLowerCase()}?m=${Math.round(amount * 100)}` };
 }
 
-/** Question libre à Bob. Brancher : POST /api/bob/devis (Claude avec le contexte du devis). */
+/** Question libre à Brix AI. Brancher : POST /api/bob/devis (Claude avec le contexte du devis). */
 export async function askBob(): Promise<void> {
   await wait(650);
 }

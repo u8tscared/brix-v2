@@ -14,7 +14,8 @@ export type ModeleEmail =
   | 'demande_prix' // au fournisseur : demande de prix (lien portail)
   | 'commande_fournisseur' // au fournisseur : bon de commande (lien portail)
   | 'reponse_fournisseur' // à l'artisan : un fournisseur a répondu
-  | 'bienvenue'; // à l'artisan : bienvenue après inscription
+  | 'bienvenue' // à l'artisan : bienvenue après inscription
+  | 'mot_de_passe'; // à l'artisan : lien pour choisir un nouveau mot de passe
 
 /** Qui envoie (l'artisan, ou Brix pour les e-mails système). */
 export interface Emetteur {
@@ -88,6 +89,7 @@ export interface DonneesEmail {
   };
   reponse_fournisseur: { emetteur: Emetteur; fournisseur: string; reference: string; montantHt: number; delai: string; lienApp: string; meilleur: boolean };
   bienvenue: { prenom: string; entreprise: string; metier: string; lienApp: string; etapes: string[] };
+  mot_de_passe: { prenom: string; lien: string; minutes: number };
 }
 
 export interface RenduEmail {

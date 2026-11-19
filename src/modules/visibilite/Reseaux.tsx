@@ -40,18 +40,18 @@ export default function Reseaux() {
     const what = c.name.split('·')[1]?.trim() ?? c.name;
     upsertPost({ id: uid('p'), chantierId: c.id, text: `${capitalize(what)} à ${c.city} : un chantier propre, livré dans les temps. Merci à notre client pour sa confiance !`, networks: NETWORKS.filter((n) => accounts[n.key]).map((n) => n.key), status: 'pret', date: dayOffset(1) });
     setCreating(false);
-    toast('Bob a préparé la publication avec les photos du chantier');
+    toast('Brix AI a préparé la publication avec les photos du chantier');
   };
 
   return (
     <div className="space-y-5">
-      <PageHeader icon={<IconTile name="Share2" dept="visibilite" size="lg" />} title="Réseaux sociaux" titleMuted="vos chantiers parlent pour vous." subtitle="À chaque fin de chantier, Bob prépare un avant/après. Vous validez, c’est publié." actions={<Button variant="primary" icon={<Plus />} onClick={() => setCreating(true)}>Nouvelle publication</Button>} />
+      <PageHeader icon={<IconTile name="Share2" dept="visibilite" size="lg" />} title="Réseaux sociaux" titleMuted="vos chantiers parlent pour vous." subtitle="À chaque fin de chantier, Brix AI prépare un avant/après. Vous validez, c’est publié." actions={<Button variant="primary" icon={<Plus />} onClick={() => setCreating(true)}>Nouvelle publication</Button>} />
 
       <StatStrip>
         <Stat icon={<IconTile icon={<Eye />} tone="rose" size="row" />} label="Vues ce mois" value={<AnimatedNumber value={2340} />} sub="+38 % par rapport au mois dernier" />
         <Stat icon={<IconTile icon={<Images />} tone="peach" size="row" />} label="Publications" value={<AnimatedNumber value={done.length} />} sub={`${ready.length} en attente`} />
         <Stat icon={<IconTile name="Inbox" tone="violet" size="row" />} label="Demandes venues des réseaux" value={<AnimatedNumber value={3} />} sub="arrivées dans Demandes" />
-        <Stat icon={<IconTile name="Timer" tone="green" size="row" />} label="Temps passé" value="0 min" sub="Bob s’occupe de tout" />
+        <Stat icon={<IconTile name="Timer" tone="green" size="row" />} label="Temps passé" value="0 min" sub="Brix AI s’occupe de tout" />
       </StatStrip>
 
       <div className="grid gap-5 [&>*]:min-w-0 xl:grid-cols-[minmax(0,1fr)_340px]">
@@ -60,7 +60,7 @@ export default function Reseaux() {
           {ready.length ? (
             <div className="stagger grid gap-4 [&>*]:min-w-0 md:grid-cols-2">{ready.map((p) => <PostCard key={p.id} post={p} />)}</div>
           ) : (
-            <EmptyState icon={<Inbox />} title="Tout est publié" text="À la prochaine fin de chantier, Bob préparera un avant/après. Vous pouvez aussi en créer un maintenant." action={<Button icon={<Plus />} onClick={() => setCreating(true)}>Préparer une publication</Button>} />
+            <EmptyState icon={<Inbox />} title="Tout est publié" text="À la prochaine fin de chantier, Brix AI préparera un avant/après. Vous pouvez aussi en créer un maintenant." action={<Button icon={<Plus />} onClick={() => setCreating(true)}>Préparer une publication</Button>} />
           )}
           {done.length > 0 && (
             <>
@@ -78,7 +78,7 @@ export default function Reseaux() {
                 <span className={cn('grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[11px] transition-[background,color] duration-300', accounts[n.key] ? '' : 'bg-pale-n text-ink-3')} style={accounts[n.key] ? { background: `${n.color}1a`, color: n.color } : undefined}><n.icon className="h-4 w-4" strokeWidth={1.75} /></span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[13.5px] font-medium">{n.label}</span>
-                  <span className="block text-[11.5px] text-ink-3">{accounts[n.key] ? 'Relié, Bob peut publier' : 'Non relié'}</span>
+                  <span className="block text-[11.5px] text-ink-3">{accounts[n.key] ? 'Relié, Brix AI peut publier' : 'Non relié'}</span>
                 </span>
                 <Switch checked={!!accounts[n.key]} onChange={(on) => { setAccount(n.key, on); toast(on ? `${n.label} relié (démo)` : `${n.label} retiré`, on ? 'ok' : 'info'); }} label={n.label} />
               </div>
@@ -132,7 +132,7 @@ export default function Reseaux() {
         </div>
       </div>
 
-      <Sheet open={creating} onClose={() => setCreating(false)} title="Nouvelle publication" subtitle="Choisissez un chantier : Bob prend les photos avant/après et écrit le texte." footer={<><Button variant="ghost" onClick={() => setCreating(false)}>Annuler</Button><Button variant="primary" disabled={!pick} onClick={create}>Préparer la publication</Button></>}>
+      <Sheet open={creating} onClose={() => setCreating(false)} title="Nouvelle publication" subtitle="Choisissez un chantier : Brix AI prend les photos avant/après et écrit le texte." footer={<><Button variant="ghost" onClick={() => setCreating(false)}>Annuler</Button><Button variant="primary" disabled={!pick} onClick={create}>Préparer la publication</Button></>}>
         <div role="radiogroup" className="stagger-fast space-y-2 pt-1">
           {chantiers.map((c) => {
             const on = pick === c.id;

@@ -6,8 +6,8 @@ import { BrandTile } from '@/components/brand/Logo';
 import { cn } from '@/components/ui';
 import { money } from '@/lib/format';
 
-/** Bob prend la parole : carte claire qui rosit, logo B, texte au tutoiement + actions éventuelles. Calme, jamais d'étincelles. */
-export function BobSays({ children, actions, tone = 'calm', className, title = 'Bob' }: { children: ReactNode; actions?: ReactNode; tone?: 'calm' | 'warn'; className?: string; title?: ReactNode }) {
+/** Brix AI prend la parole : carte claire qui rosit, logo B, texte au tutoiement + actions éventuelles. Calme, jamais d'étincelles. */
+export function BobSays({ children, actions, tone = 'calm', className, title = 'Brix AI' }: { children: ReactNode; actions?: ReactNode; tone?: 'calm' | 'warn'; className?: string; title?: ReactNode }) {
   return (
     <div
       className={cn(
